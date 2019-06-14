@@ -45,22 +45,16 @@ elseif strcmp(system, 'fcOIS2')
 elseif strcmp(system, 'EastOIS1')
     Colors=[0 0 1; 1 1 0; 1 0.5 0; 1 0 0];
     TickLabels={'B', 'Y', 'O', 'R'};
+      legendName = {'blue LED', 'green LED', 'orange LED' 'red LED'};
 elseif strcmp(system, 'EastOIS1_Fluor')
     Colors = [0 0 1; 0 1 0; 1 0.5 0; 1 0 0];
     TickLabels = {'B','G','O', 'R' };
      legendName = {'green fluorescence', 'green LED', 'orange LED' 'red LED'};
 elseif strcmp(system, 'EastOIS2')
-    TickLabels = {'Fluor','G','R'};
-    if strcmp(mouseType,'jrgeco1a')
-    Colors = [0 0 0 ;0 1 0;1 0 0];
-    legendName = {'red fluorescence', 'green LED', 'red LED'};
-    elseif strcmp(mouseType,'gcamp6f')
-     Colors = [0 0.6 0 ;0 1 0;1 0 0];
-    legendName = {'green fluorescence', 'green LED', 'red LED'};
-    elseif strcmp(mouseType,'WT')
-    Colors = [0 1 0;1 0 0];
-    legendName = {'green LED', 'red LED'};
-    end
+    TickLabels = {'Blue_green','Blue_red''Green_red','G','R'};
+    Colors = [0 0 1;0 1 1; 1 0 1;0 1 0;1 0 0];
+    legendName = {'Blue Green fluorescence', 'Blue red fluorescence','Green red fluorescence','green LED', 'red LED'};
+
 end
 
 
@@ -115,7 +109,7 @@ if strcmp(system, 'fcOIS1')
 elseif strcmp(system, 'fcOIS2')||strcmp(system, 'EastOIS1')||strcmp(system, 'EastOIS1_Fluor')
     BlueChan=2;
 elseif strcmp(system, 'EastOIS2')
-    BlueChan = 2;
+    BlueChan = 4;
 end
 
 Im1=single(squeeze(rawdata(:,:,BlueChan,1)));
