@@ -7,9 +7,9 @@ excelFile = "D:\GCaMP\GCaMP_awake.xlsx";
 nVx = 128;
 nVy = 128;
 %
-excelRows = [72 76 78];
+excelRows = 163:164;
 
-% runs = 1:3;
+runs = 1:3;
 % for excelRow = excelRows
 %     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':R',num2str(excelRow)]);
 %     recDate = excelRaw{1}; recDate = string(recDate);
@@ -317,8 +317,13 @@ excelRows = [72 76 78];
 
 
 
+
+
+
+
+
 for excelRow = excelRows
-    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':R',num2str(excelRow)]);
+    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':U',num2str(excelRow)]);
     recDate = excelRaw{1}; recDate = string(recDate);
     mouseName = excelRaw{2}; mouseName = string(mouseName);
     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
@@ -328,292 +333,13 @@ for excelRow = excelRows
     info.nVy = 128;
     sessionInfo.mouseType = excelRaw{13};
     systemType =excelRaw{5};
-    maskName = strcat(recDate,'-',mouseName,'-LandmarksandMarks','.mat');
+    maskName = strcat(recDate,'-',mouseName,'-LandmarksandMask','.mat');
     load(fullfile(saveDir,maskName), 'isbrain','xform_isbrain');
     if ~isempty(find(isnan(xform_isbrain), 1))
         xform_isbrain(isnan(xform_isbrain))=0;
     end
     sessionInfo.framerate = excelRaw{7};
-    
-    for n = runs
-        visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
-        output = fullfile(saveDir,strcat(visName,'_RawDataVis.jpg'));
-        
-        if ~ exist(output,'file')
-            rawName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'.mat');
-            load(fullfile(saveDir,rawName),'combinedRaw')
-            disp(strcat('QC raw for ',rawName))
-            
-            QCcheck_raw(combinedRaw(:,:,:,(sessionInfo.darkFrameNum/4+1):end),isbrain,systemType,sessionInfo.framerate,saveDir,visName,sessionInfo.mouseType)
-        end
-        disp('loading processed data')
-        
-        processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
-        if strcmp(char(sessionInfo.mouseType),'gcamp6f')
-            load(fullfile(saveDir, processedName),'xform_datahb','xform_gcamp','xform_gcampCorr','sessionInfo')
-        elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
-            load(fullfile(saveDir, processedName),'xform_datahb','xform_jrgeco1a','xform_jrgeco1aCorr','sessionInfo')
-        end
-        
-        if strcmp(sessionType,'fc')
-            oxy = double(squeeze(xform_datahb(:,:,1,:)));
-            disp(char(['QC check on ', processedName]))
-            if strcmp(char(sessionInfo.mouseType),'gcamp6f')
-                gcampCorr = double(squeeze(xform_gcampCorr));
-                QCcheck_fc(oxy,gcampCorr,'gcamp',xform_isbrain, sessionInfo,saveDir,visName);
-            elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
-                
-                jrgeco1aCorr = double(squeeze(xform_jrgeco1aCorr));
-                QCcheck_fc(oxy,jrgeco1aCorr,'jrgeco1a',xform_isbrain, sessionInfo,saveDir,visName);
-            end
-        elseif strcmp(sessionType,'stim')
-            
-            sessionInfo.stimblocksize = excelRaw{8};
-            sessionInfo.stimbaseline=excelRaw{9};
-            sessionInfo.stimduration = excelRaw{10};
-            sessionInfo.stimFrequency = excelRaw{12};
-            info.newFreq = 8;
-            info.freqout=1;
-            info.bandtype = {"0.01Hz-8Hz",0.01,8};
-            
-            
-            
-            %
-            % [nVy, nVx, hem, T]=size(datahb);
-            % for h=1:hem;
-            %     for m=1:T;
-            %         xform_datahb_old(:,:,h,m)=Affine(I, datahb(:,:,h,m));
-            %     end
-            % end
-            %
-            %  xform_datahb_old=real(xform_datahb_old);
-            % load('J:\ProcessedData_3\GCaMP\181217\181217-G3M6-stim1-GSR-Detrend-0.01Hz-8Hz.mat','xform_datahb_bandpass_GSR')
-            
-            
-            
-            
-            
-            
-            %xform_datahb_bandpass=lowpass(xform_datahb_bandpass ,info.bandtype{3},info.newFreq);
-            if strcmp(char(sessionInfo.mouseType),'gcamp6f')
-                C = who('-file',fullfile(saveDir,processedName));
-                isBandPass = false;
-                for  k=1:length(C)
-                    if strcmp(C(k),'xform_green_GSR')
-                        isBandPass = true;
-                    end
-                end
-                if isBandPass
-                    load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_datahb_GSR','xform_gcamp_GSR','xform_gcampCorr_GSR','xform_green_GSR');
-                else
-                    xform_datahb_bandpass =highpass(xform_datahb,info.bandtype{2},sessionInfo.framerate);
-                    xform_datahb_bandpass =lowpass(xform_datahb_bandpass,info.bandtype{3},sessionInfo.framerate);
-                    rawName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'.mat');
-                    
-                    disp('loading raw data');
-                    if strcmp(systemType,'EastOIS2')
-                        
-                        load(fullfile(saveDir,rawName),'xform_raw')
-                    elseif strcmp(systemType,'EastOIS1_Fluor')
-                        load(fullfile(saveDir,rawName),'xform_raw');
-                    end
-                    xform_raw = double(mouse.expSpecific.procFluor(xform_raw));
-                    if ~isempty(find(isnan(xform_raw), 1))
-                        xform_raw(isnan(xform_raw))=0;
-                    end
-                    
-                    load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_gcamp','xform_gcampCorr')
-                    if ~isempty(find(isnan(xform_gcamp), 1))
-                        xform_gcamp(isnan(xform_gcamp))=0;
-                    end
-                    if ~isempty(find(isnan(xform_gcampCorr), 1))
-                        xform_gcampCorr(isnan(xform_gcampCorr))=0;
-                    end
-                    
-                    
-                    
-                    
-                    xform_gcamp_bandpass =highpass(double(xform_gcamp),info.bandtype{2},sessionInfo.framerate);
-                    xform_gcampCorr_bandpass =highpass(double(xform_gcampCorr),info.bandtype{2},sessionInfo.framerate);
-                    xform_green_bandpass =highpass(xform_raw(:,:,2,:),info.bandtype{2},sessionInfo.framerate);
-                    
-                    xform_gcamp_bandpass =lowpass(double(xform_gcamp_bandpass),info.bandtype{3},sessionInfo.framerate);
-                    xform_gcampCorr_bandpass =lowpass(double(xform_gcampCorr_bandpass),info.bandtype{3},sessionInfo.framerate);
-                    xform_green_bandpass =lowpass(xform_green_bandpass,info.bandtype{3},sessionInfo.framerate);
-                    %
-                    
-                    
-                    xform_datahb_GSR = mouse.preprocess.gsr(xform_datahb_bandpass,xform_isbrain);
-                    xform_gcamp_GSR = mouse.preprocess.gsr(xform_gcamp_bandpass,xform_isbrain);
-                    xform_gcampCorr_GSR = mouse.preprocess.gsr(xform_gcampCorr_bandpass,xform_isbrain);
-                    xform_green_GSR = mouse.preprocess.gsr(xform_green_bandpass,xform_isbrain);
-                    save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_datahb_GSR','xform_gcamp_GSR','xform_gcampCorr_GSR','xform_green_GSR','-append');
-                end
-            elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
-                C = who('-file',fullfile(saveDir,processedName));
-                isBandPass = false;
-                for  k=1:length(C)
-                    
-                    if strcmp(C(k),'xform_red_bandpass')
-                        isBandPass = true;
-                    end
-                end
-                if isBandPass
-                    %                     load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_datahb_bandpass','xform_jrgeco1a_bandpass','xform_jrgeco1aCorr_bandpass','xform_red_bandpass');
-                    
-                    load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_datahb_GSR','xform_jrgeco1a_GSR','xform_jrgeco1aCorr_GSR','xform_red_GSR');
-                else
-                    xform_datahb_bandpass =highpass(xform_datahb,info.bandtype{2},sessionInfo.framerate);
-                    xform_datahb_bandpass =lowpass(xform_datahb_bandpass,info.bandtype{3},sessionInfo.framerate);
-                    rawName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'.mat');
-                    
-                    disp('loading raw data');
-                    if strcmp(systemType,'EastOIS2')
-                        
-                        load(fullfile(saveDir,rawName),'xform_raw')
-                    elseif strcmp(systemType,'EastOIS1_Fluor')
-                        load(fullfile(saveDir,rawName),'xform_raw');
-                    end
-                    xform_red = double(mouse.expSpecific.procFluor(xform_raw(:,:,3,:)));
-                    if ~isempty(find(isnan(xform_red), 1))
-                        xform_red(isnan(xform_red))=0;
-                    end
-                    
-                    load(strcat('J:\ProcessedData_2\Zyla\',recDate,'\',recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat'),'xform_jrgeco1a','xform_jrgeco1aCorr')
-                    if ~isempty(find(isnan(xform_jrgeco1a), 1))
-                        xform_jrgeco1a(isnan(xform_jrgeco1a))=0;
-                    end
-                    if ~isempty(find(isnan(xform_jrgeco1aCorr), 1))
-                        xform_jrgeco1aCorr(isnan(xform_jrgeco1aCorr))=0;
-                    end
-                    
-                    xform_jrgeco1a_bandpass =highpass(double(xform_jrgeco1a),info.bandtype{2},sessionInfo.framerate);
-                    xform_jrgeco1aCorr_bandpass =highpass(double(xform_jrgeco1aCorr),info.bandtype{2},sessionInfo.framerate);
-                    xform_red_bandpass =highpass(xform_red,info.bandtype{2},sessionInfo.framerate);
-                    xform_jrgeco1a_bandpass =lowpass(double(xform_jrgeco1a_bandpass),info.bandtype{3},sessionInfo.framerate);
-                    xform_jrgeco1aCorr_bandpass =lowpass(double(xform_jrgeco1aCorr_bandpass),info.bandtype{3},sessionInfo.framerate);
-                    xform_red_bandpass =lowpass(xform_red_bandpass,info.bandtype{3},sessionInfo.framerate);
-                    save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_datahb_bandpass','xform_jrgeco1a_bandpass','xform_jrgeco1aCorr_bandpass','xform_red_bandpass','-append');
-                    %
-                    
-                    xform_datahb_GSR = mouse.preprocess.gsr(xform_datahb_bandpass,xform_isbrain);
-                    xform_jrgeco1a_GSR = mouse.preprocess.gsr(xform_jrgeco1a_bandpass,xform_isbrain);
-                    xform_jrgeco1aCorr_GSR = mouse.preprocess.gsr(xform_jrgeco1aCorr_bandpass,xform_isbrain);
-                    xform_red_GSR = mouse.preprocess.gsr(xform_red_bandpass,xform_isbrain);
-                    save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_datahb_GSR','xform_jrgeco1a_GSR','xform_jrgeco1aCorr_GSR','xform_red_GSR','-append');
-                end
-            end
-            %
-            %
-            % if ~isempty(find(isnan(xform_datahb_bandpass_GSR), 1))
-            %     xform_datahb_bandpass_GSR(isnan(xform_datahb_bandpass_GSR))=0;
-            %     disp(strcat(tiffFileName,'xform_datahb_bandpass_GSR has NAN'));
-            % end
-            %
-            %
-            %
-            
-            
-            
-            oxy_GSR = double(squeeze(xform_datahb_GSR(:,:,1,:)));
-            deoxy_GSR = double(squeeze(xform_datahb_GSR(:,:,2,:)));
-            total_GSR = double(oxy_GSR+deoxy_GSR);
-            
-            clear xform_datahb_bandpass xform_datahb_GSR
-            if strcmp(char(sessionInfo.mouseType),'gcamp6f')
-                gcamp = double(squeeze(xform_gcamp_GSR(:,:,1,:)));
-                gcampCorr = double(squeeze(xform_gcampCorr_GSR(:,:,1,:)));
-                green = double(squeeze(xform_green_GSR(:,:,1,:)));
-            elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
-                jrgeco1a_GSR = double(squeeze(xform_jrgeco1a_GSR(:,:,1,:)));
-                jrgeco1aCorr_GSR = double(squeeze(xform_jrgeco1aCorr_GSR(:,:,1,:)));
-                red_GSR = double(squeeze(xform_red_GSR(:,:,1,:)));
-                
-                clear xform_jrgeco1a_bandpass xform_jrgeco1aCorr_bandpass xform_jrgeco1a_GSR xform_jrgeco1aCorr_GSR
-            end
-            
-            
-            xform_isbrain = double(xform_isbrain);
-            
-            oxy_GSR = oxy_GSR.*xform_isbrain;
-            deoxy_GSR = deoxy_GSR.*xform_isbrain;
-            total_GSR = total_GSR .*xform_isbrain;
-            
-            oxy_GSR(isnan(oxy_GSR)) = 0;
-            deoxy_GSR(isnan(deoxy_GSR)) = 0;
-            total_GSR(isnan(total_GSR)) = 0;
-            
-            
-            if strcmp(char(sessionInfo.mouseType),'gcamp6f')
-                gcamp = gcamp.*xform_isbrain;
-                gcampCorr = gcampCorr.*xform_isbrain;
-                green = green.*xform_isbrain;
-            elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
-                jrgeco1a_GSR = jrgeco1a_GSR.*xform_isbrain;
-                jrgeco1aCorr_GSR = jrgeco1aCorr_GSR.*xform_isbrain;
-                red_GSR = red_GSR.*xform_isbrain;
-            end
-            
-            R=mod(size(oxy_GSR,3),sessionInfo.stimblocksize);
-            if R~=0
-                pad=sessionInfo.stimblocksize-R;
-                disp(strcat('** Non integer number of blocks presented. Padded ', processedDataName, num2str(run), ' with '," ", num2str(pad), ' zeros **'))
-                oxy_GSR(:,:,end:end+pad)=0;
-                deoxy_GSR(:,:,end:end+pad)=0;
-                total_GSR(:,:,end:end+pad)=0;
-                if strcmp(char(sessionInfo.mouseType),'gcamp6f')
-                    gcamp_GSR(:,:,end:end+pad)=0;
-                    gcampCorr_GSR(:,:,end:end+pad)=0;
-                    green_GSR(:,:,end:end+pad)=0;
-                elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
-                    jrgeco1a_GSR(:,:,end:end+pad)=0;
-                    jrgeco1aCorr_GSR(:,:,end:end+pad)=0;
-                    red_GSR(:,:,end:end+pad)=0;
-                end
-                
-            end
-            % Block Average
-            texttitle_GSR = strcat(' Block Average for', "  " ,mouseName,'-stim',num2str(n)," ",'with GSR');
-            output_GSR= fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n)),'_GSR');
-            
-            if strcmp(char(sessionInfo.mouseType),'gcamp6f')
-                fluor.traceImagePlot_gcamp(oxy,deoxy,total,gcamp,gcampCorr,green,info,sessionInfo,output,texttitle)
-                close all
-                
-            elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
-                maskName = strcat(recDate,'-',mouseName,'-LandmarksandMarks','.mat');
-                load(fullfile(saveDir,maskName), 'xform_isbrain','isbrain')
-                
-                fluor.traceImagePlot_rgeco(oxy_GSR,deoxy_GSR,total_GSR,jrgeco1a_GSR,jrgeco1aCorr_GSR,red_GSR,info,sessionInfo,output_GSR,texttitle_GSR,xform_isbrain)
-                fluor.traceImagePlot_rgeco(oxy_noGSR,deoxy_noGSR,total_noGSR,jrgeco1a_noGSR,jrgeco1aCorr_noGSR,red_noGSR,info,sessionInfo,output_noGSR,texttitle_noGSR,xform_isbrain)
-                close all
-            end
-        end
-    end
-end
-
-
-
-
-
-for excelRow = excelRows
-    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':R',num2str(excelRow)]);
-    recDate = excelRaw{1}; recDate = string(recDate);
-    mouseName = excelRaw{2}; mouseName = string(mouseName);
-    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-    sessionInfo.darkFrameNum = excelRaw{11};
-    info.nVx = 128;
-    info.nVy = 128;
-    sessionInfo.mouseType = excelRaw{13};
-    systemType =excelRaw{5};
-    maskName = strcat(recDate,'-',mouseName,'-LandmarksandMarks','.mat');
-    load(fullfile(saveDir,maskName), 'isbrain','xform_isbrain');
-    if ~isempty(find(isnan(xform_isbrain), 1))
-        xform_isbrain(isnan(xform_isbrain))=0;
-    end
-    sessionInfo.framerate = excelRaw{7};
-    
+    systemInfo.numLEDs = 4;
     
     if strcmp(systemType,'EastOIS2')
         
@@ -644,7 +370,7 @@ for excelRow = excelRows
         xform_isbrain(isnan(xform_isbrain))=0;
     end
     for n = runs
-        
+        visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
         output = fullfile(saveDir,strcat(visName,'_RawDataVis.jpg'));
         
         if ~ exist(output,'file')
@@ -656,11 +382,8 @@ for excelRow = excelRows
         end
         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
         output = fullfile(saveDir,strcat(visName,'_RawDataVis.jpg'));
-        if isDetrend
-            processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
-        else
-            processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_NoDetrend','.mat');
-        end
+        
+        processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
         if exist(fullfile(saveDir, processedName),'file')
             disp('loading processed data')
             
@@ -728,18 +451,18 @@ for excelRow = excelRows
                 info.newFreq = 8;
                 info.freqout=1;
                 %info.bandtype = {"0.01Hz-8Hz",0.01,8};
-                if ~isempty(excelRaw(20))
-                    fileName_cam1 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'.mat');
-                    load(fullfile(rawdataloc,recDate,fileName_cam1));
-                    startInd = sessionInfo.darkFrameNum/systemInfo.numLEDs/sessionInfo.framerate*excelRaw{20};
-                    time = timeStamps(startInd+1:end);
-                    darkTime = timeStamps(startInd);
-                    input_stimbox = data(startInd+1:end);
-                    time = time(1:end/4)-darkTime;
-                    input_stimbox = input_stimbox(1:end/4);
-                    [~,locs] = findpeaks(input_stimbox,'MinPeakHeight',4.5);
-                    sessionInfo.stimbaseline = round(time(locs(1))*sessionInfo.framerate);
-                end
+                %                 if ~isempty(excelRaw(20))
+                %                     fileName_cam1 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'.mat');
+                %                     load(fullfile(saveDir,fileName_cam1));
+                %                     startInd = sessionInfo.darkFrameNum/systemInfo.numLEDs/sessionInfo.framerate*excelRaw{20};
+                %                     time = timeStamps(startInd+1:end);
+                %                     darkTime = timeStamps(startInd);
+                %                     input_stimbox = data(startInd+1:end);
+                %                     time = time(1:end/4)-darkTime;
+                %                     input_stimbox = input_stimbox(1:end/4);
+                %                     [~,locs] = findpeaks(input_stimbox,'MinPeakHeight',4.5);
+                %                     sessionInfo.stimbaseline = round(time(locs(1))*sessionInfo.framerate);
+                %                 end
                 isGSR = false;
                 C = who('-file',fullfile(saveDir,processedName));
                 for  k=1:length(C)
@@ -753,7 +476,12 @@ for excelRow = excelRows
                     if strcmp(char(sessionInfo.mouseType),'gcamp6f')
                         disp('loading GRS data')
                         load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_gcamp_GSR','xform_gcampCorr_GSR','xform_green_GSR')
+                    elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
+                        disp('loading GRS data')
+                        load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_jrgeco1a_GSR','xform_jrgeco1aCorr_GSR','xform_red_GSR')
                     end
+                    
+                    
                 else
                     
                     load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_datahb')
@@ -841,7 +569,7 @@ for excelRow = excelRows
                 elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
                     jrgeco1a_GSR = jrgeco1a_GSR.*xform_isbrain;
                     jrgeco1aCorr_GSR = jrgeco1aCorr_GSR.*xform_isbrain;
-                    green_GSR = green_GSR.*xform_isbrain;
+                    red_GSR = red_GSR.*xform_isbrain;
                 end
             end
             oxy_GSR(isnan(oxy_GSR)) = 0;
@@ -880,7 +608,7 @@ for excelRow = excelRows
             if strcmp(char(sessionInfo.mouseType),'gcamp6f')
                 [oxy_downsampled_GSR,deoxy_downsampled_GSR,total_downsampled_GSR,goodBlocks_GSR,temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,stimStartTime,stimEndTime,~,~,~, gcampCorr_downsampled_GSR,gcamp_downsampled_GSR, temp_gcampCorr_max_GSR] = fluor.pickGoodBlocks(double(oxy_GSR),double(deoxy_GSR),double(total_GSR),info.freqout,sessionInfo,output_GSR,texttitle_GSR,'gcampCorr',double(gcampCorr_GSR),'gcamp',double(gcamp_GSR));
             elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
-                [oxy_downsampled_GSR,deoxy_downsampled_GSR,total_downsampled_GSR,goodBlocks_GSR,temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,stimStartTime,stimEndTime,~,~,~, jrgeco1aCorr_downsampled_GSR,jrgeco1a_downsampled_GSR, temp_jrgeco1aCorr_max_GSR] = fluor.pickGoodBlocks(double(oxy_GSR),double(deoxy_GSR),double(total_GSR),info.freqout,sessionInfo,output_GSR,texttitle_GSR,'jrgeco1aCorr',double(jrgeco1aCorr_GSR),'jrgeco1a',double(jrgeco1a_GSR));
+                [oxy_downsampled_GSR,deoxy_downsampled_GSR,total_downsampled_GSR,goodBlocks_GSR,temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,stimStartTime,stimEndTime,jrgeco1aCorr_downsampled_GSR,jrgeco1a_downsampled_GSR, temp_jrgeco1aCorr_max_GSR,~,~,~] = fluor.pickGoodBlocks(double(oxy_GSR),double(deoxy_GSR),double(total_GSR),info.freqout,sessionInfo,output_GSR,texttitle_GSR,'jrgeco1aCorr',double(jrgeco1aCorr_GSR),'jrgeco1a',double(jrgeco1a_GSR));
                 
             elseif strcmp(char(sessionInfo.mouseType),'WT')
                 [oxy_downsampled_GSR,deoxy_downsampled_GSR,total_downsampled_GSR,goodBlocks_GSR,temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,stimStartTime,stimEndTime] = fluor.pickGoodBlocks(oxy_GSR,deoxy_GSR,total_GSR,info.freqout,sessionInfo,output_GSR,texttitle_GSR);
@@ -908,7 +636,7 @@ for excelRow = excelRows
                     jrgeco1aCorr_blocks_downsampled = mean(jrgeco1aCorr_downsampled_GSR(:,:,:,goodBlocks_GSR),4);
                     jrgeco1a_blocks_downsampled = mean(jrgeco1a_downsampled_GSR(:,:,:,goodBlocks_GSR),4);
                     
-                    [ROI_total,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim,~,~,ROI_jrgeco1aCorr,Avgjrgeco1aCorr_stim] = fluor.generatePeakMapandROI(oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,stimStartTime,stimEndTime,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_blocks_downsampled,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_GSR);
+                    [ROI_total,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim,ROI_jrgeco1aCorr,Avgjrgeco1aCorr_stim,~,~] = fluor.generatePeakMapandROI(oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,stimStartTime,stimEndTime,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_blocks_downsampled,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_GSR);
                     
                 elseif strcmp(char(sessionInfo.mouseType),'WT')
                     [ROI_total,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim] = fluor.generatePeakMapandROI(oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,stimStartTime,stimEndTime);
@@ -931,57 +659,58 @@ for excelRow = excelRows
                     gcampCorr_blocks_GSR = mean(gcampCorr_GSR(:,:,:,goodBlocks_GSR),4);
                     gcamp_blocks_GSR = mean(gcamp_GSR(:,:,:,goodBlocks_GSR),4);
                     green_blocks_GSR = mean(green_GSR(:,:,:,goodBlocks_GSR),4);
+%                                         if isnan(excelRaw(20))
+                        fluor.traceImagePlot(oxy_blocks_GSR,deoxy_blocks_GSR,total_blocks_GSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_GSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,sessionInfo,output_GSR,texttitle_GSR,'gcampCorr_blocks',gcampCorr_blocks_GSR,'gcampCorr_blocks_downsampled',gcampCorr_blocks_downsampled,'temp_gcampCorr_max',temp_gcampCorr_max_GSR,'AvggcampCorr_stim',AvggcampCorr_stim,'ROI_gcampCorr',ROI_gcampCorr,'gcamp_blocks_downsampled',gcamp_blocks_downsampled,'gcamp_blocks',gcamp_blocks_GSR,'green_blocks',green_blocks_GSR,'xform_isbrain',xform_isbrain)
+%                     else
+%                         fluor.traceImagePlot(oxy_blocks_GSR,deoxy_blocks_GSR,total_blocks_GSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_GSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,sessionInfo,output_GSR,texttitle_GSR,'gcampCorr_blocks',gcampCorr_blocks_GSR,'gcampCorr_blocks_downsampled',gcampCorr_blocks_downsampled,'temp_gcampCorr_max',temp_gcampCorr_max_GSR,'AvggcampCorr_stim',AvggcampCorr_stim,'ROI_gcampCorr',ROI_gcampCorr,'gcamp_blocks_downsampled',gcamp_blocks_downsampled,'gcamp_blocks',gcamp_blocks_GSR,'green_blocks',green_blocks_GSR,'xform_isbrain',xform_isbrain,'time',time,'input',input_stimbox)
+%                     end
                 elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
                     jrgeco1aCorr_GSR = reshape(jrgeco1aCorr_GSR,size(oxy_GSR,1),size(oxy_GSR,2),[],numBlock);
                     jrgeco1a_GSR = reshape(jrgeco1a_GSR,size(deoxy_GSR,1),size(deoxy_GSR,2),[],numBlock);
-                    green_GSR = reshape(green_GSR,size(deoxy_GSR,1),size(deoxy_GSR,2),[],numBlock);
+                    red_GSR = reshape(red_GSR,size(deoxy_GSR,1),size(deoxy_GSR,2),[],numBlock);
                     jrgeco1aCorr_blocks_GSR = mean(jrgeco1aCorr_GSR(:,:,:,goodBlocks_GSR),4);
                     jrgeco1a_blocks_GSR = mean(jrgeco1a_GSR(:,:,:,goodBlocks_GSR),4);
-                    green_blocks_GSR = mean(green_GSR(:,:,:,goodBlocks_GSR),4);
+                   red_blocks_GSR = mean(red_GSR(:,:,:,goodBlocks_GSR),4);
                     
-                    if isempty(excelRaw(20))
-                        fluor.traceImagePlot(oxy_blocks_GSR,deoxy_blocks_GSR,total_blocks_GSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_GSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,sessionInfo,output_GSR,texttitle_GSR,'jrgeco1aCorr_blocks',jrgeco1aCorr_blocks_GSR,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_blocks_downsampled,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_GSR,'Avgjrgeco1aCorr_stim',Avgjrgeco1aCorr_stim,'ROI_jrgeco1aCorr',ROI_jrgeco1aCorr,'jrgeco1a_blocks_downsampled',jrgeco1a_blocks_downsampled,'jrgeco1a_blocks',jrgeco1a_blocks_GSR,'green_blocks',green_blocks_GSR,'xform_isbrain',xform_isbrain)
-                    else
-                        fluor.traceImagePlot(oxy_blocks_GSR,deoxy_blocks_GSR,total_blocks_GSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_GSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,sessionInfo,output_GSR,texttitle_GSR,'jrgeco1aCorr_blocks',jrgeco1aCorr_blocks_GSR,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_blocks_downsampled,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_GSR,'Avgjrgeco1aCorr_stim',Avgjrgeco1aCorr_stim,'ROI_jrgeco1aCorr',ROI_jrgeco1aCorr,'jrgeco1a_blocks_downsampled',jrgeco1a_blocks_downsampled,'jrgeco1a_blocks',jrgeco1a_blocks_GSR,'green_blocks',green_blocks_GSR,'xform_isbrain',xform_isbrain,'time',time,'input',input_stimbox)
-                    end
-                    if isempty(excelRaw(20))
-                        fluor.traceImagePlot(oxy_blocks_GSR,deoxy_blocks_GSR,total_blocks_GSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_GSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,sessionInfo,output_GSR,texttitle_GSR,'gcampCorr_blocks',gcampCorr_blocks_GSR,'gcampCorr_blocks_downsampled',gcampCorr_blocks_downsampled,'temp_gcampCorr_max',temp_gcampCorr_max_GSR,'AvggcampCorr_stim',AvggcampCorr_stim,'ROI_gcampCorr',ROI_gcampCorr,'gcamp_blocks_downsampled',gcamp_blocks_downsampled,'gcamp_blocks',gcamp_blocks_GSR,'green_blocks',green_blocks_GSR,'xform_isbrain',xform_isbrain)
-                    else
-                        fluor.traceImagePlot(oxy_blocks_GSR,deoxy_blocks_GSR,total_blocks_GSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_GSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,sessionInfo,output_GSR,texttitle_GSR,'gcampCorr_blocks',gcampCorr_blocks_GSR,'gcampCorr_blocks_downsampled',gcampCorr_blocks_downsampled,'temp_gcampCorr_max',temp_gcampCorr_max_GSR,'AvggcampCorr_stim',AvggcampCorr_stim,'ROI_gcampCorr',ROI_gcampCorr,'gcamp_blocks_downsampled',gcamp_blocks_downsampled,'gcamp_blocks',gcamp_blocks_GSR,'green_blocks',green_blocks_GSR,'xform_isbrain',xform_isbrain,'time',time,'input',input_stimbox)
-                    end
+%                     if isnan(excelRaw(20))
+                        fluor.traceImagePlot(oxy_blocks_GSR,deoxy_blocks_GSR,total_blocks_GSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_GSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,sessionInfo,output_GSR,texttitle_GSR,'jrgeco1aCorr_blocks',jrgeco1aCorr_blocks_GSR,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_blocks_downsampled,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_GSR,'Avgjrgeco1aCorr_stim',Avgjrgeco1aCorr_stim,'ROI_jrgeco1aCorr',ROI_jrgeco1aCorr,'jrgeco1a_blocks_downsampled',jrgeco1a_blocks_downsampled,'jrgeco1a_blocks',jrgeco1a_blocks_GSR,'red_blocks',red_blocks_GSR,'xform_isbrain',xform_isbrain)
+%                     else
+%                         fluor.traceImagePlot(oxy_blocks_GSR,deoxy_blocks_GSR,total_blocks_GSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_GSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,sessionInfo,output_GSR,texttitle_GSR,'jrgeco1aCorr_blocks',jrgeco1aCorr_blocks_GSR,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_blocks_downsampled,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_GSR,'Avgjrgeco1aCorr_stim',Avgjrgeco1aCorr_stim,'ROI_jrgeco1aCorr',ROI_jrgeco1aCorr,'jrgeco1a_blocks_downsampled',jrgeco1a_blocks_downsampled,'jrgeco1a_blocks',jrgeco1a_blocks_GSR,'green_blocks',green_blocks_GSR,'xform_isbrain',xform_isbrain,'time',time,'input',input_stimbox)
+%                     end
+
                 elseif strcmp(char(sessionInfo.mouseType),'WT')
                     fluor.traceImagePlot(oxy_blocks_GSR,deoxy_blocks_GSR,total_blocks_GSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_GSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,sessionInfo,output_GSR,texttitle_GSR,'ROI_total',ROI_total)
                 end
-                
-                load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_datahb')
-                
-                %% No GSR
-                oxy_NoGSR = double(squeeze(xform_datahb(:,:,1,:)));
-                deoxy_NoGSR = double(squeeze(xform_datahb(:,:,2,:)));
-                clear xform_datahb
-                total_NoGSR = double(oxy_NoGSR+deoxy_NoGSR);
-                
-                
-                if strcmp(char(sessionInfo.mouseType),'gcamp6f')
-                    load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_gcamp','xform_gcampCorr','xform_green')
-                    
-                    gcamp_NoGSR = double(xform_gcamp);
-                    clear xform_gcamp
-                    gcampCorr_NoGSR = double(xform_gcampCorr);
-                    clear xform_gcampCorr
-                    green_NoGSR = double(xform_green);
-                    clear xform_green
-                elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
-                    load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_jrgeco1a','xform_jrgeco1aCorr','xform_red')
-                    
-                    jrgeco1a_NoGSR = double(xform_jrgeco1a);
-                    clear xform_jrgeco1a
-                    jrgeco1aCorr_NoGSR = double(xform_jrgeco1aCorr);
-                    clear xform_jrgeco1aCorr
-                    red_NoGSR = double(xform_red);
-                    clear xform_red
-                end
             end
+            load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_datahb')
+            
+            %% No GSR
+            oxy_NoGSR = double(squeeze(xform_datahb(:,:,1,:)));
+            deoxy_NoGSR = double(squeeze(xform_datahb(:,:,2,:)));
+            clear xform_datahb
+            total_NoGSR = double(oxy_NoGSR+deoxy_NoGSR);
+            
+            
+            if strcmp(char(sessionInfo.mouseType),'gcamp6f')
+                load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_gcamp','xform_gcampCorr','xform_green')
+                
+                gcamp_NoGSR = double(xform_gcamp);
+                clear xform_gcamp
+                gcampCorr_NoGSR = double(xform_gcampCorr);
+                clear xform_gcampCorr
+                green_NoGSR = double(xform_green);
+                clear xform_green
+            elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
+                load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_jrgeco1a','xform_jrgeco1aCorr','xform_red')
+                
+                jrgeco1a_NoGSR = double(xform_jrgeco1a);
+                clear xform_jrgeco1a
+                jrgeco1aCorr_NoGSR = double(xform_jrgeco1aCorr);
+                clear xform_jrgeco1aCorr
+                red_NoGSR = double(xform_red);
+                clear xform_red
+            end
+            
             xform_isbrain = double(xform_isbrain);
             
             oxy_NoGSR = oxy_NoGSR.*xform_isbrain;
@@ -997,119 +726,117 @@ for excelRow = excelRows
                 jrgeco1aCorr_NoGSR = jrgeco1aCorr_NoGSR.*xform_isbrain;
                 red_NoGSR = red_NoGSR.*xform_isbrain;
             end
-        end
-        oxy_NoGSR(isnan(oxy_NoGSR)) = 0;
-        deoxy_NoGSR(isnan(deoxy_NoGSR)) = 0;
-        total_NoGSR(isnan(total_NoGSR)) = 0;
-        
-        
-        
-        R=mod(size(oxy_NoGSR,3),sessionInfo.stimblocksize);
-        if R~=0
-            pad=sessionInfo.stimblocksize-R;
-            disp(strcat('** Non integer number of blocks presented. Padded ', processedDataName, num2str(run), ' with '," ", num2str(pad), ' zeros **'))
-            oxy_NoGSR(:,:,end:end+pad)=0;
-            deoxy_NoGSR(:,:,end:end+pad)=0;
-            total_NoGSR(:,:,end:end+pad)=0;
             
-            if strcmp(char(sessionInfo.mouseType),'gcamp6f')
-                gcamp_NoGSR(:,:,end:end+pad)=0;
-                gcampCorr_NoGSR(:,:,end:end+pad)=0;
+            oxy_NoGSR(isnan(oxy_NoGSR)) = 0;
+            deoxy_NoGSR(isnan(deoxy_NoGSR)) = 0;
+            total_NoGSR(isnan(total_NoGSR)) = 0;
+            
+            
+            
+            R=mod(size(oxy_NoGSR,3),sessionInfo.stimblocksize);
+            if R~=0
+                pad=sessionInfo.stimblocksize-R;
+                disp(strcat('** Non integer number of blocks presented. Padded ', processedDataName, num2str(run), ' with '," ", num2str(pad), ' zeros **'))
+                oxy_NoGSR(:,:,end:end+pad)=0;
+                deoxy_NoGSR(:,:,end:end+pad)=0;
+                total_NoGSR(:,:,end:end+pad)=0;
                 
-            elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
-                jrgeco1a_NoGSR(:,:,end:end+pad)=0;
-                jrgeco1aCorr_NoGSR(:,:,end:end+pad)=0;
-                
+                if strcmp(char(sessionInfo.mouseType),'gcamp6f')
+                    gcamp_NoGSR(:,:,end:end+pad)=0;
+                    gcampCorr_NoGSR(:,:,end:end+pad)=0;
+                    
+                elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
+                    jrgeco1a_NoGSR(:,:,end:end+pad)=0;
+                    jrgeco1aCorr_NoGSR(:,:,end:end+pad)=0;
+                    
+                end
             end
-        end
-        
-        
-        %             oxy_NoGSR = reshape(oxy_NoGSR,128,128,[],10);
-        %             deoxy_NoGSR = reshape(deoxy_NoGSR,128,128,[],10);
-        %             total_NoGSR = reshape(total_NoGSR,128,128,[],10);
-        
-        
-        % Block Average
-        texttitle_NoGSR = strcat(mouseName,'-stim',num2str(n)," ",'without GSR');
-        output_NoGSR= fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_NoGSR'));
-        
-        if strcmp(char(sessionInfo.mouseType),'gcamp6f')
-            [oxy_downsampled_NoGSR,deoxy_downsampled_NoGSR,total_downsampled_NoGSR,goodBlocks_NoGSR,temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,stimStartTime,stimEndTime,~,~,~, gcampCorr_downsampled_NoGSR,gcamp_downsampled_NoGSR, temp_gcampCorr_max_NoGSR] = fluor.pickGoodBlocks(double(oxy_NoGSR),double(deoxy_NoGSR),double(total_NoGSR),info.freqout,sessionInfo,output_NoGSR,texttitle_NoGSR,'gcampCorr',double(gcampCorr_NoGSR),'gcamp',double(gcamp_NoGSR));
-        elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
-            [oxy_downsampled_NoGSR,deoxy_downsampled_NoGSR,total_downsampled_NoGSR,goodBlocks_NoGSR,temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,stimStartTime,stimEndTime,~,~,~, jrgeco1aCorr_downsampled_NoGSR,jrgeco1a_downsampled_NoGSR, temp_jrgeco1aCorr_max_NoGSR] = fluor.pickGoodBlocks(double(oxy_NoGSR),double(deoxy_NoGSR),double(total_NoGSR),info.freqout,sessionInfo,output_NoGSR,texttitle_NoGSR,'jrgeco1aCorr',double(jrgeco1aCorr_NoGSR),'jrgeco1a',double(jrgeco1a_NoGSR));
             
-        elseif strcmp(char(sessionInfo.mouseType),'WT')
-            [oxy_downsampled_NoGSR,deoxy_downsampled_NoGSR,total_downsampled_NoGSR,goodBlocks_NoGSR,temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,stimStartTime,stimEndTime] = fluor.pickGoodBlocks(oxy_NoGSR,deoxy_NoGSR,total_NoGSR,info.freqout,sessionInfo,output_NoGSR,texttitle_NoGSR);
-        end
-        save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'goodBlocks_NoGSR','-append')
-        
-        if ~isempty(goodBlocks_NoGSR)
             
-            %block average
-            oxy_blocks_downsampled = mean(oxy_downsampled_NoGSR(:,:,:,goodBlocks_NoGSR),4);
-            deoxy_blocks_downsampled = mean(deoxy_downsampled_NoGSR(:,:,:,goodBlocks_NoGSR),4);
-            total_blocks_downsampled = mean(total_downsampled_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+            %             oxy_NoGSR = reshape(oxy_NoGSR,128,128,[],10);
+            %             deoxy_NoGSR = reshape(deoxy_NoGSR,128,128,[],10);
+            %             total_NoGSR = reshape(total_NoGSR,128,128,[],10);
             
+            
+            % Block Average
+            texttitle_NoGSR = strcat(mouseName,'-stim',num2str(n)," ",'without GSR');
+            output_NoGSR= fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_NoGSR'));
             
             if strcmp(char(sessionInfo.mouseType),'gcamp6f')
-                gcampCorr_blocks_downsampled = mean(gcampCorr_downsampled_NoGSR(:,:,:,goodBlocks_NoGSR),4);
-                gcamp_blocks_downsampled = mean(gcamp_downsampled_NoGSR(:,:,:,goodBlocks_NoGSR),4);
-                [ROI_total,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim,~,~,ROI_gcampCorr,AvggcampCorr_stim] = fluor.generatePeakMapandROI(oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,stimStartTime,stimEndTime,'gcampCorr_blocks_downsampled',gcampCorr_blocks_downsampled,'temp_gcampCorr_max',temp_gcampCorr_max_NoGSR);
+                [oxy_downsampled_NoGSR,deoxy_downsampled_NoGSR,total_downsampled_NoGSR,goodBlocks_NoGSR,temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,stimStartTime,stimEndTime,~,~,~, gcampCorr_downsampled_NoGSR,gcamp_downsampled_NoGSR, temp_gcampCorr_max_NoGSR] = fluor.pickGoodBlocks(double(oxy_NoGSR),double(deoxy_NoGSR),double(total_NoGSR),info.freqout,sessionInfo,output_NoGSR,texttitle_NoGSR,'gcampCorr',double(gcampCorr_NoGSR),'gcamp',double(gcamp_NoGSR));
             elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
-                jrgeco1aCorr_blocks_downsampled = mean(jrgeco1aCorr_downsampled_NoGSR(:,:,:,goodBlocks_NoGSR),4);
-                jrgeco1a_blocks_downsampled = mean(jrgeco1a_downsampled_NoGSR(:,:,:,goodBlocks_NoGSR),4);
-                [ROI_total,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim,~,~,ROI_jrgeco1aCorr,Avgjrgeco1aCorr_stim] = fluor.generatePeakMapandROI(oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,stimStartTime,stimEndTime,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_blocks_downsampled,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_NoGSR);
+                [oxy_downsampled_NoGSR,deoxy_downsampled_NoGSR,total_downsampled_NoGSR,goodBlocks_NoGSR,temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,stimStartTime,stimEndTime, jrgeco1aCorr_downsampled_NoGSR,jrgeco1a_downsampled_NoGSR, temp_jrgeco1aCorr_max_NoGSR,~,~,~] = fluor.pickGoodBlocks(double(oxy_NoGSR),double(deoxy_NoGSR),double(total_NoGSR),info.freqout,sessionInfo,output_NoGSR,texttitle_NoGSR,'jrgeco1aCorr',double(jrgeco1aCorr_NoGSR),'jrgeco1a',double(jrgeco1a_NoGSR));
                 
             elseif strcmp(char(sessionInfo.mouseType),'WT')
-                [ROI_total,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim] = fluor.generatePeakMapandROI(oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,stimStartTime,stimEndTime);
+                [oxy_downsampled_NoGSR,deoxy_downsampled_NoGSR,total_downsampled_NoGSR,goodBlocks_NoGSR,temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,stimStartTime,stimEndTime] = fluor.pickGoodBlocks(oxy_NoGSR,deoxy_NoGSR,total_NoGSR,info.freqout,sessionInfo,output_NoGSR,texttitle_NoGSR);
             end
+            save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'goodBlocks_NoGSR','-append')
             
-            
-            
-            numBlock = size(oxy_NoGSR,3)/sessionInfo.stimblocksize;
-            oxy_NoGSR = reshape(oxy_NoGSR,size(oxy_NoGSR,1),size(oxy_NoGSR,2),[],numBlock);
-            deoxy_NoGSR = reshape(deoxy_NoGSR,size(deoxy_NoGSR,1),size(deoxy_NoGSR,2),[],numBlock);
-            total_NoGSR = reshape(total_NoGSR,size(total_NoGSR,1),size(total_NoGSR,2),[],numBlock);
-            oxy_blocks_NoGSR = mean(oxy_NoGSR(:,:,:,goodBlocks_NoGSR),4);
-            deoxy_blocks_NoGSR = mean(deoxy_NoGSR(:,:,:,goodBlocks_NoGSR),4);
-            total_blocks_NoGSR = mean(total_NoGSR(:,:,:,goodBlocks_NoGSR),4);
-            
-            if strcmp(char(sessionInfo.mouseType),'gcamp6f')
-                gcampCorr_NoGSR = reshape(gcampCorr_NoGSR,size(oxy_NoGSR,1),size(oxy_NoGSR,2),[],numBlock);
-                gcamp_NoGSR = reshape(gcamp_NoGSR,size(deoxy_NoGSR,1),size(deoxy_NoGSR,2),[],numBlock);
-                green_NoGSR = reshape(green_NoGSR,size(deoxy_NoGSR,1),size(deoxy_NoGSR,2),[],numBlock);
-                gcampCorr_blocks_NoGSR = mean(gcampCorr_NoGSR(:,:,:,goodBlocks_NoGSR),4);
-                gcamp_blocks_NoGSR = mean(gcamp_NoGSR(:,:,:,goodBlocks_NoGSR),4);
-                green_blocks_NoGSR = mean(green_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+            if ~isempty(goodBlocks_NoGSR)
                 
-                if isempty(excelRaw{20})
-                    fluor.traceImagePlot(oxy_blocks_NoGSR,deoxy_blocks_NoGSR,total_blocks_NoGSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_NoGSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,sessionInfo,output_NoGSR,texttitle_NoGSR,'gcampCorr_blocks',gcampCorr_blocks_NoGSR,'gcampCorr_blocks_downsampled',gcampCorr_blocks_downsampled,'temp_gcampCorr_max',temp_gcampCorr_max_NoGSR,'AvggcampCorr_stim',AvggcampCorr_stim,'ROI_gcampCorr',ROI_gcampCorr,'gcamp_blocks_downsampled',gcamp_blocks_downsampled,'gcamp_blocks',gcamp_blocks_NoGSR,'green_blocks',green_blocks_NoGSR,'xform_isbrain',xform_isbrain)
-                else
-                    fluor.traceImagePlot(oxy_blocks_NoGSR,deoxy_blocks_NoGSR,total_blocks_NoGSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_NoGSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,sessionInfo,output_NoGSR,texttitle_NoGSR,'gcampCorr_blocks',gcampCorr_blocks_NoGSR,'gcampCorr_blocks_downsampled',gcampCorr_blocks_downsampled,'temp_gcampCorr_max',temp_gcampCorr_max_NoGSR,'AvggcampCorr_stim',AvggcampCorr_stim,'ROI_gcampCorr',ROI_gcampCorr,'gcamp_blocks_downsampled',gcamp_blocks_downsampled,'gcamp_blocks',gcamp_blocks_NoGSR,'green_blocks',green_blocks_NoGSR,'xform_isbrain',xform_isbrain,'time',time,'input',input_stimbox)
-                end
-            elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
-                jrgeco1aCorr_NoGSR = reshape(jrgeco1aCorr_NoGSR,size(oxy_NoGSR,1),size(oxy_NoGSR,2),[],numBlock);
-                jrgeco1a_NoGSR = reshape(jrgeco1a_NoGSR,size(deoxy_NoGSR,1),size(deoxy_NoGSR,2),[],numBlock);
-                green_NoGSR = reshape(green_NoGSR,size(deoxy_NoGSR,1),size(deoxy_NoGSR,2),[],numBlock);
-                jrgeco1aCorr_blocks_NoGSR = mean(jrgeco1aCorr_NoGSR(:,:,:,goodBlocks_NoGSR),4);
-                jrgeco1a_blocks_NoGSR = mean(jrgeco1a_NoGSR(:,:,:,goodBlocks_NoGSR),4);
-                green_blocks_NoGSR = mean(green_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+                %block average
+                oxy_blocks_downsampled = mean(oxy_downsampled_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+                deoxy_blocks_downsampled = mean(deoxy_downsampled_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+                total_blocks_downsampled = mean(total_downsampled_NoGSR(:,:,:,goodBlocks_NoGSR),4);
                 
-                if isempty(excelRaw{20})
-                    fluor.traceImagePlot(oxy_blocks_NoGSR,deoxy_blocks_NoGSR,total_blocks_NoGSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_NoGSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,sessionInfo,output_NoGSR,texttitle_NoGSR,'jrgeco1aCorr_blocks',jrgeco1aCorr_blocks_NoGSR,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_blocks_downsampled,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_NoGSR,'Avgjrgeco1aCorr_stim',Avgjrgeco1aCorr_stim,'ROI_jrgeco1aCorr',ROI_jrgeco1aCorr,'jrgeco1a_blocks_downsampled',jrgeco1a_blocks_downsampled,'jrgeco1a_blocks',jrgeco1a_blocks_NoGSR,'green_blocks',green_blocks_NoGSR,'xform_isbrain',xform_isbrain)
-                else
-                    fluor.traceImagePlot(oxy_blocks_NoGSR,deoxy_blocks_NoGSR,total_blocks_NoGSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_NoGSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,sessionInfo,output_NoGSR,texttitle_NoGSR,'jrgeco1aCorr_blocks',jrgeco1aCorr_blocks_NoGSR,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_blocks_downsampled,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_NoGSR,'Avgjrgeco1aCorr_stim',Avgjrgeco1aCorr_stim,'ROI_jrgeco1aCorr',ROI_jrgeco1aCorr,'jrgeco1a_blocks_downsampled',jrgeco1a_blocks_downsampled,'jrgeco1a_blocks',jrgeco1a_blocks_NoGSR,'green_blocks',green_blocks_NoGSR,'xform_isbrain',xform_isbrain,'time',time,'input',input_stimbox)
+                
+                if strcmp(char(sessionInfo.mouseType),'gcamp6f')
+                    gcampCorr_blocks_downsampled = mean(gcampCorr_downsampled_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+                    gcamp_blocks_downsampled = mean(gcamp_downsampled_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+                    [ROI_total,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim,~,~,ROI_gcampCorr,AvggcampCorr_stim] = fluor.generatePeakMapandROI(oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,stimStartTime,stimEndTime,'gcampCorr_blocks_downsampled',gcampCorr_blocks_downsampled,'temp_gcampCorr_max',temp_gcampCorr_max_NoGSR);
+                elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
+                    jrgeco1aCorr_blocks_downsampled = mean(jrgeco1aCorr_downsampled_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+                    jrgeco1a_blocks_downsampled = mean(jrgeco1a_downsampled_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+                    [ROI_total,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim,ROI_jrgeco1aCorr,Avgjrgeco1aCorr_stim,~,~] = fluor.generatePeakMapandROI(oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,stimStartTime,stimEndTime,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_blocks_downsampled,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_NoGSR);
+                    
+                elseif strcmp(char(sessionInfo.mouseType),'WT')
+                    [ROI_total,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim] = fluor.generatePeakMapandROI(oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,stimStartTime,stimEndTime);
                 end
                 
-            elseif strcmp(char(sessionInfo.mouseType),'WT')
-                fluor.traceImagePlot(oxy_blocks_NoGSR,deoxy_blocks_NoGSR,total_blocks_NoGSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_NoGSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,ROI_total,sessionInfo,output_NoGSR,texttitle_NoGSR)
+                
+                
+                numBlock = size(oxy_NoGSR,3)/sessionInfo.stimblocksize;
+                oxy_NoGSR = reshape(oxy_NoGSR,size(oxy_NoGSR,1),size(oxy_NoGSR,2),[],numBlock);
+                deoxy_NoGSR = reshape(deoxy_NoGSR,size(deoxy_NoGSR,1),size(deoxy_NoGSR,2),[],numBlock);
+                total_NoGSR = reshape(total_NoGSR,size(total_NoGSR,1),size(total_NoGSR,2),[],numBlock);
+                oxy_blocks_NoGSR = mean(oxy_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+                deoxy_blocks_NoGSR = mean(deoxy_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+                total_blocks_NoGSR = mean(total_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+                
+                if strcmp(char(sessionInfo.mouseType),'gcamp6f')
+                    gcampCorr_NoGSR = reshape(gcampCorr_NoGSR,size(oxy_NoGSR,1),size(oxy_NoGSR,2),[],numBlock);
+                    gcamp_NoGSR = reshape(gcamp_NoGSR,size(deoxy_NoGSR,1),size(deoxy_NoGSR,2),[],numBlock);
+                    green_NoGSR = reshape(green_NoGSR,size(deoxy_NoGSR,1),size(deoxy_NoGSR,2),[],numBlock);
+                    gcampCorr_blocks_NoGSR = mean(gcampCorr_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+                    gcamp_blocks_NoGSR = mean(gcamp_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+                    green_blocks_NoGSR = mean(green_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+                    
+                    if isempty(excelRaw{20})
+                        fluor.traceImagePlot(oxy_blocks_NoGSR,deoxy_blocks_NoGSR,total_blocks_NoGSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_NoGSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,sessionInfo,output_NoGSR,texttitle_NoGSR,'gcampCorr_blocks',gcampCorr_blocks_NoGSR,'gcampCorr_blocks_downsampled',gcampCorr_blocks_downsampled,'temp_gcampCorr_max',temp_gcampCorr_max_NoGSR,'AvggcampCorr_stim',AvggcampCorr_stim,'ROI_gcampCorr',ROI_gcampCorr,'gcamp_blocks_downsampled',gcamp_blocks_downsampled,'gcamp_blocks',gcamp_blocks_NoGSR,'green_blocks',green_blocks_NoGSR,'xform_isbrain',xform_isbrain)
+                    else
+                        fluor.traceImagePlot(oxy_blocks_NoGSR,deoxy_blocks_NoGSR,total_blocks_NoGSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_NoGSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,sessionInfo,output_NoGSR,texttitle_NoGSR,'gcampCorr_blocks',gcampCorr_blocks_NoGSR,'gcampCorr_blocks_downsampled',gcampCorr_blocks_downsampled,'temp_gcampCorr_max',temp_gcampCorr_max_NoGSR,'AvggcampCorr_stim',AvggcampCorr_stim,'ROI_gcampCorr',ROI_gcampCorr,'gcamp_blocks_downsampled',gcamp_blocks_downsampled,'gcamp_blocks',gcamp_blocks_NoGSR,'green_blocks',green_blocks_NoGSR,'xform_isbrain',xform_isbrain,'time',time,'input',input_stimbox)
+                    end
+                elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
+                    jrgeco1aCorr_NoGSR = reshape(jrgeco1aCorr_NoGSR,size(oxy_NoGSR,1),size(oxy_NoGSR,2),[],numBlock);
+                    jrgeco1a_NoGSR = reshape(jrgeco1a_NoGSR,size(deoxy_NoGSR,1),size(deoxy_NoGSR,2),[],numBlock);
+                    red_NoGSR = reshape(red_NoGSR,size(deoxy_NoGSR,1),size(deoxy_NoGSR,2),[],numBlock);
+                    jrgeco1aCorr_blocks_NoGSR = mean(jrgeco1aCorr_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+                    jrgeco1a_blocks_NoGSR = mean(jrgeco1a_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+                    red_blocks_NoGSR = mean(red_NoGSR(:,:,:,goodBlocks_NoGSR),4);
+                    
+           
+                        fluor.traceImagePlot(oxy_blocks_NoGSR,deoxy_blocks_NoGSR,total_blocks_NoGSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_NoGSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,sessionInfo,output_NoGSR,texttitle_NoGSR,'jrgeco1aCorr_blocks',jrgeco1aCorr_blocks_NoGSR,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_blocks_downsampled,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_NoGSR,'Avgjrgeco1aCorr_stim',Avgjrgeco1aCorr_stim,'ROI_jrgeco1aCorr',ROI_jrgeco1aCorr,'jrgeco1a_blocks_downsampled',jrgeco1a_blocks_downsampled,'jrgeco1a_blocks',jrgeco1a_blocks_NoGSR,'red_blocks',red_blocks_NoGSR,'xform_isbrain',xform_isbrain)
+                
+                    
+                elseif strcmp(char(sessionInfo.mouseType),'WT')
+                    fluor.traceImagePlot(oxy_blocks_NoGSR,deoxy_blocks_NoGSR,total_blocks_NoGSR,oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,goodBlocks_NoGSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,ROI_total,sessionInfo,output_NoGSR,texttitle_NoGSR)
+                end
             end
+            
+            close all
         end
-        
-        close all
     end
 end
-
-
-
-
+    
+    
+    

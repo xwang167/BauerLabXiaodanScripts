@@ -104,7 +104,7 @@ if ~isempty(jrgeco1aCorr_blocks_downsampled)
     radius_jrgeco1aCorr = sqrt((x1_jrgeco1aCorr-x2_jrgeco1aCorr)^2+(y1_jrgeco1aCorr-y2_jrgeco1aCorr)^2);
     ROI_jrgeco1aCorr = sqrt((X-x1_jrgeco1aCorr).^2+(Y-y1_jrgeco1aCorr).^2)<radius_jrgeco1aCorr;
     
-    max_jrgeco1aCorr = prctile(AvggcampCorrstim(ROI_jrgeco1aCorr),99);
+    max_jrgeco1aCorr = prctile(Avgjrgeco1aCorr_stim(ROI_jrgeco1aCorr),99);
     temp = Avgjrgeco1aCorr_stim.*ROI_jrgeco1aCorr;
     ROI_jrgeco1aCorr = temp>0.5*max_jrgeco1aCorr;
     
@@ -118,7 +118,7 @@ if ~isempty(jrgeco1aCorr_blocks_downsampled)
     %     ROI_jrgeco1aCorr(ROI_smallarea) = 0;
     ROI_jrgeco1aCorr_contour = bwperim(ROI_jrgeco1aCorr);
 end
-
+ROI_gcampCorr  = [];
 if ~isempty(gcampCorr_blocks_downsampled)
     figure
     imagesc(AvggcampCorr_stim,[-temp_gcampCorr_max temp_gcampCorr_max])

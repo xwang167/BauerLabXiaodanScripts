@@ -243,7 +243,7 @@ for i = 1:sessionInfo.stimblocksize
         jrgeco1aCorr_temp = jrgeco1aCorr_blocks_baseline(:,:,i);
         jrgeco1aCorr_blocks_baseline_active(i) = mean(jrgeco1aCorr_temp(ROI_jrgeco1aCorr));
         
-        jrgeco1a_temp = jrgeco1aCorr_blocks_baseline(:,:,i);
+        jrgeco1a_temp = jrgeco1a_blocks_baseline(:,:,i);
         jrgeco1a_blocks_baseline_active(i) = mean(jrgeco1a_temp(ROI_jrgeco1aCorr));
         
         red_temp = red_blocks_baseline(:,:,i);
@@ -437,6 +437,151 @@ orient portrait
 print ('-djpeg', '-r1000',output1);
 
 if ~isempty(Avgjrgeco1aCorr_stim)
+        figure('units','normalized','outerposition',[0 0 1 1]);
+    disp('image sequence of jrgeco1a')
+    
+    for b=startSecond:startSecond+9
+        p = subplot('position', [0.015+(b-startSecond)*0.09 0.80 0.07 0.12]);
+        imagesc(oxy_blocks_baseline_downsampled(:,:,b), [-0.8*temp_oxy_max 0.8*temp_oxy_max]);
+        if b == startSecond+9
+            colorbar
+            set(p,'Position',[0.015+(b-startSecond)*0.09 0.80 0.07 0.12]);
+        end
+        axis image
+        set(gca, 'XTick', []);
+        set(gca, 'YTick', []);
+        if b == 4
+            ylabel('Oxy')
+        end
+        title([num2str(b),'s']);
+        ax = gca;
+        ax.FontSize = 10;
+        colormap jet
+    end
+    
+    for b=startSecond:startSecond+9
+        p = subplot('position', [0.015+(b-startSecond)*0.09 0.64 0.07 0.12]);
+        imagesc(jrgeco1a_blocks_baseline_downsampled(:,:,b), [-1*temp_jrgeco1aCorr_max 1*temp_jrgeco1aCorr_max]);
+        if b == startSecond+9
+            colorbar
+            set(p,'Position',[0.015+(b-startSecond)*0.09 0.64 0.07 0.12]);
+        end
+        axis image;
+        set(gca, 'XTick', []);
+        set(gca, 'YTick', []);
+        if b==startSecond
+            ylabel('jrgeco1a')
+        end
+        title([num2str(b),'s']);
+        ax = gca;
+        ax.FontSize = 10;
+        colormap jet
+    end
+    
+    
+    
+    for b=startSecond:startSecond+9
+        p = subplot('position', [0.015+(b-startSecond)*0.09 0.48 0.07 0.12]);
+        imagesc(jrgeco1aCorr_blocks_baseline_downsampled(:,:,b), [-1*temp_jrgeco1aCorr_max 1*temp_jrgeco1aCorr_max]);
+        if b == startSecond+9
+            colorbar
+            set(p,'Position',[0.015+(b-startSecond)*0.09 0.48 0.07 0.12]);
+        end
+        axis image;
+        set(gca, 'XTick', []);
+        set(gca, 'YTick', []);
+        if b==startSecond
+            ylabel('jrgeco1aCorr')
+        end
+        title([num2str(b),'s']);
+        ax = gca;
+        ax.FontSize = 10;
+        colormap jet
+    end
+    
+    
+    
+    
+    hold on
+    subplot('position',[0.05,0.08,0.7,0.35])
+    p4 = plot(x,jrgeco1aCorr_blocks_baseline_active,'k-');
+    
+    
+    hold on
+    p5=plot(x,jrgeco1a_blocks_baseline_active,'Color',[ 0.6 0 0]);
+    set(findall(gca, 'Type', 'Line'),'LineWidth',2);
+    hold on
+    p6=plot(x,red_blocks_baseline_active,'r-');
+    hold on
+    
+    if isempty(time)
+        for i  = 0:1/sessionInfo.stimFrequency:sessionInfo.stimduration-1/sessionInfo.stimFrequency
+            line([sessionInfo.stimbaseline/sessionInfo.framerate+i sessionInfo.stimbaseline/sessionInfo.framerate+i],[ 1.1*min_value 1.1*max_jrgeco1aCorr]);
+            hold on
+        end
+    else
+        plot(time,input-2.5,'-')
+    end
+    ax = gca;
+    ax.FontSize = 8;
+    xlim([0 round(sessionInfo.stimblocksize/sessionInfo.framerate)])
+    
+    ylim([1.1*min_value 1.1*max_jrgeco1aCorr])
+    
+    lgd =legend('R1a(corr.)','R1a(raw)','525nm');
+    lgd.FontSize = 14;
+    xlabel('Time(s)','FontSize',20,'FontWeight','bold')
+    ylabel('jrgeco1a(\DeltaF/F)','FontSize',20,'FontWeight','bold')
+    
+    a = get(gca,'XTickLabel');
+    set(gca,'XTickLabel',a,'FontName','Times','fontsize',14,'fontweight','bold')
+    
+    ROI_jrgeco1aCorr_contour = bwperim(ROI_jrgeco1aCorr);
+    subplot('position',[0.8,0.1,0.2,0.25])
+    imagesc(Avgjrgeco1aCorr_stim*100,[-temp_jrgeco1aCorr_max*100 temp_jrgeco1aCorr_max*100])
+    colormap jet
+    hold on
+    contour(ROI_jrgeco1aCorr_contour,'k')
+    axis image off
+    c = colorbar;
+    c.FontSize = 14;
+    c.FontWeight = 'bold';
+    title('Corrected jrgeco1a 75%','fontsize',16)
+    title('Corrected jrgeco1a Percentage Change')
+    
+    % subplot('position',[0.76,0.1,0.17,0.3])
+    % disp('Calculating fft curve')
+    % info.nVy = 128;
+    % info.nVx =128;
+    % ibi=find(xform_isbrain==1);
+    % T1 =  length(oxy);
+    % hz=linspace(0,sessionInfo.framerate,T1);
+    % oxy2 = single(reshape(oxy,info.nVy*info.nVx,[]));
+    % mdata_oxy = squeeze(mean(oxy2(ibi,:),1));
+    % fdata_oxy = abs(fft(mdata_oxy));
+    % fdata_oxy = fdata_oxy./mean(fdata_oxy);
+    % p1 = loglog(hz(1:ceil(T1/2)), fdata_oxy(1:ceil(T1/2)),'g');
+    %
+    %
+    % jrgeco1aCorr2 = single(reshape(jrgeco1aCorr,info.nVy*info.nVx,[]));
+    % mdata_jrgeco1aCorr = squeeze(mean(jrgeco1aCorr2(ibi,:),1));
+    % fdata_jrgeco1aCorr = abs(fft(mdata_jrgeco1aCorr));
+    % fdata_jrgeco1aCorr = fdata_jrgeco1aCorr./mean(fdata_jrgeco1aCorr);
+    % hold on
+    % p2 = loglog(hz(1:ceil(T1/2)), fdata_jrgeco1aCorr(1:ceil(T1/2)),'k');
+    % ylim([10^-2 10^2])
+    % legend('HbO_2','jrgeco1aCorr','location','southwest')
+    % xlabel('Frequency (Hz)')
+    % ylabel('Magnitude')
+    % xlim([0.01 15]);
+    % title( 'FFT Normalized Data');
+    % ytickformat('%.1f');
+    
+    annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',texttitle,'FontWeight','bold','Color',[1 0 0],'FontSize',16);
+    % save(strcat('J:\ProcessedData_2\Zyla\',recDate,'\',recDate,'-',mouseName,'-stim_vis.mat'),'oxy_blocks_baseline_downsampled','deoxy_blocks_baseline_downsampled','total_blocks_baseline_downsampled','oxy','deoxy','total','info','oxy_mice');
+    output2 = strcat(outputName,'_jrgeco1a.jpg');
+    orient portrait
+    print ('-djpeg', '-r1000',output2);
     
 end
 
