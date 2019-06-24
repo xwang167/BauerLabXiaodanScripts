@@ -1,4 +1,4 @@
-function getRawZyla_aquisition(folderDir,folderName,numTotalFrames,numLED,nVx,nVy,mouseType,isRotate,saveDir)                 
+  function getRawZyla_aquisition(folderDir,folderName,numTotalFrames,numLED,nVx,nVy,mouseType,isRotate,saveDir)                 
 disp(strcat('starting get raw from', folderName));
 folderName = char(folderName);
 camIndex = str2double(folderName(strfind(folderName,'cam')+3));
