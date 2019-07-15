@@ -63,9 +63,8 @@ jrgeco1aCorr_blocks_downsampled = p.Results.jrgeco1aCorr_blocks_downsampled;
 
 jrgeco1a_blocks = p.Results.jrgeco1a_blocks;
 jrgeco1a_blocks_downsampled = p.Results.jrgeco1a_blocks_downsampled;
-
 red_blocks = p.Results.red_blocks;
-red_blocks_downsampled = p.Results.red_blocks_downsampled;
+
 
 temp_jrgeco1aCorr_max = p.Results.temp_jrgeco1aCorr_max;
 Avgjrgeco1aCorr_stim= p.Results.Avgjrgeco1aCorr_stim;
@@ -447,7 +446,7 @@ if ~isempty(Avgjrgeco1aCorr_stim)
     
     for b=startSecond:startSecond+9
         p = subplot('position', [0.015+(b-startSecond)*0.09 0.80 0.07 0.12]);
-        imagesc(red_blocks_baseline_downsampled(:,:,b), [-0.3*temp_jrgeco1aCorr_max 0.3*temp_jrgeco1aCorr_max]);
+        imagesc(oxy_blocks_baseline_downsampled(:,:,b), [-0.8*temp_oxy_max 0.8*temp_oxy_max]);
         if b == startSecond+9
             colorbar
             set(p,'Position',[0.015+(b-startSecond)*0.09 0.80 0.07 0.12]);
@@ -456,7 +455,7 @@ if ~isempty(Avgjrgeco1aCorr_stim)
         set(gca, 'XTick', []);
         set(gca, 'YTick', []);
         if b == 4
-            ylabel('red')
+            ylabel('Oxy')
         end
         title([num2str(b),'s']);
         ax = gca;
@@ -533,7 +532,7 @@ if ~isempty(Avgjrgeco1aCorr_stim)
     
     ylim([1.1*min_value 1.1*max_jrgeco1aCorr])
     
-    lgd =legend('R1a(corr.)','R1a(raw)','625nm');
+    lgd =legend('R1a(corr.)','R1a(raw)','525nm');
     lgd.FontSize = 14;
     xlabel('Time(s)','FontSize',20,'FontWeight','bold')
     ylabel('jrgeco1a(\DeltaF/F)','FontSize',20,'FontWeight','bold')

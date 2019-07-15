@@ -96,7 +96,7 @@ axis image off
 title('DeOxy')
 subplot(1,3,3)
 if numBlock==1
-    imagesc(squeeze(total_downsampled(:,:,stimEndTime))-baseline_total_downsampled,[-6e-6 6e-6])
+    imagesc(squeeze(oxy_downsampled(:,:,stimEndTime))-baseline_tot_downsampled,[-6e-6 6e-6])
 else
 imagesc(squeeze(total_downsampled(:,:,stimEndTime,2))-baseline_total_downsampled,[-6e-6 6e-6])
 end
@@ -120,11 +120,7 @@ numRows = 3;
 temp_jrgeco1aCorr_max = [];
 if ~isempty(jrgeco1aCorr)
     figure
-    if numBlock==1
-    imagesc(squeeze(jrgeco1aCorr_downsampled(:,:,stimEndTime))-baseline_jrgeco1aCorr_downsampled,[[-0.03 0.03]])
-    else
     imagesc(squeeze(jrgeco1aCorr_downsampled(:,:,stimEndTime,5))-baseline_jrgeco1aCorr_downsampled,[-0.03 0.03])
-    end
     colorbar
     axis image off
     title('jrgeco1aCorr')

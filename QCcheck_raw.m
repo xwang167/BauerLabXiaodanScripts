@@ -51,9 +51,9 @@ elseif strcmp(system, 'EastOIS1_Fluor')
     TickLabels = {'B','G','O', 'R' };
      legendName = {'green fluorescence', 'green LED', 'orange LED' 'red LED'};
 elseif strcmp(system, 'EastOIS2')
-    TickLabels = {'Blue_green','Blue_red''Green_red','G','R'};
-    Colors = [0 0 1;0 1 1; 1 0 1;0 1 0;1 0 0];
-    legendName = {'Blue Green fluorescence', 'Blue red fluorescence','Green red fluorescence','green LED', 'red LED'};
+    TickLabels = {'Blue_green','Green_red','G','R'};
+    Colors = [0 0 1; 1 0 1;0 1 0;1 0 0];
+    legendName = {'Blue Green fluorescence', 'Green red fluorescence','green LED', 'red LED'};
 
 end
 

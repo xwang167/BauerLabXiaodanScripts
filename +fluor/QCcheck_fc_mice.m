@@ -1,39 +1,39 @@
 close all;clearvars;clc
 import mice.*
-excelFile = "D:\GCaMP\GCaMP_awake.xlsx";
+excelFile = "D:\gcamp\gcamp_awake.xlsx";
 isZTransform = true;
 
 info.nVx = 128;
 info.nVy = 128;
 %
-excelRows = [129 131 133 135 137];
+excelRows = [181 183 185 ];
 
 numMice = length(excelRows);
 suffix = {'_cat','NoDetrend_cat','_processed','_NoDetrend'};
 ll = 1:2;
 xform_isbrain_mice = 1;
-sessionInfo.miceType = 'gcamp6f';
-saveDir_cat = 'J:\ProcessedData_3\GCaMP\cat';
+sessionInfo.miceType = 'jrgeco1a';
+saveDir_cat = 'J:\RGECO\cat';
 for ii = 3
-    if strcmp(char(sessionInfo.miceType),'gcamp6f')
-        R_gcampCorr_Delta_mice = zeros(info.nVy,info.nVx,14,numMice);
-        R_gcampCorr_ISA_mice  = zeros(info.nVy,info.nVx,14,numMice);
+    if strcmp(char(sessionInfo.miceType),'jrgeco1a')
+        R_jrgeco1aCorr_Delta_mice = zeros(info.nVy,info.nVx,14,numMice);
+        R_jrgeco1aCorr_ISA_mice  = zeros(info.nVy,info.nVx,14,numMice);
         R_oxy_Delta_mice  = zeros(info.nVy,info.nVx,14,numMice);
         R_oxy_ISA_mice  = zeros(info.nVy,info.nVx,14,numMice);
-        Rs_gcampCorr_Delta_mice = zeros(14,14,numMice);
-        Rs_gcampCorr_ISA_mice = zeros(14,14,numMice);
+        Rs_jrgeco1aCorr_Delta_mice = zeros(14,14,numMice);
+        Rs_jrgeco1aCorr_ISA_mice = zeros(14,14,numMice);
         Rs_oxy_Delta_mice = zeros(14,14,numMice);
         Rs_oxy_ISA_mice = zeros(14,14,numMice);
         fdata_deoxy_mice = [];
         fdata_oxy_mice = [];
-        fdata_gcampCorr_mice = [];
+        fdata_jrgeco1aCorr_mice = [];
         fdata_total_mice = [];
                 powerdata_deoxy_mice = [];
         powerdata_oxy_mice = [];
-        powerdata_gcampCorr_mice = [];
+        powerdata_jrgeco1aCorr_mice = [];
         powerdata_total_mice = [];
-        gcampCorr_Delta_powerMap_mice = zeros(info.nVy,info.nVx,numMice);
-        gcampCorr_ISA_powerMap_mice = zeros(info.nVy,info.nVx,numMice);
+        jrgeco1aCorr_Delta_powerMap_mice = zeros(info.nVy,info.nVx,numMice);
+        jrgeco1aCorr_ISA_powerMap_mice = zeros(info.nVy,info.nVx,numMice);
         oxy_Delta_powerMap_mice = zeros(info.nVy,info.nVx,numMice);
         oxy_ISA_powerMap_mice = zeros(info.nVy,info.nVx,numMice);
     end
@@ -55,13 +55,14 @@ for ii = 3
         sessionInfo.framerate = excelRaw{7};
         if strcmp(char(sessionInfo.miceType),'WT')
             systemInfo.numLEDs = 2;
-        elseif strcmp(char(sessionInfo.miceType),'gcamp6f')
+        elseif strcmp(char(sessionInfo.miceType),'jrgeco1a')
             systemInfo.numLEDs = 3;
         end
+          maskDir = strcat('J:\RGECO\Kenny\', recDate, '\');
+  
         
-        
-        maskName = strcat(recDate,'-',mouseName,'-LandmarksandMask','.mat');
-        load(fullfile(saveDir,maskName), 'isbrain','xform_isbrain');
+ 
+  load(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-dataHb','.mat')),'xform_isbrain');
         xform_isbrain(xform_isbrain ==2)=1;
         xform_isbrain = double(xform_isbrain);
         
@@ -74,54 +75,54 @@ for ii = 3
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,suffix(ii),'.mat');
         
         if strcmp(sessionType,'fc')
-            if strcmp(char(sessionInfo.miceType),'gcamp6f')
+            if strcmp(char(sessionInfo.miceType),'jrgeco1a')
                 if ii<3
                     disp('loading processed data')
-                    load(fullfile(saveDir, processedName),'R_gcampCorr_Delta','R_gcampCorr_ISA','R_oxy_Delta','R_oxy_ISA','Rs_gcampCorr_Delta','Rs_gcampCorr_ISA','Rs_oxy_Delta','Rs_oxy_ISA','fdata_deoxy','fdata_oxy','fdata_gcampCorr','fdata_total','powerdata_deoxy','powerdata_oxy','powerdata_gcampCorr','powerdata_total','gcampCorr_Delta_powerMap','gcampCorr_ISA_powerMap','oxy_Delta_powerMap','oxy_ISA_powerMap')
-                    R_gcampCorr_Delta_mice(:,:,:,ll) = atanh(R_gcampCorr_Delta);
-                    R_gcampCorr_ISA_mice(:,:,:,ll) = atanh(R_gcampCorr_ISA);
+                    load(fullfile(saveDir, processedName),'R_jrgeco1aCorr_Delta','R_jrgeco1aCorr_ISA','R_oxy_Delta','R_oxy_ISA','Rs_jrgeco1aCorr_Delta','Rs_jrgeco1aCorr_ISA','Rs_oxy_Delta','Rs_oxy_ISA','fdata_deoxy','fdata_oxy','fdata_jrgeco1aCorr','fdata_total','powerdata_deoxy','powerdata_oxy','powerdata_jrgeco1aCorr','powerdata_total','jrgeco1aCorr_Delta_powerMap','jrgeco1aCorr_ISA_powerMap','oxy_Delta_powerMap','oxy_ISA_powerMap')
+                    R_jrgeco1aCorr_Delta_mice(:,:,:,ll) = atanh(R_jrgeco1aCorr_Delta);
+                    R_jrgeco1aCorr_ISA_mice(:,:,:,ll) = atanh(R_jrgeco1aCorr_ISA);
                     R_oxy_Delta_mice(:,:,:,ll) = atanh(R_oxy_Delta);
                     R_oxy_ISA_mice(:,:,:,ll) = atanh(R_oxy_ISA);
                     
-                    Rs_gcampCorr_Delta_mice(:,:,ll) = atanh(Rs_gcampCorr_Delta);
-                    Rs_gcampCorr_ISA_mice(:,:,ll) = atanh(Rs_gcampCorr_ISA);
+                    Rs_jrgeco1aCorr_Delta_mice(:,:,ll) = atanh(Rs_jrgeco1aCorr_Delta);
+                    Rs_jrgeco1aCorr_ISA_mice(:,:,ll) = atanh(Rs_jrgeco1aCorr_ISA);
                     Rs_oxy_Delta_mice(:,:,ll) = atanh(Rs_oxy_Delta);
                     Rs_oxy_ISA_mice(:,:,ll) = atanh(Rs_oxy_ISA);
                     
-                    fdata_gcampCorr_mice = cat(1,fdata_gcampCorr_mice,squeeze(fdata_gcampCorr));
+                    fdata_jrgeco1aCorr_mice = cat(1,fdata_jrgeco1aCorr_mice,squeeze(fdata_jrgeco1aCorr));
                     fdata_oxy_mice = cat(1,fdata_oxy_mice,squeeze(fdata_oxy));
                     fdata_deoxy_mice = cat(1,fdata_deoxy_mice,squeeze(fdata_deoxy));
                     fdata_total_mice = cat(1,fdata_total_mice,squeeze(fdata_total));
                     
-                    gcampCorr_Delta_powerMap_mice(:,:,ll) = gcampCorr_Delta_powerMap;
-                    gcampCorr_ISA_powerMap_mice(:,:,ll) = gcampCorr_ISA_powerMap;
+                    jrgeco1aCorr_Delta_powerMap_mice(:,:,ll) = jrgeco1aCorr_Delta_powerMap;
+                    jrgeco1aCorr_ISA_powerMap_mice(:,:,ll) = jrgeco1aCorr_ISA_powerMap;
                     oxy_Delta_powerMap_mice(:,:,ll) = oxy_Delta_powerMap;
                     oxy_ISA_powerMap_mice(:,:,ll) = oxy_ISA_powerMap;
                   else
                      
-                    load(fullfile(saveDir, processedName),'R_gcampCorr_Delta_mouse','R_gcampCorr_ISA_mouse','R_oxy_Delta_mouse','R_oxy_ISA_mouse','Rs_gcampCorr_Delta_mouse','Rs_gcampCorr_ISA_mouse','Rs_oxy_Delta_mouse','Rs_oxy_ISA_mouse','fdata_deoxy_mouse','fdata_oxy_mouse','fdata_gcampCorr_mouse','fdata_total_mouse','powerdata_deoxy_mouse','powerdata_oxy_mouse','powerdata_gcampCorr_mouse','powerdata_total_mouse','gcampCorr_Delta_powerMap_mouse','gcampCorr_ISA_powerMap_mouse','oxy_Delta_powerMap_mouse','oxy_ISA_powerMap_mouse','hz','hz2')
-                    R_gcampCorr_Delta_mice(:,:,:,ll) = atanh(R_gcampCorr_Delta_mouse);
-                    R_gcampCorr_ISA_mice(:,:,:,ll) = atanh(R_gcampCorr_ISA_mouse);
+                    load(fullfile(saveDir, processedName),'R_jrgeco1aCorr_Delta_mouse','R_jrgeco1aCorr_ISA_mouse','R_oxy_Delta_mouse','R_oxy_ISA_mouse','Rs_jrgeco1aCorr_Delta_mouse','Rs_jrgeco1aCorr_ISA_mouse','Rs_oxy_Delta_mouse','Rs_oxy_ISA_mouse','fdata_deoxy_mouse','fdata_oxy_mouse','fdata_jrgeco1aCorr_mouse','fdata_total_mouse','powerdata_deoxy_mouse','powerdata_oxy_mouse','powerdata_jrgeco1aCorr_mouse','powerdata_total_mouse','jrgeco1aCorr_Delta_powerMap_mouse','jrgeco1aCorr_ISA_powerMap_mouse','oxy_Delta_powerMap_mouse','oxy_ISA_powerMap_mouse','hz','hz2')
+                    R_jrgeco1aCorr_Delta_mice(:,:,:,ll) = atanh(R_jrgeco1aCorr_Delta_mouse);
+                    R_jrgeco1aCorr_ISA_mice(:,:,:,ll) = atanh(R_jrgeco1aCorr_ISA_mouse);
                     R_oxy_Delta_mice(:,:,:,ll) = atanh(R_oxy_Delta_mouse);
                     R_oxy_ISA_mice(:,:,:,ll) = atanh(R_oxy_ISA_mouse);
                     
-                    Rs_gcampCorr_Delta_mice(:,:,ll) = atanh(Rs_gcampCorr_Delta_mouse);
-                    Rs_gcampCorr_ISA_mice(:,:,ll) = atanh(Rs_gcampCorr_ISA_mouse);
+                    Rs_jrgeco1aCorr_Delta_mice(:,:,ll) = atanh(Rs_jrgeco1aCorr_Delta_mouse);
+                    Rs_jrgeco1aCorr_ISA_mice(:,:,ll) = atanh(Rs_jrgeco1aCorr_ISA_mouse);
                     Rs_oxy_Delta_mice(:,:,ll) = atanh(Rs_oxy_Delta_mouse);
                     Rs_oxy_ISA_mice(:,:,ll) = atanh(Rs_oxy_ISA_mouse);
                     
-                    fdata_gcampCorr_mice = cat(1,fdata_gcampCorr_mice,squeeze(fdata_gcampCorr_mouse));
+                    fdata_jrgeco1aCorr_mice = cat(1,fdata_jrgeco1aCorr_mice,squeeze(fdata_jrgeco1aCorr_mouse));
                     fdata_oxy_mice = cat(1,fdata_oxy_mice,squeeze(fdata_oxy_mouse));
                     fdata_deoxy_mice = cat(1,fdata_deoxy_mice,squeeze(fdata_deoxy_mouse));
                     fdata_total_mice = cat(1,fdata_total_mice,squeeze(fdata_total_mouse));
-                               powerdata_gcampCorr_mice = cat(1,powerdata_gcampCorr_mice,squeeze(powerdata_gcampCorr_mouse));
+                               powerdata_jrgeco1aCorr_mice = cat(1,powerdata_jrgeco1aCorr_mice,squeeze(powerdata_jrgeco1aCorr_mouse));
                     powerdata_oxy_mice = cat(1,powerdata_oxy_mice,squeeze(powerdata_oxy_mouse));
                     powerdata_deoxy_mice = cat(1,powerdata_deoxy_mice,squeeze(powerdata_deoxy_mouse));
                     powerdata_total_mice = cat(1,powerdata_total_mice,squeeze(powerdata_total_mouse));
  
                     
-                    gcampCorr_Delta_powerMap_mice(:,:,ll) = gcampCorr_Delta_powerMap_mouse;
-                    gcampCorr_ISA_powerMap_mice(:,:,ll) = gcampCorr_ISA_powerMap_mouse;
+                    jrgeco1aCorr_Delta_powerMap_mice(:,:,ll) = jrgeco1aCorr_Delta_powerMap_mouse;
+                    jrgeco1aCorr_ISA_powerMap_mice(:,:,ll) = jrgeco1aCorr_ISA_powerMap_mouse;
                     oxy_Delta_powerMap_mice(:,:,ll) = oxy_Delta_powerMap_mouse;
                     oxy_ISA_powerMap_mice(:,:,ll) = oxy_ISA_powerMap_mouse;
                 end
@@ -134,29 +135,29 @@ for ii = 3
     end
     processedName_mice = strcat(recDate,'-',miceName,'-',sessionType,suffix(ii),'.mat');
     visName = strcat(recDate,'-',miceName,'-',sessionType,suffix(ii));
-    R_gcampCorr_Delta_mice = mean(R_gcampCorr_Delta_mice,4);
-    R_gcampCorr_ISA_mice  = mean(R_gcampCorr_ISA_mice,4);
+    R_jrgeco1aCorr_Delta_mice = mean(R_jrgeco1aCorr_Delta_mice,4);
+    R_jrgeco1aCorr_ISA_mice  = mean(R_jrgeco1aCorr_ISA_mice,4);
     R_oxy_Delta_mice  = mean(R_oxy_Delta_mice,4);
     R_oxy_ISA_mice  = mean(R_oxy_ISA_mice,4);
-    Rs_gcampCorr_Delta_mice = mean(Rs_gcampCorr_Delta_mice,3);
-    Rs_gcampCorr_ISA_mice = mean(Rs_gcampCorr_ISA_mice,3);
+    Rs_jrgeco1aCorr_Delta_mice = mean(Rs_jrgeco1aCorr_Delta_mice,3);
+    Rs_jrgeco1aCorr_ISA_mice = mean(Rs_jrgeco1aCorr_ISA_mice,3);
     Rs_oxy_Delta_mice = mean(Rs_oxy_Delta_mice,3);
     Rs_oxy_ISA_mice = mean(Rs_oxy_ISA_mice,3);
     fdata_deoxy_mice = mean(fdata_deoxy_mice,1);
     fdata_oxy_mice = mean(fdata_oxy_mice,1);
-    fdata_gcampCorr_mice = mean(fdata_gcampCorr_mice,1);
+    fdata_jrgeco1aCorr_mice = mean(fdata_jrgeco1aCorr_mice,1);
     fdata_total_mice = mean(fdata_total_mice,1);
     
         powerdata_deoxy_mice = mean(powerdata_deoxy_mice,1);
     powerdata_oxy_mice = mean(powerdata_oxy_mice,1);
-    powerdata_gcampCorr_mice = mean(powerdata_gcampCorr_mice,1);
+    powerdata_jrgeco1aCorr_mice = mean(powerdata_jrgeco1aCorr_mice,1);
     powerdata_total_mice = mean(powerdata_total_mice,1);
     
-    gcampCorr_Delta_powerMap_mice = mean(gcampCorr_Delta_powerMap_mice,3);
-    gcampCorr_ISA_powerMap_mice = mean(gcampCorr_ISA_powerMap_mice,3);
+    jrgeco1aCorr_Delta_powerMap_mice = mean(jrgeco1aCorr_Delta_powerMap_mice,3);
+    jrgeco1aCorr_ISA_powerMap_mice = mean(jrgeco1aCorr_ISA_powerMap_mice,3);
     oxy_Delta_powerMap_mice = mean(oxy_Delta_powerMap_mice,3);
     oxy_ISA_powerMap_mice = mean(oxy_ISA_powerMap_mice,3);
-    save(fullfile(saveDir_cat, processedName_mice),'R_gcampCorr_Delta_mice','R_gcampCorr_ISA_mice','R_oxy_Delta_mice','R_oxy_ISA_mice','Rs_gcampCorr_Delta_mice','Rs_gcampCorr_ISA_mice','Rs_oxy_Delta_mice','Rs_oxy_ISA_mice','fdata_deoxy_mice','fdata_oxy_mice','fdata_gcampCorr_mice','fdata_total_mice','gcampCorr_Delta_powerMap_mice','gcampCorr_ISA_powerMap_mice','oxy_Delta_powerMap_mice','oxy_ISA_powerMap_mice')
+    save(fullfile(saveDir_cat, processedName_mice),'R_jrgeco1aCorr_Delta_mice','R_jrgeco1aCorr_ISA_mice','R_oxy_Delta_mice','R_oxy_ISA_mice','Rs_jrgeco1aCorr_Delta_mice','Rs_jrgeco1aCorr_ISA_mice','Rs_oxy_Delta_mice','Rs_oxy_ISA_mice','fdata_deoxy_mice','fdata_oxy_mice','fdata_jrgeco1aCorr_mice','fdata_total_mice','jrgeco1aCorr_Delta_powerMap_mice','jrgeco1aCorr_ISA_powerMap_mice','oxy_Delta_powerMap_mice','oxy_ISA_powerMap_mice')
     
     isQC = false;
     %                         C = who('-file',fullfile(saveDir,processedName_mice));
@@ -169,14 +170,14 @@ for ii = 3
     else
         
         disp(char(['QC check on ', processedName_mice]))
-        if strcmp(char(sessionInfo.miceType),'gcamp6f')
+        if strcmp(char(sessionInfo.miceType),'jrgeco1a')
             refseeds=GetReferenceSeeds;
             refseeds = refseeds(1:14,:);
             
-            QCcheck_fcVis_v1(refseeds,R_oxy_ISA_mice, double(Rs_oxy_ISA_mice),R_gcampCorr_ISA_mice,double(Rs_gcampCorr_ISA_mice), 'gcamp6f','ISA',saveDir_cat,visName,isZTransform)
-            QCcheck_fcVis_v1(refseeds,R_oxy_Delta_mice, double(Rs_oxy_Delta_mice),R_gcampCorr_Delta_mice, double(Rs_gcampCorr_Delta_mice), 'gcamp6f','Delta',saveDir_cat,visName,isZTransform)
+            QCcheck_fcVis_v1(refseeds,R_oxy_ISA_mice, double(Rs_oxy_ISA_mice),R_jrgeco1aCorr_ISA_mice,double(Rs_jrgeco1aCorr_ISA_mice), 'jrgeco1a','ISA',saveDir_cat,visName,isZTransform)
+            QCcheck_fcVis_v1(refseeds,R_oxy_Delta_mice, double(Rs_oxy_Delta_mice),R_jrgeco1aCorr_Delta_mice, double(Rs_jrgeco1aCorr_Delta_mice), 'jrgeco1a','Delta',saveDir_cat,visName,isZTransform)
             close all
-            traceSpecies = {'oxy','gcampCorr','deoxy','total'};
+            traceSpecies = {'oxy','jrgeco1aCorr','deoxy','total'};
             traceColor = {'r', 'g','b','k'};
             figure
             subplot('position', [0.12 0.12 0.6 0.6])

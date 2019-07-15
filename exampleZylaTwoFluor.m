@@ -72,11 +72,30 @@ for runInfo = runsInfo % for each run
         reader2.FreqOut = runInfo.samplingRate;
         
         
-        [isbrain,affineMarkers,transformMat,WL] = getMask(runInfo.rawFile{1},runInfo.rawFile{2},reader1);       
+        [isbrain,affineMarkers,transformMat,WL,seedcenter] = getMask(runInfo.rawFile{1},runInfo.rawFile{2},reader1);       
         if ~exist(saveFolder)
             mkdir(saveFolder);
         end
+        isbrain_contour = bwperim(isbrain);
+        imagesc(WL); %changed 3/1/1
+        axis off
+        axis image
+        title(strcat(runInfo.recDate,'-',runInfo.mouseName));
         
+        for f=1:size(seedcenter,1)
+            hold on;
+            plot(seedcenter(f,1)*size(WL,1),seedcenter(f,2)*size(WL,2),'ko','MarkerFaceColor','k')
+        end
+        hold on;
+        plot(affineMarkers.tent(1,1)*size(WL,1),affineMarkers.tent(1,2)*size(WL,2),'ko','MarkerFaceColor','b')
+        hold on;
+        plot(affineMarkers.bregma(1,1)*size(WL,1),affineMarkers.bregma(1,2)*size(WL,2),'ko','MarkerFaceColor','b')
+        hold on;
+        plot(affineMarkers.OF(1,1)*size(WL,1),affineMarkers.OF(1,2)*size(WL,2),'ko','MarkerFaceColor','b')
+        hold on;
+        contour(isbrain_contour,'r')
+        saveas(gcf,fullfile(saveFolder,strcat(runInfo.recDate,'-',runInfo.mouseName,'_WLandMarks.jpg')))
+        close all
         save(maskFileName,'affineMarkers','transformMat','isbrain','WL','-v7.3');
     end
 end
@@ -163,7 +182,7 @@ for runInfo = runsInfo % for each run
     for chInd = 1:numel(raw2Cell)
         chData = raw2Cell{chInd};
         for frameInd = 1:size(chData,3)
-            warped = imwarp(chData(:,:,frameInd),maskData.transformMat);
+            warped = imwarp(chData(:,:,frameInd),maskData.transformMat,'OutputView',imref2d([size(chData,1),size(chData,2)]));
             warped = warped(1:size(chData,1),1:size(chData,2));
             chData(:,:,frameInd) = warped;
         end
@@ -411,7 +430,7 @@ end
 
 end
 
-function [isbrain,affineMarkers,transformMat,WL] = getMask(fileName1,...
+function [isbrain,affineMarkers,transformMat,WL,seedCenter] = getMask(fileName1,...
     fileName2,reader1)
 %getMask Outputs mask data from raw data
 %   By providing which files to read, as well as the reader object and
@@ -428,7 +447,7 @@ load(fileName2)
 firstFrame_cam2 = raw_unregistered(:,:,2,realDataStart);
 [WL, transformMat] = getTransformation(firstFrame_cam1,firstFrame_cam2);
 
-affineMarkers = mouse.process.getLandmarks(WL);
+[affineMarkers,seedCenter] = mouse.process.getLandmarks(WL);
 isbrain = mouse.process.getMask(WL);
 end
 

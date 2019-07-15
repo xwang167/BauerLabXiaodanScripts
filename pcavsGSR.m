@@ -1,12 +1,13 @@
-dataFile = 'J:\ProcessedData_3\GCaMP\190527\190527-G11M4-anes-stim2_processed.mat';
-maskFile = 'J:\ProcessedData_3\GCaMP\190527\190527-G11M4-anes-LandmarksandMask.mat';
+dataFile = 'J:\ProcessedData_3\GCaMP\190527\190527-G11M4-awake-stim1_processed.mat';
+maskFile = 'J:\ProcessedData_3\GCaMP\190527\190527-G11M4-awake-LandmarksandMask.mat';
 load(maskFile,'xform_isbrain')
 load(dataFile,'xform_datahb');
-data = squeeze(xform_datahb(:,:,1,:));
+data = squeeze(xform_datahb(:,:,1,2:end));
 dataGSR = mouse.process.gsr(data,xform_isbrain);
-time = linspace(1,300,size(xform_datahb,4));
-mask = logical(xform_isbrain);
 
+time = linspace(0,300,size(xform_datahb,4)-1);
+mask = logical(xform_isbrain);
+dataGSR(~mask) = nan;
 
 data = reshape(data,[],size(data,3));
 
@@ -67,15 +68,18 @@ plot(time,squeeze(dataNoPC1(64,64,:)));hold on;
 plot(time,squeeze(dataGSR(64,64,:)));
 legend('original','dataNoPC1','dataGSR')
 
-
+vid = VideoWriter('D:\Weekly Update\PCAvsGSR.avi');
+vid.FrameRate = 1;
+open(vid)
 f = figure('Position',[100 100 900 300]);
-for i = 1:numel(data)
-    subplot(2,3,1); imagesc(data(:,:,i),[-10 10]*1E-6); axis(gca,'square'); xticks([]); yticks([]); colorbar; title('original')
-    subplot(2,3,2); imagesc(dataNoPC1(:,:,i),[-10 10]*1E-6); axis(gca,'square'); xticks([]); yticks([]); colorbar; title('no pc1')
-    subplot(2,3,3); imagesc(data(:,:,i)-dataNoPC1(:,:,i),[-3 3]*1E-6); axis(gca,'square'); xticks([]); yticks([]); colorbar; title('difference')
-        subplot(2,3,4); imagesc(data(:,:,i),[-10 10]*1E-6); axis(gca,'square'); xticks([]); yticks([]); colorbar; title('original')
-    subplot(2,3,5); imagesc(dataGSR(:,:,i),[-10 10]*1E-6); axis(gca,'square'); xticks([]); yticks([]); colorbar; title('GSR')
-    subplot(2,3,6); imagesc(data(:,:,i)-dataGSR(:,:,i),[-3 3]*1E-6); axis(gca,'square'); xticks([]); yticks([]); colorbar; title('difference')
-    pause(0.1);
+for i = 5:5:5559
+    subplot(2,3,1); imagesc(data(:,:,i),[-14 14]*1E-6); axis(gca,'square'); xticks([]); yticks([]); colorbar; title('original')
+    subplot(2,3,2); imagesc(dataNoPC1(:,:,i),[-12 12]*1E-6); axis(gca,'square'); xticks([]); yticks([]); colorbar; title('no pc1')
+    subplot(2,3,3); imagesc(data(:,:,i)-dataNoPC1(:,:,i),[-5 5]*1E-6); axis(gca,'square'); xticks([]); yticks([]); colorbar; title('difference')
+        subplot(2,3,4); imagesc(data(:,:,i),[-14 14]*1E-6); axis(gca,'square'); xticks([]); yticks([]); colorbar; title('original')
+    subplot(2,3,5); imagesc(dataGSR(:,:,i),[-3 3]*1E-6); axis(gca,'square'); xticks([]); yticks([]); colorbar; title('GSR')
+    subplot(2,3,6); imagesc(data(:,:,i)-dataGSR(:,:,i),[-8 8]*1E-6); axis(gca,'square'); xticks([]); yticks([]); colorbar; title('difference')
     set(f,'Visible','on')
+    writeVideo(vid,getframe(gcf))
 end
+close(vid)

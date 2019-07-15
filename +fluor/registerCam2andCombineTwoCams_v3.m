@@ -1,4 +1,4 @@
-function raw_combined  = registerCam2andCombineTwoCams_v3(rawdata_cam1,rawdata_cam2,mytform)
+function raw  = registerCam2andCombineTwoCams_v3(rawdata_cam1,rawdata_cam2,mytform)
 
 registered_cam2 = zeros(size(rawdata_cam2)); 
 
@@ -11,8 +11,7 @@ for ii = 1: length(channels_cam2)
 end
 
 
-    raw = zeros(size(rawdata_cam1,1),size(rawdata_cam1,2),5,size(rawdata_cam1,4));
-    raw(:,:,[1 4],:) = rawdata_cam1;
-    raw(:,:,[2 3 5],:) = rawdata_cam2;
+    raw = zeros(size(rawdata_cam1,1),size(rawdata_cam1,2),4,size(rawdata_cam1,4));
+    raw(:,:,[1 3],:) = rawdata_cam1;
+    raw(:,:,[2 4],:) = rawdata_cam2;
 
-raw_combined =  raw;

@@ -66,7 +66,7 @@ for excelRow = excelRows
     processedName_mouse = strcat(recDate,'-',mouseName,'-',sessionType,'_processed_mouse','.mat');
     load(fullfile(saveDir,processedName_mouse),'xform_datahb_runs_GSR');
     maskDir = strcat('J:\RGECO\Kenny\', recDate, '\');
-    load(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-dataHb','.mat')),'xform_isbrain');
+    load(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-dataHb','.mat')),'xform_isbrain_mice');
     xform_isbrain_mice = xform_isbrain_mice.*xform_isbrain;
     
     xform_datahb_mice_GSR = cat(5,xform_datahb_mice_GSR,xform_datahb_runs_GSR);
@@ -358,7 +358,7 @@ elseif strcmp(sessionType,'stim')
     
     
     % Block Average
-    texttitle_NoGSR = strcat(' Block Average for', "  " ,miceName,'-stim'," ",'without GSR');
+    texttitle_NoGSR = strcat(' Block Average for', "  " ,miceName,'-stim'," ",'with GSR');
     output_NoGSR= fullfile(catDir,strcat(recDate,miceName,'-stim','_NoGSR'));
     
     if strcmp(char(sessionInfo.mouseType),'gcamp6f')

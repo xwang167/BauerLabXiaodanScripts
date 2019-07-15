@@ -6,9 +6,10 @@ excelFile = "D:\GCaMP\GCaMP_awake.xlsx";
 nVx = 128;
 nVy = 128;
 %
-excelRows = [ 164];
+excelRows = [ 181 183 185 ];%195 202 204
 runs = 1:3;
 length_runs = length(runs);
+
 for ii = 1
     isDetrend = logical(ii);
     for excelRow = excelRows
@@ -17,23 +18,26 @@ for ii = 1
         mouseName = excelRaw{2}; mouseName = string(mouseName);
         saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
         sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-        sessionInfo.darkFrameNum = excelRaw{11};
+        
+
+    
+        sessionInfo.darkFrameNum = excelRaw{15};
         rawdataloc = excelRaw{3};
         info.nVx = 128;
         info.nVy = 128;
-        sessionInfo.mouseType = excelRaw{13};
+        sessionInfo.mouseType = excelRaw{17};
         systemType =excelRaw{5};
-        sessionInfo.darkFrameNum = excelRaw{11};
         sessionInfo.framerate = excelRaw{7};
+
         if strcmp(char(sessionInfo.mouseType),'WT')
             systemInfo.numLEDs = 2;
         elseif strcmp(char(sessionInfo.mouseType),'gcamp6f')
             systemInfo.numLEDs = 3;
         end
         
-        
-        maskName = strcat(recDate,'-',mouseName,'-LandmarksandMask','.mat');
-        load(fullfile(saveDir,maskName), 'isbrain','xform_isbrain');
+  maskDir = strcat('J:\RGECO\Kenny\', recDate, '\');
+    load(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-dataHb','.mat')),'xform_isbrain');
+ 
         xform_isbrain(xform_isbrain ==2)=1;
         xform_isbrain = double(xform_isbrain);
         if ~isempty(find(isnan(xform_isbrain), 1))
@@ -160,6 +164,7 @@ for ii = 1
         powerdata_deoxy_mouse = mean(powerdata_deoxy_mouse,1);
         powerdata_oxy_mouse = mean(powerdata_oxy_mouse,1);
           powerdata_total_mouse = mean(powerdata_total_mouse,1);
+          
         
             oxy_Delta_powerMap_mouse = mean(oxy_Delta_powerMap_mouse,3);
         oxy_ISA_powerMap_mouse = mean(oxy_ISA_powerMap_mouse,3);
