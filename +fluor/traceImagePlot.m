@@ -437,7 +437,7 @@ colormap jet
 texttitle = strcat(' Block Average for', {' '},texttitle,{' '}, 'for blocks ',{' '}, num2str(goodBlocks));
 annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',texttitle,'FontWeight','bold','Color',[1 0 0],'FontSize',16);
 
-output1 = strcat(outputName,'_OIS_ROI50.jpg');
+output1 = strcat(outputName,'_OIS_ROI75.jpg');
 orient portrait
 print ('-djpeg', '-r1000',output1);
 
@@ -456,7 +456,7 @@ if ~isempty(Avgjrgeco1aCorr_stim)
         set(gca, 'XTick', []);
         set(gca, 'YTick', []);
         if b == 4
-            ylabel('red')
+            ylabel('625nm')
         end
         title([num2str(b),'s']);
         ax = gca;
