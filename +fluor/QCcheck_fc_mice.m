@@ -218,15 +218,15 @@ for ii = 3
             end
             
             figure(1)
-            legend('HbO_2',traceSpecies{2},'HbR','Total')
+            legend(traceSpecies{2},'HbO_2','HbR','Total','location','southwest')
             xlabel('Frequency (Hz)')
-            title(strcat(visName,'  Power Spectrum Density'),'fontsize',14);
+            title(strcat(visName,'  Power Spectrum Density'),'fontsize',14,'Interpreter', 'none');
             ytickformat('%.1f');
             saveas(gcf,(fullfile(saveDir_cat,strcat(visName,'_FCpowerCurve.jpg'))));
             figure(2)
-            legend('HbO_2',traceSpecies{2},'HbR','Total')
+            legend(traceSpecies{2},'HbO_2','HbR','Total','location','southwest')
             xlabel('Frequency (Hz)')
-            title(strcat(visName,'  Normalized fft '),'fontsize',14);
+            title(strcat(visName,'  Normalized fft '),'fontsize',14,'Interpreter', 'none');
             ytickformat('%.1f');
             saveas(gcf,(fullfile(saveDir_cat,strcat(visName,'_FCfftCurve.jpg'))));
       

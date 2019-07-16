@@ -97,7 +97,8 @@ if ~isempty(jrgeco1aCorr_blocks_downsampled)
     axis image off
     title('jrgeco1aCorr');
     colormap jet
-    
+        hold on
+    contour(ROI_barrel,'k')
     [x1_jrgeco1aCorr,y1_jrgeco1aCorr] = ginput(1);
     [x2_jrgeco1aCorr,y2_jrgeco1aCorr] = ginput(1);
     
