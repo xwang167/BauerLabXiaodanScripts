@@ -85,7 +85,7 @@ if isempty(gcampCorr_blocks_downsampled)&& isempty(jrgeco1aCorr_blocks_downsampl
     
     max_total = prctile(AvgTotal_stim(ROI_total),99);
     temp = AvgTotal_stim.*ROI_total;
-    ROI_total = temp>0.5*max_total;
+    ROI_total = temp>0.9*max_total;
 end
 
 ROI_total_contour = bwperim(ROI_total);

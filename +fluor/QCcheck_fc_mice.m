@@ -2,11 +2,13 @@ close all;clearvars;clc
 import mice.*
 excelFile = "D:\gcamp\gcamp_awake.xlsx";
 isZTransform = true;
+set(0,'defaulttextfontsize',28);
+set(0,'defaultaxesfontsize',12);
 
 info.nVx = 128;
 info.nVy = 128;
 %
-excelRows = [181 183 185 ];
+excelRows = [195 202 204];
 
 numMice = length(excelRows);
 suffix = {'_cat','NoDetrend_cat','_processed','_NoDetrend'};
@@ -134,7 +136,8 @@ for ii = 3
         end
     end
     processedName_mice = strcat(recDate,'-',miceName,'-',sessionType,suffix(ii),'.mat');
-    visName = strcat(recDate,'-',miceName,'-',sessionType,suffix(ii));
+    titleName = strcat(recDate,miceName);
+    visName = 'Averaged Across Mice';
     R_jrgeco1aCorr_Delta_mice = mean(R_jrgeco1aCorr_Delta_mice,4);
     R_jrgeco1aCorr_ISA_mice  = mean(R_jrgeco1aCorr_ISA_mice,4);
     R_oxy_Delta_mice  = mean(R_oxy_Delta_mice,4);
@@ -180,7 +183,7 @@ for ii = 3
             traceSpecies = {'oxy','jrgeco1aCorr','deoxy','total'};
             traceColor = {'r', 'g','b','k'};
             figure
-            subplot('position', [0.12 0.12 0.6 0.6])
+
             
             for ii = 1:4
                 
@@ -188,31 +191,35 @@ for ii = 3
                 powerCurve = genvarname(['powerdata_' traceSpecies{ii} '_mice']);
                 
                 figure(1)
+                subplot('position', [0.2 0.14 0.6 0.8])
                 if ii==2
                     yyaxis left
                     set(gca, 'YScale', 'log')
-                    ylabel('G6((\DeltaF/F)^2/Hz)')
+                    ylabel('R1((\DeltaF/F)^2/Hz)')
                     eval(['ylim([-inf 1.1*max(' powerCurve ')])'])
                 else
                     yyaxis right
                     ylabel('Hb(M^2/Hz)')
                 end
                 eval(['p' num2str(ii) '= loglog(hz,' powerCurve ',traceColor{ii});']);
+                xlim([hz(1),hz(end)])
                 hold on
                 
                 
                                
                 figure(2)
+                subplot('position', [0.2 0.14 0.6 0.8])
                 if ii==2
                     yyaxis left
                     set(gca, 'YScale', 'log')
-                    ylabel('G6(\DeltaF/F/Hz)')
+                    ylabel('R1(\DeltaF/F/Hz)')
                     eval(['ylim([-inf 1.1*max(' fftCurve ')])'])
                 else
                     yyaxis right
                     ylabel('Hb(M/Hz)')
                 end
                 eval(['p' num2str(ii) '= loglog(hz2(1:ceil(end/2)),' fftCurve '(1:ceil(end/2)),traceColor{ii});']);
+                xlim([hz(1) hz(ceil(end/2))])
                 hold on
                 
             end
@@ -220,15 +227,17 @@ for ii = 3
             figure(1)
             legend(traceSpecies{2},'HbO_2','HbR','Total','location','southwest')
             xlabel('Frequency (Hz)')
-            title(strcat(visName,'  Power Spectrum Density'),'fontsize',14,'Interpreter', 'none');
+            suptitle(strcat(' Power Spectrum Density',32, visName));
             ytickformat('%.1f');
-            saveas(gcf,(fullfile(saveDir_cat,strcat(visName,'_FCpowerCurve.jpg'))));
+            saveas(gcf,(fullfile(saveDir_cat,strcat(titleName,'_FCpowerCurve.jpg'))));
+            savefig(fullfile(saveDir_cat,strcat(titleName,'_FCpowerCurve')))
             figure(2)
             legend(traceSpecies{2},'HbO_2','HbR','Total','location','southwest')
             xlabel('Frequency (Hz)')
-            title(strcat(visName,'  Normalized fft '),'fontsize',14,'Interpreter', 'none');
+            suptitle(strcat(' Normalized fft',32,visName));
             ytickformat('%.1f');
-            saveas(gcf,(fullfile(saveDir_cat,strcat(visName,'_FCfftCurve.jpg'))));
+            saveas(gcf,(fullfile(saveDir_cat,strcat(titleName,'_FCfftCurve.jpg'))));
+            savefig(fullfile(saveDir_cat,strcat(visName,'_FCfftCurve')))
       
             
             close all
@@ -251,7 +260,13 @@ for ii = 3
                     
                     
                     colormap jet
-                    eval(['imagesc(log(' powerMap '))'])
+                    if strcmp(bandTypes{jj},'ISA');
+                    bandRange = [0.4 4];
+                 
+                    elseif strcmp(bandTypes{jj},'Delta');
+                      bandRange = [0.009 0.08];   
+                    end
+                    eval(['imagesc(log(' powerMap '/(bandRange(2)-bandRange(1))))'])
                     cb = colorbar();
                     cb.Ruler.MinorTick = 'on';
                     if ii == 1
@@ -268,7 +283,9 @@ for ii = 3
                     
                 end
             end
+            suptitle(strcat('Power Map', 32 ,visName))
             saveas(gcf,(fullfile(saveDir_cat,strcat(visName,'_FCpowerMap.jpg'))));
+            savefig(fullfile(saveDir_cat,strcat(visName,'_FCpowerMap')))
             
             
             

@@ -22,15 +22,13 @@ function traceImagePlot(oxy_blocks,deoxy_blocks,total_blocks,oxy_blocks_downsamp
 import mouse.*
 
 
-%
-% prompt = 'Does the ROI seem to be right? Y/N';
+
 p = inputParser;
 
 
 addParameter(p,'time',[],@isnumeric);
 addParameter(p,'input',[],@isnumeric);
 
-addParameter(p,'xform_isbrain',[]);
 addParameter(p,'jrgeco1aCorr_blocks',[],@isnumeric);
 addParameter(p,'jrgeco1a_blocks',[],@isnumeric);
 addParameter(p,'red_blocks',[],@isnumeric);
@@ -56,7 +54,7 @@ parse(p,varargin{:});
 
 time = p.Results.time;
 input = p.Results.input;
-xform_isbrain = p.Results.xform_isbrain;
+
 jrgeco1aCorr_blocks = p.Results.jrgeco1aCorr_blocks;
 jrgeco1aCorr_blocks_downsampled = p.Results.jrgeco1aCorr_blocks_downsampled;
 
@@ -370,12 +368,12 @@ ylabel('HBO_2,HbR(\DeltaM)','FontSize',12)
 if ~isempty(Avgjrgeco1aCorr_stim)
     ROI_jrgeco1aCorr_contour = bwperim(ROI_jrgeco1aCorr);
     subplot('position',[0.6,0.25,0.15,0.2])
-    imagesc(Avgjrgeco1aCorr_stim,[-temp_jrgeco1aCorr_max temp_jrgeco1aCorr_max])
+    imagesc(Avgjrgeco1aCorr_stim*100,[-temp_jrgeco1aCorr_max*100 temp_jrgeco1aCorr_max*100])
     colorbar
     hold on
     contour(ROI_jrgeco1aCorr_contour,'k')
     axis image off
-    title('jrgeco1aCorr at');
+    title('jrgeco1aCorr %');
 end
 
 if ~isempty(AvggcampCorr_stim)
@@ -521,7 +519,7 @@ if ~isempty(Avgjrgeco1aCorr_stim)
     
     if isempty(time)
         for i  = 0:1/sessionInfo.stimFrequency:sessionInfo.stimduration-1/sessionInfo.stimFrequency
-            line([sessionInfo.stimbaseline/sessionInfo.framerate+i sessionInfo.stimbaseline/sessionInfo.framerate+i],[ 1.1*min_value 1.1*max_jrgeco1aCorr]);
+            line([sessionInfo.stimbaseline/sessionInfo.framerate+i sessionInfo.stimbaseline/sessionInfo.framerate+i],[ 1.1*min_value 1.3*max_jrgeco1aCorr]);
             hold on
         end
     else
@@ -531,7 +529,7 @@ if ~isempty(Avgjrgeco1aCorr_stim)
     ax.FontSize = 8;
     xlim([0 round(sessionInfo.stimblocksize/sessionInfo.framerate)])
     
-    ylim([1.1*min_value 1.1*max_jrgeco1aCorr])
+    ylim([1.1*min_value 1.3*max_jrgeco1aCorr])
     
     lgd =legend('R1a(corr.)','R1a(raw)','625nm');
     lgd.FontSize = 14;
@@ -543,6 +541,7 @@ if ~isempty(Avgjrgeco1aCorr_stim)
     
     ROI_jrgeco1aCorr_contour = bwperim(ROI_jrgeco1aCorr);
     subplot('position',[0.8,0.1,0.2,0.25])
+    Avgjrgeco1aCorr_stim(isinf(Avgjrgeco1aCorr_stim)) = 0;
     imagesc(Avgjrgeco1aCorr_stim*100,[-temp_jrgeco1aCorr_max*100 temp_jrgeco1aCorr_max*100])
     colormap jet
     hold on

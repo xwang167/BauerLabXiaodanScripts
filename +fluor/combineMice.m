@@ -1,10 +1,10 @@
 close all;clearvars;clc
 %excelRows = 113:115;
-excelRows = [182 184 186];
+excelRows = [203 205];
 excelFile = "D:\GCaMP\GCaMP_awake.xlsx";
 nVx = 128;
 nVy = 128;
-catDir = 'J:\ProcessedData_3\GCaMP\cat' ;
+catDir = 'J:\RGECO\cat' ;
 %catDir = 'J:\ProcessedData_2\Zyla\cat';
 miceName = [];
 xform_datahb_mice_GSR = [];
@@ -226,7 +226,7 @@ elseif strcmp(sessionType,'stim')
              [oxy_downsampled_GSR,deoxy_downsampled_GSR,total_downsampled_GSR,goodBlocks_GSR,temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,stimStartTime,stimEndTime,jrgeco1aCorr_downsampled_GSR,jrgeco1a_downsampled_GSR, temp_jrgeco1aCorr_max_GSR,~,~,~] = fluor.pickGoodBlocks(double(oxy_GSR),double(deoxy_GSR),double(total_GSR),info.freqout,sessionInfo,output_GSR,texttitle_GSR,'jrgeco1aCorr',double(jrgeco1aCorr_GSR),'jrgeco1a',double(jrgeco1a_GSR));
   
         [~,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim,ROI_jrgeco1aCorr_GSR,Avgjrgeco1aCorr_stim,~,~] = fluor.generatePeakMapandROI(oxy_downsampled_GSR,deoxy_downsampled_GSR,total_downsampled_GSR,temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,stimStartTime,stimEndTime,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_downsampled_GSR,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_GSR);
-        fluor.traceImagePlot(oxy_GSR,deoxy_GSR,total_GSR,oxy_downsampled_GSR,deoxy_downsampled_GSR,total_downsampled_GSR,goodBlocks_GSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,sessionInfo,output_GSR,texttitle_GSR,'jrgeco1aCorr_blocks',jrgeco1aCorr_GSR,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_downsampled_GSR,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_GSR,'Avgjrgeco1aCorr_stim',Avgjrgeco1aCorr_stim,'ROI_jrgeco1aCorr',ROI_jrgeco1aCorr_GSR,'jrgeco1a_blocks_downsampled',jrgeco1a_downsampled_GSR,'red_blocks_downsampled',red_downsampled_GSR,'jrgeco1a_blocks',jrgeco1a_GSR,'red_blocks',red_GSR,'xform_isbrain',xform_isbrain_mice)
+        fluor.traceImagePlot(oxy_GSR,deoxy_GSR,total_GSR,oxy_downsampled_GSR,deoxy_downsampled_GSR,total_downsampled_GSR,goodBlocks_GSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_GSR,temp_deoxy_max_GSR,temp_total_max_GSR,sessionInfo,output_GSR,texttitle_GSR,'jrgeco1aCorr_blocks',jrgeco1aCorr_GSR,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_downsampled_GSR,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_GSR,'Avgjrgeco1aCorr_stim',Avgjrgeco1aCorr_stim,'ROI_jrgeco1aCorr',ROI_jrgeco1aCorr_GSR,'jrgeco1a_blocks_downsampled',jrgeco1a_downsampled_GSR,'red_blocks_downsampled',red_downsampled_GSR,'jrgeco1a_blocks',jrgeco1a_GSR,'red_blocks',red_GSR)
         
     elseif strcmp(char(sessionInfo.mouseType),'WT')
         maskName = strcat(recDate,'-',mouseName,'-LandmarksandMarks','.mat');
@@ -352,6 +352,9 @@ elseif strcmp(sessionType,'stim')
         jrgeco1a_NoGSR = jrgeco1a_NoGSR.*xform_isbrain_mice;
         jrgeco1aCorr_NoGSR = jrgeco1aCorr_NoGSR.*xform_isbrain_mice;
         red_NoGSR = red_NoGSR.*xform_isbrain_mice;
+        jrgeco1a_NoGSR(isnan(jrgeco1a_NoGSR)) = 0;
+        jrgeco1aCorr_NoGSR(isnan(jrgeco1aCorr_NoGSR)) =0;
+        red_NoGSR(isnan(red_NoGSR)) =0;
         
     end
     
@@ -430,7 +433,7 @@ elseif strcmp(sessionType,'stim')
         red_downsampled_NoGSR = resampledata(red_NoGSR,size(red_NoGSR,3),numDesample,10^-5);
         
         [ROI_total,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim,ROI_jrgeco1aCorr_GSR,Avgjrgeco1aCorr_stim,~,~] = fluor.generatePeakMapandROI(oxy_downsampled_NoGSR,deoxy_downsampled_NoGSR,total_downsampled_NoGSR,temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,stimStartTime,stimEndTime,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_downsampled_NoGSR,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_NoGSR);
-        fluor.traceImagePlot(oxy_NoGSR,deoxy_NoGSR,total_NoGSR,oxy_downsampled_NoGSR,deoxy_downsampled_NoGSR,total_downsampled_NoGSR,goodBlocks_NoGSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,sessionInfo,output_NoGSR,texttitle_NoGSR,'jrgeco1aCorr_blocks',jrgeco1aCorr_NoGSR,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_downsampled_NoGSR,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_NoGSR,'Avgjrgeco1aCorr_stim',Avgjrgeco1aCorr_stim,'ROI_jrgeco1aCorr',ROI_jrgeco1aCorr_GSR,'jrgeco1a_blocks_downsampled',jrgeco1a_downsampled_NoGSR,'red_blocks_downsampled',red_downsampled_NoGSR,'jrgeco1a_blocks',jrgeco1a_NoGSR,'red_blocks',red_NoGSR,'xform_isbrain',xform_isbrain_mice)
+        fluor.traceImagePlot(oxy_NoGSR,deoxy_NoGSR,total_NoGSR,oxy_downsampled_NoGSR,deoxy_downsampled_NoGSR,total_downsampled_NoGSR,goodBlocks_NoGSR,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim, temp_oxy_max_NoGSR,temp_deoxy_max_NoGSR,temp_total_max_NoGSR,sessionInfo,output_NoGSR,texttitle_NoGSR,'jrgeco1aCorr_blocks',jrgeco1aCorr_NoGSR,'jrgeco1aCorr_blocks_downsampled',jrgeco1aCorr_downsampled_NoGSR,'temp_jrgeco1aCorr_max',temp_jrgeco1aCorr_max_NoGSR,'Avgjrgeco1aCorr_stim',Avgjrgeco1aCorr_stim,'ROI_jrgeco1aCorr',ROI_jrgeco1aCorr_GSR,'jrgeco1a_blocks_downsampled',jrgeco1a_downsampled_NoGSR,'red_blocks_downsampled',red_downsampled_NoGSR,'jrgeco1a_blocks',jrgeco1a_NoGSR,'red_blocks',red_NoGSR)
     elseif strcmp(char(sessionInfo.mouseType),'WT')
         maskName = strcat(recDate,'-',mouseName,'-LandmarksandMarks','.mat');
         load(fullfile(saveDir,maskName), 'xform_isbrain_mice','isbrain')
@@ -444,14 +447,7 @@ elseif strcmp(sessionType,'stim')
         
         fluor.traceImagePlot_gcamp(oxy_NoGSR,deoxy_NoGSR,total_NoGSR,gcamp_NoGSR,gcampCorr_NoGSR,green_NoGSR,info,sessionInfo,output_NoGSR,texttitle_NoGSR,xform_isbrain_mice)
         close all
-    elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
-        
-        fluor.traceImagePlot_rgeco(oxy_NoGSR,deoxy_NoGSR,total_NoGSR,jrgeco1a_NoGSR,jrgeco1aCorr_NoGSR,red_NoGSR,info,sessionInfo,output_NoGSR,texttitle_NoGSR,xform_isbrain_mice)
-        clear oxy_NoGSR deoxy_NoGSR total_NoGSR
-        %         fluor.traceImagePlot_rgeco(oxy_noGSR,deoxy_noGSR,total_noGSR,jrgeco1a_noGSR,jrgeco1aCorr_noGSR,red_noGSR,info,sessionInfo,output_noGSR,texttitle_noGSR,xform_isbrain_mice)
-        %         clear oxy_noGSR deoxy_noGSR total_noGSR
-        close all
-    elseif strcmp(char(sessionInfo.mouseType),'WT')
+      elseif strcmp(char(sessionInfo.mouseType),'WT')
         fluor.traceImagePlot_WT(oxy_NoGSR,deoxy_NoGSR,total_NoGSR,info,sessionInfo,output_NoGSR,texttitle_NoGSR)
         clear oxy_NoGSR deoxy_NoGSR total_NoGSR
         %                 fluor.traceImagePlot_WT(oxy_noGSR,deoxy_noGSR,total_noGSR,info,sessionInfo,output_noGSR,texttitle_noGSR)

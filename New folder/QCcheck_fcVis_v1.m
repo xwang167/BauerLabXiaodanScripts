@@ -3,6 +3,7 @@ disp('QC visualization')
 seednames={'Olf','Fr','Cg','M','SS','RS','V'};
 numseeds=numel(seednames);
 
+
 figure('units','normalized','outerposition',[0 0 1 1])
 colormap jet
 for s=1:numseeds
@@ -90,7 +91,7 @@ set(gca,'XTickLabel',{'OL','FL','CL','ML','SL','RL','VL','OR','FR','CR','MR','SR
 set(gca,'YTickLabel',{'OL','FL','CL','ML','SL','RL','VL','OR','FR','CR','MR','SR','RR','VR'})
 title('Correlation Matrix')
 
-subplot('position', [0.75 0.098 0.19 0.32]);
+pFluor = subplot('position', [0.75 0.098 0.19 0.32]);
 
 imagesc(Rs_fluorCorr_band,[-1 1]);
 
@@ -108,17 +109,19 @@ ylabel(h,'z','FontSize',12);
 else
   ylabel(h,'r','FontSize',12);  
 end
-annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',strcat(visName," " ,bandname, " ",'Data Visualization'),'FontWeight','bold','FontSize',18,'Interpreter','none');
-annotation('textbox',[0.1 0.9 0.2 0.04],'HorizontalAlignment','center','LineStyle','none','String',"Oxy",'FontWeight','bold','Color',[1 0 0],'FontSize',14);
+set(pFluor, 'Position', [0.75 0.098 0.19 0.32])
+annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',strcat(visName," " ,bandname, " ",'Data Visualization'),'FontWeight','bold','FontSize',28,'Interpreter','none');
+annotation('textbox',[0.1 0.92 0.2 0.04],'HorizontalAlignment','center','LineStyle','none','String',"Oxy",'FontWeight','bold','Color',[1 0 0],'FontSize',28);
 
 if strcmp(fluorName,'gcamp6f')
-    annotation('textbox',[0.65 0.9 0.2 0.04],'HorizontalAlignment','center','LineStyle','none','String',strcat(fluorName,'Corr'),'FontWeight','bold','Color',[0 1 0],'FontSize',14);
+    annotation('textbox',[0.65 0.92 0.2 0.04],'HorizontalAlignment','center','LineStyle','none','String',strcat(fluorName,'Corr'),'FontWeight','bold','Color',[0 1 0],'FontSize',28);
 elseif strcmp(fluorName,'jrgeco1a')
-    annotation('textbox',[0.65 0.9 0.2 0.04],'HorizontalAlignment','center','LineStyle','none','String',strcat(fluorName,'Corr'),'FontWeight','bold','Color',[1 0 0],'FontSize',14);
+    annotation('textbox',[0.65 0.92 0.2 0.04],'HorizontalAlignment','center','LineStyle','none','String',strcat(fluorName,'Corr'),'FontWeight','bold','Color',[1 0 0],'FontSize',28);
 end
-
+savefig(strcat(fullfile(saveDir,visName),'_',bandname,'FC'))
     
 output= strcat(fullfile(saveDir,visName),'_',bandname,'FC.jpg');
+
 orient portrait
 print ('-djpeg', '-r300', output);
 
