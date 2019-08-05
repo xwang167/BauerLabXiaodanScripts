@@ -88,18 +88,20 @@ set(gca,'XTickLabel',TickLabels)
 title('Std Deviation');
 ylabel('% Deviation')
 
+
 %% FFT Check
 fdata=abs(fft(logmean(mdata),[],2));
 hz=linspace(0,frameRate,info.T1);
 subplot('position', [0.1 0.08 0.25 0.29]);
-p=loglog(hz(1:ceil(info.T1)),fdata(:,1:ceil(info.T1))'); title('FFT Raw Data');
+ title('FFT Raw Data');
 for c=1:systemInfo.LEDFiles;
+    p(c)=loglog(hz(1:ceil(info.T1)),fdata(c,1:ceil(info.T1))'/10^(c-1));
     set(p(c),'Color',Colors(c,:));
 end
 xlabel('Frequency (Hz)')
 ylabel('Magnitude')
 xlim([0.01 10]);
-legend(p,legendName,'Location','southwest')
+legend(legendName,'Location','southwest')%legend(p,legendName,'Location','southwest')
 
 %% Movement Check
 rawdata=reshape(rawdata, info.nVy, info.nVx,systemInfo.LEDFiles, []);

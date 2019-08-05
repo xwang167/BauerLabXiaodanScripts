@@ -202,7 +202,7 @@ for ii = 3
                     ylabel('Hb(M^2/Hz)')
                 end
                 eval(['p' num2str(ii) '= loglog(hz,' powerCurve ',traceColor{ii});']);
-                xlim([hz(1),hz(end)])
+                xlim([10^-2,hz(end)])
                 hold on
                 
                 
@@ -219,7 +219,7 @@ for ii = 3
                     ylabel('Hb(M/Hz)')
                 end
                 eval(['p' num2str(ii) '= loglog(hz2(1:ceil(end/2)),' fftCurve '(1:ceil(end/2)),traceColor{ii});']);
-                xlim([hz(1) hz(ceil(end/2))])
+                xlim([10^-2 hz(ceil(end/2))])
                 hold on
                 
             end

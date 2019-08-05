@@ -300,7 +300,6 @@ if ~isempty(Avgjrgeco1aCorr_stim)
     ylim([-1.1*max_jrgeco1aCorr 1.1*max_jrgeco1aCorr])
     ylabel('jrgeco1a(\DeltaF/F)','FontSize',12);
     hold on
-
 end
 
 
@@ -355,8 +354,7 @@ lgd.FontSize = 14;
 
 
 xlabel('Time(s)','FontSize',12)
-
-ylabel('HBO_2,HbR(\DeltaM)','FontSize',12)
+ylabel('Hb(\DeltaM)','FontSize',12)
 
 
 
