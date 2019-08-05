@@ -1,4 +1,4 @@
-function [ROI_total,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim,ROI_jrgeco1aCorr,Avgjrgeco1aCorr_stim,ROI_gcampCorr,AvggcampCorr_stim] = generatePeakMapandROI(oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,temp_oxy_max,temp_deoxy_max,temp_total_max,stimStartTime,stimEndTime,varargin)
+function [ROI,AvgOxy_stim, AvgDeOxy_stim, AvgTotal_stim,Avgjrgeco1aCorr_stim,AvggcampCorr_stim] = generatePeakMapandROI(oxy_blocks_downsampled,deoxy_blocks_downsampled,total_blocks_downsampled,temp_oxy_max,temp_deoxy_max,temp_total_max,stimStartTime,stimEndTime,varargin)
 
 load('D:\OIS_Process\atlas.mat','AtlasSeeds')
 barrel = AtlasSeeds == 9;
