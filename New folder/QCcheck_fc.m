@@ -105,8 +105,8 @@ for ii = 1:length(traceSpecies)
             
             for kk = 1:info.nVy
                 for ll=1:info.nVx
-                    eval([powerMap '(kk,ll) = (hz(2)-hz(1))*sum(Pxx(kk,ll,(startLoc_' bandTypes{jj} ': endLoc_' ,bandTypes{jj} ...
-                        ')/(sessionInfo.bandtype_' bandTypes{jj} '(3)-sessionInfo.bandtype_' bandTypes{jj} '(2)));']);
+                    eval([powerMap '(kk,ll) = (hz(2)-hz(1))*sum(Pxx(kk,ll,startLoc_' bandTypes{jj} ': endLoc_' ,bandTypes{jj} ...
+                        '),3)/(sessionInfo.bandtype_' bandTypes{jj} '{3}-sessionInfo.bandtype_' bandTypes{jj} '{2});']);
                 end
             end
             

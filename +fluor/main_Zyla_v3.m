@@ -9,7 +9,7 @@ nVy = 128;
 %
 excelRows = [182];%[181:186  195 202:205];
 
-runs =1:3;
+runs =1;
 isDetrend = 1;
 % for excelRow = excelRows
 %     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':R',num2str(excelRow)]);
@@ -104,7 +104,7 @@ isDetrend = 1;
 %
 % % Process raw data to get xform_datahb and xform_fluor(if needed)
 
-% %
+%
 % for excelRow = excelRows
 %     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
 %     recDate = excelRaw{1}; recDate = string(recDate);
@@ -216,7 +216,7 @@ isDetrend = 1;
 %             load(fullfile(maskDir,maskName), 'affineMarkers','isbrain')
 %            
 %             visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
-%             QCcheck_raw(rawdata(:,:,:,sessionInfo.darkFrameNum/systemInfo.numLEDs+2:end),isbrain,systemType,sessionInfo.framerate,saveDir,visName,sessionInfo.mouseType)
+% %            QCcheck_raw(rawdata(:,:,:,sessionInfo.darkFrameNum/systemInfo.numLEDs+2:end),isbrain,systemType,sessionInfo.framerate,saveDir,visName,sessionInfo.mouseType)
 %             
 %             % detrend raw
 %                 if sessionInfo.darkFrameNum ==0

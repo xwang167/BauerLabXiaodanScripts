@@ -2,7 +2,13 @@ function QCcheck_fcVis_twoFluor(refseeds,R_fluor1_band, Rs_fluor1_band,R_fluor2_
 disp('QC visualization')
 seednames={'Olf','Fr','Cg','M','SS','RS','V'};
 numseeds=numel(seednames);
+    if isZTransform
+R_fluor1_band = atanh(R_fluor1_band);
+R_fluor2_band = atanh(R_fluor2_band);
+Rs_fluor1_band = atanh(Rs_fluor1_band);
+Rs_fluor2_band = atanh(Rs_fluor2_band);
 
+end
 
 figure('units','normalized','outerposition',[0 0 1 1])
 colormap jet
@@ -14,7 +20,7 @@ for s=1:numseeds
     else
         OE=0.02;
     end
-    
+
     subplot('position', [OE (0.47-((round(s/2)-1)*0.15))+0.3 0.10 0.12]);
     %             Im2=overlaymouse(R_oxy(:,:,(2*(s-1)+1)),double(WL_atlas), xform_isbrain,'jet',-1,1);
     imagesc(R_fluor1_band(:,:,(2*(s-1)+1)),[-1 1]); %changed 3/1/11
@@ -115,12 +121,10 @@ annotation('textbox',[0.1 0.92 0.2 0.04],'HorizontalAlignment','center','LineSty
 
     annotation('textbox',[0.65 0.92 0.2 0.04],'HorizontalAlignment','center','LineStyle','none','String',fluorName2,'FontWeight','bold','Color',fluorColor2,'FontSize',28);
 
-savefig(strcat(fullfile(saveDir,visName),'_',bandname,'FC'))
+savefig(gcf,fullfile(saveDir,strcat(visName,'_',bandname,'FC_',fluorName1,fluorName2,'.fig')))
+saveas(gcf,fullfile(saveDir,strcat(visName,'_',bandname,'FC_',fluorName1,fluorName2,'.png')))
     
-output= strcat(fullfile(saveDir,visName),'_',bandname,'FC.jpg');
 
-orient portrait
-print ('-djpeg', '-r300', output);
 
 
 

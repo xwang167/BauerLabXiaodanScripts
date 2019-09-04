@@ -352,7 +352,6 @@ lgd.FontSize = 14;
 
 
 
-
 xlabel('Time(s)','FontSize',12)
 ylabel('Hb(\DeltaM)','FontSize',12)
 

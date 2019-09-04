@@ -1,6 +1,6 @@
 close all;clearvars;clc
 %excelRows = 113:115;
-excelRows = [109 109 110];
+excelRows = [124 126 127];
 excelFile = "D:\GCaMP\GCaMP_awake.xlsx";
 nVx = 128;
 nVy = 128;

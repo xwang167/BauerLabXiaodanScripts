@@ -1,4 +1,4 @@
-function QCcheck_fc_twoFluor(fluor1,fluor2,fluorName1,fluorName2,fluorColor1,fluorColor2,xform_isbrain,framerate,saveDir,visName,isGSR)
+function QCcheck_fc_twoFluor(fluor1,fluor2,fluorName1,fluorName2,fluorColor1,fluorColor2,xform_isbrain,framerate,saveDir,visName,isZtrans,yunit1,yunit2)
 info.nVy = 128;
 info.nVx =128;
 T1 =  length(fluor1);
@@ -38,99 +38,100 @@ subplot_Index = 1;
 
 
 for ii = 1:length(traceSpecies)
-    data2 = genvarname(traceSpecies{ii});
-
+    data2 = genvarname(['fluor' num2str(ii)]);
+    
     eval([data2 '(isnan(' data2 ')) = 0;']);
+    
+    for jj = 1:length(bandTypes)
         
-        for jj = 1:length(bandTypes)
-            
-            
-            dataBandpass = genvarname([traceSpecies{ii} bandTypes{jj}]);
-            disp(['filtering ', traceSpecies{ii}, ' with ', bandTypes{jj}])
-         eval([dataBandpass '=mouse.freq.filterData(double(',data2,'),sessionInfo.bandtype_',bandTypes{jj},'{2},sessionInfo.bandtype_',bandTypes{jj},'{3},framerate);']);
-          
-%             eval([dataBandpass '=highpass(double(',data2,'),sessionInfo.bandtype_',bandTypes{jj},'{2},framerate);']);
-%            eval([dataBandpass '=lowpass(double(',dataBandpass,'),sessionInfo.bandtype_',bandTypes{jj},'{3},framerate);']);
-             eval([dataBandpass,'(isnan(',dataBandpass,'))= 0;']);
-            
-            if isGSR
-            disp('gsr');
-            eval([dataBandpass, '= mouse.process.gsr(',dataBandpass,',xform_isbrain);']);
+        
+        dataBandpass = genvarname([traceSpecies{ii} bandTypes{jj}]);
+        disp(['filtering ', traceSpecies{ii}, ' with ', bandTypes{jj}])
+        eval([dataBandpass '=mouse.freq.filterData(double(',data2,'),sessionInfo.bandtype_',bandTypes{jj},'{2},sessionInfo.bandtype_',bandTypes{jj},'{3},framerate);']);
+        
+        %             eval([dataBandpass '=highpass(double(',data2,'),sessionInfo.bandtype_',bandTypes{jj},'{2},framerate);']);
+        %            eval([dataBandpass '=lowpass(double(',dataBandpass,'),sessionInfo.bandtype_',bandTypes{jj},'{3},framerate);']);
+        eval([dataBandpass,'(isnan(',dataBandpass,'))= 0;']);
+        
+        
+        disp('gsr');
+        eval([dataBandpass, '= mouse.process.gsr(',dataBandpass,',xform_isbrain);']);
+        
+        eval([dataBandpass, '=', dataBandpass,'.*xform_isbrain;']);
+        eval([dataBandpass,'(isnan(',dataBandpass,')) = 0;']);
+        eval([dataBandpass,'=reshape(',dataBandpass,',info.nVy*info.nVx,[]);']);
+        
+        disp('Calculating R Rs')
+        eval(['strace=P2strace(P,',dataBandpass,', SeedsUsed);']);              % strace is each seeds trace resulting from averaging the pixels within a seed region
+        fcMap = genvarname(['R_',traceSpecies{ii},'_',bandTypes{jj}]);
+        eval([fcMap ' = strace2R(strace,' dataBandpass ', info.nVx, info.nVy); ']);                % R is the functional connectivity maps: normalize rows in time, dot product of those rows with strce
+        eval(['R_AP = makeRs(' dataBandpass ',strace); ']);                     % R_AP is a matrix of the seed-to-seed fc values
+        clear dataBandpass
+        idx=find(isnan(SeedsUsed(:,1)));
+        eval([fcMap,'(:,:,idx)=0;']);
+        R_AP(idx, idx)=0;
+        fcMatrix = genvarname(['Rs_' traceSpecies{ii} '_',bandTypes{jj}]);
+        eval([fcMatrix '= single(R_AP(map, map)); ']);
+        clear strace R_AP
+        
+        
+        disp('Calculating power map');
+        powerMap = genvarname([traceSpecies{ii} '_' bandTypes{jj} '_powerMap']);
+        eval([powerMap '= zeros(info.nVy,info.nVx);'])
+        %             for kk = 1:info.nVy
+        %                 for ll=1:info.nVx
+        %                     eval(['fdata_temp = abs(fft(' data2 '(kk,ll,:)));']);
+        %                     fdata_temp = fdata_temp./mean(fdata_temp);
+        %                     %%% range for Delta and ISA
+        %                     eval([powerMap '(kk,ll) = sum(fdata_temp(startLoc_' bandTypes{jj} ': endLoc_' ,bandTypes{jj} '))/(endLoc_' bandTypes{jj} '-startLoc_' bandTypes{jj} ');']);
+        %                 end
+        %             end
+        
+        eval(['data = reshape(' data2 ',info.nVy*info.nVy,[]);'])
+        data = data';
+        [Pxx,hz] = pwelch(data,[],[],[],framerate);
+        
+        [~,startLoc_ISA]=min(abs(hz-sessionInfo.bandtype_ISA {2}));
+        [~,startLoc_Delta]=min(abs(hz-sessionInfo.bandtype_Delta {2}));
+        [~,endLoc_ISA]=min(abs(hz-sessionInfo.bandtype_ISA {3}));
+        [~,endLoc_Delta]=min(abs(hz-sessionInfo.bandtype_Delta {3}));
+        
+        Pxx = Pxx';
+        Pxx = reshape(Pxx,info.nVy,info.nVx,[]);
+        
+        for kk = 1:info.nVy
+            for ll=1:info.nVx
+                eval([powerMap '(kk,ll) = (hz(2)-hz(1))*sum(Pxx(kk,ll,startLoc_' bandTypes{jj} ': endLoc_' ,bandTypes{jj} ...
+                    '))/(sessionInfo.bandtype_' bandTypes{jj} '{3}-sessionInfo.bandtype_' bandTypes{jj} '{2});']);
             end
-            eval([dataBandpass, '=', dataBandpass,'.*xform_isbrain;']);
-            eval([dataBandpass,'(isnan(',dataBandpass,')) = 0;']);
-            eval([dataBandpass,'=reshape(',dataBandpass,',info.nVy*info.nVx,[]);']);
+        end
+        
+        load('D:\OIS_Process\noVasculatureMask.mat')
+        figure(1)
+        subplot(2,2,subplot_Index)
+        mask = xform_isbrain.*(double(leftMask)+double(rightMask));
+        mask(mask==0)=NaN;
+        eval([powerMap '=' powerMap '.*mask;']);
+        
+        colormap jet
+        eval(['imagesc(log10(abs(' powerMap ')))'])
+        cb = colorbar();
+        cb.Ruler.MinorTick = 'on';
+        if ii == 1
+            ylabel(cb,['log10(',yunit1,'^2)'],'FontSize',12)
+        elseif ii==2
+            ylabel(cb,['log10((',yunit2,'^2)'],'FontSize',12)
+        end
+        
+        axis image off
+        title([ traceSpecies{ii} bandTypes{jj} ])
+        subplot_Index = subplot_Index+1;
+        if exist(strcat(fullfile(saveDir,visName),".mat"))
+            eval(['save(strcat(fullfile(saveDir,visName),".mat"),' char(39) fcMatrix char(39) ',' char(39) fcMap char(39) ','  char(39) powerMap char(39) ',' char(39) '-append' char(39) ');'])
+        else
+            eval(['save(strcat(fullfile(saveDir,visName),".mat"),' char(39) fcMatrix char(39) ',' char(39) fcMap char(39) ','  char(39) powerMap char(39)  ');'])
             
-            disp('Calculating R Rs')
-            eval(['strace=P2strace(P,',dataBandpass,', SeedsUsed);']);              % strace is each seeds trace resulting from averaging the pixels within a seed region
-            fcMap = genvarname(['R_',traceSpecies{ii},'_',bandTypes{jj}]);
-            eval([fcMap ' = strace2R(strace,' dataBandpass ', info.nVx, info.nVy); ']);                % R is the functional connectivity maps: normalize rows in time, dot product of those rows with strce
-            eval(['R_AP = makeRs(' dataBandpass ',strace); ']);                     % R_AP is a matrix of the seed-to-seed fc values
-            clear dataBandpass
-            idx=find(isnan(SeedsUsed(:,1)));
-            eval([fcMap,'(:,:,idx)=0;']);
-            R_AP(idx, idx)=0;
-            fcMatrix = genvarname(['Rs_' traceSpecies{ii} '_',bandTypes{jj}]);
-            eval([fcMatrix '= single(R_AP(map, map)); ']);
-            clear strace R_AP
-            
-            
-            disp('Calculating power map');
-            powerMap = genvarname([traceSpecies{ii} '_' bandTypes{jj} '_powerMap']);
-            eval([powerMap '= zeros(info.nVy,info.nVx);'])
-            %             for kk = 1:info.nVy
-            %                 for ll=1:info.nVx
-            %                     eval(['fdata_temp = abs(fft(' data2 '(kk,ll,:)));']);
-            %                     fdata_temp = fdata_temp./mean(fdata_temp);
-            %                     %%% range for Delta and ISA
-            %                     eval([powerMap '(kk,ll) = sum(fdata_temp(startLoc_' bandTypes{jj} ': endLoc_' ,bandTypes{jj} '))/(endLoc_' bandTypes{jj} '-startLoc_' bandTypes{jj} ');']);
-            %                 end
-            %             end
-            
-            eval(['data = reshape(' data2 ',info.nVy*info.nVy,[]);'])
-            data = data';
-            [Pxx,hz] = pwelch(data,[],[],[],framerate);
-            
-            [~,startLoc_ISA]=min(abs(hz-sessionInfo.bandtype_ISA {2}));
-            [~,startLoc_Delta]=min(abs(hz-sessionInfo.bandtype_Delta {2}));
-            [~,endLoc_ISA]=min(abs(hz-sessionInfo.bandtype_ISA {3}));
-            [~,endLoc_Delta]=min(abs(hz-sessionInfo.bandtype_Delta {3}));
-            
-            Pxx = Pxx';
-            Pxx = reshape(Pxx,info.nVy,info.nVx,[]);
-            
-            for kk = 1:info.nVy
-                for ll=1:info.nVx
-                    eval([powerMap '(kk,ll) = (hz(2)-hz(1))*sum(Pxx(kk,ll,(startLoc_' bandTypes{jj} ': endLoc_' ,bandTypes{jj} ...
-                        ')/(sessionInfo.bandtype_' bandTypes{jj} '(3)-sessionInfo.bandtype_' bandTypes{jj} '(2)));']);
-                end
-            end
-            
-            load('D:\OIS_Process\noVasculatureMask.mat')
-            figure(1)
-            subplot(2,2,subplot_Index)
-            mask = xform_isbrain.*(double(leftMask)+double(rightMask));
-            mask(mask==0)=NaN;
-            eval([powerMap '=' powerMap '.*mask;']);
-            
-            colormap jet
-            eval(['imagesc(log10(abs(' powerMap ')))'])
-            cb = colorbar();
-            cb.Ruler.MinorTick = 'on';
-            if ii == 1
-                ylabel(cb,'log10(M^2)','FontSize',12)
-            elseif ii==2
-                ylabel(cb,'log10((\DeltaF/F)^2)','FontSize',12)
-            end
-            axis image off
-            title([ traceSpecies{ii} bandTypes{jj} ])
-            subplot_Index = subplot_Index+1;
-            if exist(strcat(fullfile(saveDir,visName),".mat"))
-                eval(['save(strcat(fullfile(saveDir,visName),".mat"),' char(39) fcMatrix char(39) ',' char(39) fcMap char(39) ','  char(39) powerMap char(39) ',' char(39) '-append' char(39) ');'])
-            else
-                eval(['save(strcat(fullfile(saveDir,visName),".mat"),' char(39) fcMatrix char(39) ',' char(39) fcMap char(39) ','  char(39) powerMap char(39)  ');'])
-                
-            end
+        end
         
         save(strcat(fullfile(saveDir,visName),".mat"),'hz','T1','-append')
         eval([data2, '=', data2,'.*xform_isbrain;']);
@@ -153,90 +154,84 @@ for ii = 1:length(traceSpecies)
     end
     
     disp('Calculating power curve')
-    eval([data2 '= single(reshape(' data2 ',info.nVy*info.nVx,[]));']);
-    eval(['mdata = squeeze(mean(' data2 '(ibi,:),1));']);
+    
     
     powerCurve = genvarname(['powerdata_' traceSpecies{ii}]);
-   
     
-    [mPxx,hz] = pwelch(mdata',[],[],[],framerate);
-    mPxx = mPxx';
-    eval([powerCurve '= mPxx;'])
+    
+    Pxx = reshape(Pxx,[],size(Pxx,3));
+    eval([powerCurve '= mean(Pxx(ibi,:),1);'])
     
     figure(2)
     subplot('position', [0.12 0.12 0.6 0.7])
-    if ii==2
+    if ii==1
         yyaxis left
-        set(gca, 'YScale', 'log')
-        ylabel('G6((\DeltaF/F)^2/Hz)')
+        set(gca, 'YScale', 'log','YColor',fluorColor1)
+        ylabel([ yunit1 '^2/Hz'])
         eval(['ylim([-inf 1.1*max(' powerCurve ')])'])
     else
         yyaxis right
-        ylabel('Hb(M^2/Hz)')
+        set(gca, 'YScale', 'log','YColor',fluorColor2)
+        ylabel([ yunit2 '^2/Hz'])
     end
     hz = hz';
     
-     eval(['p' num2str(ii) '= loglog(hz,' powerCurve ',traceColor{ii});']);
+    eval(['p' num2str(ii) '= loglog(hz,' powerCurve ',traceColor{ii});']);
     eval(['save(strcat(fullfile(saveDir,visName),".mat"),' char(39) powerCurve char(39) ',' char(39) '-append' char(39)  ',' char(39) 'hz' char(39) ');'])
     hold on
     
-
-      figure(3)
-         fftCurve = genvarname(['fdata_' traceSpecies{ii}]);
-                fdata = abs(fft(mdata));
-         eval([fftCurve '= fdata./mean(fdata);']);
+    figure(3)
+    fftCurve = genvarname(['fdata_' traceSpecies{ii}]);
+    fdata = abs(fft(data));
+    fdata = fdata';
+    eval([fftCurve '= mean(fdata(ibi,:),1);']);
     subplot('position', [0.12 0.12 0.6 0.7])
-    if ii==2
-        hold on
+    if ii==1
         yyaxis left
         set(gca, 'YScale', 'log')
-        ylabel('G6(\DeltaF/F)')
+        ylabel(yunit1)
         eval(['ylim([-inf 1.1*max(' fftCurve ')])'])
     else
         yyaxis right
-        ylabel('Hb(M)')
+        ylabel(yunit2)
     end
-   
-    
-
     eval(['p' num2str(ii) '= loglog(hz2(1:ceil(T1/2)),' fftCurve '(1:ceil(T1/2)),traceColor{ii});']);
     xlim([10^-2,10])
- eval(['save(strcat(fullfile(saveDir,visName),".mat"),' char(39) fftCurve char(39) ',' char(39) '-append' char(39)  ',' char(39) 'hz2' char(39) ');'])
+    eval(['save(strcat(fullfile(saveDir,visName),".mat"),' char(39) fftCurve char(39) ',' char(39) '-append' char(39)  ',' char(39) 'hz2' char(39) ');'])
     hold on
-
-    
 end
 
 figure(1);
-saveas(gcf,(fullfile(saveDir,strcat(visName,'_FCpowerMap.jpg'))));
+saveas(gcf,(fullfile(saveDir,strcat(visName,fluorName1,fluorName2,'_FCpowerMap.png'))));
+saveas(gcf,(fullfile(saveDir,strcat(visName,fluorName1,fluorName2,'_FCpowerMap.fig'))));
 
 figure(2)
-legend(traceSpecies{2},'HbO_2','HbR','Total')
+legend(fluorName1,fluorName2)
 xlabel('Frequency (Hz)')
-title(strcat(visName,'  Power Density Spectrum '),'fontsize',14);
+title(strcat(visName,'  PDS '),'fontsize',14, 'Interpreter', 'none');
 ytickformat('%.1f');
-saveas(gcf,(fullfile(saveDir,strcat(visName,'_FCpowerCurve.jpg'))));
+saveas(gcf,(fullfile(saveDir,strcat(visName,fluorName1,fluorName2,'_FCpowerCurve.png'))));
+saveas(gcf,(fullfile(saveDir,strcat(visName,fluorName1,fluorName2,'_FCpowerCurve.fig'))));
 
 figure(3)
-legend(traceSpecies{2},'HbO_2','HbR','Total','Location','southwest')
+legend(fluorName1,fluorName2,'Location','southwest')
 xlabel('Frequency (Hz)')
 
-title(strcat(visName,'  Normalized fft '),'fontsize',14);
+title(strcat(visName,'  Normalized fft '),'fontsize',14, 'Interpreter', 'none');
 ytickformat('%.1f');
-saveas(gcf,(fullfile(saveDir,strcat(visName,'_FCfftCurve.jpg'))));
-    
-if isGSR
-    visName = strcat(visName,'_GSR');
-else
-    
-    visName = strcat(visName,'_NoGSR');
+saveas(gcf,(fullfile(saveDir,strcat(visName,fluorName1,fluorName2,'_FCfftCurve.png'))));
+saveas(gcf,(fullfile(saveDir,strcat(visName,fluorName1,fluorName2,'_FCfftCurve.fig'))));
+
+
+
+for ii = 1:length(bandTypes)
+    fcMatrix1 = genvarname(['Rs_',fluorName1,'_',bandTypes{ii}]);
+    fcMatrix2 = genvarname(['Rs_',fluorName2,'_',bandTypes{ii}]);
+    fcMap1 = genvarname(['R_',fluorName1,'_',bandTypes{ii}]);
+    fcMap2 =  genvarname(['R_',fluorName2,'_',bandTypes{ii}]);
+    eval( ['QCcheck_fcVis_twoFluor(refseeds,' fcMap1 ',' fcMatrix1 ',' fcMap2 ',' fcMatrix2 ', fluorName1,fluorName2,fluorColor1,fluorColor2,bandTypes{ii},saveDir,visName,isZtrans)']);
 end
 
-
-    
-
-    QCcheck_fcVis_twoFluor(refseeds,R_FADCorr_ISA, Rs_FADCorr_ISA,R_jrgeco1aCorr_ISA,Rs_jrgeco1aCorr_ISA, fluorName1,fluorName2,fluorColor1,fluorColor2,'ISA',saveDir,visName,false)
-    QCcheck_fcVis_twoFluor(refseeds,R_FADCorr_Delta, Rs_FADCorr_Delta,R_jrgeco1aCorr_Delta, Rs_jrgeco1aCorr_Delta, fluorName1,fluorName2,fluorColor1,fluorColor2,'Delta',saveDir,visName,false)
 
 
 

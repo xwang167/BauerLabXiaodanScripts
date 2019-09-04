@@ -1,4 +1,4 @@
-function QCcheck_raw(raw,isbrain,system,frameRate,saveDir,visName,mouseType)
+function QCcheck_raw(raw,isbrain,system,frameRate,saveDir,visName)
 rawdata = double(raw);
 [info.nVy, info.nVx,systemInfo.LEDFiles, ~]=size(rawdata);
 info.T1=size(rawdata,4);
@@ -51,7 +51,7 @@ elseif strcmp(system, 'EastOIS1_Fluor')
     TickLabels = {'B','G','O', 'R' };
      legendName = {'green fluorescence', 'green LED', 'orange LED' 'red LED'};
 elseif strcmp(system, 'EastOIS2')
-    TickLabels = {'Blue_green','Green_red','G','R'};
+    TickLabels = {'B','G1','G2','R'};
     Colors = [0 0 1; 1 0 1;0 1 0;1 0 0];
     legendName = {'Blue Green fluorescence', 'Green red fluorescence','green LED', 'red LED'};
 
@@ -59,7 +59,7 @@ end
 
 
 
-subplot('position', [0.12 0.73 0.25 0.2])
+subplot('position', [0.1 0.75 0.25 0.2])
 p=plot(time,mdata); title('Raw Data');
 for c=1:systemInfo.LEDFiles;
     set(p(c),'Color',Colors(c,:));
@@ -71,17 +71,17 @@ ylim([0.8*min(min(mdata)) 1.1*max(max(mdata))])
 
 xlim([time(1) time(end)])
 
-subplot('position', [0.45 0.73 0.35 0.2])
+subplot('position', [0.45 0.68 0.5 0.27])
 p=plot(time,mdatanorm'); title('Normalized Raw Data');
 for c=1:systemInfo.LEDFiles;
     set(p(c),'Color',Colors(c,:));
 end
 xlabel('Time (sec)')
 ylabel('Mean Counts')
-ylim([0.8*min(min(mdatanorm)) 1.1*max(max(mdatanorm))])
+ylim([min(min(mdatanorm)) max(max(mdatanorm))])
 xlim([time(1) time(end)])
 
-subplot('position', [0.12 0.45 0.1 0.2])
+subplot('position', [0.42 0.09 0.14 0.18])
 plot(stddatanorm*100');
 set(gca,'XTick',(1:systemInfo.LEDFiles));
 set(gca,'XTickLabel',TickLabels)
@@ -92,11 +92,12 @@ ylabel('% Deviation')
 %% FFT Check
 fdata=abs(fft(logmean(mdata),[],2));
 hz=linspace(0,frameRate,info.T1);
-subplot('position', [0.1 0.08 0.25 0.29]);
+subplot('position', [0.1 0.08 0.25 0.6]);
  title('FFT Raw Data');
 for c=1:systemInfo.LEDFiles;
-    p(c)=loglog(hz(1:ceil(info.T1)),fdata(c,1:ceil(info.T1))'/10^(c-1));
+    p(c)=loglog(hz(1:ceil(info.T1)),fdata(c,1:ceil(info.T1))'/100^(c-1));
     set(p(c),'Color',Colors(c,:));
+    hold on
 end
 xlabel('Frequency (Hz)')
 ylabel('Magnitude')
@@ -148,14 +149,10 @@ end
 
 clear rawdata
 
-subplot('position', [0.35 0.45 0.5 0.2])
+subplot('position', [0.43 0.4 0.5 0.2])
 
 [AX, H1, H2]=plotyy(time, InstMvMt/1e6,time, LTMvMt/1e6);
-maxval=round(4*max(InstMvMt/1e6));
-set(AX(1),'ylim',[0 maxval]);
-set(AX(1),'ytick',[0,0.2,0.4,0.6,0.8,1]*maxval)
-set(AX(2),'ylim',[0 maxval]);
-set(AX(2), 'ytick',[0,0.2,0.4,0.6,0.8,1]*maxval)
+
 set(get(AX(1), 'YLabel'), 'String', {'Sum Abs Diff Frame to Frame,'; '(Counts x 10^6)'});
 set(get(AX(2),'YLabel'), 'String', {'Sum Abs Diff WRT First Frame,'; '(Counts x 10^6)'});
 xlabel('Time  (sec)');
@@ -164,7 +161,7 @@ xlim(AX(2), [time(1) time(end)])
 legend('Instantaneous Change','Change over Run');
 
 
-subplot('position', [0.50 0.08 0.34 0.2]);
+subplot('position', [0.62 0.08 0.34 0.2]);
 plot(time, Shift(1,:),'k');
 hold on;
 plot(time, Shift(2,:),'b');
