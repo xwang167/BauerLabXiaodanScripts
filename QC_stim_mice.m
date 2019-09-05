@@ -224,11 +224,11 @@ elseif strcmp(char(sessionInfo.miceType),'jrgeco1a')
     numDesample = size(xform_green_mice_NoGSR,3)/sessionInfo.framerate*info.freqout;
     factor = round(numDesample/1);
     numDesample = factor*1;
-%     
-    disp('QC on non GSR stim')
-    QC_stim(squeeze(xform_datahb_mice_NoGSR(:,:,1,:)),squeeze(xform_datahb_mice_NoGSR(:,:,2,:)),...
-        xform_FAD_mice_NoGSR,xform_FADCorr_mice_NoGSR,xform_green_mice_NoGSR,xform_jrgeco1a_mice_NoGSR,xform_jrgeco1aCorr_mice_NoGSR,xform_red_mice_NoGSR,...
-        xform_isbrain_mice,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR);
+% %     
+%     disp('QC on non GSR stim')
+%     QC_stim(squeeze(xform_datahb_mice_NoGSR(:,:,1,:)),squeeze(xform_datahb_mice_NoGSR(:,:,2,:)),...
+%         xform_FAD_mice_NoGSR,xform_FADCorr_mice_NoGSR,xform_green_mice_NoGSR,xform_jrgeco1a_mice_NoGSR,xform_jrgeco1aCorr_mice_NoGSR,xform_red_mice_NoGSR,...
+%         xform_isbrain_mice,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR);
     clear xofrm_datahb_mice_NoGSR xform_jrgeco1a_mice_NoGSR xform_jrgeco1aCorr_mice_NoGSR xform_red_mice_NoGSR  xform_FAD_mice_NoGSR xform_FADCorr_mice_NoGSR xform_green_mice_NoGSR
     
     

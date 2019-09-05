@@ -268,39 +268,6 @@ isDetrend = 1;
 %             
 %             save(fullfile(saveDir,processedName),'xform_datahb','sessionInfo','systemInfo','op','E','-v7.3')
 %             
-%             if strcmp(char(sessionInfo.mouseType),'gcamp6f')
-%                 
-%                 xform_fluor = squeeze(xform_raw(:,:,sessionInfo.fluorSpecies,:));
-%                 
-%                 baseline = nanmean(xform_fluor,3);
-%                 xform_fluor = xform_fluor./repmat(baseline,[1 1 size(xform_fluor,3)]); % make the data ratiometric
-%                 xform_fluor = xform_fluor - 1; % make the data change from baseline (center at zero)
-%                 
-% 
-%                 [op_in, E_in] = getHbOpticalProperties_xw(muspFcn,systemInfo.LEDFiles(1));
-%                 [op_out, E_out] = getHbOpticalProperties_xw(muspFcn,sessionInfo.fluorEmissionFile);
-%                 
-%                 
-%                 dpIn = op_in.dpf/2;
-%                 dpOut = op_out.dpf/2;
-%                 
-%                 
-%                 xform_gcamp= xform_fluor ;
-%                 xform_gcampCorr = mouse.physics.correctHb(xform_gcamp,xform_datahb,...
-%                     [E_in(1) E_out(1)],[E_in(2) E_out(2)],dpIn,dpOut);
-%                 xform_green = squeeze(xform_raw(:,:,2,:));
-%                 
-%                 xform_gcamp = process.smoothImage(xform_gcamp,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
-%                 xform_gcampCorr = process.smoothImage(xform_gcampCorr,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
-%                 
-%                 baseline = nanmean(xform_green,3);
-%                 xform_green = xform_green./repmat(baseline,[1 1 size(xform_green,3)]); % make the data ratiometric
-%                 xform_green = xform_green - 1;
-%                 xform_green = process.smoothImage(xform_green,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
-%                 
-%                 
-%                 save(fullfile(saveDir, processedName),'xform_gcamp','xform_gcampCorr','xform_green','op_in', 'E_in','op_out', 'E_out','-append')
-%             end
 % 
 %         else
 %             disp(strcat('OIS data already processed for ',processedName))
