@@ -11,94 +11,91 @@ excelRows = [182];%[181:186  195 202:205];
 
 runs =1;
 isDetrend = 1;
-% for excelRow = excelRows
-%     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':R',num2str(excelRow)]);
-%     recDate = excelRaw{1}; recDate = string(recDate);
-%     mouseName = excelRaw{2}; mouseName = string(mouseName);
-%     rawdataloc = excelRaw{3};
-%     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-%     if ~exist(saveDir)
-%         mkdir(saveDir)
-%     end
-%     systemType = excelRaw{5};
-%     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-%     sessionInfo.mouseType = excelRaw{13};
-%     sessionInfo.darkFrameNum = excelRaw{11};
-%     sessionInfo.totalFrameNum = excelRaw{18};
-%     systemInfo.numLEDs = 4;
-%     sessionInfo.stimbaseline=excelRaw{9};
-%     sessionInfo.framerate = excelRaw{7};
-%     sessionInfo.stimblocksize = excelRaw{8};
-% 
-% 
-%     wlName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-%     if exist(fullfile(saveDir,wlName),'file')
-%         disp(strcat('WL and transform file already exists for ', recDate,'-', mouseName))
-%         load(fullfile(saveDir,wlName),'transformMat','WL');
-%     else
-%         disp(strcat('get WL and transform for ', recDate,'-', mouseName))
-% 
-%         fileName_cam1 = strcat(recDate,'-',mouseName,'-cam1','-',sessionType,'1.mat');
-%         fileName_cam1 = fullfile(rawdataloc,recDate,fileName_cam1);
-%         load(fileName_cam1)
-% 
-%         if strcmp(sessionInfo.mouseType,'jrgeco1a')|| strcmp(sessionInfo.mouseType,'WT')
-%         firtFrame_cam1  = squeeze(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4+1));
-%         elseif strcmp(sessionInfo.mouseType,'gcamp6f')
-%         firtFrame_cam1  = squeeze(raw_unregistered(:,:,2,sessionInfo.darkFrameNum/4+1));
-%         end
-%         clear raw_unregistered
-%         fileName_cam2 = strcat(recDate,'-',mouseName,'-cam2','-',sessionType,'1.mat');
-%         fileName_cam2 = fullfile(rawdataloc,recDate,fileName_cam2);
-%         load(fileName_cam2)
-%         if strcmp(sessionInfo.mouseType,'jrgeco1a')
-%         firtFrame_cam2  = squeeze(raw_unregistered(:,:,2,sessionInfo.darkFrameNum/4+1));
-%         elseif strcmp(sessionInfo.mouseType,'gcamp6f')|| strcmp(sessionInfo.mouseType,'WT')
-%         firtFrame_cam2  = squeeze(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4+1));
-%         end
-% 
-%         clear raw_unregistered
-%         [WL,transformMat] = fluor.getTransformationandWL_Zyla(firtFrame_cam1, firtFrame_cam2,nVy,nVx);
-%         save(fullfile(saveDir,wlName),'transformMat','WL');
-%         close all
-%     end
-% 
-% 
-%     maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-%     if exist(fullfile(saveDir,maskName))
-%         disp(strcat('Landmarks and mask file already exists for ', recDate,'-', mouseName))
-%         load(fullfile(saveDir,maskName), 'isbrain',  'affineMarkers')
-%     else
-%         % need to be modified to see if WL exist
-% 
-%         disp(strcat('get landmarks and mask for',recDate,'-', mouseName))
-%         [isbrain,xform_isbrain,I,seedcenter,WLcrop,xform_WLcrop,xform_WL] = getLandMarksandMask_xw(WL);
-%         isbrain_contour = bwperim(isbrain);
-%         save(fullfile(saveDir,maskName),'isbrain',  'affineMarkers' ,'WL','WLcrop', 'xform_WLcrop', 'xform_isbrain', 'isbrain', 'WL', 'xform_WL', 'affineMarkers', 'seedcenter')
-%         figure;
-%         imagesc(WL); %changed 3/1/1
-%         axis off
-%         axis image
-%         title(strcat(recDate,'-',mouseName));
-% 
-%         for f=1:size(seedcenter,1)
-%             hold on;
-%             plot(seedcenter(f,1),seedcenter(f,2),'ko','MarkerFaceColor','k')
-%         end
-%         hold on;
-%         plot(I.tent(1,1),I.tent(1,2),'ko','MarkerFaceColor','b')
-%         hold on;
-%         plot(I.bregma(1,1),I.bregma(1,2),'ko','MarkerFaceColor','b')
-%         hold on;
-%         plot(I.OF(1,1),I.OF(1,2),'ko','MarkerFaceColor','b')
-%         hold on;
-%         contour(isbrain_contour,'r')
-%         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'_WLandMarks.jpg')))
-% 
-% 
-%     end
-%     clearvars -except excelFile nVx nVy excelRows runs
-% end
+for excelRow = excelRows
+    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':R',num2str(excelRow)]);
+    recDate = excelRaw{1}; recDate = string(recDate);
+    mouseName = excelRaw{2}; mouseName = string(mouseName);
+    rawdataloc = excelRaw{3};
+    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+    if ~exist(saveDir)
+        mkdir(saveDir)
+    end
+    systemType = excelRaw{5};
+    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+    sessionInfo.mouseType = excelRaw{13};
+    sessionInfo.darkFrameNum = excelRaw{11};
+    sessionInfo.totalFrameNum = excelRaw{18};
+    systemInfo.numLEDs = 4;
+    sessionInfo.stimbaseline=excelRaw{9};
+    sessionInfo.framerate = excelRaw{7};
+    sessionInfo.stimblocksize = excelRaw{8};
+
+
+    wlName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+    if exist(fullfile(saveDir,wlName),'file')
+        disp(strcat('WL and transform file already exists for ', recDate,'-', mouseName))
+        load(fullfile(saveDir,wlName),'transformMat','WL');
+    else
+        disp(strcat('get WL and transform for ', recDate,'-', mouseName))
+
+        fileName_cam1 = strcat(recDate,'-',mouseName,'-cam1','-',sessionType,'1.mat');
+        fileName_cam1 = fullfile(rawdataloc,recDate,fileName_cam1);
+        load(fileName_cam1)
+
+        if strcmp(sessionInfo.mouseType,'jrgeco1a')|| strcmp(sessionInfo.mouseType,'WT')
+        firtFrame_cam1  = squeeze(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4+1));
+        elseif strcmp(sessionInfo.mouseType,'gcamp6f')
+        firtFrame_cam1  = squeeze(raw_unregistered(:,:,2,sessionInfo.darkFrameNum/4+1));
+        end
+        clear raw_unregistered
+        fileName_cam2 = strcat(recDate,'-',mouseName,'-cam2','-',sessionType,'1.mat');
+        fileName_cam2 = fullfile(rawdataloc,recDate,fileName_cam2);
+        load(fileName_cam2)
+        if strcmp(sessionInfo.mouseType,'jrgeco1a')
+        firtFrame_cam2  = squeeze(raw_unregistered(:,:,2,sessionInfo.darkFrameNum/4+1));
+        elseif strcmp(sessionInfo.mouseType,'gcamp6f')|| strcmp(sessionInfo.mouseType,'WT')
+        firtFrame_cam2  = squeeze(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4+1));
+        end
+
+        clear raw_unregistered
+        [WL,transformMat] = fluor.getTransformationandWL_Zyla(firtFrame_cam1, firtFrame_cam2,nVy,nVx);
+        save(fullfile(saveDir,wlName),'transformMat','WL');
+        close all
+    end
+
+
+    maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+
+        % need to be modified to see if WL exist
+
+        disp(strcat('get landmarks and mask for',recDate,'-', mouseName))
+        [isbrain,xform_isbrain,I,seedcenter,WLcrop,xform_WLcrop,xform_WL] = getLandMarksandMask_xw(WL);
+        isbrain_contour = bwperim(isbrain);
+        save(fullfile(saveDir,maskName),'isbrain',  'affineMarkers' ,'WL','WLcrop', 'xform_WLcrop', 'xform_isbrain', 'isbrain', 'WL', 'xform_WL', 'affineMarkers', 'seedcenter')
+        figure;
+        imagesc(WL); %changed 3/1/1
+        axis off
+        axis image
+        title(strcat(recDate,'-',mouseName));
+
+        for f=1:size(seedcenter,1)
+            hold on;
+            plot(seedcenter(f,1),seedcenter(f,2),'ko','MarkerFaceColor','k')
+        end
+        hold on;
+        plot(I.tent(1,1),I.tent(1,2),'ko','MarkerFaceColor','b')
+        hold on;
+        plot(I.bregma(1,1),I.bregma(1,2),'ko','MarkerFaceColor','b')
+        hold on;
+        plot(I.OF(1,1),I.OF(1,2),'ko','MarkerFaceColor','b')
+        hold on;
+        contour(isbrain_contour,'r')
+        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'_WLandMarks.jpg')))
+
+
+
+    clearvars -except excelFile nVx nVy excelRows runs
+end
 %
 %
 %
@@ -297,7 +294,7 @@ isDetrend = 1;
 % 
 % 
 % 
-%                              xform_fluor = squeeze(xform_raw(:,:,sessionInfo.fluorSpecies,:));
+%                 xform_fluor = squeeze(xform_raw(:,:,sessionInfo.fluorSpecies,:));
 %                 
 %                 baseline = nanmean(xform_fluor,3);
 %                 xform_fluor = xform_fluor./repmat(baseline,[1 1 size(xform_fluor,3)]); % make the data ratiometric

@@ -6,7 +6,7 @@ excelFile = "D:\GCaMP\GCaMP_awake.xlsx";
 nVx = 128;
 nVy = 128;
 %
-excelRows = [ 181 183 185 195 202 204];
+excelRows = [ 181 183 185];
 runs = 1:3;
 length_runs = length(runs);
 

@@ -1,6 +1,6 @@
 
 
-function   [goodBlocks,ROI] = QC_stim(oxy,deoxy,greenFluor,greenFluorCorr,green,jrgeco1a,jrgeco1aCorr,red,xform_isbrain,numBlock,numDesample,stimStartTime,stimduration,stimFreq,framerate,stimblocksize,stimbaseline,texttitle,output,input_ROI)
+function   [goodBlocks,ROI] = QC_stim(oxy,deoxy,greenFluor,greenFluorCorr,green,jrgeco1a,jrgeco1aCorr,red,xform_isbrain,numBlock,numDesample,stimStartTime,stimduration,stimFreq,framerate,stimblocksize,stimbaseline,texttitle,output,Input_ROI)
 
 disp('downsampling')
 
