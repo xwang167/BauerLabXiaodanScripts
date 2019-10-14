@@ -38,10 +38,10 @@ fid=fopen(hillmanFile);
 temp=textscan(fid,'%f %f','headerlines',0);
 fclose(fid);
 lambda_hillman= temp{1};
-pdf_hillman = temp{2};
+dpf_hillman = temp{2};
 
-pdf_hillman = interp1(lambda_hillman,...
-    pdf_hillman ,lambda1,'pchip');
+dpf_hillman = interp1(lambda_hillman,...
+    dpf_hillman ,lambda1,'pchip');
 %%%
 
 for sourceInd = 1:numel(lightSourceFiles)
@@ -71,7 +71,7 @@ for sourceInd = 1:numel(lightSourceFiles)
     musp = muspFcn(lambda1,sourceSpectra{sourceInd});
     
     %%%
-    op.dpf(sourceInd) = pdf_hillman'*sourceSpectra{sourceInd}/10;
+    op.dpf(sourceInd) = dpf_hillman'*sourceSpectra{sourceInd}/10;
     %%%
     
 end

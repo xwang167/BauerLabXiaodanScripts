@@ -50,7 +50,7 @@ for excelRow = excelRows
             "TwoCam_TL625_Pol.txt"];
         sessionInfo.hbSpecies = 3:4;
         sessionInfo.fluorSpecies = 1;
-        sessionInfo.fluorEmissionFile = "gcamp6f_emission.txt";
+        sessionInfo.fluorEmissionFile = "gcamp6f_emission_hillman.txt";
         
     elseif strcmp(systemType,'EastOIS2')
         systemInfo.numLEDs = 4;
@@ -101,7 +101,7 @@ for excelRow = excelRows
     
     pkgDir = what('bauerParams');
     
-    fluorDir = fullfile(pkgDir.path,'probeSpectra');
+    %fluorDir = fullfile(pkgDir.path,'probeSpectra');
     
     for n = runs
         
@@ -204,11 +204,11 @@ for excelRow = excelRows
             xform_isbrain = logical(xform_isbrain);
             
             
-            
-            [op, E] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.hbSpecies)));
-            %         %%%
-            %         [op, E] = getHbOpticalProperties_hillman(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.hbSpecies)));
-            %         %%%
+%             
+%             [op, E] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.hbSpecies)));
+%             %         %%%
+                    [op, E] = getHbOpticalProperties_hillman(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.hbSpecies)));
+                    %%%
             
             BaselineFunction  = @(x) mean(x,numel(size(x)));
             baselineValues = BaselineFunction(xform_raw);
@@ -239,14 +239,14 @@ for excelRow = excelRows
                         
                         
                         
-                        [op_in, E_in] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.fluorSpecies )));
-                        [op_out, E_out] = getHbOpticalProperties_xw(muspFcn,fullfile(fluorDir,sessionInfo.fluorEmissionFile));
-                        %                     %
+%                         [op_in, E_in] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.fluorSpecies )));
+%                         [op_out, E_out] = getHbOpticalProperties_xw(muspFcn,fullfile(fluorDir,sessionInfo.fluorEmissionFile));
+%                         %                     %
                         %
-                        %                     %%%
-                        %                     [op_in, E_in] = getHbOpticalProperties_hillman(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.fluorSpecies )));
-                        %                     [op_out, E_out] = getHbOpticalProperties_hillman(muspFcn,fullfile(fluorDir,sessionInfo.fluorEmissionFile));
-                        %                     %%%
+                                            %%%
+                                            [op_in, E_in] = getHbOpticalProperties_hillman(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.fluorSpecies )));
+                                            [op_out, E_out] = getHbOpticalProperties_hillman(muspFcn,fullfile(fluorDir,sessionInfo.fluorEmissionFile));
+                                            %%%
                         
                         
                         dpIn = op_in.dpf/2;
