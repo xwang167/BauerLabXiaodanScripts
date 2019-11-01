@@ -1,4 +1,4 @@
-function raw  = registerCam2andCombineTwoCams_v3(rawdata_cam1,rawdata_cam2,mytform)
+function raw  = registerCam2andCombineTwoCams_v3(rawdata_cam1,rawdata_cam2,mytform,mouseType)
 
 registered_cam2 = zeros(size(rawdata_cam2)); 
 
@@ -11,7 +11,17 @@ for ii = 1: length(channels_cam2)
 end
 
 
-    raw = zeros(size(rawdata_cam1,1),size(rawdata_cam1,2),4,size(rawdata_cam1,4));
-    raw(:,:,[1 3],:) = rawdata_cam1;
-    raw(:,:,[2 4],:) = rawdata_cam2;
+    
+    if strcmp(mouseType,'PV')
+        channels = 3;
+        cam1Chan = [1,3];
+        cam2Chan = 2;
+    else
+        channels = 4;
+        cam1Chan = [1 3];
+        cam2Chan = [2 4];
+    end
+    raw = zeros(size(rawdata_cam1,1),size(rawdata_cam1,2),channels,size(rawdata_cam1,4));
+    raw(:,:,cam1Chan,:) = rawdata_cam1;
+    raw(:,:,cam2Chan,:) = rawdata_cam2;
 

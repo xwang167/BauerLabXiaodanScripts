@@ -8,7 +8,7 @@ disp('Create mask')
 mask=roipoly(WL);
 
 if ~any(any(mask))
-    load('D:\MatlabCode\NeuroDOT\OIS\Paxinos\AtlasandIsbrain.mat', 'parcelisbrainPS');
+    load('D:\OIS_Process\Paxinos\AtlasandIsbrain.mat', 'parcelisbrainPS');
     isbrain=InvAffine(I, parcelisbrainPS, 'New');
     isbrain=single(uint8(isbrain));
     [xform_isbrain]=Affine(I, isbrain, 'New');

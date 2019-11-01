@@ -8,7 +8,7 @@ set(0,'defaultaxesfontsize',12);
 info.nVx = 128;
 info.nVy = 128;
 %
-excelRows = [195 202 204 ];
+excelRows = [181 183 185];
 
 numMice = length(excelRows);
 suffix = {'_cat','NoDetrend_cat','_processed','_NoDetrend'};
@@ -169,10 +169,10 @@ for ii = 3
     processedName_mice = strcat(recDate,'-',miceName,'-',sessionType,suffix(ii),'.mat');
     titleName = strcat(recDate,miceName);
     visName = 'Averaged Across Mice';
-    R_oxy_Delta_mice  = mean(R_oxy_Delta_mice,4);
-    R_oxy_ISA_mice  = mean(R_oxy_ISA_mice,4);
-    Rs_oxy_Delta_mice = mean(Rs_oxy_Delta_mice,3);
-    Rs_oxy_ISA_mice = mean(Rs_oxy_ISA_mice,3);
+    R_oxy_Delta_mice  = tanh(mean(R_oxy_Delta_mice,4));
+    R_oxy_ISA_mice  = tanh(mean(R_oxy_ISA_mice,4));
+    Rs_oxy_Delta_mice = tanh(mean(Rs_oxy_Delta_mice,3));
+    Rs_oxy_ISA_mice = tanh(mean(Rs_oxy_ISA_mice,3));
     fdata_oxy_mice = mean(fdata_oxy_mice,1);
     powerdata_oxy_mice = mean(powerdata_oxy_mice,1);
     
@@ -236,15 +236,15 @@ for ii = 3
                
             eval( ['QCcheck_fcVis_twoFluor(refseeds,' fcMap1 ',' fcMatrix1 ',' fcMap2 ',' fcMatrix2 ', ' char(39) 'Oxy' char(39)...
                 ',' char(39) 'jrgeco1aCorr' char(39) ',' char(39) 'r' char(39) ',' char(39)...
-                ' m' char(39) ',bandTypes{ii},saveDir_cat,miceName,false)']);
+                ' m' char(39) ',bandTypes{ii},saveDir_cat,miceName,true,xform_isbrain_mice)']);
             eval( ['QCcheck_fcVis_twoFluor(refseeds,' fcMap3 ',' fcMatrix3 ',' fcMap2 ',' fcMatrix2 ', ' char(39) 'FADCorr' char(39)...
                 ',' char(39) 'jrgeco1aCorr' char(39) ',' char(39) 'g' char(39) ',' char(39)...
-                'm' char(39) ',bandTypes{ii},saveDir_cat,miceName,false)']);
+                'm' char(39) ',bandTypes{ii},saveDir_cat,miceName,true,xform_isbrain_mice)']);
             
         end
         close all
         traceSpecies = {'oxy','deoxy','total','jrgeco1aCorr','FADCorr'};
-        traceColor = {'r', 'b','k','m','g'};
+        traceColor = {'r-', 'b-','k-','m-','g-'};
         
         for ii = 1:5
             
@@ -308,16 +308,24 @@ for ii = 3
         figure('units','normalized','outerposition',[0 0 1 1]);
         load('D:\OIS_Process\noVasculatureMask.mat')
         subplot_Index = 1;
-        for ii= [1,4,5]
+        for ii= [4,5,3]
             for jj = 1:2
                 
                 powerMap = genvarname([traceSpecies{ii} '_' bandTypes{jj} '_powerMap_mice']);
                 subplot(3,2,subplot_Index)
-                mask = xform_isbrain.*(double(leftMask)+double(rightMask));
+                midVas = zeros(128,128);
+                midVas(23:107,51:78) = 1;
+                mask = xform_isbrain_mice.*(double(leftMask)+double(rightMask));
+                %mask(mask==2) = 1;
                 mask(mask==0)=NaN;
-                eval([powerMap '=' powerMap '.*mask;']);
+%                 eval([powerMap '=' powerMap '.*mask;']);
                 colormap jet
-                eval(['imagesc(log(' powerMap '))'])
+                eval(['imagesc(log10(' powerMap '.*xform_isbrain_mice),[min(min(log10(' powerMap ').*mask)) max(max(log10(' powerMap ').*mask))])'])
+                   hold on
+                   load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','WL')
+                   mask(isnan(mask)) = 0;
+    imagesc(WL,'AlphaData',1-xform_isbrain_mice)
+    
                 cb = colorbar();
                 cb.Ruler.MinorTick = 'on';
                 if ii == 1

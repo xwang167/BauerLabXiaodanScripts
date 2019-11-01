@@ -1,4 +1,5 @@
 function QCcheck_fc_twoFluor(fluor1,fluor2,fluorName1,fluorName2,fluorColor1,fluorColor2,xform_isbrain,framerate,saveDir,visName,isZtrans,yunit1,yunit2)
+load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','WL')
 info.nVy = 128;
 info.nVx =128;
 T1 =  length(fluor1);
@@ -106,15 +107,27 @@ for ii = 1:length(traceSpecies)
             end
         end
         
-        load('D:\OIS_Process\noVasculatureMask.mat')
+                if exist(strcat(fullfile(saveDir,visName),".mat"))
+            eval(['save(strcat(fullfile(saveDir,visName),".mat"),' char(39) fcMatrix char(39) ',' char(39) fcMap char(39) ','  char(39) powerMap char(39) ',' char(39) '-append' char(39) ');'])
+        else
+            eval(['save(strcat(fullfile(saveDir,visName),".mat"),' char(39) fcMatrix char(39) ',' char(39) fcMap char(39) ','  char(39) powerMap char(39)  ');'])
+            
+        end
+        
+%         load('D:\OIS_Process\noVasculatureMask.mat')
+        %         mask = xform_isbrain.*(double(leftMask)+double(rightMask));
+%         mask(mask==0)=NaN;
+%         eval([powerMap '=' powerMap '.*mask;']);
+
         figure(1)
         subplot(2,2,subplot_Index)
-        mask = xform_isbrain.*(double(leftMask)+double(rightMask));
-        mask(mask==0)=NaN;
-        eval([powerMap '=' powerMap '.*mask;']);
         
         colormap jet
-        eval(['imagesc(log10(abs(' powerMap ')))'])
+        eval(['imagesc(log10(abs(' powerMap '.*xform_isbrain)))'])
+        
+    hold on
+    imagesc(WL,'AlphaData',1-xform_isbrain)
+        
         cb = colorbar();
         cb.Ruler.MinorTick = 'on';
         if ii == 1
@@ -126,15 +139,10 @@ for ii = 1:length(traceSpecies)
         axis image off
         title([ traceSpecies{ii} bandTypes{jj} ])
         subplot_Index = subplot_Index+1;
-        if exist(strcat(fullfile(saveDir,visName),".mat"))
-            eval(['save(strcat(fullfile(saveDir,visName),".mat"),' char(39) fcMatrix char(39) ',' char(39) fcMap char(39) ','  char(39) powerMap char(39) ',' char(39) '-append' char(39) ');'])
-        else
-            eval(['save(strcat(fullfile(saveDir,visName),".mat"),' char(39) fcMatrix char(39) ',' char(39) fcMap char(39) ','  char(39) powerMap char(39)  ');'])
-            
-        end
+
         
         save(strcat(fullfile(saveDir,visName),".mat"),'hz','T1','-append')
-        eval([data2, '=', data2,'.*xform_isbrain;']);
+        %eval([data2, '=', data2,'.*xform_isbrain;']);
         eval([data2,'(isnan(',data2,')) = 0;']);
         eval([data2,'(isinf(',data2,')) = 0;']);
         eval(['data3= mouse.process.gsr(',data2,',xform_isbrain);']);
@@ -165,7 +173,7 @@ for ii = 1:length(traceSpecies)
     figure(2)
     subplot('position', [0.12 0.12 0.6 0.7])
     if ii==1
-        yyaxis left
+        yyaxis left''
         set(gca, 'YScale', 'log','YColor',fluorColor1)
         ylabel([ yunit1 '^2/Hz'])
         eval(['ylim([-inf 1.1*max(' powerCurve ')])'])
@@ -229,7 +237,7 @@ for ii = 1:length(bandTypes)
     fcMatrix2 = genvarname(['Rs_',fluorName2,'_',bandTypes{ii}]);
     fcMap1 = genvarname(['R_',fluorName1,'_',bandTypes{ii}]);
     fcMap2 =  genvarname(['R_',fluorName2,'_',bandTypes{ii}]);
-    eval( ['QCcheck_fcVis_twoFluor(refseeds,' fcMap1 ',' fcMatrix1 ',' fcMap2 ',' fcMatrix2 ', fluorName1,fluorName2,fluorColor1,fluorColor2,bandTypes{ii},saveDir,visName,isZtrans)']);
+    eval( ['QCcheck_fcVis_twoFluor(refseeds,' fcMap1 ',' fcMatrix1 ',' fcMap2 ',' fcMatrix2 ', fluorName1,fluorName2,fluorColor1,fluorColor2,bandTypes{ii},saveDir,visName,isZtrans,xform_isbrain)']);
 end
 
 

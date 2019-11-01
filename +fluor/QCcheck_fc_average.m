@@ -6,7 +6,7 @@ excelFile = "D:\GCaMP\GCaMP_awake.xlsx";
 nVx = 128;
 nVy = 128;
 %
-excelRows = [ 181 183 185];
+excelRows = [181 183 185 195 202 204];
 runs = 1:3;
 length_runs = length(runs);
 
@@ -281,13 +281,13 @@ for ii = 1
                     powerMap = genvarname([traceSpecies{ii} '_' bandTypes{jj} '_powerMap' '_mouse']);
                     
                     subplot(2,2,subplot_Index)
-                    mask = xform_isbrain.*(double(leftMask)+double(rightMask));
-                    mask(mask==0)=NaN;
-                    eval([powerMap '=' powerMap '.*mask;']);
+%                     mask = xform_isbrain.*(double(leftMask)+double(rightMask));
+%                     mask(mask==0)=NaN;
+%                     eval([powerMap '=' powerMap '.*mask;']);
                     
                     
                     colormap jet
-                    eval(['imagesc(log(' powerMap '))'])
+                    eval(['imagesc(log10(' powerMap '.*xform_isbrain))'])
                     cb = colorbar();
                     cb.Ruler.MinorTick = 'on';
                     if ii == 1
@@ -352,10 +352,10 @@ for ii = 1
                 
                 eval( ['QCcheck_fcVis_twoFluor(refseeds,' fcMap1 ',' fcMatrix1 ',' fcMap2 ',' fcMatrix2 ', ' char(39) 'Oxy' char(39)...
                     ',' char(39) 'jrgeco1aCorr' char(39) ',' char(39) 'r' char(39) ',' char(39)...
-                   ' m' char(39) ',bandTypes{ii},saveDir,visName,false)']);
+                   ' m' char(39) ',bandTypes{ii},saveDir,visName,false,xform_isbrain)']);
                 eval( ['QCcheck_fcVis_twoFluor(refseeds,' fcMap3 ',' fcMatrix3 ',' fcMap2 ',' fcMatrix2 ', ' char(39) 'FADCorr' char(39)...
                     ',' char(39) 'jrgeco1aCorr' char(39) ',' char(39) 'g' char(39) ',' char(39)...
-                    'm' char(39) ',bandTypes{ii},saveDir,visName,false)']);
+                    'm' char(39) ',bandTypes{ii},saveDir,visName,false,xform_isbrain)']);
                 
             end
             close all
@@ -428,11 +428,14 @@ for ii = 1
                     
                     powerMap = genvarname([traceSpecies{ii} '_' bandTypes{jj} '_powerMap_mouse']);
                     subplot(3,2,subplot_Index)
-                    mask = xform_isbrain.*(double(leftMask)+double(rightMask));
-                    mask(mask==0)=NaN;
-                    eval([powerMap '=' powerMap '.*mask;']);
-                    colormap jet
-                    eval(['imagesc(log(' powerMap '))'])
+%                     mask = xform_isbrain.*(double(leftMask)+double(rightMask));
+%                     mask(mask==0)=NaN;
+%                     eval([powerMap '=' powerMap '.*mask;']);
+                     colormap jet
+                    eval(['imagesc(log10(' powerMap '.*xform_isbrain))'])
+                        hold on
+                        load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','WL')
+    imagesc(WL,'AlphaData',1-xform_isbrain)
                     cb = colorbar();
                     cb.Ruler.MinorTick = 'on';
                     if ii == 1

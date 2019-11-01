@@ -1,4 +1,4 @@
-function  traceImage(downSampledBlocks1,downSampledBlocks2,downSampledBlocks3,name1,name2,name3,active1,active2,active3,color1,color2,color3,ROI_contour,yunit,stimduration,stimblocksize,stimFrequency,framerate,stimbaseline,stimStartTime,stimEndTime)
+function  traceImage(downSampledBlocks1,downSampledBlocks2,downSampledBlocks3,name1,name2,name3,active1,active2,active3,color1,color2,color3,ROI_contour,yunit,stimduration,stimblocksize,stimFrequency,framerate,stimbaseline,stimStartTime,stimEndTime,xform_isbrain)
 x = linspace(0,stimblocksize/framerate,length(active1));
 figure('units','normalized','outerposition',[0 0 1 1]);
 subplot('position',[0.05,0.08,0.55,0.35])
@@ -40,7 +40,7 @@ set(gca,'XTickLabel',a,'FontName','Times','fontsize',14,'fontweight','bold')
 
 subplot('position',[0.8,0.1,0.2,0.25])
 
-
+load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','WL')
 for b=stimStartTime: stimEndTime+4
     p = subplot('position', [0.015+(b-stimStartTime)*0.09 0.80 0.07 0.12]);
     imagesc(downSampledBlocks1(:,:,b), [-1.3*max1 1.3*max1]);
@@ -48,9 +48,10 @@ for b=stimStartTime: stimEndTime+4
         colorbar
         set(p,'Position',[0.015+(b-stimStartTime)*0.09 0.80 0.07 0.12]);
     end
-    axis image
-    set(gca, 'XTick', []);
-    set(gca, 'YTick', []);
+    axis image off
+    hold on
+    imagesc(WL,'AlphaData',1-xform_isbrain)
+    
     if b == stimStartTime
         ylabel(name1,'FontWeight','bold')
     end
@@ -67,9 +68,12 @@ for b=stimStartTime: stimEndTime+4
         colorbar
         set(p,'Position',[0.015+(b-stimStartTime)*0.09 0.64 0.07 0.12]);
     end
-    axis image;
-    set(gca, 'XTick', []);
-    set(gca, 'YTick', []);
+    axis image off;
+%     set(gca, 'XTick', []);
+%     set(gca, 'YTick', []);
+ hold on
+    imagesc(WL,'AlphaData',1-xform_isbrain)
+    
     if b==stimStartTime
         ylabel(name2,'FontWeight','bold')
     end
@@ -88,9 +92,10 @@ for b=stimStartTime: stimEndTime+4
         colorbar
         set(p,'Position',[0.015+(b-stimStartTime)*0.09 0.48 0.07 0.12]);
     end
-    axis image;
-    set(gca, 'XTick', []);
-    set(gca, 'YTick', []);
+    axis image off;
+     hold on
+    imagesc(WL,'AlphaData',1-xform_isbrain)
+
     if b==stimStartTime
         ylabel(name3,'FontWeight','bold')
     end
@@ -105,6 +110,8 @@ subplot('position',[0.79,0.27,0.13,0.18])
 imagesc(downSampledBlocks1(:,:,stimEndTime),...
     [min(downSampledBlocks1(:,:,stimEndTime),[],'all'),max(downSampledBlocks1(:,:,stimEndTime),[],'all')])
 colorbar
+ hold on
+    imagesc(WL,'AlphaData',1-xform_isbrain)
 hold on
 contour(ROI_contour,'k')
 axis image off
@@ -113,6 +120,8 @@ title(name1);
 subplot('position',[0.64,0.05,0.13,0.18])
 imagesc(downSampledBlocks2(:,:,stimEndTime),...
     [min(downSampledBlocks2(:,:,stimEndTime),[],'all'),max(downSampledBlocks2(:,:,stimEndTime),[],'all')])
+ hold on
+    imagesc(WL,'AlphaData',1-xform_isbrain)
 colorbar
 hold on
 contour(ROI_contour,'k')
@@ -125,13 +134,51 @@ subplot('position',[0.79,0.05,0.13,0.18])
 imagesc(downSampledBlocks3(:,:,stimEndTime),...
     [min(downSampledBlocks3(:,:,stimEndTime),[],'all'),max(downSampledBlocks3(:,:,stimEndTime),[],'all')])
 colorbar
+ hold on
+    imagesc(WL,'AlphaData',1-xform_isbrain)
 hold on
 contour(ROI_contour,'k')
 axis image off
 title(name3)
 colormap jet
-end
 
+
+% 
+% figure
+% 
+% mask = poly2mask(ROI_contour);
+% imagesc(downSampledBlocks1(:,:,stimEndTime),...
+%     [min(downSampledBlocks1(:,:,stimEndTime),[],'all'),max(downSampledBlocks1(:,:,stimEndTime),[],'all')])
+% colorbar
+%  hold on
+%     imagesc(WL,'AlphaData',1-mask)
+% axis image off
+% title(name1);
+% 
+% figure
+% mask = poly2mask(ROI_contour);
+% imagesc(downSampledBlocks2(:,:,stimEndTime),...
+%     [min(downSampledBlocks2(:,:,stimEndTime),[],'all'),max(downSampledBlocks2(:,:,stimEndTime),[],'all')])
+% colorbar
+%  hold on
+%     imagesc(WL,'AlphaData',1-mask)
+% axis image off
+% title(name2);
+% 
+figure
+
+imagesc(downSampledBlocks2(:,:,stimEndTime),...
+    [min(downSampledBlocks2(:,:,stimEndTime),[],'all'),max(downSampledBlocks2(:,:,stimEndTime),[],'all')])
+colorbar
+ hold on
+    imagesc(WL,'AlphaData',1-ROI_contour)
+axis image off
+title(name2);
+
+colormap jet
+
+
+end
 
 
 

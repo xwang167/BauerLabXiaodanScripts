@@ -9,7 +9,6 @@ f = msgbox(['click four pairs of points',newline,'export in movingPoints and fix
 pause(0.5)
 [movingPoints,fixedPoints] = cpselect(unregistered,fixed,'Wait',true);
 
-close(f)
 mytform = fitgeotrans(movingPoints, fixedPoints, 'projective');
 
 registered = imwarp(unregistered, mytform,'OutputView',imref2d(size(unregistered)));

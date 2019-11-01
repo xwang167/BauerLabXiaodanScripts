@@ -83,7 +83,7 @@ for excelRow = excelRows
             'East3410OIS1_TL_625_Pol.txt'};
         sessionInfo.hbSpecies = 2:4;
         sessionInfo.fluorSpecies = 1;
-        sessionInfo.fluorEmissionFile = "gcamp6f_emission_hillman_edited.txt";
+        sessionInfo.fluorEmissionFile = "gcamp6f_emission.txt";
         
     end
     

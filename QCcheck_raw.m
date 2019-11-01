@@ -1,6 +1,6 @@
-function QCcheck_raw(raw,isbrain,system,frameRate,saveDir,visName)
+function QCcheck_raw(raw,isbrain,system,frameRate,saveDir,visName,mouseType)
 rawdata = double(raw);
-[info.nVy, info.nVx,systemInfo.LEDFiles, ~]=size(rawdata);
+[info.nVy, info.nVx,numLED, ~]=size(rawdata);
 info.T1=size(rawdata,4);
 % testpixel=squeeze(rawdata(31,82,:,:));
 %         if any(any(testpixel==0))
@@ -15,16 +15,16 @@ info.T1=size(rawdata,4);
 %         end
 
 ibi=find(isbrain==1);
-rawdata=single(reshape(rawdata,info.nVy*info.nVx,systemInfo.LEDFiles,[]));
+rawdata=single(reshape(rawdata,info.nVy*info.nVx,numLED,[]));
 
 clear mdatanorm stddatanorm
 mdata=squeeze(mean(rawdata(ibi,:,:),1));
 
-for c=1:systemInfo.LEDFiles;
+for c=1:numLED;
     mdatanorm(c,:)=mdata(c,:)./(squeeze(mean(mdata(c,:),2)));
 end
 
-for c=1:systemInfo.LEDFiles;
+for c=1:numLED;
     stddatanorm(c,:)=std(mdatanorm(c,:),0,2);
 end
 
@@ -51,9 +51,16 @@ elseif strcmp(system, 'EastOIS1_Fluor')
     TickLabels = {'B','G','O', 'R' };
      legendName = {'green fluorescence', 'green LED', 'orange LED' 'red LED'};
 elseif strcmp(system, 'EastOIS2')
+    if strcmp(mouseType,'PV')
+         TickLabels = {'G','R','B'};
+           Colors = [0 1 0;1 0 0;0 0 1];
+    legendName = {'green LED', 'red LED','Laser'};
+
+    else
     TickLabels = {'B','G1','G2','R'};
     Colors = [0 0 1; 1 0 1;0 1 0;1 0 0];
     legendName = {'Blue Green fluorescence', 'Green red fluorescence','green LED', 'red LED'};
+    end
 
 end
 
@@ -61,7 +68,7 @@ end
 
 subplot('position', [0.1 0.75 0.25 0.2])
 p=plot(time,mdata); title('Raw Data');
-for c=1:systemInfo.LEDFiles;
+for c=1:numLED;
     set(p(c),'Color',Colors(c,:));
 end
 title('Raw Data');
@@ -73,7 +80,7 @@ xlim([time(1) time(end)])
 
 subplot('position', [0.45 0.68 0.5 0.27])
 p=plot(time,mdatanorm'); title('Normalized Raw Data');
-for c=1:systemInfo.LEDFiles;
+for c=1:numLED;
     set(p(c),'Color',Colors(c,:));
 end
 xlabel('Time (sec)')
@@ -83,7 +90,7 @@ xlim([time(1) time(end)])
 
 subplot('position', [0.42 0.09 0.14 0.18])
 plot(stddatanorm*100');
-set(gca,'XTick',(1:systemInfo.LEDFiles));
+set(gca,'XTick',(1:numLED));
 set(gca,'XTickLabel',TickLabels)
 title('Std Deviation');
 ylabel('% Deviation')
@@ -94,7 +101,7 @@ fdata=abs(fft(logmean(mdata),[],2));
 hz=linspace(0,frameRate,info.T1);
 subplot('position', [0.1 0.08 0.25 0.6]);
  title('FFT Raw Data');
-for c=1:systemInfo.LEDFiles;
+for c=1:numLED;
     p(c)=loglog(hz(1:ceil(info.T1)),fdata(c,1:ceil(info.T1))'/100^(c-1));
     set(p(c),'Color',Colors(c,:));
     hold on
@@ -105,14 +112,18 @@ xlim([0.01 10]);
 legend(legendName,'Location','southwest')%legend(p,legendName,'Location','southwest')
 
 %% Movement Check
-rawdata=reshape(rawdata, info.nVy, info.nVx,systemInfo.LEDFiles, []);
+rawdata=reshape(rawdata, info.nVy, info.nVx,numLED, []);
 
 if strcmp(system, 'fcOIS1')
     BlueChan=4;
 elseif strcmp(system, 'fcOIS2')||strcmp(system, 'EastOIS1')||strcmp(system, 'EastOIS1_Fluor')
     BlueChan=2;
 elseif strcmp(system, 'EastOIS2')
-    BlueChan = 4;
+    if strcmp(mouseType,'PV')
+        BlueChan = 1;
+    else
+    BlueChan = 3;
+    end
 end
 
 Im1=single(squeeze(rawdata(:,:,BlueChan,1)));
