@@ -237,7 +237,8 @@ for ii = 1:length(bandTypes)
     fcMatrix2 = genvarname(['Rs_',fluorName2,'_',bandTypes{ii}]);
     fcMap1 = genvarname(['R_',fluorName1,'_',bandTypes{ii}]);
     fcMap2 =  genvarname(['R_',fluorName2,'_',bandTypes{ii}]);
-    eval( ['QCcheck_fcVis_twoFluor(refseeds,' fcMap1 ',' fcMatrix1 ',' fcMap2 ',' fcMatrix2 ', fluorName1,fluorName2,fluorColor1,fluorColor2,bandTypes{ii},saveDir,visName,isZtrans,xform_isbrain)']);
+    eval( ['QCcheck_fcVis_twoFluor(refseeds,' fcMap1 ',' fcMatrix1  ', fluorName1,fluorColor1,bandTypes{ii},saveDir,visName,isZtrans,xform_isbrain)']);
+    eval( ['QCcheck_fcVis_twoFluor(refseeds,' fcMap2 ',' fcMatrix2  ', fluorName2,fluorColor2,bandTypes{ii},saveDir,visName,isZtrans,xform_isbrain)']);
 end
 
 
