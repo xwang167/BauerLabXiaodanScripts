@@ -28,7 +28,7 @@ for ii = 1
         sessionInfo.mouseType = excelRaw{17};
         systemType =excelRaw{5};
         sessionInfo.framerate = excelRaw{7};
-        %goodRuns = str2num(excelRaw{18});
+        goodRuns = str2num(excelRaw{18});
         
         if strcmp(char(sessionInfo.mouseType),'WT')
             systemInfo.numLEDs = 2;
@@ -123,7 +123,7 @@ for ii = 1
                     Rs_total_Delta_mouse(:,:,n) = Rs_total_Delta;
                     Rs_total_ISA_mouse(:,:,n) = Rs_total_ISA;
                     
-                    %if ismember(n,goodRuns)
+                    if ismember(n,goodRuns)
                         powerdata_average_gcampCorr_mouse = cat(1,powerdata_average_gcampCorr_mouse,squeeze(powerdata_average_gcamp6fCorr));
                         powerdata_average_oxy_mouse = cat(1,powerdata_average_oxy_mouse,squeeze(powerdata_average_oxy));
                         powerdata_average_deoxy_mouse = cat(1,powerdata_average_deoxy_mouse,squeeze(powerdata_average_deoxy));
@@ -133,7 +133,7 @@ for ii = 1
                         powerdata_oxy_mouse = cat(1,powerdata_oxy_mouse,squeeze(powerdata_oxy));
                         powerdata_deoxy_mouse = cat(1,powerdata_deoxy_mouse,squeeze(powerdata_deoxy));
                         powerdata_total_mouse = cat(1,powerdata_total_mouse,squeeze(powerdata_total));
-                    %end
+                   end
                     
                     gcampCorr_Delta_powerMap_mouse(:,:,n) = gcamp6fCorr_Delta_powerMap;
                     gcampCorr_ISA_powerMap_mouse(:,:,n) = gcamp6fCorr_ISA_powerMap;
@@ -155,7 +155,7 @@ for ii = 1
                     total_ISA_powerMap_mouse(:,:,n) = total_ISA_powerMap;
                     
                     
-                   % if ismember(n,goodRuns)
+                    if ismember(n,goodRuns)
                         load(fullfile(saveDir, processedName),'powerdata_oxy','powerdata_deoxy','powerdata_jrgeco1aCorr','powerdata_total','powerdata_FADCorr',...
                             'powerdata_average_oxy','powerdata_average_deoxy','powerdata_average_jrgeco1aCorr','powerdata_average_total','powerdata_average_FADCorr')
                         powerdata_jrgeco1aCorr_mouse = cat(1,powerdata_jrgeco1aCorr_mouse,squeeze(powerdata_jrgeco1aCorr));
@@ -170,7 +170,7 @@ for ii = 1
                         powerdata_average_deoxy_mouse = cat(1,powerdata_average_deoxy_mouse,squeeze(powerdata_average_deoxy'));
                         powerdata_average_total_mouse = cat(1,powerdata_average_total_mouse,squeeze(powerdata_average_total'));
                         
-                   % end
+                    end
                     
                     
                     R_jrgeco1aCorr_Delta_mouse(:,:,:,n) = R_jrgeco1aCorr_Delta;
@@ -353,7 +353,7 @@ for ii = 1
                 'total_Delta_powerMap_mouse','jrgeco1aCorr_Delta_powerMap_mouse','FADCorr_Delta_powerMap_mouse',...
                 'hz','-v7.3')
             visName = strcat(recDate,'-',mouseName,'-',sessionType);
-            %if goodRuns ~=0
+            if goodRuns ~=0
                 
                 powerdata_average_jrgeco1aCorr_mouse = mean(powerdata_average_jrgeco1aCorr_mouse,1);
                 powerdata_jrgeco1aCorr_mouse = mean(powerdata_jrgeco1aCorr_mouse,1);
@@ -375,7 +375,7 @@ for ii = 1
                 rightLabel = 'Hb(\muM^2/Hz)';
                 leftLineStyle = {'m-','g-'};
                 rightLineStyle= {'r-','b-','k-'};
-                legendName = ["Corrected jRGECO1a","jRGECO1a","Corrected FAD","HbO","HbR","HbT"];
+                legendName = ["Corrected jRGECO1a","Corrected FAD","HbO","HbR","HbT"];
                                
                 QCcheck_fftVis(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir,strcat(visName, '_powerCurve'))
                 
@@ -395,10 +395,10 @@ for ii = 1
                 rightLabel = 'Hb(\muM^2/Hz)';
                 leftLineStyle = {'m-','g-'};
                 rightLineStyle= {'r-','b-','k-'};
-                legendName = ["Corrected jRGECO1a","jRGECO1a","Corrected FAD","HbO","HbR","HbT"];
+                legendName = ["Corrected jRGECO1a","Corrected FAD","HbO","HbR","HbT"];
                                QCcheck_fftVis(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir,strcat(visName, '_powerCurve_average'))
                 
-            %end
+            end
             
             
             refseeds=GetReferenceSeeds;

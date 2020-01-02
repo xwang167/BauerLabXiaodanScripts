@@ -1,29 +1,37 @@
-function raw_combined  = registerCam2andCombineTwoCams(rawdata_cam1,rawdata_cam2,mytform,mouseType)
+function raw  = registerCam2andCombineTwoCams(rawdata_cam1,rawdata_cam2,mytform,mouseType)
 
 registered_cam2 = zeros(size(rawdata_cam2)); 
 
-if strcmp(char(mouseType),'WT')
-    channels_cam1 = [3];
-    channels_cam2 = [4];
-elseif strcmp(char(mouseType),'gcamp6f')
-    channels_cam1 = [1 3];
-    channels_cam2 = [4];
-elseif strcmp(char(mouseType),'jrgeco1a')
-    channels_cam1 = [3];
-    channels_cam2 = [2 4];
-end
 
+channels_cam2 = size(rawdata_cam2,3);
 for ii = 1: length(channels_cam2)
     for jj = 1:size(rawdata_cam2,4)
         registered_cam2(:,:,channels_cam2(ii),jj) = imwarp(rawdata_cam2(:,:,channels_cam2(ii),jj), mytform,'OutputView',imref2d(size(rawdata_cam2)));
-    end
+    end 
 end
 
 
-raw = zeros(size(rawdata_cam1));
-raw(:,:,channels_cam1,:) = rawdata_cam1(:,:,channels_cam1,:);
-raw(:,:,channels_cam2,:) = registered_cam2(:,:,channels_cam2,:);
+    
+    if strcmp(mouseType,'PV')
+        channels = 3;
+        cam1Chan = [1,3];
+        cam2Chan = 2;
+     elseif strcmp(mouseType,'jrgeco1a-opto2')
+        channels = 3;
+        cam1Chan = [1];
+        cam2Chan = [2 3];    
+        
+    elseif strcmp(mouseType,'jrgeco1a-opto3')
+        channels = 4;
+        cam1Chan = [3];
+        cam2Chan = [1 2 4];
+            
+    else
+        channels = 4;
+        cam1Chan = [1 3];
+        cam2Chan = [2 4];
+    end
+    raw = zeros(size(rawdata_cam1,1),size(rawdata_cam1,2),channels,size(rawdata_cam1,4));
+    raw(:,:,cam1Chan,:) = rawdata_cam1;
+    raw(:,:,cam2Chan,:) = rawdata_cam2;
 
-channels_combined = sort([channels_cam1 channels_cam2]);
-
-raw_combined =  raw(:,:,channels_combined,:);

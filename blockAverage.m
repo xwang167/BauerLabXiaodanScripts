@@ -1,4 +1,4 @@
-function [downSampledDataBlockAvg,dataBlockAvg] = blockAverage(downSampledData,data,goodBlocks,numBlock,stimStartFrame)
+function [downSampledDataBlockAvg,dataBlockAvg,dataBlockAvgBaseline] = blockAverage(downSampledData,data,goodBlocks,numBlock,stimStartFrame)
 downSampledDataBlockAvg = squeeze(mean(downSampledData(:,:,:,goodBlocks),4));
 data = reshape(data,size(data,1),size(data,2),[],numBlock);
 dataBlockAvg = squeeze(mean(data(:,:,:,goodBlocks),4));

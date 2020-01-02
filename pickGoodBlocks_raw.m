@@ -1,4 +1,4 @@
-function [goodBlocks] = pickGoodBlocks(stimStartTime,stimEndTime,numBlock,oxyDownSampled, ...
+function [goodBlocks] = pickGoodBlocks_raw(stimStartTime,stimEndTime,numBlock,oxyDownSampled, ...
     deoxyDownSampled,totalDownSampled,greenFluorCorrDownSampled,jrgecoCorrDownSampled)
 
 
@@ -8,7 +8,7 @@ subplot(1,3,1)
 imagesc(squeeze(mean(oxyDownSampled(:,:,stimStartTime+1:stimEndTime,1),3)))
 colorbar
 axis image off
-title('Oxy')
+title('Green')
 oxyDownSampled_2 = reshape(oxyDownSampled,[],size(oxyDownSampled,3)*size(oxyDownSampled,4));
 iROI = find(ROI_NoGSR==1);
 oxy_active = mean(oxyDownSampled_2(iROI,:),1);
@@ -17,13 +17,13 @@ subplot(1,3,2)
 imagesc(squeeze(mean(deoxyDownSampled(:,:,stimStartTime+1:stimEndTime,1),3)))
 colorbar
 axis image off
-title('DeOxy')
+title('red')
 
 subplot(1,3,3)
 imagesc(squeeze(mean(totalDownSampled(:,:,stimStartTime+1:stimEndTime,1),3)))
 colorbar
 axis image off
-title('Total')
+title('laser')
 
 colormap jet
 pause;
@@ -106,7 +106,7 @@ for ii = 1:numBlock
     set(gca, 'XTick', []);
     set(gca, 'YTick', []);
     if ii == 1
-        ylabel('oxy')
+        ylabel('green')
     end
     
     subplot(numRows,numBlock,numBlock+ii)
@@ -115,7 +115,7 @@ for ii = 1:numBlock
     set(gca, 'XTick', []);
     set(gca, 'YTick', []);
     if ii == 1
-        ylabel('deoxy')
+        ylabel('red')
     end
     
     
@@ -126,7 +126,7 @@ for ii = 1:numBlock
     set(gca, 'XTick', []);
     set(gca, 'YTick', []);
     if ii == 1
-        ylabel('total')
+        ylabel('laser')
     end
     
     if ~isempty(greenFluorCorrDownSampled)

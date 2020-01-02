@@ -1,4 +1,4 @@
-function QCcheck_raw(raw,isbrain,system,frameRate,saveDir,visName,mouseType)
+function [mdata, Colors,legendName] = QCcheck_raw(raw,isbrain,system,frameRate,saveDir,visName,mouseType)
 rawdata = double(raw);
 [info.nVy, info.nVx,numLED, ~]=size(rawdata);
 info.T1=size(rawdata,4);
@@ -61,6 +61,14 @@ elseif strcmp(system, 'EastOIS2')
     Colors = [0 0 1; 1 0 1;0 1 0;1 0 0];
     legendName = {'Blue Green fluorescence', 'Green red fluorescence','green LED', 'red LED'};
     end
+elseif strcmp(system,'EastOIS2_OneCam')
+
+         TickLabels = {'Fluor','G','R'};
+           Colors = [ 0 0 1;0 1 0;1 0 0];
+    legendName = {'Green fluorescence', 'GreenLED','Red LED'};
+
+    
+    
 
 end
 
@@ -124,6 +132,8 @@ elseif strcmp(system, 'EastOIS2')
     else
     BlueChan = 3;
     end
+elseif strcmp(system,'EastOIS2_OneCam')
+    BlueChan = 2;
 end
 
 Im1=single(squeeze(rawdata(:,:,BlueChan,1)));

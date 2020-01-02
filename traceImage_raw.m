@@ -1,4 +1,4 @@
-function  traceImage(downSampledBlocks1,downSampledBlocks2,downSampledBlocks3,name1,name2,name3,active1,active2,active3,color1,color2,color3,ROI_contour,yunit,stimduration,stimblocksize,stimFrequency,framerate,stimbaseline,stimStartTime,stimEndTime,xform_isbrain)
+function  traceImage_raw(downSampledBlocks1,downSampledBlocks2,downSampledBlocks3,name1,name2,name3,active1,active2,active3,color1,color2,color3,ROI_contour,yunit,stimduration,stimblocksize,stimFrequency,framerate,stimbaseline,stimStartTime,stimEndTime,xform_isbrain)
 x = linspace(0,stimblocksize/framerate,length(active1));
 figure('units','normalized','outerposition',[0 0 1 1]);
 subplot('position',[0.05,0.08,0.55,0.35])
@@ -45,7 +45,7 @@ subplot('position',[0.8,0.1,0.2,0.25])
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','WL')
 for b=stimStartTime: stimEndTime+4
     p = subplot('position', [0.015+(b-stimStartTime)*0.09 0.80 0.07 0.12]);
-    imagesc(downSampledBlocks1(:,:,b), [-1.3*max1 1.3*max1]);
+    imagesc(downSampledBlocks1(:,:,b), [0 0.7]);
     if b == stimEndTime+4
         colorbar
         set(p,'Position',[0.015+(b-stimStartTime)*0.09 0.80 0.07 0.12]);
@@ -65,7 +65,7 @@ end
 
 for b=stimStartTime: stimEndTime+4
     p = subplot('position', [0.015+(b-stimStartTime)*0.09 0.64 0.07 0.12]);
-    imagesc(downSampledBlocks2(:,:,b), [-1.3*max2 1.3*max2]);
+    imagesc(downSampledBlocks2(:,:,b), [0 0.7]);
     if b == stimEndTime+4
         colorbar
         set(p,'Position',[0.015+(b-stimStartTime)*0.09 0.64 0.07 0.12]);
@@ -89,7 +89,7 @@ end
 
 for b=stimStartTime: stimEndTime+4
     p = subplot('position', [0.015+(b-stimStartTime)*0.09 0.48 0.07 0.12]);
-    imagesc(downSampledBlocks3(:,:,b), [-1.3*max3 1.3*max3]);
+    imagesc(downSampledBlocks3(:,:,b), [0 80]);
     if b == stimEndTime+4
         colorbar
         set(p,'Position',[0.015+(b-stimStartTime)*0.09 0.48 0.07 0.12]);
@@ -110,7 +110,7 @@ end
 
 subplot('position',[0.79,0.27,0.13,0.18])
 imagesc(downSampledBlocks1(:,:,stimEndTime),...
-    [min(downSampledBlocks1(:,:,stimEndTime),[],'all'),max(downSampledBlocks1(:,:,stimEndTime),[],'all')])
+    [-0.5,1.5])
 colorbar
  hold on
     imagesc(WL,'AlphaData',1-xform_isbrain)
@@ -121,7 +121,7 @@ title(name1);
 
 subplot('position',[0.64,0.05,0.13,0.18])
 imagesc(downSampledBlocks2(:,:,stimEndTime),...
-    [min(downSampledBlocks2(:,:,stimEndTime),[],'all'),max(downSampledBlocks2(:,:,stimEndTime),[],'all')])
+    [-0.5 1.5])
  hold on
     imagesc(WL,'AlphaData',1-xform_isbrain)
 colorbar
@@ -134,7 +134,7 @@ title(name2);
 subplot('position',[0.79,0.05,0.13,0.18])
 
 imagesc(downSampledBlocks3(:,:,stimEndTime),...
-    [min(downSampledBlocks3(:,:,stimEndTime),[],'all'),max(downSampledBlocks3(:,:,stimEndTime),[],'all')])
+    [0 20])
 colorbar
  hold on
     imagesc(WL,'AlphaData',1-xform_isbrain)
