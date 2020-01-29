@@ -25,6 +25,10 @@ end
         channels = 4;
         cam1Chan = [3];
         cam2Chan = [1 2 4];
+    elseif strcmp(mouseType,'Gopto3')||strcmp(mouseType,'Wopto3')
+        channels = 4;
+        cam1Chan = [1 2 3];
+        cam2Chan = [4];    
             
     else
         channels = 4;

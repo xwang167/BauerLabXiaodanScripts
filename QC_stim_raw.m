@@ -94,7 +94,6 @@ hold on
 plot(x,frame3_active*100,'m-');
 
 
-
 xlabel('Time(s)','FontSize',12)
 ylabel('\DeltaR/R(%)','FontSize',12)
 

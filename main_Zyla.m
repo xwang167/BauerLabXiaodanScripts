@@ -4,49 +4,52 @@ close all;clear all;clc
 import mouse.*
 excelFile = "D:\GCaMP\GCaMP_awake.xlsx";
 
-excelRows = 113;
+excelRows = 292:293;
 
-runs =1;
+runs = 1;
 isDetrend = 1;
 nVy = 128;
 nVx = 128;
-
+%% make mask and transform matrix
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
     recDate = excelRaw{1}; recDate = string(recDate);
     mouseName = excelRaw{2}; mouseName = string(mouseName);
     rawdataloc = excelRaw{3};
     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-    
+
     oriDir = "D:\"; oriDir = fullfile(oriDir,recDate);
     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
     if ~exist(saveDir)
         mkdir(saveDir)
     end
-    
+
     sessionInfo.mouseType = excelRaw{17};
     sessionInfo.darkFrameNum = excelRaw{15};
     sessionInfo.totalFrameNum = excelRaw{22};
     sessionInfo.framerate = excelRaw{7};
     sessionInfo.freqout = sessionInfo.framerate;
     systemType = excelRaw{5};
-    
-    
+
+
     wlName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
     if exist(fullfile(saveDir,wlName),'file')
         disp(strcat('WL and transform file already exists for ', recDate,'-', mouseName))
         load(fullfile(saveDir,wlName),'transformMat','WL');
     else
         disp(strcat('get WL and transform for ', recDate,'-', mouseName))
-        
+
         fileName_cam1 = strcat(recDate,'-',mouseName,'-',sessionType,'1-cam1.mat');
         fileName_cam1 = fullfile(rawdataloc,recDate,fileName_cam1);
         load(fileName_cam1)
         if strcmp(sessionInfo.mouseType,'gcamp6f')
             firtFrame_cam1  = squeeze(raw_unregistered(:,:,2,sessionInfo.darkFrameNum/4+1));
+        elseif strcmp(sessionInfo.mouseType,'Gopto3')||strcmp(sessionInfo.mouseType,'Wopto3')
+            firtFrame_cam1  = squeeze(raw_unregistered(:,:,3,sessionInfo.darkFrameNum/4+1));
+
         else
             firtFrame_cam1  = squeeze(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4+1));
-            
+
         end
         clear raw_unregistered
         fileName_cam2 = strcat(recDate,'-',mouseName,'-',sessionType,'1-cam2.mat');
@@ -56,21 +59,21 @@ for excelRow = excelRows
             firtFrame_cam2  = squeeze(raw_unregistered(:,:,2,sessionInfo.darkFrameNum/4+1));
         elseif strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')
             firtFrame_cam2  = squeeze(raw_unregistered(:,:,3,sessionInfo.darkFrameNum/4+1));
-        elseif strcmp(sessionInfo.mouseType,'gcamp6f')|| strcmp(sessionInfo.mouseType,'WT')||strcmp(sessionInfo.mouseType,'PV')
+        elseif strcmp(sessionInfo.mouseType,'gcamp6f')|| strcmp(sessionInfo.mouseType,'WT')||strcmp(sessionInfo.mouseType,'PV')||strcmp(sessionInfo.mouseType,'Gopto3')||strcmp(sessionInfo.mouseType,'Wopto3')
             firtFrame_cam2  = squeeze(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4+1));
         end
-        
+
         clear raw_unregistered
         [WL,transformMat] = fluor.getTransformationandWL_Zyla(firtFrame_cam1, firtFrame_cam2,nVy,nVx);
         save(fullfile(saveDir,wlName),'transformMat','WL');
         close all
-        
-        
-        
+
+
+
         maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-        
+
         % need to be modified to see if WL exist
-        
+
         disp(strcat('get landmarks and mask for',recDate,'-', mouseName))
         [isbrain,xform_isbrain,affineMarkers,seedcenter,WLcrop,xform_WLcrop,xform_WL] = getLandMarksandMask_xw(WL);
         isbrain_contour = bwperim(isbrain);
@@ -80,7 +83,7 @@ for excelRow = excelRows
         axis off
         axis image
         title(strcat(recDate,'-',mouseName));
-        
+
         for f=1:size(seedcenter,1)
             hold on;
             plot(seedcenter(f,1),seedcenter(f,2),'ko','MarkerFaceColor','k')
@@ -94,19 +97,105 @@ for excelRow = excelRows
         hold on;
         contour(isbrain_contour,'r')
         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'_WLandMarks.jpg')))
-        
-        
-        
+
+
+
         clearvars -except excelFile nVx nVy excelRows runs isDetrend
     end
 end
 
+%% get registered together, dark frame removed raw and QC_raw check
 
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
     recDate = excelRaw{1}; recDate = string(recDate);
     mouseName = excelRaw{2}; mouseName = string(mouseName);
     rawdataloc = excelRaw{3};
+    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+    if ~exist(saveDir)
+        mkdir(saveDir)
+    end
+    sessionInfo.mouseType = excelRaw{17};
+    sessionInfo.darkFrameNum = excelRaw{15};
+    systemType = excelRaw{5};
+    sessionInfo.framerate = excelRaw{7};
+    maskDir = saveDir;
+    %maskDir = strcat('J:\RGECO\Kenny\', recDate, '\');
+    maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+    load(fullfile(maskDir,maskName),'isbrain')
+    
+    for n = runs
+        
+        rawName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'.mat');
+        if exist(fullfile(saveDir,rawName),'file')
+            disp(strcat('registered rawdata file already exist for ',rawName ))
+            
+        else
+            disp('loading unregistered data')
+            wlName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+            load(fullfile(maskDir,wlName),'transformMat');
+            disp(strcat('Register and Combine two cameras for ', rawName))
+            fileName_cam1 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam1.mat');
+            fileName_cam1 = fullfile(rawdataloc,recDate,fileName_cam1);
+            fileName_cam2 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam2.mat');
+            fileName_cam2 = fullfile(rawdataloc,recDate,fileName_cam2);
+            load(fileName_cam1)
+            binnedRaw_cam1 = raw_unregistered;
+            clear raw_unregistered
+            load(fileName_cam2)
+            binnedRaw_cam2 = raw_unregistered;
+            clear raw_unregistered
+             rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,transformMat,sessionInfo.mouseType);
+      
+            %                 if  strcmp(char(sessionInfo.mouseType),'PV')
+            if strcmp(sessionInfo.mouseType,'PV')
+            elseif sessionInfo.darkFrameNum ==0
+                raw_nondark =rawdata;
+                darkName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Dark.mat');
+                darkName =  fullfile(rawdataloc,recDate,darkName);
+                load(darkName)
+                darkFrame = squeeze(mean(rawdata(:,:,:,2:end),4));
+                clear rawdata
+                raw_baselineMinus = raw_nondark - repmat(darkFrame,1,1,1,size(raw_nondark,4));
+                clear raw_baselineMinus
+                rawdata = raw_baselineMinus;
+            else
+                darkFrameInd = 2:sessionInfo.darkFrameNum/size(rawdata,3);
+                darkFrame = squeeze(mean(rawdata(:,:,:,darkFrameInd),4));
+                raw_baselineMinus = rawdata - repmat(darkFrame,1,1,1,size(rawdata,4));
+                clear rawdata
+                raw_baselineMinus(:,:,:,1:sessionInfo.darkFrameNum/size(raw_baselineMinus,3))=[];
+                rawdata = raw_baselineMinus;
+                clear raw_baselineMinus
+                
+            end
+            
+              
+            
+            %                 else
+            %                 rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1(:,:,1,:),binnedRaw_cam2(:,:,[2 3],:),transformMat,sessionInfo.mouseType);
+            %                 end
+            %                 disp(strcat('QC raw for ',rawName))
+            visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
+            mdata = QCcheck_raw(rawdata(:,:,:,(sessionInfo.darkFrameNum/4+1):end),isbrain,systemType,sessionInfo.framerate,saveDir,visName,sessionInfo.mouseType);
+            save(fullfile(saveDir,rawName),'rawdata','mdata','-v7.3')
+        end
+    end
+end
+
+
+
+
+
+
+
+
+%% process raw to trace
+for excelRow = excelRows
+    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+    recDate = excelRaw{1}; recDate = string(recDate);
+    mouseName = excelRaw{2}; mouseName = string(mouseName);
     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
     
     oriDir = "D:\"; oriDir = fullfile(oriDir,recDate);
@@ -135,19 +224,22 @@ for excelRow = excelRows
         sessionInfo.hbSpecies = 3:4;
         sessionInfo.fluorSpecies = 1;
         sessionInfo.fluorEmissionFile = "gcamp6f_emission.txt";
+    elseif strcmp(char(sessionInfo.mouseType),'Wopto3')
+        sessionInfo.hbSpecies = 3:4;
+        sessionInfo.fluorSpecies = 2;
+        sessionInfo.fluorEmissionFile = "gcamp6f_emission.txt";
+    elseif strcmp(char(sessionInfo.mouseType),'Gopto3')
+        sessionInfo.hbSpecies = 3:4;
+        sessionInfo.fluorSpecies = 2;
+        sessionInfo.fluorEmissionFile = "fad_emission.txt";
         
     elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')||strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto3')
         sessionInfo.hbSpecies = 3:4;
         sessionInfo.fluorSpecies = 2;
         sessionInfo.fluorEmissionFile = "jrgeco1a_emission.txt";
-        
         sessionInfo.FADspecies = 1;
         sessionInfo.FADEmissionFile = "fad_emission.txt";
-        
     end
-    
-    
-    
     
     
     if strcmp(systemType,'EastOIS2_OneCam')
@@ -162,6 +254,12 @@ for excelRow = excelRows
             systemInfo.LEDFiles = [
                 "TwoCam_Mightex525_BP_Pol_500-580.txt", ...
                 "TwoCam_TL625_Pol_Longer593.txt"];
+        elseif strcmp(sessionInfo.mouseType,'Gopto3')||strcmp(sessionInfo.mouseType,'Wopto3')
+            systemInfo.numLEDs = 3;
+            systemInfo.LEDFiles = ["TwoCam_Mightex470_BP_Pol.txt",...
+                "TwoCam_Mightex525_BP_Pol_500-580.txt", ...
+                "TwoCam_TL625_Pol_Longer593.txt"];
+            
             
         else
             systemInfo.numLEDs = 4;
@@ -195,249 +293,234 @@ for excelRow = excelRows
         
         disp('loading raw data')
         rawName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'.mat');
+        
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
         if ~exist(fullfile(saveDir,processedName))
             disp('loading raw data')
             rawName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'.mat');
-            if exist(fullfile(saveDir,rawName),'file')
-                disp(strcat('combined file already exist for ',rawName ))
-                load(fullfile(saveDir,rawName),'rawdata')
-            else
-                wlName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-                load(fullfile(maskDir,wlName),'transformMat');
-                disp(strcat('Register and Combine two cameras for ', rawName))
-                fileName_cam1 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam1.mat');
-                fileName_cam1 = fullfile(rawdataloc,recDate,fileName_cam1);
-                fileName_cam2 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam2.mat');
-                fileName_cam2 = fullfile(rawdataloc,recDate,fileName_cam2);
-                load(fileName_cam1)
-                binnedRaw_cam1 = raw_unregistered;
-                clear raw_unregistered
-                load(fileName_cam2)
-                binnedRaw_cam2 = raw_unregistered;
-                clear raw_unregistered
-                rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1(:,:,1,:),binnedRaw_cam2(:,:,[2 3],:),transformMat,sessionInfo.mouseType);
-                disp(strcat('QC raw for ',rawName))
-                visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
-                QCcheck_raw(rawdata(:,:,:,(sessionInfo.darkFrameNum/4+1):end-1),isbrain,systemType,sessionInfo.framerate,saveDir,visName,sessionInfo.mouseType)
-                
-                save(fullfile(saveDir,rawName),'rawdata','-v7.3')
-                
-            end
-            if mod(sessionInfo.darkFrameNum,systemInfo.numLEDs)~=0
-                sessionInfo.darkFrameNum = sessionInfo.darkFrameNum+1;
-            end
-        else
             load(fullfile(saveDir,rawName),'rawdata')
-        end
-        
-        
-        
-        
-        if mod(sessionInfo.darkFrameNum,systemInfo.numLEDs)~=0
-            sessionInfo.darkFrameNum = sessionInfo.darkFrameNum+1;
-        end
-        
-        
-        
-        
-        %
-        disp('preprocess raw and tranform raw');
-        
-        %         if strcmp(sessionInfo.mouseType,'PV')
-        %         elseif sessionInfo.darkFrameNum ==0
-        %             raw_nondark =rawdata;
-        %             darkName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Dark.mat');
-        %             darkName =  fullfile(rawdataloc,recDate,darkName);
-        %             load(darkName)
-        %             darkFrame = squeeze(mean(rawdata(:,:,:,2:end),4));
-        %             clear rawdata
-        %             raw_baselineMinus = raw_nondark - repmat(darkFrame,1,1,1,size(raw_nondark,4));
-        %             clear raw_baselineMinus
-        %             rawdata = raw_baselineMinus;
-        %         else
-        %             darkFrameInd = 2:sessionInfo.darkFrameNum/systemInfo.numLEDs;
-        %             darkFrame = squeeze(mean(rawdata(:,:,:,darkFrameInd),4));
-        %             raw_baselineMinus = rawdata - repmat(darkFrame,1,1,1,size(rawdata,4));
-        %             clear rawdata
-        %             raw_baselineMinus(:,:,:,1:sessionInfo.darkFrameNum/systemInfo.numLEDs)=[];
-        %             rawdata = raw_baselineMinus;
-        %             clear raw_baselineMinus
-        %
-        %
-        %         end
-        
-        if strcmp(sessionType,'stim')
-            rawdata(:,:,:,1) = rawdata(:,:,:,2);
-        elseif strcmp(sessionType,'fc')
-            rawdata(:,:,:,1) = [];
-        end
-        rawdata(:,:,:,end) = rawdata(:,:,:,end-1);
-        
-        
-        if isDetrend
-            %raw_detrend = process.temporalDetrend(rawdata,true);
-            raw_detrend = temporalDetrendAdam(rawdata);
-        end
-        %affine transform
-        
-        if  strcmp(systemType,'EastOIS2')
-            raw_detrend = process.smoothImage(raw_detrend,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
-            
-        end
-        
-        if strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto3')||strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto2')
-            xform_raw = raw_detrend;
-        else
-            xform_raw = process.affineTransform(raw_detrend,affineMarkers);
-        end
-        clear raw_detrend
-        xform_raw(isnan(xform_raw)) = 0;
-        disp(strcat('get hemoglobin data for', recDate,'-',mouseName,'-',sessionType,num2str(n)));
-        
-        xform_isbrain(isnan(xform_isbrain)) = 0;
-        xform_isbrain = logical(xform_isbrain);
-        
-        
-        
-        [op, E] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.hbSpecies)));
-        %         %
-        %         [op, E] = getHbOpticalProperties_hillman(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.hbSpecies)));
-        %         %%
-        
-        BaselineFunction  = @(x) mean(x,numel(size(x)));
-        baselineValues = BaselineFunction(xform_raw);
-        xform_datahb = mouse.process.procOIS(xform_raw(:,:,sessionInfo.hbSpecies,:),baselineValues(:,:,sessionInfo.hbSpecies),op.dpf,E);
-        xform_datahb = process.smoothImage(xform_datahb,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
-        
-        save(fullfile(saveDir,processedName),'xform_datahb','sessionInfo','systemInfo','op','E','-v7.3')
-        
-        
-        if strcmp(char(sessionInfo.mouseType),'WT')||strcmp(char(sessionInfo.mouseType),'PV')||strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto2')
             
             
-        elseif strcmp(char(sessionInfo.mouseType),'gcamp6f')
+            %
+            disp('preprocess raw and tranform raw');
             
-            C = who('-file',fullfile(saveDir,processedName));
-            isFluorGot = false;
-            for  k=1:length(C)
-                if strcmp(C(k),'xform_gcamp')
-                    isFluorGot = true;
-                end
+            
+            
+            if strcmp(sessionType,'stim')
+                rawdata(:,:,:,1) = rawdata(:,:,:,2);
+            elseif strcmp(sessionType,'fc')
+                rawdata(:,:,:,1) = [];
             end
-            if ~isFluorGot
-                disp('correct gcamp')
-                xform_fluor = squeeze(xform_raw(:,:,sessionInfo.fluorSpecies,:));
-                xform_gcamp = mouse.expSpecific.procFluor(xform_fluor); % make the data ratiometric
-                clear xform_fluor
-                [lambda, extCoeff] = mouse.expSpecific.getHbExtCoeff(fullfile(pkgDir.path,sessionInfo.extCoeffFile));
-                
-                
-                %
-                %                 %%%
-                %                 [op_in, E_in] = getHbOpticalProperties_hillman(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.fluorSpecies )));
-                %                 [op_out, E_out] = getHbOpticalProperties_hillman(muspFcn,fullfile(fluorDir,sessionInfo.fluorEmissionFile));
-                %                 %%%
-                
-                
-                dpIn = op_in.dpf/2;
-                dpOut = op_out.dpf/2;
-                
-                
-                xform_gcampCorr = mouse.physics.correctHb(xform_gcamp,xform_datahb,...
-                    [E_in(1) E_out(1)],[E_in(2) E_out(2)],dpIn,dpOut);
-                xform_green = squeeze(xform_raw(:,:,2,:));
-                clear xform_raw
-                xform_gcampCorr = process.smoothImage(xform_gcampCorr,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
-                
-                baseline = nanmean(xform_green,3);
-                xform_green = xform_green./repmat(baseline,[1 1 size(xform_green,3)]); % make the data ratiometric
-                xform_green = xform_green - 1;
-                xform_green = process.smoothImage(xform_green,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
-                
-                
-                save(fullfile(saveDir, processedName),'xform_gcamp','xform_gcampCorr','xform_green','op_in', 'E_in','op_out', 'E_out','-append','-v7.3')
-                clear xform_gcamp xform_gcampCorr xform_green
-            end
-        elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')||strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto3')
-            isFluorGot = false;
-            C = who('-file',fullfile(saveDir,processedName));
+            rawdata(:,:,:,end) = rawdata(:,:,:,end-1);
             
-            for  k=1:length(C)
-                if strcmp(C(k),'xform_jrgeco1a')
-                    isFluorGot = true;
-                end
+            
+            if isDetrend
+                %raw_detrend = process.temporalDetrend(rawdata,true);
+                raw_detrend = temporalDetrendAdam(rawdata);
             end
-            if ~isFluorGot
-                disp('correct jrgeco1a')
-                xform_fluor = xform_raw(:,:,sessionInfo.fluorSpecies,:);
-                xform_fluor = mouse.expSpecific.procFluor(xform_fluor); % make the data ratiometric
-                [lambda, extCoeff] = mouse.expSpecific.getHbExtCoeff(fullfile(pkgDir.path,sessionInfo.extCoeffFile));
+            %affine transform
+            
+            if  strcmp(systemType,'EastOIS2')
+                raw_detrend = process.smoothImage(raw_detrend,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
                 
-                
-                [op_in, E_in] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(2)));
-                [op_out, E_out] = getHbOpticalProperties_xw(muspFcn,fullfile(fluorDir,sessionInfo.fluorEmissionFile));
-                
-                dpIn = op_in.dpf/2;
-                dpOut = op_out.dpf/2;
-                
-                %
-                xform_jrgeco1a = xform_fluor ;
-                xform_jrgeco1aCorr = mouse.physics.correctHb(xform_jrgeco1a,xform_datahb,...
-                    [E_in(1) E_out(1)],[E_in(2) E_out(2)],dpIn,dpOut);
-                xform_red = squeeze(xform_raw(:,:,4,:));
-                
-                xform_jrgeco1a = process.smoothImage(xform_jrgeco1a,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
-                xform_jrgeco1aCorr = process.smoothImage(xform_jrgeco1aCorr,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
-                
-                baseline = nanmean(xform_red,3);
-                xform_red = xform_red./repmat(baseline,[1 1 size(xform_red,3)]); % make the data ratiometric
-                xform_red = xform_red - 1;
-                xform_red = process.smoothImage(xform_red,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
-                
-                save(fullfile(saveDir,processedName),'xform_jrgeco1a','xform_jrgeco1aCorr','xform_red','-append','-v7.3')
-                clear xform_jrgeco1a xform_jrgeco1aCorr xform_red
-                disp('correct FAD')
-                xform_FAD = squeeze(xform_raw(:,:,sessionInfo.FADspecies,:));
-                
-                baseline = nanmean(xform_FAD,3);
-                xform_FAD = xform_FAD./repmat(baseline,[1 1 size(xform_FAD,3)]); % make the data ratiometric
-                xform_FAD = xform_FAD - 1; % make the data change from baseline (center at zero)
-                
-                
-                [op_in_FAD, E_in_FAD] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.FADspecies)));
-                [op_out_FAD, E_out_FAD] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'probeSpectra',sessionInfo.FADEmissionFile));
-                
-                dpIn_FAD = op_in_FAD.dpf/2;
-                dpOut_FAD = op_out_FAD.dpf/2;
-                
-                
-                xform_FADCorr = mouse.physics.correctHb(xform_FAD,xform_datahb,...
-                    [E_in_FAD(1) E_out_FAD(1)],[E_in_FAD(2) E_out_FAD(2)],dpIn_FAD,dpOut_FAD);
-                clear xform_datahb
-                xform_green = squeeze(xform_raw(:,:,3,:));
-                clear xform_raw
-                xform_FAD = process.smoothImage(xform_FAD,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
-                xform_FADCorr = process.smoothImage(xform_FADCorr,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
-                
-                baseline = nanmean(xform_green,3);
-                xform_green = xform_green./repmat(baseline,[1 1 size(xform_green,3)]); % make the data ratiometric
-                xform_green = xform_green - 1;
-                xform_green = process.smoothImage(xform_green,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
-                
-                save(fullfile(saveDir, processedName),'xform_FAD','xform_FADCorr','xform_green',...
-                    'op_in_FAD', 'E_in_FAD','op_out_FAD', 'E_out_FAD','op_in_FAD', 'E_in_FAD','op_out_FAD', 'E_out_FAD','-append')
+            end
+            
+            if strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto3')||strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto2')
+                xform_raw = raw_detrend;
             else
-                disp(strcat('jrgeco1a data already processed for ',processedName))
+                xform_raw = process.affineTransform(raw_detrend,affineMarkers);
             end
+            clear raw_detrend
+            xform_raw(isnan(xform_raw)) = 0;
+            disp(strcat('get hemoglobin data for', recDate,'-',mouseName,'-',sessionType,num2str(n)));
+            
+            xform_isbrain(isnan(xform_isbrain)) = 0;
+            xform_isbrain = logical(xform_isbrain);
+            
+            if strcmp(char(sessionInfo.mouseType),'Gopto3')||strcmp(char(sessionInfo.mouseType),'Wopto3')
+                [op, E] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(2:3)));
+            else
+                
+                [op, E] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.hbSpecies)));
+            end
+            %         %
+            %         [op, E] = getHbOpticalProperties_hillman(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.hbSpecies)));
+            %         %%
+            
+            BaselineFunction  = @(x) mean(x,numel(size(x)));
+            baselineValues = BaselineFunction(xform_raw);
+            xform_datahb = mouse.process.procOIS(xform_raw(:,:,sessionInfo.hbSpecies,:),baselineValues(:,:,sessionInfo.hbSpecies),op.dpf,E);
+            xform_datahb = process.smoothImage(xform_datahb,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
+            
+            save(fullfile(saveDir,processedName),'xform_datahb','sessionInfo','systemInfo','op','E','-v7.3')
+            
+            
+            if strcmp(char(sessionInfo.mouseType),'WT')||strcmp(char(sessionInfo.mouseType),'PV')||strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto2')
+                
+                
+            elseif strcmp(char(sessionInfo.mouseType),'gcamp6f')||strcmp(char(sessionInfo.mouseType),'Gopto3')
+                
+                C = who('-file',fullfile(saveDir,processedName));
+                isFluorGot = false;
+                for  k=1:length(C)
+                    if strcmp(C(k),'xform_gcamp')
+                        isFluorGot = true;
+                    end
+                end
+                if ~isFluorGot
+                    disp('correct gcamp')
+                    xform_fluor = squeeze(xform_raw(:,:,sessionInfo.fluorSpecies,:));
+                    xform_gcamp = mouse.expSpecific.procFluor(xform_fluor); % make the data ratiometric
+                    clear xform_fluor
+                    [lambda, extCoeff] = mouse.expSpecific.getHbExtCoeff(fullfile(pkgDir.path,sessionInfo.extCoeffFile));
+                    
+                    
+                    
+                    %%%
+                    [op_in, E_in] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.fluorSpecies )));
+                    [op_out, E_out] = getHbOpticalProperties_xw(muspFcn,fullfile(fluorDir,sessionInfo.fluorEmissionFile));
+                    %%%
+                    
+                    
+                    dpIn = op_in.dpf/2;
+                    dpOut = op_out.dpf/2;
+                    
+                    
+                    xform_gcampCorr = mouse.physics.correctHb(xform_gcamp,xform_datahb,...
+                        [E_in(1) E_out(1)],[E_in(2) E_out(2)],dpIn,dpOut);
+                    xform_green = squeeze(xform_raw(:,:,3,:));
+                    clear xform_raw
+                    xform_gcampCorr = process.smoothImage(xform_gcampCorr,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
+                    
+                    baseline = nanmean(xform_green,3);
+                    xform_green = xform_green./repmat(baseline,[1 1 size(xform_green,3)]); % make the data ratiometric
+                    xform_green = xform_green - 1;
+                    xform_green = process.smoothImage(xform_green,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
+                    
+                    
+                    save(fullfile(saveDir, processedName),'xform_gcamp','xform_gcampCorr','xform_green','op_in', 'E_in','op_out', 'E_out','-append','-v7.3')
+                    clear xform_gcamp xform_gcampCorr xform_green
+                end
+            elseif strcmp(char(sessionInfo.mouseType),'Wopto3')
+                C = who('-file',fullfile(saveDir,processedName));
+                isFluorGot = false;
+                for  k=1:length(C)
+                    if strcmp(C(k),'xform_FAD')
+                        isFluorGot = true;
+                    end
+                end
+                if ~isFluorGot
+                    disp('correct FAD')
+                    xform_fluor = squeeze(xform_raw(:,:,sessionInfo.fluorSpecies,:));
+                    xform_FAD = mouse.expSpecific.procFluor(xform_fluor); % make the data ratiometric
+                    clear xform_fluor
+                    [lambda, extCoeff] = mouse.expSpecific.getHbExtCoeff(fullfile(pkgDir.path,sessionInfo.extCoeffFile));
+                    
+                    
+                    %
+                    %                 %%%
+                    [op_in, E_in] = getHbOpticalProperties_hillman(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.fluorSpecies )));
+                    [op_out, E_out] = getHbOpticalProperties_hillman(muspFcn,fullfile(fluorDir,sessionInfo.fluorEmissionFile));
+                    %%%
+                    
+                    
+                    dpIn = op_in.dpf/2;
+                    dpOut = op_out.dpf/2;
+                    
+                    
+                    xform_FADCorr = mouse.physics.correctHb(xform_FAD,xform_datahb,...
+                        [E_in(1) E_out(1)],[E_in(2) E_out(2)],dpIn,dpOut);
+                    xform_green = squeeze(xform_raw(:,:,3,:));
+                    clear xform_raw
+                    xform_FADCorr = process.smoothImage(xform_FADCorr,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
+                    
+                    baseline = nanmean(xform_green,3);
+                    xform_green = xform_green./repmat(baseline,[1 1 size(xform_green,3)]); % make the data ratiometric
+                    xform_green = xform_green - 1;
+                    xform_green = process.smoothImage(xform_green,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
+                    
+                    
+                    save(fullfile(saveDir, processedName),'xform_FAD','xform_FADCorr','xform_green','op_in', 'E_in','op_out', 'E_out','-append','-v7.3')
+                    clear xform_FAD xform_FADCorr xform_green
+                    
+                end
+            elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')||strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto3')
+                isFluorGot = false;
+                C = who('-file',fullfile(saveDir,processedName));
+                
+                for  k=1:length(C)
+                    if strcmp(C(k),'xform_jrgeco1a')
+                        isFluorGot = true;
+                    end
+                end
+                if ~isFluorGot
+                    disp('correct jrgeco1a')
+                    xform_fluor = xform_raw(:,:,sessionInfo.fluorSpecies,:);
+                    xform_fluor = mouse.expSpecific.procFluor(xform_fluor); % make the data ratiometric
+                    [lambda, extCoeff] = mouse.expSpecific.getHbExtCoeff(fullfile(pkgDir.path,sessionInfo.extCoeffFile));
+                    
+                    
+                    [op_in, E_in] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(2)));
+                    [op_out, E_out] = getHbOpticalProperties_xw(muspFcn,fullfile(fluorDir,sessionInfo.fluorEmissionFile));
+                    
+                    dpIn = op_in.dpf/2;
+                    dpOut = op_out.dpf/2;
+                    
+                    %
+                    xform_jrgeco1a = xform_fluor ;
+                    xform_jrgeco1aCorr = mouse.physics.correctHb(xform_jrgeco1a,xform_datahb,...
+                        [E_in(1) E_out(1)],[E_in(2) E_out(2)],dpIn,dpOut);
+                    xform_red = squeeze(xform_raw(:,:,4,:));
+                    
+                    xform_jrgeco1a = process.smoothImage(xform_jrgeco1a,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
+                    xform_jrgeco1aCorr = process.smoothImage(xform_jrgeco1aCorr,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
+                    
+                    baseline = nanmean(xform_red,3);
+                    xform_red = xform_red./repmat(baseline,[1 1 size(xform_red,3)]); % make the data ratiometric
+                    xform_red = xform_red - 1;
+                    xform_red = process.smoothImage(xform_red,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
+                    
+                    save(fullfile(saveDir,processedName),'xform_jrgeco1a','xform_jrgeco1aCorr','xform_red','-append','-v7.3')
+                    clear xform_jrgeco1a xform_jrgeco1aCorr xform_red
+                    disp('correct FAD')
+                    xform_FAD = squeeze(xform_raw(:,:,sessionInfo.FADspecies,:));
+                    
+                    baseline = nanmean(xform_FAD,3);
+                    xform_FAD = xform_FAD./repmat(baseline,[1 1 size(xform_FAD,3)]); % make the data ratiometric
+                    xform_FAD = xform_FAD - 1; % make the data change from baseline (center at zero)
+                    
+                    
+                    [op_in_FAD, E_in_FAD] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.FADspecies)));
+                    [op_out_FAD, E_out_FAD] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'probeSpectra',sessionInfo.FADEmissionFile));
+                    
+                    dpIn_FAD = op_in_FAD.dpf/2;
+                    dpOut_FAD = op_out_FAD.dpf/2;
+                    
+                    
+                    xform_FADCorr = mouse.physics.correctHb(xform_FAD,xform_datahb,...
+                        [E_in_FAD(1) E_out_FAD(1)],[E_in_FAD(2) E_out_FAD(2)],dpIn_FAD,dpOut_FAD);
+                    clear xform_datahb
+                    xform_green = squeeze(xform_raw(:,:,3,:));
+                    clear xform_raw
+                    xform_FAD = process.smoothImage(xform_FAD,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
+                    xform_FADCorr = process.smoothImage(xform_FADCorr,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
+                    
+                    baseline = nanmean(xform_green,3);
+                    xform_green = xform_green./repmat(baseline,[1 1 size(xform_green,3)]); % make the data ratiometric
+                    xform_green = xform_green - 1;
+                    xform_green = process.smoothImage(xform_green,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
+                    
+                    save(fullfile(saveDir, processedName),'xform_FAD','xform_FADCorr','xform_green',...
+                        'op_in_FAD', 'E_in_FAD','op_out_FAD', 'E_out_FAD','op_in_FAD', 'E_in_FAD','op_out_FAD', 'E_out_FAD','-append')
+                    
+                end
+                
+            end
+            
         end
-        
-        
-        
+        clearvars -except excelFile excelRows runs isDetrend
     end
-    clearvars -except excelFile excelRows runs isDetrend
 end
-
 
 
 
@@ -628,26 +711,29 @@ for excelRow = excelRows
             stimStartTime = 5;
             info.freqout=1;
             disp('loading Non GRS data')
-            if strcmp(sessionInfo.mouseType,'gcamp6f')
+            if strcmp(sessionInfo.mouseType,'gcamp6f')||strcmp(sessionInfo.mouseType,'Gopto3')
+                load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),...
+                    'xform_gcamp','xform_gcampCorr','xform_green','xform_datahb')
+            elseif strcmp(sessionInfo.mouseType,'Gopto3')
                 load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),...
                     'xform_gcamp','xform_gcampCorr','xform_green','xform_datahb')
             elseif strcmp(sessionInfo.mouseType,'jrgeco1a')||strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')
                 load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),...
                     'xform_jrgeco1a','xform_jrgeco1aCorr','xform_red','xform_FAD','xform_FADCorr','xform_green','xform_datahb')
             end
-                
-                
-                
-            if strcmp(sessionInfo.mouseType,'PV')||strcmp(sessionInfo.mouseType,'jrgeco1a-opto2')||strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')
+            
+            
+            
+            if strcmp(sessionInfo.mouseType,'PV')||strcmp(sessionInfo.mouseType,'jrgeco1a-opto2')||strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')||strcmp(sessionInfo.mouseType,'Gopto3')||strcmp(sessionInfo.mouseType,'Wopto3')
                 
                 load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'.mat')))
                 if strcmp(sessionInfo.mouseType,'PV')
                     load(fullfile(maskDir_new,maskName_new), 'affineMarkers')
-                peakMap_ROI= process.affineTransform(rawdata(:,:,3,sessionInfo.stimbaseline+1),affineMarkers) ;
+                    peakMap_ROI= process.affineTransform(rawdata(:,:,3,sessionInfo.stimbaseline+1),affineMarkers) ;
                 elseif strcmp(sessionInfo.mouseType,'jrgeco1a-opto2')
                     peakMap_ROI = rawdata(:,:,3,sessionInfo.stimbaseline+1);
                 else
-                    peakMap_ROI = rawdata(:,:,1,sessionInfo.stimbaseline+1);
+                    peakMap_ROI = rawdata(:,:,1,sessionInfo.darkFrameNum/4+sessionInfo.stimbaseline+1);
                 end
                 clear rawdata
                 imagesc(peakMap_ROI)
@@ -655,13 +741,13 @@ for excelRow = excelRows
                 colormap jet
                 
                 if strcmp(sessionInfo.mouseType,'PV')
-                hold on
-                load('D:\OIS_Process\atlas.mat','AtlasSeeds')
-                barrel = AtlasSeeds == 9;
-                ROI_barrel =  bwperim(barrel);
-                
-                
-                contour(ROI_barrel,'k')
+                    hold on
+                    load('D:\OIS_Process\atlas.mat','AtlasSeeds')
+                    barrel = AtlasSeeds == 9;
+                    ROI_barrel =  bwperim(barrel);
+                    
+                    
+                    contour(ROI_barrel,'k')
                 end
                 
                 [x1,y1] = ginput(1);
@@ -692,13 +778,22 @@ for excelRow = excelRows
             disp('QC on non GSR stim')
             
             
-            
+            %   load(fullfile(saveDir,'ROI.mat'))
             
             
             if strcmp(sessionInfo.mouseType,'gcamp6f')
                 [goodBlocks_NoGSR,ROI_NoGSR] = QC_stim(squeeze(xform_datahb(:,:,1,:)),squeeze(xform_datahb(:,:,2,:)),...
                     xform_gcamp,xform_gcampCorr,xform_green,[],[],[],...
                     xform_isbrain,numBlock,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,[]);
+            elseif strcmp(sessionInfo.mouseType,'Gopto3')
+                [goodBlocks_NoGSR,ROI_NoGSR] = QC_stim(squeeze(xform_datahb(:,:,1,:)),squeeze(xform_datahb(:,:,2,:)),...
+                    xform_gcamp,xform_gcampCorr,xform_green,[],[],[],...
+                    xform_isbrain,numBlock,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,ROI);
+            elseif strcmp(sessionInfo.mouseType,'Wopto3')
+                [goodBlocks_NoGSR,ROI_NoGSR] = QC_stim(squeeze(xform_datahb(:,:,1,:)),squeeze(xform_datahb(:,:,2,:)),...
+                    xform_FAD,xform_FADCorr,xform_green,[],[],[],...
+                    xform_isbrain,numBlock,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,ROI);
+                
                 
             elseif strcmp(sessionInfo.mouseType,'jrgeco1a')
                 [goodBlocks_NoGSR,ROI_NoGSR] = QC_stim(squeeze(xform_datahb(:,:,1,:))*10^6,squeeze(xform_datahb(:,:,2,:))*10^6,...
@@ -709,19 +804,19 @@ for excelRow = excelRows
                 load(fullfile(maskDir_new,maskName_new), 'isbrain')
                 [goodBlocks_NoGSR,ROI_NoGSR] = QC_stim(squeeze(xform_datahb(:,:,1,:))*10^6,squeeze(xform_datahb(:,:,2,:))*10^6,...
                     xform_FAD/3,xform_FADCorr/3,xform_green*100,xform_jrgeco1a*100,xform_jrgeco1aCorr*100,xform_red*100,...
-                   isbrain,numBlock,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,ROI);
+                    isbrain,numBlock,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,ROI);
             elseif strcmp(sessionInfo.mouseType,'PV')
                 xform_datahb(isnan(xform_datahb)) = 0;
                 xform_datahb =  mouse.freq.lowpass(xform_datahb,0.5,sessionInfo.framerate);
                 [goodBlocks_NoGSR,ROI_NoGSR] = QC_stim(squeeze(xform_datahb(:,:,1,:))*10^6,squeeze(xform_datahb(:,:,2,:))*10^6,...
                     [],[],[],[],[],[],...
                     xform_isbrain,numBlock,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,ROI);
-            elseif strcmp(sessionInfo.mouseType,'jrgeco1a-opto2') 
+            elseif strcmp(sessionInfo.mouseType,'jrgeco1a-opto2')
                 load(fullfile(maskDir_new,maskName_new), 'isbrain')
-                   [goodBlocks_NoGSR,ROI_NoGSR] = QC_stim(squeeze(xform_datahb(:,:,1,:))*10^6,squeeze(xform_datahb(:,:,2,:))*10^6,...
+                [goodBlocks_NoGSR,ROI_NoGSR] = QC_stim(squeeze(xform_datahb(:,:,1,:))*10^6,squeeze(xform_datahb(:,:,2,:))*10^6,...
                     [],[],[],[],[],[],...
                     isbrain,numBlock,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,ROI);
-   
+                
             end
             close all
             save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'goodBlocks_NoGSR','ROI_NoGSR','-append')

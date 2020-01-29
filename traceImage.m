@@ -107,10 +107,12 @@ for b=stimStartTime: stimEndTime+4
     colormap jet
 end
 
-
+max1 = max(abs(downSampledBlocks1(:,:,stimEndTime)),[],'all');
+max2 = max(abs(downSampledBlocks2(:,:,stimEndTime)),[],'all');
+max3 = max(abs(downSampledBlocks3(:,:,stimEndTime)),[],'all');
 subplot('position',[0.79,0.27,0.13,0.18])
 imagesc(downSampledBlocks1(:,:,stimEndTime),...
-    [min(downSampledBlocks1(:,:,stimEndTime),[],'all'),max(downSampledBlocks1(:,:,stimEndTime),[],'all')])
+    [-max1,max1])
 colorbar
  hold on
     imagesc(WL,'AlphaData',1-xform_isbrain)
@@ -121,7 +123,7 @@ title(name1);
 
 subplot('position',[0.64,0.05,0.13,0.18])
 imagesc(downSampledBlocks2(:,:,stimEndTime),...
-    [min(downSampledBlocks2(:,:,stimEndTime),[],'all'),max(downSampledBlocks2(:,:,stimEndTime),[],'all')])
+    [-max2,max2])
  hold on
     imagesc(WL,'AlphaData',1-xform_isbrain)
 colorbar
@@ -134,7 +136,7 @@ title(name2);
 subplot('position',[0.79,0.05,0.13,0.18])
 
 imagesc(downSampledBlocks3(:,:,stimEndTime),...
-    [min(downSampledBlocks3(:,:,stimEndTime),[],'all'),max(downSampledBlocks3(:,:,stimEndTime),[],'all')])
+    [-max3,max3])
 colorbar
  hold on
     imagesc(WL,'AlphaData',1-xform_isbrain)

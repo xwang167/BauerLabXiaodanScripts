@@ -1,6 +1,6 @@
 
 close all;clearvars;clc
-excelRows = [247 248 250];%182,184,186,203,
+excelRows = [276];%182,184,186,203,
 excelFile = "D:\GCaMP\GCaMP_awake.xlsx";
 stimStartTime = 5;
 
@@ -69,7 +69,7 @@ for excelRow = excelRows
     xform_green_mouse_NoGSR = [];
     
     %if ~exist(fullfile(saveDir,processedName_mouse),'file')
-    for n = 1:3
+    for n = 1:6
         
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
         sessionInfo.stimblocksize = excelRaw{11};
@@ -283,12 +283,12 @@ for excelRow = excelRows
         texttitle_NoGSR = strcat(mouseName,'-stim'," ",'without GSR with 0.5 low pass');
         output_NoGSR= fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim','_NoGSR'));
         disp('QC on non GSR stim')
-        % load(fullfile(saveDir, processedName),'ROI')
-        load(fullfile(saveDir,'ROI.mat'))
+        load(fullfile(saveDir, processedName),'ROI_NoGSR')
+        %load(fullfile(saveDir,'ROI.mat'))
         if strcmp(char(sessionInfo.mouseType),'PV')
             QC_stim(squeeze(xform_datahb_mouse_NoGSR(:,:,1,:))*10^6,squeeze(xform_datahb_mouse_NoGSR(:,:,2,:))*10^6,...
                 [],[],[],[],[],[],...
-                xform_isbrain,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,ROI);
+                xform_isbrain,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,ROI_NoGSR);
         else
             QC_stim(squeeze(xform_datahb_mouse_NoGSR(:,:,1,:))*10^6,squeeze(xform_datahb_mouse_NoGSR(:,:,2,:))*10^6,...
                 [],[],[],[],[],[],...

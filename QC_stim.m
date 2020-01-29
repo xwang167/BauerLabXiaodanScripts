@@ -21,15 +21,15 @@ if ~isempty(jrgeco1a)
 end
 stimEndTime= stimStartTime+stimduration;
 
-if ~isempty(jrgeco1a)
-    [goodBlocks] = pickGoodBlocks(stimStartTime,stimEndTime,numBlock,oxy_downsampled,deoxy_downsampled,total_downsampled,greenFluorCorr_downsampled,jrgeco1a_downsampled);
-elseif ~isempty(greenFluor)
-    [goodBlocks] = pickGoodBlocks(stimStartTime,stimEndTime,numBlock,oxy_downsampled,deoxy_downsampled,total_downsampled,greenFluorCorr_downsampled,[]);
-else
-    [goodBlocks] = pickGoodBlocks(stimStartTime,stimEndTime,numBlock,oxy_downsampled,deoxy_downsampled,total_downsampled,[],[]);
-    
-end
-
+% if ~isempty(jrgeco1a)
+%     [goodBlocks] = pickGoodBlocks(stimStartTime,stimEndTime,numBlock,oxy_downsampled,deoxy_downsampled,total_downsampled,greenFluorCorr_downsampled,jrgeco1a_downsampled);
+% elseif ~isempty(greenFluor)
+%     [goodBlocks] = pickGoodBlocks(stimStartTime,stimEndTime,numBlock,oxy_downsampled,deoxy_downsampled,total_downsampled,greenFluorCorr_downsampled,[]);
+% else
+%     [goodBlocks] = pickGoodBlocks(stimStartTime,stimEndTime,numBlock,oxy_downsampled,deoxy_downsampled,total_downsampled,[],[]);
+%     
+% end
+goodBlocks = 1:5;%Delete
 
 texttitle1 = strcat(' Peak Map for each block', {' '},texttitle,{' '}, 'blocks ',{' '}, num2str(goodBlocks),{' '},'are picked');
 annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',texttitle1,'FontWeight','bold','Color',[1 0 0],'FontSize',16);
@@ -193,7 +193,7 @@ if ~isempty(goodBlocks)
     
     
     xlabel('Time(s)','FontSize',12)
-    ylabel('Hb(\DeltaM)','FontSize',12)
+    ylabel('Hb(\Delta\muM)','FontSize',12)
     ylim([-1.1*cMax 1.1*cMax])
     
     xlim([0 round( stimblocksize/ framerate)])

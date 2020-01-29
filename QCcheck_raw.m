@@ -55,6 +55,10 @@ elseif strcmp(system, 'EastOIS2')
          TickLabels = {'G','R','B'};
            Colors = [0 1 0;1 0 0;0 0 1];
     legendName = {'green LED', 'red LED','Laser'};
+    elseif strcmp(mouseType,'Gopto3')||strcmp(mouseType,'Wopto3')
+         TickLabels = {'L','B','G','Red'};
+           Colors = [0 0 1;1 0 1;0 1 0;1 0 0];
+    legendName = {'Laser', 'Green Fluor','Green LED','red LED'};
 
     else
     TickLabels = {'B','G1','G2','R'};
