@@ -59,7 +59,10 @@ elseif strcmp(system, 'EastOIS2')
          TickLabels = {'L','B','G','Red'};
            Colors = [0 0 1;1 0 1;0 1 0;1 0 0];
     legendName = {'Laser', 'Green Fluor','Green LED','red LED'};
-
+    elseif strcmp(mouseType,'jrgeco1a-opto3')||strcmp(mouseType,'Wopto3')
+         TickLabels = {'G','R','F','L'};
+         Colors = [0 1 0;1 0 0;1 0 1;0 0 1;];
+    legendName = {'Green LED','red LED', 'Red Fluor','Laser'};
     else
     TickLabels = {'B','G1','G2','R'};
     Colors = [0 0 1; 1 0 1;0 1 0;1 0 0];
@@ -95,9 +98,10 @@ p=plot(time,mdatanorm'); title('Normalized Raw Data');
 for c=1:numLED;
     set(p(c),'Color',Colors(c,:));
 end
+p(4).Color(4) = 0.05;
 xlabel('Time (sec)')
 ylabel('Mean Counts')
-ylim([min(min(mdatanorm)) max(max(mdatanorm))])
+ylim([max(min(min(mdatanorm)),0.9) min(max(max(mdatanorm)),1.1)])
 xlim([time(1) time(end)])
 
 subplot('position', [0.42 0.09 0.14 0.18])
@@ -114,7 +118,7 @@ hz=linspace(0,frameRate,info.T1);
 subplot('position', [0.1 0.08 0.25 0.6]);
  title('FFT Raw Data');
 for c=1:numLED;
-    p(c)=loglog(hz(1:ceil(info.T1)),fdata(c,1:ceil(info.T1))'/100^(c-1));
+    p(c)=loglog(hz(1:ceil(info.T1)),fdata(c,1:ceil(info.T1))'/5^(c^2-1));
     set(p(c),'Color',Colors(c,:));
     hold on
 end
@@ -131,7 +135,7 @@ if strcmp(system, 'fcOIS1')
 elseif strcmp(system, 'fcOIS2')||strcmp(system, 'EastOIS1')||strcmp(system, 'EastOIS1_Fluor')
     BlueChan=2;
 elseif strcmp(system, 'EastOIS2')
-    if strcmp(mouseType,'PV')
+    if strcmp(mouseType,'PV')||strcmp(mouseType,'jrgeco1a-opto3')
         BlueChan = 1;
     else
     BlueChan = 3;
