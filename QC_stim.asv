@@ -1,7 +1,7 @@
 
 
 function   [goodBlocks,ROI] = QC_stim(oxy,oxy_downsampled,deoxy,deoxy_downsampled,greenFluor,greenFluorCorr,green,jrgeco1a,jrgeco1a_downsampled,jrgeco1aCorr,jrgeco1aCorr_downsampled,red,red_downsampled,xform_isbrain,numBlock,stimStartTime,stimduration,stimFreq,framerate,stimblocksize,stimbaseline,texttitle,output,input_ROI)
-maxTotal = 0.8;
+maxTotal = 0.5;
 maxRGECO = 0.4;
 total_downsampled  = oxy_downsampled + deoxy_downsampled;
 stimEndTime= stimStartTime+stimduration;
@@ -209,7 +209,7 @@ if ~isempty(goodBlocks)
     
     traceImage(oxy_downsampled_blocks,total_downsampled_blocks,deoxy_downsampled_blocks,...
         'HbO','Total','HbR',oxy_active,total_active,deoxy_active,'r','k','b',ROI,'\Delta\muM',...
-        stimduration, 30, stimFreq, 1, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[maxTotal maxTotal maxTotal/2])
+        stimduration, 30, stimFreq, 1, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[maxTotal maxTotal maxTotal])
     
     texttitle2 = strcat(' Block Average for ', {' '},texttitle);
     annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',texttitle2,'FontWeight','bold','Color',[1 0 0],'FontSize',16);
@@ -233,7 +233,7 @@ if ~isempty(goodBlocks)
     if ~isempty(jrgeco1a)
         traceImage(jrgeco1a_downsampled_blocks,jrgeco1aCorr_downsampled_blocks,red_downsampled_blocks,...
             'jrgeco1a','jrgeco1aCorr','625nm Reflectance',jrgeco1a_active,jrgeco1aCorr_active,red_active,'k','m','r',ROI,'\DeltaF/F%',...
-            stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[maxRGECO maxRGECO maxRGECO/4])
+            stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[maxRGECO maxRGECO maxRGECO/2])
         
         annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',texttitle2,'FontWeight','bold','Color',[1 0 0],'FontSize',16);
         saveas(gcf,strcat(output,'RGECOTraceImage.fig'))

@@ -35,7 +35,7 @@ for excelRow = excelRows
     
     maskDir = saveDir;
     maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-    load(fullfile(maskDir,maskName),'xform_isbrain','isbrain');
+    load(fullfile(maskDir,recDate,maskName),'xform_isbrain','isbrain');
     
     sessionInfo.framerate = excelRaw{7};
     processedName_mouse = strcat(recDate,'-',mouseName,'-',sessionType,'_processed_mouse','.mat');

@@ -1,5 +1,8 @@
 function downSampledData  = processAndDownsample(data,mask,numBlock,numDesample,stimStartTime)
 %input needs to be 128*128*time
+
+
+
 mask = double(mask);
 data = double(data).*mask;
 data(isnan(data)) = 0;

@@ -9,6 +9,7 @@ mpp=mm/size(data,1);
 seedradmm=0.25;
 seedradpix=seedradmm/mpp;
 
+if size(refseeds,1)>3
 for n=1:2:size(refseeds,1)-1
     if xform_isbrain(refseeds(n,2),refseeds(n,1))==1 && xform_isbrain(refseeds(n+1,2),refseeds(n+1,1))==1;  %%remove 129- on y coordinate for newer data sets
         SeedsUsed(n,:)=refseeds(n,:);
@@ -17,6 +18,9 @@ for n=1:2:size(refseeds,1)-1
         SeedsUsed(n,:)=[NaN, NaN];
         SeedsUsed(n+1,:)=[NaN, NaN];
     end
+end
+else
+        SeedsUsed= refseeds;
 end
 P=burnseeds(SeedsUsed,seedradpix,xform_isbrain);          % make a mask of seed locations
 length_seeds=size(SeedsUsed,1);                           %reorder so bilateral connectivity values are on the off-diagonal
