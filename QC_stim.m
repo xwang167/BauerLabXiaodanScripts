@@ -1,7 +1,7 @@
 
 
 function   [goodBlocks,ROI] = QC_stim(oxy,oxy_downsampled,deoxy,deoxy_downsampled,greenFluor,greenFluorCorr,green,jrgeco1a,jrgeco1a_downsampled,jrgeco1aCorr,jrgeco1aCorr_downsampled,red,red_downsampled,xform_isbrain,numBlock,stimStartTime,stimduration,stimFreq,framerate,stimblocksize,stimbaseline,texttitle,output,input_ROI)
-maxTotal = 0.8;
+maxTotal = 0.5;
 maxRGECO = 0.4;
 total_downsampled  = oxy_downsampled + deoxy_downsampled;
 stimEndTime= stimStartTime+stimduration;
@@ -170,14 +170,13 @@ if ~isempty(goodBlocks)
         hold on
     end
     
-    
-    x1 = 1:round( stimblocksize/ framerate);
+  
     yyaxis right
-    plot(x1,oxy_active,'r-');
+    plot(x,oxy_active,'r-');
     hold on
-    plot(x1,deoxy_active,'b-');
+    plot(x,deoxy_active,'b-');
     hold on
-    plot(x1,total_active,'Color','k');
+    plot(x,total_active,'Color','k');
     set(findall(gca, 'Type', 'Line'),'LineWidth',1);
     
     
@@ -209,7 +208,7 @@ if ~isempty(goodBlocks)
     
     traceImage(oxy_downsampled_blocks,total_downsampled_blocks,deoxy_downsampled_blocks,...
         'HbO','Total','HbR',oxy_active,total_active,deoxy_active,'r','k','b',ROI,'\Delta\muM',...
-        stimduration, 30, stimFreq, 1, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[maxTotal maxTotal maxTotal/2])
+        stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[maxTotal maxTotal maxTotal/2])
     
     texttitle2 = strcat(' Block Average for ', {' '},texttitle);
     annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',texttitle2,'FontWeight','bold','Color',[1 0 0],'FontSize',16);

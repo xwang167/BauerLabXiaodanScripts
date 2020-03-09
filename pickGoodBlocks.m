@@ -35,9 +35,9 @@ colormap jet
 % temp_oxy_max = str2double(answer{1});
 % temp_deoxy_max = str2double(answer{2});
 % temp_total_max = str2double(answer{3});
-temp_oxy_max = 0.8;
-temp_deoxy_max = 0.4;
-temp_total_max = 0.8;
+temp_oxy_max = 0.5;
+temp_deoxy_max = 0.25;
+temp_total_max = 0.5;
 close all;
 
 if ~isempty(jrgecoCorrDownSampled)
