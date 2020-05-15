@@ -17,7 +17,9 @@
 
 nFrames = 750;
 % Frames(1:nFrames) = struct('cdata',[], 'colormap',[]);
-saveDest = 'J:\RGECO\awakeRest.avi';
+saveDest = strcat('D:\movie\',mouseName,'.avi');
+   saveDest = fullfile('D:\',strcat(mouseName,'-',sessionType,num2str(n),'.avi'));
+  
 writerObj = VideoWriter(saveDest);
 writerObj.FrameRate = 25;
 

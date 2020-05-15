@@ -1,83 +1,83 @@
 
-close all;clearvars;clc
+%close all;clearvars;clc
 import mouse.*
-excelFile = "D:\GCaMP\GCaMP_awake.xlsx";
+excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
 
 
 nVx = 128;
 nVy = 128;
 runs = 1:6;
-excelRows = 91:92;
+excelRows = 32;
 
-% for excelRow = excelRows
-%     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':R',num2str(excelRow)]);
-%     recDate = excelRaw{1}; recDate = string(recDate);
-%     mouseName = excelRaw{2}; mouseName = string(mouseName);
-%     rawdataloc = excelRaw{3};
-%     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-%     if ~exist(saveDir)
-%         mkdir(saveDir)
-%     end
-%     systemType = excelRaw{5};
-%     systemInfo = expSpecific.sysInfo(systemType);
-%     mouseType = excelRaw{13};
-%     sessionInfo =  expSpecific.sesInfo(mouseType);
-%     sessionInfo.mouseType = mouseType;
-%     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-%     
-%     maskName = strcat(recDate,'-',mouseName,'-LandmarksandMarks','.mat');
-%         if exist(fullfile(saveDir,maskName))
-%             disp(strcat('Landmarks and mask file already exists for ', recDate,'-', mouseName))
-%             load(fullfile(saveDir,maskName), 'isbrain',  'I')
-%         else
-%     % need to be modified to see if WL exist
-%     sessionInfo.darkFrameNum = excelRaw{11};
-%     
-%     sessionInfo.stimbaseline=excelRaw{9};
-%     sessionInfo.framerate = excelRaw{7};
-%     sessionInfo.stimblocksize = excelRaw{8};
-%     darkFrameInd = 2:sessionInfo.darkFrameNum;
-%     filename = char(fullfile(rawdataloc,recDate,strcat(recDate,'-',mouseName,'-',sessionType,'1.tif')));
-%     
-% %     raw = read.readRaw(fileName,systemInfo.numLEDs,systemInfo.readFcn);
-% %     WL = preprocess.getWL(raw,darkFrameInd,[4 3 2]);
-%     
-%     wl = zeros(128,128,3);
-%     wl(:,:,1)= read.readtiff_oneImage(filename,sessionInfo.darkFrameNum*systemInfo.numLEDs+4);
-%     wl(:,:,2) = read.readtiff_oneImage(filename,sessionInfo.darkFrameNum*systemInfo.numLEDs+3);
-%     wl(:,:,3) = read.readtiff_oneImage(filename,sessionInfo.darkFrameNum*systemInfo.numLEDs+2);
-%     WL = zeros(128,128,3);
-%             WL(:,:,1) = wl(:,:,1)./max(max(wl(:,:,1)));
-%         WL(:,:,2) = wl(:,:,2)./max(max(wl(:,:,2)));
-%         WL(:,:,3) = wl(:,:,3)./max(max(wl(:,:,3)));
-%     disp(strcat('get landmarks and mask for',recDate,'-', mouseName))
-%     [isbrain,xform_isbrain,I,seedcenter,WLcrop,xform_WLcrop,xform_WL] = getLandMarksandMask_xw(WL);
-%     save(fullfile(saveDir,maskName), 'isbrain',  'I' ,'WL','WLcrop', 'xform_WLcrop', 'xform_isbrain', 'isbrain', 'WL', 'xform_WL', 'I', 'seedcenter')
-%     isbrain_contour = bwperim(isbrain);
-%     
-%     figure;
-%     imagesc(WL); %changed 3/1/1
-%     axis off
-%     axis image
-%     title(strcat(recDate,'-',mouseName));
-%     
-%     for f=1:size(seedcenter,1)
-%         hold on;
-%         plot(seedcenter(f,1),seedcenter(f,2),'ko','MarkerFaceColor','k')
-%     end
-%     hold on;
-%     plot(I.tent(1,1),I.tent(1,2),'ko','MarkerFaceColor','b')
-%     hold on;
-%     plot(I.bregma(1,1),I.bregma(1,2),'ko','MarkerFaceColor','b')
-%     hold on;
-%     plot(I.OF(1,1),I.OF(1,2),'ko','MarkerFaceColor','b')
-%     hold on;
-%     contour(isbrain_contour,'r')
-%     saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'_WLandMarks.jpg')))
-%       end
-%     clearvars -except excelFile nVx nVy excelRows runs
-%     close all;
-% end
+for excelRow = excelRows
+    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':R',num2str(excelRow)]);
+    recDate = excelRaw{1}; recDate = string(recDate);
+    mouseName = excelRaw{2}; mouseName = string(mouseName);
+    rawdataloc = excelRaw{3};
+    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+    if ~exist(saveDir)
+        mkdir(saveDir)
+    end
+    systemType = excelRaw{5};
+    systemInfo = expSpecific.sysInfo(systemType);
+    mouseType = excelRaw{13};
+%    sessionInfo =  expSpecific.sesInfo(mouseType);
+    sessionInfo.mouseType = mouseType;
+    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+    
+    maskName = strcat(recDate,'-',mouseName,'-LandmarksandMarks','.mat');
+        if exist(fullfile(saveDir,maskName))
+            disp(strcat('Landmarks and mask file already exists for ', recDate,'-', mouseName))
+            load(fullfile(saveDir,maskName), 'isbrain',  'I')
+        else
+    % need to be modified to see if WL exist
+    sessionInfo.darkFrameNum = excelRaw{11};
+    
+    sessionInfo.stimbaseline=excelRaw{9};
+    sessionInfo.framerate = excelRaw{7};
+    sessionInfo.stimblocksize = excelRaw{8};
+    darkFrameInd = 2:sessionInfo.darkFrameNum;
+    filename = char(fullfile(rawdataloc,recDate,strcat(recDate,'-',mouseName,'-',sessionType,'1.tif')));
+    
+%     raw = read.readRaw(fileName,systemInfo.numLEDs,systemInfo.readFcn);
+%     WL = preprocess.getWL(raw,darkFrameInd,[4 3 2]);
+    
+    wl = zeros(128,128,3);
+    wl(:,:,1)= read.readtiff_oneImage(filename,sessionInfo.darkFrameNum*systemInfo.numLEDs+4);
+    wl(:,:,2) = read.readtiff_oneImage(filename,sessionInfo.darkFrameNum*systemInfo.numLEDs+3);
+    wl(:,:,3) = read.readtiff_oneImage(filename,sessionInfo.darkFrameNum*systemInfo.numLEDs+2);
+    WL = zeros(128,128,3);
+            WL(:,:,1) = wl(:,:,1)./max(max(wl(:,:,1)));
+        WL(:,:,2) = wl(:,:,2)./max(max(wl(:,:,2)));
+        WL(:,:,3) = wl(:,:,3)./max(max(wl(:,:,3)));
+    disp(strcat('get landmarks and mask for',recDate,'-', mouseName))
+    [isbrain,xform_isbrain,I,seedcenter,WLcrop,xform_WLcrop,xform_WL] = getLandMarksandMask_xw(WL);
+    save(fullfile(saveDir,maskName), 'isbrain',  'I' ,'WL','WLcrop', 'xform_WLcrop', 'xform_isbrain', 'isbrain', 'WL', 'xform_WL', 'I', 'seedcenter')
+    isbrain_contour = bwperim(isbrain);
+    
+    figure;
+    imagesc(WL); %changed 3/1/1
+    axis off
+    axis image
+    title(strcat(recDate,'-',mouseName));
+    
+    for f=1:size(seedcenter,1)
+        hold on;
+        plot(seedcenter(f,1),seedcenter(f,2),'ko','MarkerFaceColor','k')
+    end
+    hold on;
+    plot(I.tent(1,1),I.tent(1,2),'ko','MarkerFaceColor','b')
+    hold on;
+    plot(I.bregma(1,1),I.bregma(1,2),'ko','MarkerFaceColor','b')
+    hold on;
+    plot(I.OF(1,1),I.OF(1,2),'ko','MarkerFaceColor','b')
+    hold on;
+    contour(isbrain_contour,'r')
+    saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'_WLandMarks.jpg')))
+      end
+    clearvars -except excelFile nVx nVy excelRows runs
+    close all;
+end
 % 
 % 
 % 

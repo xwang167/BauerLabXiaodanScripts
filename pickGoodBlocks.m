@@ -1,5 +1,6 @@
 function [goodBlocks] = pickGoodBlocks(stimStartTime,stimEndTime,numBlock,oxyDownSampled, ...
-    deoxyDownSampled,totalDownSampled,greenFluorCorrDownSampled,jrgecoCorrDownSampled,ROI)
+    deoxyDownSampled,totalDownSampled,greenFluorCorrDownSampled,jrgecoCorrDownSampled,ROI,...
+    InstMvMt_detrend,LTMvMt_detrend,frameRate)
 
 
 %load('J:\RGECO\cat\ROI_NoGSR_Awake.mat')
@@ -108,11 +109,14 @@ end
 
 
 close all
+T1 = length(InstMvMt_detrend);
+time=linspace(1,T1,T1)/frameRate;
 
-figure
-plot(1:length(oxy_active),oxy_active);
+figure('units','normalized','outerposition',[0 0.2 0.2 0.4]);
+subplot(2,1,1);plot(1:length(oxy_active),oxy_active);
+subplot(2,1,2);plotyy(time, InstMvMt_detrend/1e6,time, LTMvMt_detrend/1e6);
 
-figure('units','normalized','outerposition',[0 0 1 1]);
+figure('units','normalized','outerposition',[0.2 0.2 0.8 1]);
 for ii = 1:numBlock
     subplot(numRows,numBlock,ii)
     imagesc(squeeze(mean(oxyDownSampled(:,:,stimStartTime+1:stimEndTime,ii),3)),[-temp_oxy_max temp_oxy_max]);
@@ -189,14 +193,14 @@ end
     hold on
     contour( ROI,'k');
 
-% prompt = {'Bad blocks to remove:'};
-% title1 = 'Pick block';
-% dims = [1 35];
-% definput = {'[]'};
-% answer = inputdlg(prompt,title1,dims,definput);
+prompt = {'Bad blocks to remove:'};
+title1 = 'Pick block';
+dims = [1 35];
+definput = {'[]'};
+answer = inputdlg(prompt,title1,dims,definput);
 blocks = 1:numBlock;
-% if ~isempty(str2num(answer{1}))
-%     blocks(str2num(answer{1})) = [];
-% end
+if ~isempty(str2num(answer{1}))
+    blocks(str2num(answer{1})) = [];
+end
 goodBlocks = blocks;
 % end

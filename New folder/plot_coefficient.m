@@ -52,9 +52,33 @@ lambda = s{1};
 oxy = s{2};
 deoxy = s{3};
 figure;
-plot(lambda,oxy,'r')
+semilogy(lambda,oxy,'r','LineWidth',4)
 hold on;
-plot(lambda,deoxy,'b')
-xlim([400 750])
-xticks(400:50:750);
-title('prahl extinct coef')
+semilogy(lambda,deoxy,'b','LineWidth',4)
+xlim([450 650])
+xticks(450:50:650);
+set(gca,'FontSize',16,'FontWeight','bold')
+xlabel('Wavelength(nm)')
+ylabel('Extinction Coefficient(M^-^1cm^-^1)')
+legend({'HbO','HbR'},'location','southeast')
+
+
+
+fid = fopen('C:\Users\xiaodanwang\Documents\GitHub\BauerLab\MATLAB\parameters\+bauerParams\probeSpectra\fad_excitation_plot.txt');
+s =textscan(fid,'%f %f');
+fclose(fid);
+lambda = s{1};
+intensity = s{2};
+figure;
+plot(lambda,intensity,'c','LineWidth',4);
+xlim([420 560])
+xticks(420:20:560);
+hold on
+
+fid = fopen('C:\Users\xiaodanwang\Documents\GitHub\BauerLab\MATLAB\parameters\+bauerParams\probeSpectra\fad_emission_plot.txt');
+s =textscan(fid,'%f %f');
+fclose(fid);
+lambda = s{1};
+intensity = s{2};
+plot(lambda,intensity,'g','LineWidth',4);
+

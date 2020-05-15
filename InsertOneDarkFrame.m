@@ -4,7 +4,7 @@ import mouse.*
 
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
 
-excelRows = 323;
+excelRows = [327];
 
 runs = 1;
 isDetrend = 1;
@@ -50,52 +50,26 @@ for excelRow = excelRows
             fileName_cam2 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam2.mat');
             fileName_cam2 = fullfile(rawdataloc,recDate,fileName_cam2);
             load(fileName_cam1)
-            
-            if strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')
+            if strcmp(sessionInfo.mouseType,'jrgeco1a')
                 raw_unregistered = reshape(raw_unregistered,128,128,[]);
                 raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
                 raw_unregistered = reshape(raw_unregistered,128,128,4,[]);
-                binnedRaw_cam1 = raw_unregistered(:,:,[1,4],:);
-            elseif strcmp(sessionInfo.mouseType,'jrgeco1a')
-              binnedRaw_cam1 = raw_unregistered(:,:,[1,2],:);
-            else
-                binnedRaw_cam1 = raw_unregistered;
+                binnedRaw_cam1 = raw_unregistered(:,:,[1,2],:);
+                
             end
             clear raw_unregistered
             load(fileName_cam2)
-            if strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')
-                binnedRaw_cam2 = raw_unregistered(:,:,[2,3],:);
-                load(fullfile(maskDir,wlName),'mytform');
-                rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,mytform,sessionInfo.mouseType);
-            elseif strcmp(sessionInfo.mouseType,'jrgeco1a')
+            if strcmp(sessionInfo.mouseType,'jrgeco1a')
                 raw_unregistered = reshape(raw_unregistered,128,128,[]);
                 raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
                 raw_unregistered = reshape(raw_unregistered,128,128,4,[]);
-              binnedRaw_cam2= raw_unregistered(:,:,[3,4],:);                
-                load(fullfile(maskDir,wlName),'transformMat');
-                rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,transformMat,sessionInfo.mouseType);
-            else
-                binnedRaw_cam2 = raw_unregistered;
+                binnedRaw_cam2= raw_unregistered(:,:,[3,4],:);
                 load(fullfile(maskDir,wlName),'transformMat');
                 rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,transformMat,sessionInfo.mouseType);
                 
             end
             clear raw_unregistered
-            
-            %     if  strcmp(char(sessionInfo.mouseType),'PV')
-            if strcmp(sessionInfo.mouseType,'PV')
-            elseif sessionInfo.darkFrameNum ==0
-                raw_nondark =rawdata;
-                darkName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Dark.mat');
-                darkName =  fullfile(rawdataloc,recDate,darkName);
-                load(darkName)
-                darkFrame = squeeze(mean(rawdata(:,:,:,2:end),4));
-                clear rawdata
-                raw_baselineMinus = raw_nondark - repmat(darkFrame,1,1,1,size(raw_nondark,4));
-                clear raw_baselineMinus
-                rawdata = raw_baselineMinus;
-            else
-                darkFrameInd = 2:sessionInfo.darkFrameNum/size(rawdata,3);
+                 darkFrameInd = 2:sessionInfo.darkFrameNum/size(rawdata,3);
                 darkFrame = squeeze(mean(rawdata(:,:,:,darkFrameInd),4));
                 raw_baselineMinus = rawdata - repmat(darkFrame,1,1,1,size(rawdata,4));
                 clear rawdata
@@ -103,8 +77,7 @@ for excelRow = excelRows
                 rawdata = raw_baselineMinus;
                 clear raw_baselineMinus
                 
-            end
-            
+         
             
             
             %                 else
@@ -112,9 +85,9 @@ for excelRow = excelRows
             %                 end
             %                 disp(strcat('QC raw for ',rawName))
             visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
-            mdata = QCcheck_raw(rawdata(:,:,:,(sessionInfo.darkFrameNum/4+1):end),isbrain,systemType,sessionInfo.framerate,saveDir,visName,sessionInfo.mouseType);
+            mdata = QCcheck_raw(rawdata,isbrain,systemType,sessionInfo.framerate,saveDir,visName,sessionInfo.mouseType);
             save(fullfile(saveDir,rawName),'rawdata','mdata','-v7.3')
-  
-         end
+            
+        end
     end
 end

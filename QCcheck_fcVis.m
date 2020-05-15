@@ -4,22 +4,23 @@ mm=10;
 mpp=mm/size(xform_isbrain,1);
 seedradmm=0.25;
 seedradpix=seedradmm/mpp;
-
+xform_isbrain = ones(128,128);
+xform_isbrain(isnan(R_fluor_band(:,:,1))) = 0;
 disp('QC visualization')
-seednames={'Olf','Fr','Cg','M','SS','RS','V'};
+seednames={'Olf','P','Cg','M','SS','RS','V'};
 numseeds=numel(seednames);
 colorMax = 1;
     if isZTransform
-colorMax = 2;
+colorMax = 1.1;
     end
 
-    load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','WL')
+
+    load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
 
 figure('units','normalized','outerposition',[0 0 1 1])
 colormap jet
 for s=1:numseeds
     
-
     if mod(s,2)==0
         OE=0.22;
     else
@@ -27,10 +28,11 @@ for s=1:numseeds
     end
 
     subplot('position', [OE (0.47-((round(s/2)-1)*0.15))+0.3 0.10 0.12]);
-    %             Im2=overlaymouse(R_oxy(:,:,(2*(s-1)+1)),double(WL_atlas), xform_isbrain,'jet',-1,1);
+    %             Im2=overlaymouse(R_oxy(:,:,(2*(s-1)+1)),double(xform_WL_atlas), xform_isbrain,'jet',-1,1);
     imagesc(R_fluor_band(:,:,(2*(s-1)+1)),[-colorMax colorMax]); %changed 3/1/11
+
     hold on
-    imagesc(WL,'AlphaData',1-xform_isbrain.*cerebralMask)
+    imagesc(xform_WL,'AlphaData',1-xform_isbrain.*cerebralMask)
     
     hold on;
     circles(refseeds(2*(s-1)+1,1),refseeds(2*(s-1)+1,2),seedradpix,'facecolor','none');
@@ -38,10 +40,11 @@ for s=1:numseeds
     title([seednames{s},'L'],'FontSize',10)
     
     p1 = subplot('position', [OE+0.1 (0.47-((round(s/2)-1)*0.15))+0.3 0.10 0.12]);
-    %             Im2=overlaymouse(R_oxy(:,:,(2*(s-1)+2)),double(WL_atlas), xform_isbrain,'jet',-1,1);
-    imagesc(R_fluor_band(:,:,(2*(s-1)+2)),[-colorMax colorMax]); %changed 3/1/11
+    %             Im2=overlaymouse(R_oxy(:,:,(2*(s-1)+2)),double(xform_WL_atlas), xform_isbrain,'jet',-1,1);
+     imagesc(R_fluor_band(:,:,(2*(s-1)+2)),[-colorMax colorMax]); %changed 3/1/11
+
         hold on
-    imagesc(WL,'AlphaData',1-xform_isbrain.*cerebralMask)
+    imagesc(xform_WL,'AlphaData',1-xform_isbrain.*cerebralMask)
     hold on;
     circles(refseeds(2*(s-1)+2,1),refseeds(2*(s-1)+2,2),seedradpix,'facecolor','none');
     axis image off
@@ -55,6 +58,7 @@ ylabel(h,'z','FontSize',12);
 else
   ylabel(h,'r','FontSize',12);  
 end
+
 set(p1,'Position',[OE+0.10 (0.47-((round(s/2)-1)*0.15))+0.3 0.10 0.12]);
 
 
@@ -65,8 +69,8 @@ imagesc(Rs_fluor_band,[-colorMax colorMax]);
 axis image
 set(gca,'XTick',(1:14));
 set(gca,'YTick',(1:14));
-set(gca,'XTickLabel',{'OL','FL','CL','ML','SL','RL','VL','OR','FR','CR','MR','SR','RR','VR'});
-set(gca,'YTickLabel',{'OL','FL','CL','ML','SL','RL','VL','OR','FR','CR','MR','SR','RR','VR'})
+set(gca,'XTickLabel',{'OL','PL','CL','ML','SL','RL','VL','OR','FR','CR','MR','SR','RR','VR'});
+set(gca,'YTickLabel',{'OL','PL','CL','ML','SL','RL','VL','OR','FR','CR','MR','SR','RR','VR'})
 title('Correlation Matrix')
 
 

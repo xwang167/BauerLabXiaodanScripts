@@ -41,13 +41,14 @@ dataBandpass=reshape(dataBandpass,nVy*nVx,[]);
 disp('Calculating R Rs')
 strace=P2strace(P,dataBandpass,SeedsUsed);             % strace is each seeds trace resulting from averaging the pixels within a seed region
 R= strace2R(strace,dataBandpass , nVx, nVy);                 % R is the functional connectivity maps: normalize rows in time, dot product of those rows with strce
-clear dataBandpass
+
 idx=find(isnan(SeedsUsed(:,1)));
 R(:,:,idx)=0;
 
 
 if size(refseeds,1)>3
     R_AP = makeRs(dataBandpass ,strace);                     % R_AP is a matrix of the seed-to-seed fc values
+    clear dataBandpass
     R_AP(idx, idx)=0;
     Rs = single(R_AP(map, map));
     clear strace R_AP

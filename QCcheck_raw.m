@@ -1,4 +1,4 @@
-function [mdata, Colors,legendName] = QCcheck_raw(raw,isbrain,system,frameRate,saveDir,visName,mouseType)
+function [mdata, stddatanorm,InstMvMt,LTMvMt] = QCcheck_raw(raw,isbrain,system,frameRate,saveDir,visName,mouseType)
 rawdata = double(raw);
 [info.nVy, info.nVx,numLED, ~]=size(rawdata);
 info.T1=size(rawdata,4);
@@ -106,6 +106,7 @@ xlim([time(1) time(end)])
 
 subplot('position', [0.42 0.09 0.14 0.18])
 plot(stddatanorm*100');
+ylim([0,2])
 set(gca,'XTick',(1:numLED));
 set(gca,'XTickLabel',TickLabels)
 title('Std Deviation');
