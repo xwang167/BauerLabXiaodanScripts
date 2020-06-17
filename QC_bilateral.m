@@ -18,96 +18,96 @@ stdMask = load(fullfile(paramPath.path,'stdMask.mat'));
 % get seed FC each run
 % bilatFCMapCat = {};
 % bilatFCMapMouse = {};
+% % 
+% for excelRow = excelRows
+%     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+%     recDate = excelRaw{1}; recDate = string(recDate);
+%     mouseName = excelRaw{2}; mouseName = string(mouseName);
+%     rawdataloc = excelRaw{3};
+%     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+%     sessionInfo.darkFrameNum = excelRaw{15};
+%     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+%     cFs = excelRaw{7};
+%     systemType = excelRaw{5};
+%     sessionInfo.mouseType = excelRaw{17};
+%     maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+%     load(fullfile(saveDir,maskName),'xform_isbrain')
+%     
+%     for n = runs
+%         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
+%         
+%         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
+%         load(fullfile(saveDir,processedName),'xform_datahb')
+%         for jj = 1:size(xform_datahb,4)
+%             xform_isbrain(isinf(xform_datahb(:,:,1,jj))) = 0;
+%             xform_isbrain(isnan(xform_datahb(:,:,1,jj))) = 0;
+%             
+%         end
+%         total = squeeze(xform_datahb(:,:,1,:)) + squeeze(xform_datahb(:,:,2,:));
+%         load(fullfile(saveDir, processedName),'xform_FADCorr','xform_jrgeco1aCorr')
+%         
+%         % saveFileSeedFC = [runInfo.saveFilePrefix,'-bilateralFC-',fStr,'.mat'];
+%         
+%         disp(mouseName)
+%         disp(['#',num2str(n)])
+%         disp('loading data');
+%         data = {}; mask = {}; fs = [];
+%         data{1} = total;
+%         data{2} = xform_FADCorr;
+%         data{3} = xform_jrgeco1aCorr;
+%         mask{1} = xform_isbrain; mask{2} = mask{1}; mask{3} = mask{2};
+%         contrastName = {'HbT','FADCorr','jRGECO1aCorr'};
+%         
+%         
+%         %%% save each figure
+%         for contrastInd = 1:numel(data)
+%             cData = data{contrastInd};
+%             cMask = mask{contrastInd};
+%             cName = contrastName{contrastInd};
+%             
+%             %%%prepare data
+%             cData_gsr = mouse.process.gsr(cData,cMask); % gsr
+%             for ii = 1:2
+%                 fRange = fRanges{ii};
+%                 
+%                 fStr = fStrs{ii};
+%                 cData = mouse.freq.filterData(cData_gsr,fRange(1),fRange(2),cFs);
+%                 
+%                 %%% get bilateral fc
+%                 bilateralFCMap{contrastInd} = mouse.conn.bilateralFC(cData);
+%                 clear cData
+%                 %%% plot
+%                 cMaskMirrored = cMask & fliplr(cMask);
+%                 fh(contrastInd) = mouse.expSpecific.plotFCMap([],[],...
+%                     bilateralFCMap{contrastInd},cMaskMirrored);
+%                 
+%                 %%% plot title
+%                 titleAxesHandle=axes('position',[0 0 1 0.9]);
+%                 t = title(titleAxesHandle,[cName ' FC, ' fStr 'Hz']);
+%                 set(titleAxesHandle,'visible','off');
+%                 set(t,'visible','on');
+%                 pause(0.1);
+%                 visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
+%                 saveFigSeedFC = fullfile(saveDir,strcat(visName,'-bilateralFC-',fStr,'-',cName));
+%                 saveas(fh(contrastInd),strcat(saveFigSeedFC, '.png'));
+%                 close(fh(contrastInd));
+%                 
+%                 
+% %%%                save seed fc data
+%                 if ii ==1
+%                     bilateralFCMap_ISA{contrastInd} = bilateralFCMap{contrastInd};
+%                 elseif ii ==2
+%                     bilateralFCMap_Delta{contrastInd} = bilateralFCMap{contrastInd};           
+%                 end
+%             end
+%             clear cData_gsr
+%             
+%         end
+%                    save(fullfile(saveDir,processedName),'contrastName','bilateralFCMap_ISA','bilateralFCMap_Delta','mask','-append');
+%          clear bilateralFCMap_ISA bilateralFCMap_Delta
+%     end
+% end
 % 
-for excelRow = excelRows
-    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
-    recDate = excelRaw{1}; recDate = string(recDate);
-    mouseName = excelRaw{2}; mouseName = string(mouseName);
-    rawdataloc = excelRaw{3};
-    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-    sessionInfo.darkFrameNum = excelRaw{15};
-    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-    cFs = excelRaw{7};
-    systemType = excelRaw{5};
-    sessionInfo.mouseType = excelRaw{17};
-    maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-    load(fullfile(saveDir,maskName),'xform_isbrain')
-    
-    for n = runs
-        visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
-        
-        processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
-        load(fullfile(saveDir,processedName),'xform_datahb')
-        for jj = 1:size(xform_datahb,4)
-            xform_isbrain(isinf(xform_datahb(:,:,1,jj))) = 0;
-            xform_isbrain(isnan(xform_datahb(:,:,1,jj))) = 0;
-            
-        end
-        total = squeeze(xform_datahb(:,:,1,:)) + squeeze(xform_datahb(:,:,2,:));
-        load(fullfile(saveDir, processedName),'xform_FADCorr','xform_jrgeco1aCorr')
-        
-        % saveFileSeedFC = [runInfo.saveFilePrefix,'-bilateralFC-',fStr,'.mat'];
-        
-        disp(mouseName)
-        disp(['#',num2str(n)])
-        disp('loading data');
-        data = {}; mask = {}; fs = [];
-        data{1} = total;
-        data{2} = xform_FADCorr;
-        data{3} = xform_jrgeco1aCorr;
-        mask{1} = xform_isbrain; mask{2} = mask{1}; mask{3} = mask{2};
-        contrastName = {'HbT','FADCorr','jRGECO1aCorr'};
-        
-        
-        %%% save each figure
-        for contrastInd = 1:numel(data)
-            cData = data{contrastInd};
-            cMask = mask{contrastInd};
-            cName = contrastName{contrastInd};
-            
-            %%%prepare data
-            cData_gsr = mouse.process.gsr(cData,cMask); % gsr
-            for ii = 1:2
-                fRange = fRanges{ii};
-                
-                fStr = fStrs{ii};
-                cData = mouse.freq.filterData(cData_gsr,fRange(1),fRange(2),cFs);
-                
-                %%% get bilateral fc
-                bilateralFCMap{contrastInd} = mouse.conn.bilateralFC(cData);
-                clear cData
-                %%% plot
-                cMaskMirrored = cMask & fliplr(cMask);
-                fh(contrastInd) = mouse.expSpecific.plotFCMap([],[],...
-                    bilateralFCMap{contrastInd},cMaskMirrored);
-                
-                %%% plot title
-                titleAxesHandle=axes('position',[0 0 1 0.9]);
-                t = title(titleAxesHandle,[cName ' FC, ' fStr 'Hz']);
-                set(titleAxesHandle,'visible','off');
-                set(t,'visible','on');
-                pause(0.1);
-                visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
-                saveFigSeedFC = fullfile(saveDir,strcat(visName,'-bilateralFC-',fStr,'-',cName));
-                saveas(fh(contrastInd),strcat(saveFigSeedFC, '.png'));
-                close(fh(contrastInd));
-                
-                
-%%%                save seed fc data
-                if ii ==1
-                    bilateralFCMap_ISA{contrastInd} = bilateralFCMap{contrastInd};
-                elseif ii ==2
-                    bilateralFCMap_Delta{contrastInd} = bilateralFCMap{contrastInd};           
-                end
-            end
-            clear cData_gsr
-            
-        end
-                   save(fullfile(saveDir,processedName),'contrastName','bilateralFCMap_ISA','bilateralFCMap_Delta','mask','-append');
-         clear bilateralFCMap_ISA bilateralFCMap_Delta
-    end
-end
-
 
 saveDir_cat = 'K:\Glucose\cat';
 for run = runs;
@@ -190,7 +190,7 @@ for run = runs;
         pause(0.1);
         
         % save fig
-        saveFigName = fullfile(saveDir_cat,strcat(contrastName{contrast}, 'ISA fc',num2str(run)));
+        saveFigName = fullfile(saveDir_cat,strcat(contrastName{contrast}, '_ISA_BilateralFC',num2str(run)));
         savefig(f1,saveFigName);
         saveas(f1,strcat(saveFigName, '.png'));
         close(f1);
@@ -207,7 +207,7 @@ for run = runs;
         set(t,'visible','on');
         
         % save fig
-        saveFigName2 = fullfile(saveDir_cat,strcat(contrastName{contrast}, 'Delta fc',num2str(run)));
+        saveFigName2 = fullfile(saveDir_cat,strcat(contrastName{contrast}, '_Delta_BilateralFC',num2str(run)));
         savefig(f2,saveFigName2);
         saveas(f2,strcat(saveFigName2, '.png'));
         close(f2);

@@ -4,12 +4,13 @@ import mouse.*
 
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
 
-excelRows = [327];
+excelRows = [347];
 
 runs = 1;
 isDetrend = 1;
 nVy = 128;
 nVx = 128;
+
 
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
@@ -32,8 +33,8 @@ for excelRow = excelRows
     end
     
     %maskDir = strcat('J:\RGECO\Kenny\', recDate, '\');
-    maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-    load(fullfile(maskDir,maskName),'isbrain')
+ %   maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+%    load(fullfile(maskDir,maskName),'isbrain')
     
     for n = runs
         
@@ -54,6 +55,7 @@ for excelRow = excelRows
                 raw_unregistered = reshape(raw_unregistered,128,128,[]);
                 raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
                 raw_unregistered = reshape(raw_unregistered,128,128,4,[]);
+                save(fileName_cam1,'raw_unregistered','-v7.3');
                 binnedRaw_cam1 = raw_unregistered(:,:,[1,2],:);
                 
             end
@@ -63,6 +65,7 @@ for excelRow = excelRows
                 raw_unregistered = reshape(raw_unregistered,128,128,[]);
                 raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
                 raw_unregistered = reshape(raw_unregistered,128,128,4,[]);
+                save(fileName_cam2,'raw_unregistered','-v7.3');
                 binnedRaw_cam2= raw_unregistered(:,:,[3,4],:);
                 load(fullfile(maskDir,wlName),'transformMat');
                 rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,transformMat,sessionInfo.mouseType);

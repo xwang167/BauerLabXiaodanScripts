@@ -7,140 +7,99 @@ excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBa
 
 
 
-excelRows = [181];%321:327;
+excelRows = [181,183,185,228,232,236];%321:327;
 
-runs = 2;
+runs = 1:3;
 
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
 load('D:\OIS_Process\noVasculatureMask.mat')
 mask = leftMask+rightMask;
 
-for excelRow = excelRows
-    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
-    recDate = excelRaw{1}; recDate = string(recDate);
-    mouseName = excelRaw{2}; mouseName = string(mouseName);
-    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-    sessionInfo.darkFrameNum = excelRaw{15};
-    sessionInfo.mouseType = excelRaw{17};
-    systemType =excelRaw{5};
-    maskDir_new = saveDir;
-    sessionInfo.framerate = excelRaw{7};
-    systemInfo.numLEDs = 4;
-    fs = excelRaw{7};
-    %maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datahb','.mat');
-    %load(fullfile(maskDir,maskName), 'xform_isbrain')
-    %save(fullfile(maskDir_new,maskName_new),'xform_isbrain')
-    maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-    load(fullfile(saveDir,maskName),'xform_isbrain')
-    for n = runs
-        visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
-        processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
-        disp('loading processed data')
-        load(fullfile(saveDir,processedName),'xform_datahb')
-
-        if strcmp(sessionType,'fc')
-
-
-            if strcmp(sessionInfo.mouseType,'jrgeco1a')
-                load(fullfile(saveDir, processedName),'xform_FADCorr','xform_jrgeco1aCorr')
-                xform_total = squeeze(xform_datahb(:,:,1,:)+ xform_datahb(:,:,2,:));
-                xform_total(isinf(xform_total)) = 0;
-                xform_total(isnan(xform_total)) = 0;
-                xform_FADCorr(isnan(xform_FADCorr)) = 0;
-                xform_FADCorr(isinf(xform_FADCorr)) = 0;
-                xform_jrgeco1aCorr(isinf(xform_jrgeco1aCorr)) = 0;
-                xform_jrgeco1aCorr(isnan(xform_jrgeco1aCorr)) = 0;
-
-
-
-                %%comparing our NVC measures to Hillman (0.02-2)
-                disp('filtering')
-
-                xform_total_filtered = mouse.freq.filterData(double(xform_total),0.02,2,fs);% a 0.02-Hz high-pass filter (HPF) to remove slow drifts, as well as a 2-Hz low-pass filter (LPF) to reduce physiological noise
-
-                xform_FADCorr_filtered = mouse.freq.filterData(double(xform_FADCorr),0.02,2,fs);
-                xform_jrgeco1aCorr_filtered = mouse.freq.filterData(double(xform_jrgeco1aCorr),0.02,2,fs);
-                edgeLen =3;
-                tZone = 4;
-                corrThr = 0.3;
-                validRange = - edgeLen: round(tZone*fs);
-                tLim = [-2 2];
-                tLim_FAD = [0 0.3];
-                rLim = [-1 1];
-                disp(strcat('Lag analysis on ', recDate, '', mouseName, ' run#', num2str(n)))
-
-                                [lagTimeTrial_HbTCalcium, lagAmpTrial_HbTCalcium,covResult_HbTCalcium] = mouse.conn.dotLag(...
-                                    xform_total_filtered,xform_jrgeco1aCorr_filtered,edgeLen,validRange,corrThr, true,true);
-                                clear xform_total_filtered
-                                lagTimeTrial_HbTCalcium = lagTimeTrial_HbTCalcium./fs;
-                
-                                [lagTimeTrial_FADCalcium, lagAmpTrial_FADCalcium,covResult_FADCalcium] = mouse.conn.dotLag(...
-                                    xform_FADCorr_filtered,xform_jrgeco1aCorr_filtered,edgeLen,validRange,corrThr, true,true);
-                                clear xform_FADCorr_filtered xform_jrgeco1aCorr_filtered
-                                lagTimeTrial_FADCalcium= lagTimeTrial_FADCalcium./fs;
-                
-                                figure;
-                                colormap jet;
-                                subplot(2,2,1); imagesc(lagTimeTrial_HbTCalcium,tLim); axis image off;h = colorbar;ylabel(h,'t(s)');title('HbT Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask);
-                                subplot(2,2,2); imagesc(lagTimeTrial_FADCalcium,tLim_FAD);axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask);
-                                subplot(2,2,3); imagesc(lagAmpTrial_HbTCalcium,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask);
-                                subplot(2,2,4); imagesc(lagAmpTrial_FADCalcium,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask);
-                                suptitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n)))
-                                saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Lag.png')));
-                                saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Lag.fig')));
-                                save(fullfile(saveDir,processedName),'lagTimeTrial_HbTCalcium', 'lagAmpTrial_HbTCalcium','lagTimeTrial_FADCalcium', 'lagAmpTrial_FADCalcium','-append');
-                                close all
-                %functionally relvenat brain organization (lag with respect to global signal)
-                ISA = [0.009 0.08];
-                Delta = [0.4 4];
-                validRange = -round(tZone*fs): round(tZone*fs);
-                tLim_ISA = [-1.5 1.5];
-                tLim_Delta = [-0.02 0.02];
-                corrThr = 0.3;
-                [lagTime_GS_Calcium_ISA,lagAmp_GS_Calcium_ISA] = calcLagGS(squeeze(xform_jrgeco1aCorr),ISA(1),ISA(2),fs,edgeLen,validRange,corrThr);
-                [lagTime_GS_FAD_ISA,lagAmp_GS_FAD_ISA] = calcLagGS(xform_FADCorr,ISA(1),ISA(2),fs,edgeLen,validRange,corrThr);
-                [lagTime_GS_total_ISA,lagAmp_GS_total_ISA] = calcLagGS(xform_total,ISA(1),ISA(2),fs,edgeLen,validRange,corrThr);
-                save(fullfile(saveDir,processedName),'lagTime_GS_total_ISA', 'lagAmp_GS_total_ISA','lagTime_GS_FAD_ISA', 'lagAmp_GS_FAD_ISA','lagTime_GS_Calcium_ISA','lagAmp_GS_Calcium_ISA','-append');
-
-
-                figure;
-                colormap jet
-                subplot(2,3,1); imagesc(lagTime_GS_Calcium_ISA,tLim_ISA); axis image off;h = colorbar;ylabel(h,'t(s)');title('Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask);
-                subplot(2,3,2); imagesc(lagTime_GS_FAD_ISA,tLim_ISA); axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD');hold on;imagesc(xform_WL,'AlphaData',1-mask);
-                subplot(2,3,3); imagesc(lagTime_GS_total_ISA,tLim_ISA); axis image off;h = colorbar;ylabel(h,'t(s)');title('Total');hold on;imagesc(xform_WL,'AlphaData',1-mask);
-                subplot(2,3,4); imagesc(lagAmp_GS_Calcium_ISA,rLim); axis image off;h = colorbar;ylabel(h,'t(s)');hold on;imagesc(xform_WL,'AlphaData',1-mask);
-                subplot(2,3,5); imagesc(lagAmp_GS_FAD_ISA,rLim); axis image off;h = colorbar;ylabel(h,'t(s)');hold on;imagesc(xform_WL,'AlphaData',1-mask);
-                subplot(2,3,6); imagesc(lagAmp_GS_total_ISA,rLim); axis image off;h = colorbar;ylabel(h,'t(s)');hold on;imagesc(xform_WL,'AlphaData',1-mask);
-                suptitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'Lag with GS, ISA'))
-                saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_LagGS_ISA.png')));
-                saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_LagGS_ISA.fig')));
-
-
-                [lagTime_GS_total_Delta,lagAmp_GS_total_Delta] = calcLagGS(xform_total,Delta(1),Delta(2),fs,edgeLen,validRange,corrThr);
-                [lagTime_GS_FAD_Delta,lagAmp_GS_FAD_Delta] = calcLagGS(xform_FADCorr,Delta(1),Delta(2),fs,edgeLen,validRange,corrThr);
-                [lagTime_GS_Calcium_Delta,lagAmp_GS_Calcium_Delta] = calcLagGS(squeeze(xform_jrgeco1aCorr),Delta(1),Delta(2),fs,edgeLen,validRange,corrThr);
-
-                save(fullfile(saveDir,processedName),'lagTime_GS_total_Delta', 'lagAmp_GS_total_Delta','lagTime_GS_FAD_Delta', 'lagAmp_GS_FAD_Delta','lagTime_GS_Calcium_Delta','lagAmp_GS_Calcium_Delta','-append');
-
-
-                figure;
-                colormap jet
-                subplot(2,3,1); imagesc(lagTime_GS_Calcium_Delta,tLim_Delta); axis image off;h = colorbar;ylabel(h,'t(s)');title('Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask);
-                subplot(2,3,2); imagesc(lagTime_GS_FAD_Delta,tLim_Delta/2); axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD');hold on;imagesc(xform_WL,'AlphaData',1-mask);
-                subplot(2,3,3); imagesc(lagTime_GS_total_Delta,tLim_Delta/2); axis image off;h = colorbar;ylabel(h,'t(s)');title('Total');hold on;imagesc(xform_WL,'AlphaData',1-mask);
-                subplot(2,3,4); imagesc(lagAmp_GS_Calcium_Delta,rLim); axis image off;h = colorbar;ylabel(h,'t(s)');hold on;imagesc(xform_WL,'AlphaData',1-mask);
-                subplot(2,3,5); imagesc(lagAmp_GS_FAD_Delta,rLim); axis image off;h = colorbar;ylabel(h,'t(s)');hold on;imagesc(xform_WL,'AlphaData',1-mask);
-                subplot(2,3,6); imagesc(lagAmp_GS_total_Delta,rLim); axis image off;h = colorbar;ylabel(h,'t(s)');hold on;imagesc(xform_WL,'AlphaData',1-mask);
-                suptitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'Lag with GS, Delta'))
-                saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_LagGS_Delta.png')));
-                saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_LagGS_Delta.fig')));
-                close all
-            end
-            close all
-        end
-    end
-end
+% for excelRow = excelRows
+%     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+%     recDate = excelRaw{1}; recDate = string(recDate);
+%     mouseName = excelRaw{2}; mouseName = string(mouseName);
+%     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+%     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+%     sessionInfo.darkFrameNum = excelRaw{15};
+%     sessionInfo.mouseType = excelRaw{17};
+%     systemType =excelRaw{5};
+%     maskDir_new = saveDir;
+%     sessionInfo.framerate = excelRaw{7};
+%     systemInfo.numLEDs = 4;
+%     fs = excelRaw{7};
+%     %maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datahb','.mat');
+%     %load(fullfile(maskDir,maskName), 'xform_isbrain')
+%     %save(fullfile(maskDir_new,maskName_new),'xform_isbrain')
+%     maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+%     load(fullfile(saveDir,maskName),'xform_isbrain')
+%     for n = runs
+%         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
+%         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
+%         disp('loading processed data')
+%         load(fullfile(saveDir,processedName),'xform_datahb')
+% 
+%         if strcmp(sessionType,'fc')
+% 
+% 
+%             if strcmp(sessionInfo.mouseType,'jrgeco1a')
+%                tLim = [-2 2];
+%                 tLim_FAD = [-0.3 0.3];
+%                 rLim = [-1 1];
+%                 disp(strcat('Lag analysis on ', recDate, '', mouseName, ' run#', num2str(n)))
+% 
+%                                   load(fullfile(saveDir,processedName),'lagTimeTrial_HbTCalcium', 'lagAmpTrial_HbTCalcium','lagTimeTrial_FADCalcium', 'lagAmpTrial_FADCalcium');
+%                             
+%                                 figure;
+%                                 colormap jet;
+%                                 subplot(2,2,1); imagesc(lagTimeTrial_HbTCalcium,tLim); axis image off;h = colorbar;ylabel(h,'t(s)');title('HbT Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask);
+%                                 subplot(2,2,2); imagesc(lagTimeTrial_FADCalcium,tLim_FAD);axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask);
+%                                 subplot(2,2,3); imagesc(lagAmpTrial_HbTCalcium,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask);
+%                                 subplot(2,2,4); imagesc(lagAmpTrial_FADCalcium,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask);
+%                                 suptitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n)))
+%                                 saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Lag.png')));
+%                                 saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Lag.fig')));
+%                                  close all
+%                 %functionally relvenat brain organization (lag with respect to global signal)
+%                     tLim_ISA = [-1.5 1.5];
+%                 tLim_Delta = [-0.02 0.02];
+%                    load(fullfile(saveDir,processedName),'lagTime_GS_total_ISA', 'lagAmp_GS_total_ISA','lagTime_GS_FAD_ISA', 'lagAmp_GS_FAD_ISA','lagTime_GS_Calcium_ISA','lagAmp_GS_Calcium_ISA');
+% 
+% 
+%                 figure;
+%                 colormap jet
+%                 subplot(2,3,1); imagesc(lagTime_GS_Calcium_ISA,tLim_ISA); axis image off;h = colorbar;ylabel(h,'t(s)');title('Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask);
+%                 subplot(2,3,2); imagesc(lagTime_GS_FAD_ISA,tLim_ISA); axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD');hold on;imagesc(xform_WL,'AlphaData',1-mask);
+%                 subplot(2,3,3); imagesc(lagTime_GS_total_ISA,tLim_ISA); axis image off;h = colorbar;ylabel(h,'t(s)');title('Total');hold on;imagesc(xform_WL,'AlphaData',1-mask);
+%                 subplot(2,3,4); imagesc(lagAmp_GS_Calcium_ISA,rLim); axis image off;h = colorbar;ylabel(h,'t(s)');hold on;imagesc(xform_WL,'AlphaData',1-mask);
+%                 subplot(2,3,5); imagesc(lagAmp_GS_FAD_ISA,rLim); axis image off;h = colorbar;ylabel(h,'t(s)');hold on;imagesc(xform_WL,'AlphaData',1-mask);
+%                 subplot(2,3,6); imagesc(lagAmp_GS_total_ISA,rLim); axis image off;h = colorbar;ylabel(h,'t(s)');hold on;imagesc(xform_WL,'AlphaData',1-mask);
+%                 suptitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'Lag with GS, ISA'))
+%                 saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_LagGS_ISA.png')));
+%                 saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_LagGS_ISA.fig')));
+% 
+% 
+% 
+%                 load(fullfile(saveDir,processedName),'lagTime_GS_total_Delta', 'lagAmp_GS_total_Delta','lagTime_GS_FAD_Delta', 'lagAmp_GS_FAD_Delta','lagTime_GS_Calcium_Delta','lagAmp_GS_Calcium_Delta');
+% 
+% 
+%                 figure;
+%                 colormap jet
+%                 subplot(2,3,1); imagesc(lagTime_GS_Calcium_Delta,tLim_Delta); axis image off;h = colorbar;ylabel(h,'t(s)');title('Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask);
+%                 subplot(2,3,2); imagesc(lagTime_GS_FAD_Delta,tLim_Delta/2); axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD');hold on;imagesc(xform_WL,'AlphaData',1-mask);
+%                 subplot(2,3,3); imagesc(lagTime_GS_total_Delta,tLim_Delta/2); axis image off;h = colorbar;ylabel(h,'t(s)');title('Total');hold on;imagesc(xform_WL,'AlphaData',1-mask);
+%                 subplot(2,3,4); imagesc(lagAmp_GS_Calcium_Delta,rLim); axis image off;h = colorbar;ylabel(h,'t(s)');hold on;imagesc(xform_WL,'AlphaData',1-mask);
+%                 subplot(2,3,5); imagesc(lagAmp_GS_FAD_Delta,rLim); axis image off;h = colorbar;ylabel(h,'t(s)');hold on;imagesc(xform_WL,'AlphaData',1-mask);
+%                 subplot(2,3,6); imagesc(lagAmp_GS_total_Delta,rLim); axis image off;h = colorbar;ylabel(h,'t(s)');hold on;imagesc(xform_WL,'AlphaData',1-mask);
+%                 suptitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'Lag with GS, Delta'))
+%                 saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_LagGS_Delta.png')));
+%                 saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_LagGS_Delta.fig')));
+%                 close all
+%             end
+%             close all
+%         end
+%     end
+% end
 
 
 
@@ -170,10 +129,10 @@ bandStrs = ["ISA","Delta"];
 avgWayStrs = ["mean","median"];
 lagSpeciesStrs = ["HbTCalcium","FADCalcium"];
 
-tLim = [0 1.2];
+tLim = [-2 2];
 rLim = [-1 1];
-tLim_ISA = [-0.25 0.25];
-tLim_Delta = [-0.06 0.06];
+tLim_ISA = [-1.5,1.5];%[-0.25 0.25];
+tLim_Delta = [-0.2 0.2];%[-0.06 0.06];
 for ii = 1:2
     for jj = 1:3
         for kk = 1:2
@@ -281,7 +240,7 @@ for excelRow = excelRows
     figure;
     colormap jet;
     subplot(2,2,1); imagesc(lagTimeTrial_HbTCalcium_mouse_mean,tLim); axis image off;h = colorbar;ylabel(h,'t(s)');title('HbT Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
-    subplot(2,2,2); imagesc(lagTimeTrial_FADCalcium_mouse_mean,[0 0.1]);axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
+    subplot(2,2,2); imagesc(lagTimeTrial_FADCalcium_mouse_mean,[-0.3 0.3]);axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
     subplot(2,2,3); imagesc(lagAmpTrial_HbTCalcium_mouse_mean,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
     subplot(2,2,4); imagesc(lagAmpTrial_FADCalcium_mouse_mean,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
     suptitle(strcat(recDate,'-',mouseName,'-',sessionType,'-mean'))
@@ -291,7 +250,7 @@ for excelRow = excelRows
     figure;
     colormap jet;
     subplot(2,2,1); imagesc(lagTimeTrial_HbTCalcium_mouse_median,tLim); axis image off;h = colorbar;ylabel(h,'t(s)');title('HbT Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
-    subplot(2,2,2); imagesc(lagTimeTrial_FADCalcium_mouse_median,[0 0.1]);axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
+    subplot(2,2,2); imagesc(lagTimeTrial_FADCalcium_mouse_median,[-0.3]);axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
     subplot(2,2,3); imagesc(lagAmpTrial_HbTCalcium_mouse_median,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
     subplot(2,2,4); imagesc(lagAmpTrial_FADCalcium_mouse_median,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
     suptitle(strcat(recDate,'-',mouseName,'-',sessionType,'-median'))

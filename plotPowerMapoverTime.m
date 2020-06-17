@@ -30,11 +30,11 @@ colors = {'k','g','m'};
 time = 1:9;
 
 
-plot(time,total_ISA_powerMap_leftHem,colors{1},'LineStyle',':','LineWidth',3)
+plot(time,total_ISA_powerMap_leftHem./total_ISA_powerMap_leftHem(1),colors{1},'LineStyle',':','LineWidth',3)
 hold on
-plot(time,FADCorr_ISA_powerMap_leftHem,colors{2},'LineStyle',':','LineWidth',3)
+plot(time,FADCorr_ISA_powerMap_leftHem./FADCorr_ISA_powerMap_leftHem(1),colors{2},'LineStyle',':','LineWidth',3)
 hold on
-plot(time,jrgeco1aCorr_ISA_powerMap_leftHem,colors{3},'LineStyle',':','LineWidth',3)
+plot(time,jrgeco1aCorr_ISA_powerMap_leftHem./jrgeco1aCorr_ISA_powerMap_leftHem(1),colors{3},'LineStyle',':','LineWidth',3)
 
 legend({'HbT','Corrected FAD','Corrected jRGECO1a'},'Location','northeast');
 names = {'fc1' 'fc2' 'fc3' 'fc4' 'fc5' 'fc6' 'fc7' 'fc8' 'fc9'};
@@ -42,11 +42,11 @@ set(gca, 'XTick', 1:9, 'XTickLabel', names)
 title('Average ISA power map across two hemispheres')
 
 figure
- plot(time,total_Delta_powerMap_leftHem,colors{1},'LineWidth',3);
+ plot(time,total_Delta_powerMap_leftHem./total_Delta_powerMap_leftHem(1),colors{1},'LineWidth',3);
 hold on
-plot(time,FADCorr_Delta_powerMap_leftHem,colors{2},'LineWidth',3);
+plot(time,FADCorr_Delta_powerMap_leftHem./FADCorr_Delta_powerMap_leftHem(1),colors{2},'LineWidth',3);
 hold on
- plot(time,jrgeco1aCorr_Delta_powerMap_leftHem,colors{3},'LineWidth',3);
+ plot(time,jrgeco1aCorr_Delta_powerMap_leftHem./jrgeco1aCorr_Delta_powerMap_leftHem(1),colors{3},'LineWidth',3);
 
 legend({'HbT','Corrected FAD','Corrected jRGECO1a'},'Location','northeast');
 names = {'fc1' 'fc2' 'fc3' 'fc4' 'fc5' 'fc6' 'fc7' 'fc8' 'fc9'};
@@ -111,22 +111,22 @@ for ii =1:5
     colors = {'k','g','m'};
     time = 1:9;
     figure
-plot(time,total_ISA_powerMap_Regions,colors{1},'LineStyle',':','LineWidth',3)
+plot(time,total_ISA_powerMap_Regions./total_ISA_powerMap_Regions(1),colors{1},'LineStyle',':','LineWidth',3)
 hold on
-plot(time,FADCorr_ISA_powerMap_Regions,colors{2},'LineStyle',':','LineWidth',3)
+plot(time,FADCorr_ISA_powerMap_Regions./FADCorr_ISA_powerMap_Regions(1),colors{2},'LineStyle',':','LineWidth',3)
 hold on
-plot(time,jrgeco1aCorr_ISA_powerMap_Regions,colors{3},'LineStyle',':','LineWidth',3)
+plot(time,jrgeco1aCorr_ISA_powerMap_Regions./jrgeco1aCorr_ISA_powerMap_Regions(1),colors{3},'LineStyle',':','LineWidth',3)
     lgd = legend({'HbT','Corrected FAD','Corrected jRGECO1a'},'Location','northeast');
     names = {'fc1' 'fc2' 'fc3' 'fc4' 'fc5' 'fc6' 'fc7' 'fc8' 'fc9'};
     set(gca, 'XTick', 1:9, 'XTickLabel', names)
     title(strcat('Average ISA power map across'," ", regName))
 
 figure
-plot(time,total_Delta_powerMap_Regions,colors{1},'LineWidth',3);
+plot(time,total_Delta_powerMap_Regions./total_Delta_powerMap_Regions(1),colors{1},'LineWidth',3);
 hold on
-plot(time,FADCorr_Delta_powerMap_Regions,colors{2},'LineWidth',3);
+plot(time,FADCorr_Delta_powerMap_Regions./FADCorr_Delta_powerMap_Regions(1),colors{2},'LineWidth',3);
 hold on
-plot(time,jrgeco1aCorr_Delta_powerMap_Regions,colors{3},'LineWidth',3);
+plot(time,jrgeco1aCorr_Delta_powerMap_Regions./jrgeco1aCorr_Delta_powerMap_Regions(1),colors{3},'LineWidth',3);
     
     lgd = legend({'HbT','Corrected FAD','Corrected jRGECO1a'},'Location','northeast');
     names = {'fc1' 'fc2' 'fc3' 'fc4' 'fc5' 'fc6' 'fc7' 'fc8' 'fc9'};
