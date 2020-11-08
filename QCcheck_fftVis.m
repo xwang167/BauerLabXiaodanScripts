@@ -38,6 +38,6 @@ ytickformat('%.1f');
 xlim([10^-2 10])
 set(gca,'FontSize',20,'FontWeight','Bold')
  set(findall(gca, 'Type', 'Line'),'LineWidth',2);
-%legend(legendName,'location','southwest','FontSize',13)
+legend(legendName,'location','southwest','FontSize',13)
 saveas(gcf,fullfile(saveDir,strcat(Name,'.png')));
 saveas(gcf,fullfile(saveDir,strcat(Name,'.fig')));

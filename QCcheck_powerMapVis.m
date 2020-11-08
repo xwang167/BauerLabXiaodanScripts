@@ -1,5 +1,6 @@
 function QCcheck_powerMapVis(powerMap,xform_isbrain,unit,saveDir,titleName)
 load('D:\OIS_Process\noVasculatureMask.mat')
+mask = leftMask+rightMask;
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\CerebMask.mat')
 
 xform_isbrain(isnan(xform_isbrain)) = 0;
@@ -17,14 +18,14 @@ figure('Position', [50 50 200 300])
 % ylabel(cb,[unit,'^2'],'FontSize',12)
 
 imagesc(log10(powerMap),[minVal maxVal]);
-cb = colorbar( 'SouthOutside','AxisLocation','in',...
+cb = colorbar( 'SouthOutside','AxisLocation','out',...
     'FontSize',15,'fontweight','bold');
 cb.Ruler.MinorTick = 'on';
 %set(cb,'YTick',[-0.25 0 0.25]);
 ylabel(cb,['log_1_0(',unit,'^2)'],'FontSize',12,'fontweight','bold')
 hold on
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL');
-mask = leftMask+rightMask;
+
 imagesc(xform_WL,'AlphaData',1-mask);
 %imagesc(xform_WL,'AlphaData',1-xform_isbrain.*cerebralMask);
 colormap jet

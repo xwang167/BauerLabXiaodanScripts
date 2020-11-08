@@ -55,8 +55,8 @@ stimEndTime= stimStartTime+stimduration;
 %
 
 % end
-
-goodBlocks = 1:5;%Delete
+disp('all blocks')
+goodBlocks = 1:numBlock;%Delete
 
 
 
@@ -76,90 +76,93 @@ ROI = [];
 
 if ~isempty(goodBlocks)
     
-    stimStartFrame = stimStartTime* framerate;
     
     [oxy_downsampled_blocks,oxy_blocks] = blockAverage...
-        (oxy_downsampled, oxy,goodBlocks,numBlock,stimStartFrame);
-
-clear oxy
-
-[deoxy_downsampled_blocks,deoxy_blocks] = blockAverage...
-    (deoxy_downsampled, deoxy,goodBlocks,numBlock,stimStartFrame);
-
-clear deoxy
-
-total_downsampled_blocks = oxy_downsampled_blocks+deoxy_downsampled_blocks;
-
-total_blocks = oxy_blocks+deoxy_blocks;
-
-if ~isempty(greenFluor)
+        (oxy_downsampled, oxy,goodBlocks,numBlock,stimbaseline);
     
-    [greenFluorCorr_downsampled_blocks,greenFluorCorr_blocks] = blockAverage...
-        (greenFluorCorr_downsampled, greenFluorCorr,goodBlocks,numBlock,stimStartFrame);
-
-clear greenFluorCorr
-
-[greenFluor_downsampled_blocks,greenFluor_blocks] = blockAverage...
-    (greenFluor_downsampled, greenFluor,goodBlocks,numBlock,stimStartFrame);
-
-[green_downsampled_blocks,green_blocks] = blockAverage...
-    (green_downsampled, green,goodBlocks,numBlock,stimStartFrame);
-
-clear green
-
-if ~isempty(jrgeco1a)
+    clear oxy
     
-    [jrgeco1aCorr_downsampled_blocks,jrgeco1aCorr_blocks] = blockAverage...
-        (jrgeco1aCorr_downsampled, jrgeco1aCorr,goodBlocks,numBlock,stimStartFrame);
-
-clear jrgeco1aCorr
-
-[jrgeco1a_downsampled_blocks,jrgeco1a_blocks] = blockAverage...
-    (jrgeco1a_downsampled, jrgeco1a,goodBlocks,numBlock,stimStartFrame);
-
-clear jrgeco1a
-
-jrgeco1a = 1;
-
-[red_downsampled_blocks,red_blocks] = blockAverage...
-    (red_downsampled, red,goodBlocks,numBlock,stimStartFrame);
-
-clear red
-
-peakMap_ROI= jrgeco1aCorr_downsampled_blocks(:,:,stimEndTime);
-
-figure
-
-imagesc(peakMap_ROI,[min(peakMap_ROI,[],'all') max(peakMap_ROI,[],'all')])
-
-colorbar
-
-axis image off
-
-title('jrgeco1aCorr');
-
-colormap jet
-
-
-
-else
+    [deoxy_downsampled_blocks,deoxy_blocks] = blockAverage...
+        (deoxy_downsampled, deoxy,goodBlocks,numBlock,stimbaseline);
     
-    peakMap_ROI= greenFluorCorr_downsampled_blocks(:,:,stimEndTime);
+    clear deoxy
     
-    figure
+    total_downsampled_blocks = oxy_downsampled_blocks+deoxy_downsampled_blocks;
     
-    imagesc(peakMap_ROI,[min(peakMap_ROI,[],'all') max(peakMap_ROI,[],'all')])
+    total_blocks = oxy_blocks+deoxy_blocks;
     
-    colorbar
+    if ~isempty(jrgeco1a)
+        
+        [jrgeco1aCorr_downsampled_blocks,jrgeco1aCorr_blocks] = blockAverage...
+            (jrgeco1aCorr_downsampled, jrgeco1aCorr,goodBlocks,numBlock,stimbaseline);
+        
+        clear jrgeco1aCorr
+        
+        [jrgeco1a_downsampled_blocks,jrgeco1a_blocks] = blockAverage...
+            (jrgeco1a_downsampled, jrgeco1a,goodBlocks,numBlock,stimbaseline);
+        
+        clear jrgeco1a
+        
+        jrgeco1a = 1;
+        
+        [red_downsampled_blocks,red_blocks] = blockAverage...
+            (red_downsampled, red,goodBlocks,numBlock,stimbaseline);
+        
+        clear red
+        
+        peakMap_ROI= jrgeco1aCorr_downsampled_blocks(:,:,stimEndTime);
+        
+        figure
+        
+        imagesc(peakMap_ROI,[min(peakMap_ROI,[],'all') max(peakMap_ROI,[],'all')])
+        
+        colorbar
+        
+        axis image off
+        
+        title('jrgeco1aCorr');
+        
+        colormap jet
+        
+        if ~isempty(greenFluor)
+            
+            [greenFluorCorr_downsampled_blocks,greenFluorCorr_blocks] = blockAverage...
+                (greenFluorCorr_downsampled, greenFluorCorr,goodBlocks,numBlock,stimbaseline);
+            
+            clear greenFluorCorr
+            
+            [greenFluor_downsampled_blocks,greenFluor_blocks] = blockAverage...
+                (greenFluor_downsampled, greenFluor,goodBlocks,numBlock,stimbaseline);
+            
+            [green_downsampled_blocks,green_blocks] = blockAverage...
+                (green_downsampled, green,goodBlocks,numBlock,stimbaseline);
+            
+            clear green
+            
+        end
+        
+        
+        
+        
+    else
+        
+        peakMap_ROI= greenFluorCorr_downsampled_blocks(:,:,stimEndTime);
+        
+        figure
+        
+        imagesc(peakMap_ROI,[min(peakMap_ROI,[],'all') max(peakMap_ROI,[],'all')])
+        
+        colorbar
+        
+        axis image off
+        
+        title('gcampCorr');
+        
+        colormap jet
+        
+        
+    end
     
-    axis image off
-    
-    title('gcampCorr');
-    
-    colormap jet
-    
-end
-
 else
     
     peakMap_ROI= total_downsampled_blocks(:,:,stimEndTime);
@@ -183,20 +186,20 @@ end
 
 
 
-
-hold on
-
-load('D:\OIS_Process\atlas.mat','AtlasSeeds')
-
-barrel = AtlasSeeds == 9;
-
-ROI_barrel =  bwperim(barrel);
-
-
-
-
-
-contour(ROI_barrel,'k')
+%
+% hold on
+%
+% load('D:\OIS_Process\atlas.mat','AtlasSeeds')
+%
+% barrel = AtlasSeeds == 9;
+%
+% ROI_barrel =  bwperim(barrel);
+%
+%
+%
+%
+%
+% contour(ROI_barrel,'k')
 
 if isempty(input_ROI)
     
@@ -423,9 +426,8 @@ load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','WL')
 
 
 traceImage(oxy_downsampled_blocks,total_downsampled_blocks,deoxy_downsampled_blocks,...
-    'HbO','Total','HbR',oxy_active,total_active,deoxy_active,'r','k','b',ROI,'\DeltaM',...
-    stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain)
-
+    'HbO','Total','HbR',oxy_active,total_active,deoxy_active,'r','k','b',ROI,'\Delta\muM',...
+    stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[0.5,0.3,0.2])
 
 
 texttitle2 = strcat(' Block Average for ', {' '},texttitle);
@@ -468,95 +470,95 @@ saveas(gcf,strcat(output,'Hbpeak.png'))
 if ~isempty(jrgeco1a)
     
     traceImage(jrgeco1a_downsampled_blocks,jrgeco1aCorr_downsampled_blocks,red_downsampled_blocks,...
-        'jrgeco1a','jrgeco1aCorr','625nm Reflectance',jrgeco1a_active,jrgeco1aCorr_active,red_active,'m','k','r',ROI,'\DeltaF/F',...
-    stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain)
-
-
-
-annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',texttitle2,'FontWeight','bold','Color',[1 0 0],'FontSize',16);
-
-saveas(gcf,strcat(output,'RGECOTraceImage.fig'))
-
-saveas(gcf,strcat(output,'RGECOTraceImage.png'))
-
-
-
-figure
-
-
-
-imagesc(jrgeco1aCorr_downsampled_blocks(:,:,stimEndTime),...
-    [min(jrgeco1aCorr_downsampled_blocks(:,:,stimEndTime),[],'all'),max(jrgeco1aCorr_downsampled_blocks(:,:,stimEndTime),[],'all')])
-
-colorbar
-
-hold on
-
-imagesc(WL,'AlphaData',1-ROI)
-
-axis image off
-
-title('jregeco1Corr');
-
-saveas(gcf,strcat(output,'rgecopeak.fig'))
-
-saveas(gcf,strcat(output,'rgecopeak.png'))
-
-
-
-traceImage(greenFluor_downsampled_blocks,greenFluorCorr_downsampled_blocks,green_downsampled_blocks,...
-    'FAD','FADCorr','525nm Reflectance',greenFluor_active,greenFluorCorr_active,green_active,'g','k',[ 0 0.6 0],ROI,'\DeltaF/F',...
-    stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain)
-
-
-
-annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',texttitle2,'FontWeight','bold','Color',[1 0 0],'FontSize',16);
-
-saveas(gcf,strcat(output,'FADTraceImage.fig'))
-
-saveas(gcf,strcat(output,'FADTraceImage.png'))
-
-
-
-figure
-
-
-
-imagesc(greenFluorCorr_downsampled_blocks(:,:,stimEndTime),...
-    [min(greenFluorCorr_downsampled_blocks(:,:,stimEndTime),[],'all'),max(greenFluorCorr_downsampled_blocks(:,:,stimEndTime),[],'all')])
-
-colorbar
-
-hold on
-
-imagesc(WL,'AlphaData',1-ROI)
-
-axis image off
-
-title('FAD');
-
-saveas(gcf,strcat(output,'FADpeak.fig'))
-
-saveas(gcf,strcat(output,'FADpeak.png'))
-
-
-
-
-
+        'jrgeco1a','jrgeco1aCorr','625nm Reflectance',jrgeco1a_active,jrgeco1aCorr_active,red_active,'m','k','r',ROI,'\DeltaF/F%',...
+        stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[2 2.4 0.1])
+    
+    
+    
+    annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',texttitle2,'FontWeight','bold','Color',[1 0 0],'FontSize',16);
+    
+    saveas(gcf,strcat(output,'RGECOTraceImage.fig'))
+    
+    saveas(gcf,strcat(output,'RGECOTraceImage.png'))
+    
+    if ~isempty(greenFluor)
+        
+        figure
+        
+        
+        
+        imagesc(jrgeco1aCorr_downsampled_blocks(:,:,stimEndTime),...
+            [min(jrgeco1aCorr_downsampled_blocks(:,:,stimEndTime),[],'all'),max(jrgeco1aCorr_downsampled_blocks(:,:,stimEndTime),[],'all')])
+        
+        colorbar
+        
+        hold on
+        
+        imagesc(WL,'AlphaData',1-ROI)
+        
+        axis image off
+        
+        title('jregeco1Corr');
+        
+        saveas(gcf,strcat(output,'rgecopeak.fig'))
+        
+        saveas(gcf,strcat(output,'rgecopeak.png'))
+        
+        
+        
+        traceImage(greenFluor_downsampled_blocks,greenFluorCorr_downsampled_blocks,green_downsampled_blocks,...
+            'FAD','FADCorr','525nm Reflectance',greenFluor_active,greenFluorCorr_active,green_active,'g','k',[ 0 0.6 0],ROI,'\DeltaF/F%',...
+            stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[2,1,1.5])
+        
+        
+        
+        annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',texttitle2,'FontWeight','bold','Color',[1 0 0],'FontSize',16);
+        
+        saveas(gcf,strcat(output,'FADTraceImage.fig'))
+        
+        saveas(gcf,strcat(output,'FADTraceImage.png'))
+        
+        
+        
+        figure
+        
+        
+        
+        imagesc(greenFluorCorr_downsampled_blocks(:,:,stimEndTime),...
+            [min(greenFluorCorr_downsampled_blocks(:,:,stimEndTime),[],'all'),max(greenFluorCorr_downsampled_blocks(:,:,stimEndTime),[],'all')])
+        
+        colorbar
+        
+        hold on
+        
+        imagesc(WL,'AlphaData',1-ROI)
+        
+        axis image off
+        
+        title('FAD');
+        
+        saveas(gcf,strcat(output,'FADpeak.fig'))
+        
+        saveas(gcf,strcat(output,'FADpeak.png'))
+        
+    end
+    
+    
+    
 elseif ~isempty(greenFluor)
     
     traceImage(greenFluor_downsampled_blocks,greenFluorCorr_downsampled_blocks,green_downsampled_blocks,...
-        'gcamp','gcampCorr','525nm',greenFluor_active,greenFluorCorr_active,green_active,'g','k',[ 0 0.6 0],ROI,'\DeltaF/F',...
-    stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain)
-
-
-
-annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',texttitle2,'FontWeight','bold','Color',[1 0 0],'FontSize',16);
-
-saveas(gcf,strcat(output,'gcampTraceImage.fig'))
-
-saveas(gcf,strcat(output,'gcampTraceImage.png'))
-
+        'gcamp','gcampCorr','525nm',greenFluor_active,greenFluorCorr_active,green_active,'g','k',[ 1 1 1],ROI,'\DeltaF/F',...
+        stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain)
+    
+    
+    
+    annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',texttitle2,'FontWeight','bold','Color',[1 0 0],'FontSize',16);
+    
+    saveas(gcf,strcat(output,'gcampTraceImage.fig'))
+    
+    saveas(gcf,strcat(output,'gcampTraceImage.png'))
+    
 end
 
 end

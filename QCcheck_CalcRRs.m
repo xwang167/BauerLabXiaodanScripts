@@ -1,5 +1,6 @@
 function [R,Rs] = QCcheck_CalcRRs(refseeds,data,framerate,xform_isbrain,freqRange,isGSR)
-
+load('D:\OIS_Process\noVasculatureMask.mat')
+mask = leftMask+rightMask;
 nVy = size(data,1);
 nVx = size(data,2);
 
@@ -30,7 +31,7 @@ data(isnan(data)) = 0;
 data(isinf(data)) = 0;
 if isGSR
 disp('gsr');
-data = mouse.process.gsr(data,xform_isbrain);
+data = mouse.process.gsr(data,xform_isbrain.*mask);
 end
 disp(['filtering  with' num2str(freqRange(1)) '-' num2str(freqRange(2)) 'hz'])
 dataBandpass =mouse.freq.filterData(double(data),freqRange(1),freqRange(2),framerate);

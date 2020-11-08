@@ -7,78 +7,78 @@ excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBa
 nVx = 128;
 nVy = 128;
 runs = 1:6;
-excelRows = 32;
-
-for excelRow = excelRows
-    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':R',num2str(excelRow)]);
-    recDate = excelRaw{1}; recDate = string(recDate);
-    mouseName = excelRaw{2}; mouseName = string(mouseName);
-    rawdataloc = excelRaw{3};
-    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-    if ~exist(saveDir)
-        mkdir(saveDir)
-    end
-    systemType = excelRaw{5};
-    systemInfo = expSpecific.sysInfo(systemType);
-    mouseType = excelRaw{13};
-%    sessionInfo =  expSpecific.sesInfo(mouseType);
-    sessionInfo.mouseType = mouseType;
-    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-    
-    maskName = strcat(recDate,'-',mouseName,'-LandmarksandMarks','.mat');
-        if exist(fullfile(saveDir,maskName))
-            disp(strcat('Landmarks and mask file already exists for ', recDate,'-', mouseName))
-            load(fullfile(saveDir,maskName), 'isbrain',  'I')
-        else
-    % need to be modified to see if WL exist
-    sessionInfo.darkFrameNum = excelRaw{11};
-    
-    sessionInfo.stimbaseline=excelRaw{9};
-    sessionInfo.framerate = excelRaw{7};
-    sessionInfo.stimblocksize = excelRaw{8};
-    darkFrameInd = 2:sessionInfo.darkFrameNum;
-    filename = char(fullfile(rawdataloc,recDate,strcat(recDate,'-',mouseName,'-',sessionType,'1.tif')));
-    
-%     raw = read.readRaw(fileName,systemInfo.numLEDs,systemInfo.readFcn);
-%     WL = preprocess.getWL(raw,darkFrameInd,[4 3 2]);
-    
-    wl = zeros(128,128,3);
-    wl(:,:,1)= read.readtiff_oneImage(filename,sessionInfo.darkFrameNum*systemInfo.numLEDs+4);
-    wl(:,:,2) = read.readtiff_oneImage(filename,sessionInfo.darkFrameNum*systemInfo.numLEDs+3);
-    wl(:,:,3) = read.readtiff_oneImage(filename,sessionInfo.darkFrameNum*systemInfo.numLEDs+2);
-    WL = zeros(128,128,3);
-            WL(:,:,1) = wl(:,:,1)./max(max(wl(:,:,1)));
-        WL(:,:,2) = wl(:,:,2)./max(max(wl(:,:,2)));
-        WL(:,:,3) = wl(:,:,3)./max(max(wl(:,:,3)));
-    disp(strcat('get landmarks and mask for',recDate,'-', mouseName))
-    [isbrain,xform_isbrain,I,seedcenter,WLcrop,xform_WLcrop,xform_WL] = getLandMarksandMask_xw(WL);
-    save(fullfile(saveDir,maskName), 'isbrain',  'I' ,'WL','WLcrop', 'xform_WLcrop', 'xform_isbrain', 'isbrain', 'WL', 'xform_WL', 'I', 'seedcenter')
-    isbrain_contour = bwperim(isbrain);
-    
-    figure;
-    imagesc(WL); %changed 3/1/1
-    axis off
-    axis image
-    title(strcat(recDate,'-',mouseName));
-    
-    for f=1:size(seedcenter,1)
-        hold on;
-        plot(seedcenter(f,1),seedcenter(f,2),'ko','MarkerFaceColor','k')
-    end
-    hold on;
-    plot(I.tent(1,1),I.tent(1,2),'ko','MarkerFaceColor','b')
-    hold on;
-    plot(I.bregma(1,1),I.bregma(1,2),'ko','MarkerFaceColor','b')
-    hold on;
-    plot(I.OF(1,1),I.OF(1,2),'ko','MarkerFaceColor','b')
-    hold on;
-    contour(isbrain_contour,'r')
-    saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'_WLandMarks.jpg')))
-      end
-    clearvars -except excelFile nVx nVy excelRows runs
-    close all;
-end
+excelRows = [142 144];
 % 
+% for excelRow = excelRows
+%     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':R',num2str(excelRow)]);
+%     recDate = excelRaw{1}; recDate = string(recDate);
+%     mouseName = excelRaw{2}; mouseName = string(mouseName);
+%     rawdataloc = excelRaw{3};
+%     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+%     if ~exist(saveDir)
+%         mkdir(saveDir)
+%     end
+%     systemType = excelRaw{5};
+%     systemInfo = expSpecific.sysInfo(systemType);
+%     mouseType = excelRaw{13};
+% %    sessionInfo =  expSpecific.sesInfo(mouseType);
+%     sessionInfo.mouseType = mouseType;
+%     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+%     
+%     maskName = strcat(recDate,'-',mouseName,'-LandmarksandMarks','.mat');
+%         if exist(fullfile(saveDir,maskName))
+%             disp(strcat('Landmarks and mask file already exists for ', recDate,'-', mouseName))
+%             load(fullfile(saveDir,maskName), 'isbrain',  'I')
+%         else
+%     % need to be modified to see if WL exist
+%     sessionInfo.darkFrameNum = excelRaw{14};
+%     
+%     sessionInfo.stimbaseline=excelRaw{9};
+%     sessionInfo.framerate = excelRaw{7};
+%     sessionInfo.stimblocksize = excelRaw{8};
+%     darkFrameInd = 2:sessionInfo.darkFrameNum;
+%     filename = char(fullfile(rawdataloc,recDate,strcat(recDate,'-',mouseName,'-',sessionType,'1.tif')));
+%     
+% %     raw = read.readRaw(fileName,systemInfo.numLEDs,systemInfo.readFcn);
+% %     WL = preprocess.getWL(raw,darkFrameInd,[4 3 2]);
+%     
+%     wl = zeros(128,128,3);
+%     wl(:,:,1)= readtiff_oneImage(filename,sessionInfo.darkFrameNum*systemInfo.numLEDs+4);
+%     wl(:,:,2) = readtiff_oneImage(filename,sessionInfo.darkFrameNum*systemInfo.numLEDs+3);
+%     wl(:,:,3) = readtiff_oneImage(filename,sessionInfo.darkFrameNum*systemInfo.numLEDs+2);
+%     WL = zeros(128,128,3);
+%             WL(:,:,1) = wl(:,:,1)./max(max(wl(:,:,1)));
+%         WL(:,:,2) = wl(:,:,2)./max(max(wl(:,:,2)));
+%         WL(:,:,3) = wl(:,:,3)./max(max(wl(:,:,3)));
+%     disp(strcat('get landmarks and mask for',recDate,'-', mouseName))
+%     [isbrain,xform_isbrain,I,seedcenter,WLcrop,xform_WLcrop,xform_WL] = getLandMarksandMask_xw(WL);
+%     save(fullfile(saveDir,maskName), 'isbrain',  'I' ,'WL','WLcrop', 'xform_WLcrop', 'xform_isbrain', 'isbrain', 'WL', 'xform_WL', 'I', 'seedcenter')
+%     isbrain_contour = bwperim(isbrain);
+%     
+%     figure;
+%     imagesc(WL); %changed 3/1/1
+%     axis off
+%     axis image
+%     title(strcat(recDate,'-',mouseName));
+%     
+%     for f=1:size(seedcenter,1)
+%         hold on;
+%         plot(seedcenter(f,1),seedcenter(f,2),'ko','MarkerFaceColor','k')
+%     end
+%     hold on;
+%     plot(I.tent(1,1),I.tent(1,2),'ko','MarkerFaceColor','b')
+%     hold on;
+%     plot(I.bregma(1,1),I.bregma(1,2),'ko','MarkerFaceColor','b')
+%     hold on;
+%     plot(I.OF(1,1),I.OF(1,2),'ko','MarkerFaceColor','b')
+%     hold on;
+%     contour(isbrain_contour,'r')
+%     saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'_WLandMarks.jpg')))
+%       end
+%     clearvars -except excelFile nVx nVy excelRows runs
+%     close all;
+% end
+% % 
 % 
 % 
 % % Process raw data to get xform_datahb and xform_fluor(if needed)
@@ -233,7 +233,7 @@ for excelRow = excelRows
     info.nVy = 128;
     sessionInfo.mouseType = excelRaw{13};
     systemType =excelRaw{5};
-    maskName = strcat(recDate,'-',mouseName,'-LandmarksandMarks','.mat');
+    maskName = strcat(recDate,'-',mouseName,'-LandmarksandMask','.mat');
     load(fullfile(saveDir,maskName), 'isbrain','xform_isbrain');
     if ~isempty(find(isnan(xform_isbrain), 1))
         xform_isbrain(isnan(xform_isbrain))=0;
@@ -288,74 +288,17 @@ for excelRow = excelRows
             
             
             
-            if strcmp(char(sessionInfo.mouseType),'gcamp6f')
-                C = who('-file',fullfile(saveDir,processedName));
-                isGsr = false;
-                for  k=1:length(C)
-                    if strcmp(C(k),'xform_green_GSR')
-                        isGsr = true;
-                    end
-                end
-                if isGsr
-                    load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_datahb_GSR','xform_gcamp_GSR','xform_gcampCorr_GSR','xform_green_GSR');
-                else
-                    xform_datahb_bandpass =highpass(xform_datahb,info.bandtype{2},sessionInfo.framerate);
-                    xform_datahb_bandpass =lowpass(xform_datahb_bandpass,info.bandtype{3},sessionInfo.framerate);
-                    rawName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'.mat');
-                    
-                    disp('loading raw data');
-                    if strcmp(systemType,'EastOIS2')
-                        
-                        load(fullfile(saveDir,rawName),'xform_raw')
-                    elseif strcmp(systemType,'EastOIS1_Fluor')
-                        load(fullfile(saveDir,rawName),'xform_raw');
-                    end
-                    xform_raw = double(mouse.expSpecific.procFluor(xform_raw));
-                    if ~isempty(find(isnan(xform_raw), 1))
-                        xform_raw(isnan(xform_raw))=0;
-                    end
-                    
-                    load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_gcamp','xform_gcampCorr')
-                    if ~isempty(find(isnan(xform_gcamp), 1))
-                        xform_gcamp(isnan(xform_gcamp))=0;
-                    end
-                    if ~isempty(find(isnan(xform_gcampCorr), 1))
-                        xform_gcampCorr(isnan(xform_gcampCorr))=0;
-                    end
-                    
-                    
-                    
-                    
-                    xform_gcamp_bandpass =highpass(double(xform_gcamp),info.bandtype{2},sessionInfo.framerate);
-                    xform_gcampCorr_bandpass =highpass(double(xform_gcampCorr),info.bandtype{2},sessionInfo.framerate);
-                    xform_green_bandpass =highpass(xform_raw(:,:,2,:),info.bandtype{2},sessionInfo.framerate);
-                    
-                    xform_gcamp_bandpass =lowpass(double(xform_gcamp_bandpass),info.bandtype{3},sessionInfo.framerate);
-                    xform_gcampCorr_bandpass =lowpass(double(xform_gcampCorr_bandpass),info.bandtype{3},sessionInfo.framerate);
-                    xform_green_bandpass =lowpass(xform_green_bandpass,info.bandtype{3},sessionInfo.framerate);
-                    
-                    
-                    
-                    
-                    
-                    xform_datahb_GSR = mouse.preprocess.gsr(xform_datahb_bandpass,xform_isbrain);
-                    xform_gcamp_GSR = mouse.preprocess.gsr(xform_gcamp_bandpass,xform_isbrain);
-                    xform_gcampCorr_GSR = mouse.preprocess.gsr(xform_gcampCorr_bandpass,xform_isbrain);
-                    xform_green_GSR = mouse.preprocess.gsr(xform_green_bandpass,xform_isbrain);
-                    save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_datahb_GSR','xform_gcamp_GSR','xform_gcampCorr_GSR','xform_green_GSR','-append');
-                end
-            end
+        
             
             
-            
-            oxy = double(squeeze(xform_datahb_GSR(:,:,1,:)));
-            deoxy = double(squeeze(xform_datahb_GSR(:,:,2,:)));
+            oxy = double(squeeze(xform_datahb(:,:,1,:)));
+            deoxy = double(squeeze(xform_datahb(:,:,2,:)));
             total = double(oxy+deoxy);
             
             if strcmp(char(sessionInfo.mouseType),'gcamp6f')
-                gcamp = double(squeeze(xform_gcamp_GSR(:,:,1,:)));
-                gcampCorr = double(squeeze(xform_gcampCorr_GSR(:,:,1,:)));
-                green = double(squeeze(xform_green_GSR(:,:,1,:)));
+                gcamp = double(squeeze(xform_gcamp(:,:,1,:)));
+                gcampCorr = double(squeeze(xform_gcampCorr(:,:,1,:)));
+                green = double(squeeze(xform_green(:,:,1,:)));
             end
             
             

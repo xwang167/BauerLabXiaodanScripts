@@ -1,15 +1,15 @@
 
 close all;clearvars;clc
 import mouse.*
-excelFile = "D:\GCaMP\GCaMP_awake.xlsx";
+excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";;
 
 
 nVx = 128;
 nVy = 128;
 %
-excelRows = [109];
+excelRows = 116:119;
 
-runs = 1;
+runs = 1:6;
 
 for ii = 1
     isDetrend = logical(ii);
@@ -19,7 +19,8 @@ for ii = 1
 %         mouseName = excelRaw{2}; mouseName = string(mouseName);
 %         rawdataloc = excelRaw{3};
 %         saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-%         sessionInfo.mouseType = excelRaw{18};
+%         
+%         sessionInfo.mouseType = excelRaw{17};
 %         if ~exist(saveDir)
 %             mkdir(saveDir)
 %         end
@@ -29,7 +30,6 @@ for ii = 1
 %         fileName_cam1 = strcat(recDate,'-',mouseName,'-',sessionType,'1.mat');
 %         fileName_cam1 = fullfile(rawdataloc,recDate,fileName_cam1);
 %         load(fileName_cam1)
-%     
 %         if strcmp(char(sessionInfo.mouseType),'WT')
 %             sessionInfo.hbSpecies = 1:2;
 %             systemInfo.numLEDs = 2;
@@ -38,7 +38,8 @@ for ii = 1
 %             sessionInfo.fluorSpecies = 1;
 %             sessionInfo.fluorExcitationFile = "gcamp6f_excitation.txt";
 %             sessionInfo.fluorEmissionFile = "gcamp6f_emission.txt";
-%             sessionInfo.darkFrameNum = excelRaw{15};
+%             
+%     sessionInfo.darkFrameNum = excelRaw{15};
 %             systemInfo.numLEDs = 3;
 %         end
 %     
@@ -91,8 +92,8 @@ for ii = 1
 %         end
 %         clearvars -except excelFile nVx nVy excelRows runs isDetrend
 %     end
-%     
-%     
+    
+    
     
     % Process raw data to get xform_datahb and xform_fluor(if needed)
     %

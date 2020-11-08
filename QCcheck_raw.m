@@ -13,7 +13,9 @@ info.T1=size(rawdata,4);
 %             save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(run),'.mat')),'info', '-append');
 %             break
 %         end
-
+load('D:\OIS_Process\noVasculatureMask.mat')
+mask = leftMask+rightMask;
+isbrain = isbrain.*mask;
 ibi=find(isbrain==1);
 rawdata=single(reshape(rawdata,info.nVy*info.nVx,numLED,[]));
 
@@ -45,38 +47,42 @@ elseif strcmp(system, 'fcOIS2')
 elseif strcmp(system, 'EastOIS1')
     Colors=[0 0 1; 1 1 0; 1 0.5 0; 1 0 0];
     TickLabels={'B', 'Y', 'O', 'R'};
-      legendName = {'blue LED', 'green LED', 'orange LED' 'red LED'};
+    legendName = {'blue LED', 'green LED', 'orange LED' 'red LED'};
 elseif strcmp(system, 'EastOIS1_Fluor')
     Colors = [0 0 1; 0 1 0; 1 0.5 0; 1 0 0];
     TickLabels = {'B','G','O', 'R' };
-     legendName = {'green fluorescence', 'green LED', 'orange LED' 'red LED'};
+    legendName = {'green fluorescence', 'green LED', 'orange LED' 'red LED'};
 elseif strcmp(system, 'EastOIS2')
     if strcmp(mouseType,'PV')
-         TickLabels = {'G','R','B'};
-           Colors = [0 1 0;1 0 0;0 0 1];
-    legendName = {'green LED', 'red LED','Laser'};
+        TickLabels = {'G','R','B'};
+        Colors = [0 1 0;1 0 0;0 0 1];
+        legendName = {'green LED', 'red LED','Laser'};
     elseif strcmp(mouseType,'Gopto3')||strcmp(mouseType,'Wopto3')
-         TickLabels = {'L','B','G','Red'};
-           Colors = [0 0 1;1 0 1;0 1 0;1 0 0];
-    legendName = {'Laser', 'Green Fluor','Green LED','red LED'};
+        TickLabels = {'L','B','G','Red'};
+        Colors = [0 0 1;1 0 1;0 1 0;1 0 0];
+        legendName = {'Laser', 'Green Fluor','Green LED','red LED'};
     elseif strcmp(mouseType,'jrgeco1a-opto3')||strcmp(mouseType,'Wopto3')
-         TickLabels = {'G','R','F','L'};
-         Colors = [0 1 0;1 0 0;1 0 1;0 0 1;];
-    legendName = {'Green LED','red LED', 'Red Fluor','Laser'};
-    else
-    TickLabels = {'B','G1','G2','R'};
-    Colors = [0 0 1; 1 0 1;0 1 0;1 0 0];
-    legendName = {'Blue Green fluorescence', 'Green red fluorescence','green LED', 'red LED'};
+        TickLabels = {'G','R','F','L'};
+        Colors = [0 1 0;1 0 0;1 0 1;0 0 1;];
+        legendName = {'Green LED','red LED', 'Red Fluor','Laser'};
+    elseif strcmp(mouseType,'jrgeco1a')      
+        TickLabels = {'B','G1','G2','R'};
+        Colors = [0 0 1; 1 0 1;0 1 0;1 0 0];
+        legendName = {'Blue Green fluorescence','Green red fluorescence', 'green LED','red LED'};
+        %
+        %     TickLabels = {'B','G1','G2','R'};
+        %     Colors = [0 0 1; 1 0 1;0 1 0;1 0 0];
+        %     legendName = {'Blue Green fluorescence', 'Green red fluorescence','green LED', 'red LED'};
     end
 elseif strcmp(system,'EastOIS2_OneCam')
-
-         TickLabels = {'Fluor','G','R'};
-           Colors = [ 0 0 1;0 1 0;1 0 0];
+    
+    TickLabels = {'Fluor','G','R'};
+    Colors = [ 0 0 1;0 1 0;1 0 0];
     legendName = {'Green fluorescence', 'GreenLED','Red LED'};
-
     
     
-
+    
+    
 end
 
 
@@ -98,7 +104,9 @@ p=plot(time,mdatanorm'); title('Normalized Raw Data');
 for c=1:numLED;
     set(p(c),'Color',Colors(c,:));
 end
+if numLED>3
 p(4).Color(4) = 0.05;
+end
 xlabel('Time (sec)')
 ylabel('Mean Counts')
 ylim([max(min(min(mdatanorm)),0.9) min(max(max(mdatanorm)),1.1)])
@@ -117,7 +125,7 @@ ylabel('% Deviation')
 fdata=abs(fft(logmean(mdata),[],2));
 hz=linspace(0,frameRate,info.T1);
 subplot('position', [0.1 0.08 0.25 0.6]);
- title('FFT Raw Data');
+title('FFT Raw Data');
 for c=1:numLED;
     p(c)=loglog(hz(1:ceil(info.T1)),fdata(c,1:ceil(info.T1))'/5^(c^2-1));
     set(p(c),'Color',Colors(c,:));
@@ -139,7 +147,7 @@ elseif strcmp(system, 'EastOIS2')
     if strcmp(mouseType,'PV')||strcmp(mouseType,'jrgeco1a-opto3')
         BlueChan = 1;
     else
-    BlueChan = 3;
+        BlueChan = 3;
     end
 elseif strcmp(system,'EastOIS2_OneCam')
     BlueChan = 2;
@@ -210,8 +218,6 @@ output=fullfile(saveDir,strcat(visName,'_RawDataVis.jpg'));
 orient portrait
 print ('-djpeg', '-r300', output);
 
-figure('visible', 'on');
-close all
 %save(fullfile(saveDir,strcat(visName,'.mat')), 'mdatanorm', 'mdata', 'stddatanorm', 'LTMvMt', 'InstMvMt', 'Shift', 'time', 'fdata', 'hz','info','-append');
 
 %strcat(recDate,'-',mouseName,'-',sessionType,num2str(run))),'.mat')

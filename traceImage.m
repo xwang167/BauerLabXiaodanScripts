@@ -43,10 +43,10 @@ set(gca,'XTickLabel',a,'FontName','Times','fontsize',14,'fontweight','bold')
 subplot('position',[0.8,0.1,0.2,0.25])
 
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','WL')
-for b=stimStartTime: stimEndTime+4
+for b=stimStartTime-2: stimEndTime+6
     p = subplot('position', [0.015+(b-stimStartTime)*0.09 0.80 0.07 0.12]);
     imagesc(downSampledBlocks1(:,:,b), [-1.1*maxVal(1) 1.1*maxVal(1)]);
-    if b == stimEndTime+4
+    if b == stimEndTime+6
         colorbar
         set(p,'Position',[0.015+(b-stimStartTime)*0.09 0.80 0.07 0.12]);
     end
@@ -54,7 +54,7 @@ for b=stimStartTime: stimEndTime+4
     hold on
     imagesc(WL,'AlphaData',1-xform_isbrain)
     
-    if b == stimStartTime
+    if b == stimStartTime-2
         ylabel(name1,'FontWeight','bold')
     end
     title([num2str(b),'s']);
@@ -63,10 +63,10 @@ for b=stimStartTime: stimEndTime+4
     colormap jet
 end
 
-for b=stimStartTime: stimEndTime+4
+for b=stimStartTime-2: stimEndTime+6
     p = subplot('position', [0.015+(b-stimStartTime)*0.09 0.64 0.07 0.12]);
     imagesc(downSampledBlocks2(:,:,b), [-1.1*maxVal(2) 1.1*maxVal(2)]);
-    if b == stimEndTime+4
+    if b == stimEndTime+6
         colorbar
         set(p,'Position',[0.015+(b-stimStartTime)*0.09 0.64 0.07 0.12]);
     end
@@ -87,10 +87,10 @@ end
 
 
 
-for b=stimStartTime: stimEndTime+4
+for b=stimStartTime-2: stimEndTime+6
     p = subplot('position', [0.015+(b-stimStartTime)*0.09 0.48 0.07 0.12]);
     imagesc(downSampledBlocks3(:,:,b), [-1.1*maxVal(3) 1.1*maxVal(3)]);
-    if b == stimEndTime+4
+    if b == stimEndTime+6
         colorbar
         set(p,'Position',[0.015+(b-stimStartTime)*0.09 0.48 0.07 0.12]);
     end

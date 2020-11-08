@@ -390,7 +390,7 @@ imagesc(log10(powerMap),[minVal maxVal]);
 cb = colorbar( 'SouthOutside','AxisLocation','out',...
     'FontSize',15,'fontweight','bold');
 cb.Ruler.MinorTick = 'on';
-%set(cb,'YTick',[-0.25 0 0.25]);
+set(cb,'YTick',[minVal (minVal+maxVal)/2 maxVal]);
 ylabel(cb,['log_1_0(',unit,'^2)'],'FontSize',12,'fontweight','bold')
 hold on
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL');
