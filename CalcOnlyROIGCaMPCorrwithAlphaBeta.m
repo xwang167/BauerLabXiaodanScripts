@@ -197,7 +197,7 @@ for ii = 1:length(Alpha);
         xlabel('Time(s)')
         ylabel('Fluor(\DeltaF/F)')
         set(gca,'fontweight','bold','FontSize',14)
-        pause
+     
         close all
     end
 end

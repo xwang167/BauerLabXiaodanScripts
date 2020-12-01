@@ -2,11 +2,12 @@ clear all;close all;clc
 import mouse.*
 load('D:\OIS_Process\noVasculatureMask.mat')
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
-excelRows =  [181 183 185  228 232 236];%[182,184,186,233,237];
+excelRows =321:327;% [181 183 185  228 232 236];%[182,184,186,233,237]; %
+framerate = 20;
 nVx = 128;
 nVy = 128;
 nFrames = 7500;
-framerate = 25;
+
     fft_pieces_oxy_mice = [];
     fft_pieces_deoxy_mice = [];
     fft_pieces_total_mice = [];
@@ -61,7 +62,10 @@ for excelRow = excelRows
         load(fullfile(saveDir,processedName),'xform_datahb','xform_jrgeco1aCorr')
               %load(fullfile(saveDir,processedName),'xform_jrgeco1aCorr')
        data = squeeze(xform_jrgeco1aCorr);
-        %data(:,:,end+1) = data(:,:,end);
+        data(:,:,end+1) = data(:,:,end);
+        if length(xform_jrgeco1aCorr) ==11998
+            data(:,:,end+1) = data(:,:,end);
+        end
         data(isnan(data)) = 0;
         data(isinf(data)) = 0;
         data = reshape(data,128*128,[]);
@@ -80,7 +84,10 @@ for excelRow = excelRows
         fft_pieces_rgeco = mean(fft_pieces_rgeco,2);
         
         data = squeeze(xform_datahb(:,:,1,:));
-        %data(:,:,end+1) = data(:,:,end);
+        data(:,:,end+1) = data(:,:,end);
+                if length(xform_jrgeco1aCorr) ==11998
+            data(:,:,end+1) = data(:,:,end);
+        end
         data(isnan(data)) = 0;
         data(isinf(data)) = 0;
         data = reshape(data,128*128,[]);
@@ -98,8 +105,11 @@ for excelRow = excelRows
         fft_pieces_oxy = squeeze(mean(fft_pieces_oxy,1));
         fft_pieces_oxy = mean(fft_pieces_oxy,2);
         
-        data = xform_datahb(:,:,2,:);
-        %data(:,:,end+1) = data(:,:,end);
+        data = squeeze(xform_datahb(:,:,2,:));
+        data(:,:,end+1) = data(:,:,end);
+                if length(xform_jrgeco1aCorr) ==11998
+            data(:,:,end+1) = data(:,:,end);
+        end
         data(isnan(data)) = 0;
         data(isinf(data)) = 0;
         data = reshape(data,128*128,[]);
@@ -114,7 +124,11 @@ for excelRow = excelRows
         fft_pieces_deoxy = squeeze(mean(fft_pieces_deoxy,1));
         fft_pieces_deoxy = mean(fft_pieces_deoxy,2);
         
-        data = xform_datahb(:,:,1,:) + xform_datahb(:,:,2,:);
+        data = squeeze(xform_datahb(:,:,1,:) + xform_datahb(:,:,2,:));
+        data(:,:,end+1) = data(:,:,end);
+                if length(xform_jrgeco1aCorr) ==11998
+            data(:,:,end+1) = data(:,:,end);
+        end
         data(isnan(data)) = 0;
         data(isinf(data)) = 0;
         data = reshape(data,128*128,[]);

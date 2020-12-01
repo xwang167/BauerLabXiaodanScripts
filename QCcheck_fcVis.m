@@ -1,5 +1,6 @@
 function QCcheck_fcVis(refseeds,R_fluor_band, Rs_fluor_band,fluorName,fluorColor,bandname,saveDir,visName,isZTransform,xform_isbrain)
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\CerebMask.mat')
+
 mm=10;
 mpp=mm/size(xform_isbrain,1);
 seedradmm=0.25;

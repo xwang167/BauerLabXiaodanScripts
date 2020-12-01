@@ -39,7 +39,7 @@ function [datahb, WL, op, E, info] = procOISData_xw(filename, info, system)
 disp('Getting Optical Properties')
 info.system=system;
 [op, E, numled, led, Hb]=getop_system(system);
-E =1.0e+04 * [3.3934, 3.7290; 0.0557,0.4765];%Xiaodan Wnag
+%E =1.0e+04 * [3.3934, 3.7290; 0.0557,0.4765];%Xiaodan Wnag
 info.numled=numled;
 info.hb=size(Hb,2);
 
@@ -258,8 +258,8 @@ end
 end
 
 function [led, lambda]=getEastOIS2LEDs
-led{1}.name='C:\Users\xiaodanwang\Documents\GitHub\BauerLab\MATLAB\parameters\+bauerParams\ledSpectra\TwoCam_Mightex525_BP_Pol_500-580';      %Green
-led{2}.name='C:\Users\xiaodanwang\Documents\GitHub\BauerLab\MATLAB\parameters\+bauerParams\ledSpectra\M530_Pol_580Di_500LP';      %Red
+led{1}.name='C:\Users\xiaodanwang\Documents\GitHub\BauerLab\MATLAB\parameters\+bauerParams\ledSpectra\M530_Pol_580Di_500LP';      %Green
+led{2}.name='C:\Users\xiaodanwang\Documents\GitHub\BauerLab\MATLAB\parameters\+bauerParams\ledSpectra\TL625_Pol_580Di_590LPF';      %Red
 
 numled=size(led,2);
 

@@ -1,4 +1,4 @@
-load('J:\RGECO\190707\190707-R5M2286-anes-fc1_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M86-fc1
+load('J:\RGECO\190707\190707-R5M2286-anes-fc1_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
 load('D:\OIS_Process\noVasculatureMask.mat');
 WB = 255*ones(128,128,3);
 mask = leftMask+rightMask;

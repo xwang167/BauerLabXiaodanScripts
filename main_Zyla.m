@@ -5,38 +5,38 @@ import mouse.*
 
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
 
-excelRows = 391;
+excelRows = 229;
 
-runs = 1:4;
+runs = 2;
 isDetrend = 1;
 nVy = 128;
 nVx = 128;
 
 
 
-% % % % % %
-% % % %make mask and transform matrix
+% % % % %
+% % %make mask and transform matrix
 % for excelRow = excelRows
 %     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
 %     recDate = excelRaw{1}; recDate = string(recDate);
 %     mouseName = excelRaw{2}; mouseName = string(mouseName);
 %     rawdataloc = excelRaw{3};
 %     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-%
+% 
 %     oriDir = "D:\"; oriDir = fullfile(oriDir,recDate);
 %     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
 %     if ~exist(saveDir)
 %         mkdir(saveDir)
 %     end
-%
+% 
 %     sessionInfo.mouseType = excelRaw{17};
 %     sessionInfo.darkFrameNum = excelRaw{15};
 %     sessionInfo.totalFrameNum = excelRaw{22};
 %     sessionInfo.framerate = excelRaw{7};
 %     sessionInfo.freqout = sessionInfo.framerate;
 %     systemType = excelRaw{5};
-%
-%
+% 
+% 
 %     wlName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
 %     if exist(fullfile(saveDir,wlName),'file')
 %         load(fullfile(saveDir,wlName),'transformMat','WL');
@@ -46,7 +46,7 @@ nVx = 128;
 %         %         load(fullfile(rawdataloc,recDate,wlName),'mytform','WL');
 %     else
 %         disp(strcat('get WL and transform for ', recDate,'-', mouseName))
-%
+% 
 %         fileName_cam1 = strcat(recDate,'-',mouseName,'-',sessionType,'1-cam1.mat');
 %         fileName_cam1 = fullfile(rawdataloc,recDate,fileName_cam1);
 %         load(fileName_cam1)
@@ -55,17 +55,17 @@ nVx = 128;
 %                 raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
 %             end
 %         end
-%
+% 
 %         if strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')||strcmp(sessionInfo.mouseType,'PV')
 %             firtFrame_cam1  = squeeze(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4+1));
 %         elseif strcmp(sessionInfo.mouseType,'gcamp6f')
 %             firtFrame_cam1  = squeeze(raw_unregistered(:,:,2,sessionInfo.darkFrameNum/4+1));
 %         elseif strcmp(sessionInfo.mouseType,'Gopto3')||strcmp(sessionInfo.mouseType,'Wopto3')
 %             firtFrame_cam1  = squeeze(raw_unregistered(:,:,3,sessionInfo.darkFrameNum/4+1));
-%
+% 
 %         else
 %             firtFrame_cam1  = squeeze(raw_unregistered(:,:,2,sessionInfo.darkFrameNum/4+1));
-%
+% 
 %         end
 %         clear raw_unregistered
 %         fileName_cam2 = strcat(recDate,'-',mouseName,'-',sessionType,'1-cam2.mat');
@@ -83,18 +83,18 @@ nVx = 128;
 %         elseif strcmp(sessionInfo.mouseType,'gcamp6f')|| strcmp(sessionInfo.mouseType,'WT')||strcmp(sessionInfo.mouseType,'PV')||strcmp(sessionInfo.mouseType,'Gopto3')||strcmp(sessionInfo.mouseType,'Wopto3')
 %             firtFrame_cam2  = squeeze(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4+1));
 %         end
-%
+% 
 %         clear raw_unregistered
 %         [WL,transformMat] = fluor.getTransformationandWL_Zyla(firtFrame_cam1, firtFrame_cam2,nVy,nVx);
 %         save(fullfile(saveDir,wlName),'transformMat','WL');
 %         close all
-%
-%
-%
+% 
+% 
+% 
 %         maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-%
+% 
 %         % need to be modified to see if WL exist
-%
+% 
 %         disp(strcat('get landmarks and mask for',recDate,'-', mouseName))
 %         [isbrain,xform_isbrain,affineMarkers,seedcenter,WLcrop,xform_WLcrop,xform_WL] = getLandMarksandMask_xw(WL);
 %         isbrain_contour = bwperim(isbrain);
@@ -104,7 +104,7 @@ nVx = 128;
 %         axis off
 %         axis image
 %         title(strcat(recDate,'-',mouseName));
-%
+% 
 %         for f=1:size(seedcenter,1)
 %             hold on;
 %             plot(seedcenter(f,1),seedcenter(f,2),'ko','MarkerFaceColor','k')
@@ -118,165 +118,165 @@ nVx = 128;
 %         hold on;
 %         contour(isbrain_contour,'r')
 %         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'_WLandMarks.jpg')))
-%
-%
-%
+% 
+% 
+% 
 %         clearvars -except excelFile nVx nVy excelRows runs isDetrend
 %     end
 % end
-% %
-% % %get registered together, dark frame removed raw and QC_raw check
 %
-for excelRow = excelRows
-    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
-    recDate = excelRaw{1}; recDate = string(recDate);
-    mouseName = excelRaw{2}; mouseName = string(mouseName);
-    rawdataloc = excelRaw{3};
-    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-    if ~exist(saveDir)
-        mkdir(saveDir)
-    end
-    sessionInfo.mouseType = excelRaw{17};
-    sessionInfo.darkFrameNum = excelRaw{15};
-    systemType = excelRaw{5};
-    sessionInfo.framerate = excelRaw{7};
-    if strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto3')
-        maskDir = fullfile(rawdataloc,recDate);
-    else
-        maskDir = saveDir;
-    end
-    %mouseName = 'N4M330-opto3';
-    %maskDir = strcat('J:\RGECO\Kenny\', recDate, '\');
-    %maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-    maskName = strcat(recDate,'-N4M326-anes-1mW-opto3-LandmarksAndMask','.mat');
-    
-    load(fullfile(maskDir,maskName),'isbrain')
-    
-    for n = runs
-        
-        rawName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'.mat');
-        if exist(fullfile(saveDir,rawName),'file')
-            disp(strcat('registered rawdata file already exist for ',rawName ))
-            
-        else
-               wlName = strcat(recDate,'-N4M326-anes-1mW-opto3-LandmarksAndMask','.mat');
-            %wlName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-            
-            %             fileName_cam1 = strcat(recDate,'-',mouseName,'-cam1','-',sessionType,num2str(n),'.mat');%
-            fileName_cam1 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam1.mat');
-            fileName_cam1 = fullfile(rawdataloc,recDate,fileName_cam1);
-            %             fileName_cam2 = strcat(recDate,'-',mouseName,'-cam2','-',sessionType,num2str(n),'.mat');%
-            fileName_cam2 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam2.mat');
-            fileName_cam2 = fullfile(rawdataloc,recDate,fileName_cam2);
-            if exist(fileName_cam1)
-                disp('loading unregistered data')
-         
-                load(fileName_cam1)
-                if sessionInfo.darkFrameNum>0
-                    if sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4-1),'all')>5
-                        raw_unregistered(:,:,1,2:end) = raw_unregistered(:,:,1,1:end-1);
-                    end
-                end
-                if strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')
-                    binnedRaw_cam1 = raw_unregistered(:,:,[1,4],:);
-                elseif strcmp(sessionInfo.mouseType,'jrgeco1a')
-                    binnedRaw_cam1 = raw_unregistered(:,:,[1,2],:);
-                else
-                    binnedRaw_cam1 = raw_unregistered;
-                end
-                clear raw_unregistered
-                load(fileName_cam2)
-                if sessionInfo.darkFrameNum>0
-                    if sum(raw_unregistered(:,:,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,sessionInfo.darkFrameNum/4-1),'all')>5
-                        raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
-                    end
-                end
-                disp(strcat('Register and Combine two cameras for ', rawName))
-                if strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')
-                    binnedRaw_cam2 = raw_unregistered(:,:,[2,3],:);
-                    %                     load(fullfile(maskDir,wlName),'transformMat');
-                    %
-                    %                     rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,transformMat,sessionInfo.mouseType);
-                    load(fullfile(maskDir,wlName),'mytform');
-                                      length_1 = size(binnedRaw_cam1,4);
-                    length_2 = size(binnedRaw_cam2,4);
-                                        if  length_1==length_2
-                         rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,mytform,sessionInfo.mouseType);
-                    elseif length_1 < length_2
-                        rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2(:,:,:,1:length_1),mytform,sessionInfo.mouseType);
-                        disp(['raw1 is shorter than raw 2, raw1 is ', num2str(length_1)] )
-                    else
-                        rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1(:,:,:, 1:length_2),binnedRaw_cam2,mytform,sessionInfo.mouseType);
-                        disp(['raw2 is shorter than raw 1, raw1 is ', num2str(length_1)] )
-                    end
-                elseif strcmp(sessionInfo.mouseType,'jrgeco1a')
-                    %                     binnedRaw_cam2= raw_unregistered(:,:,[1,2],:);
-                    %                     load(fullfile(maskDir,wlName),'mytform');
-                    %                     rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,mytform,sessionInfo.mouseType);
-                    binnedRaw_cam2= raw_unregistered(:,:,[3,4],:);
-                    load(fullfile(maskDir,wlName),'transformMat');
-                    rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,transformMat,sessionInfo.mouseType);
-                    
-                    
-                else
-                    binnedRaw_cam2 = raw_unregistered;
-                    load(fullfile(maskDir,wlName),'transformMat');
-                    length_1 = size(binnedRaw_cam1,4);
-                    length_2 = size(binnedRaw_cam2,4);
-                    if  length_1==length_2
-                        rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,transformMat,sessionInfo.mouseType);
-                    elseif length_1 < length_2
-                        rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2(:,:,:,1:length_1),transformMat,sessionInfo.mouseType);
-                        disp(['raw1 is shorter than raw 2, raw1 is ', num2str(length_1)] )
-                    else
-                        rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1(:,:,:, 1:length_2),binnedRaw_cam2,transformMat,sessionInfo.mouseType);
-                        disp(['raw2 is shorter than raw 1, raw1 is ', num2str(length_1)] )
-                    end
-                    
-                end
-                clear raw_unregistered
-                
-                
-                if strcmp(sessionInfo.mouseType,'PV')
-                elseif sessionInfo.darkFrameNum ==0
-                    raw_nondark =rawdata;
-                    darkName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Dark.mat');
-                    darkName =  fullfile(rawdataloc,recDate,darkName);
-                    load(darkName)
-                    darkFrame = squeeze(mean(rawdata(:,:,:,2:end),4));
-                    clear rawdata
-                    raw_baselineMinus = raw_nondark - repmat(darkFrame,1,1,1,size(raw_nondark,4));
-                    clear raw_baselineMinus
-                    rawdata = raw_baselineMinus;
-                else
-                    darkFrameInd = 2:sessionInfo.darkFrameNum/size(rawdata,3);
-                    darkFrame = squeeze(mean(rawdata(:,:,:,darkFrameInd),4));
-                    raw_baselineMinus = rawdata - repmat(darkFrame,1,1,1,size(rawdata,4));
-                    clear rawdata
-                    raw_baselineMinus(:,:,:,1:sessionInfo.darkFrameNum/size(raw_baselineMinus,3))=[];
-                    rawdata = raw_baselineMinus;
-                    clear raw_baselineMinus
-                    
-                end
-                
-                disp(strcat('QC raw for ',rawName))
-                visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
-                [mdata, Colors, legendName] = QCcheck_raw(rawdata,isbrain,systemType,sessionInfo.framerate,saveDir,visName,sessionInfo.mouseType);
-                save(fullfile(saveDir,rawName),'rawdata','mdata','-v7.3')
-            end
-        end
-    end
-end
+% %get registered together, dark frame removed raw and QC_raw check
+
+% for excelRow = excelRows
+%     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+%     recDate = excelRaw{1}; recDate = string(recDate);
+%     mouseName = excelRaw{2}; mouseName = string(mouseName);
+%     rawdataloc = excelRaw{3};
+%     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+%     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+%     if ~exist(saveDir)
+%         mkdir(saveDir)
+%     end
+%     sessionInfo.mouseType = excelRaw{17};
+%     sessionInfo.darkFrameNum = excelRaw{15};
+%     systemType = excelRaw{5};
+%     sessionInfo.framerate = excelRaw{7};
+%     if strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto3')
+%         maskDir = fullfile(rawdataloc,recDate);
+%     else
+%         maskDir = saveDir;
+%     end
+%     %mouseName = 'N4M330-opto3';
+%     %maskDir = strcat('J:\RGECO\Kenny\', recDate, '\');
+%     %maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+%     maskName = strcat(recDate,'-N8M864-opto3-LandmarksAndMask','.mat');
+% 
+%     load(fullfile(maskDir,maskName),'isbrain')
+% 
+%     for n = runs
+% 
+%         rawName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'.mat');
+%         if exist(fullfile(saveDir,rawName),'file')
+%             disp(strcat('registered rawdata file already exist for ',rawName ))
+% 
+%         else
+%                wlName = maskName;
+%             %wlName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+% 
+%             %             fileName_cam1 = strcat(recDate,'-',mouseName,'-cam1','-',sessionType,num2str(n),'.mat');%
+%             fileName_cam1 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam1.mat');
+%             fileName_cam1 = fullfile(rawdataloc,recDate,fileName_cam1);
+%             %             fileName_cam2 = strcat(recDate,'-',mouseName,'-cam2','-',sessionType,num2str(n),'.mat');%
+%             fileName_cam2 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam2.mat');
+%             fileName_cam2 = fullfile(rawdataloc,recDate,fileName_cam2);
+%             if exist(fileName_cam1)
+%                 disp('loading unregistered data')
+% 
+%                 load(fileName_cam1)
+%                 if sessionInfo.darkFrameNum>0
+%                     if sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4-1),'all')>5
+%                         raw_unregistered(:,:,1,2:end) = raw_unregistered(:,:,1,1:end-1);
+%                     end
+%                 end
+%                 if strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')
+%                     binnedRaw_cam1 = raw_unregistered(:,:,[1,4],:);
+%                 elseif strcmp(sessionInfo.mouseType,'jrgeco1a')
+%                     binnedRaw_cam1 = raw_unregistered(:,:,[1,2],:);
+%                 else
+%                     binnedRaw_cam1 = raw_unregistered;
+%                 end
+%                 clear raw_unregistered
+%                 load(fileName_cam2)
+%                 if sessionInfo.darkFrameNum>0
+%                     if sum(raw_unregistered(:,:,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,sessionInfo.darkFrameNum/4-1),'all')>5
+%                         raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
+%                     end
+%                 end
+%                 disp(strcat('Register and Combine two cameras for ', rawName))
+%                 if strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')
+%                     binnedRaw_cam2 = raw_unregistered(:,:,[2,3],:);
+%                     %                     load(fullfile(maskDir,wlName),'transformMat');
+%                     %
+%                     %                     rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,transformMat,sessionInfo.mouseType);
+%                     load(fullfile(maskDir,wlName),'mytform');
+%                                       length_1 = size(binnedRaw_cam1,4);
+%                     length_2 = size(binnedRaw_cam2,4);
+%                                         if  length_1==length_2
+%                          rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,mytform,sessionInfo.mouseType);
+%                     elseif length_1 < length_2
+%                         rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2(:,:,:,1:length_1),mytform,sessionInfo.mouseType);
+%                         disp(['raw1 is shorter than raw 2, raw1 is ', num2str(length_1)] )
+%                     else
+%                         rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1(:,:,:, 1:length_2),binnedRaw_cam2,mytform,sessionInfo.mouseType);
+%                         disp(['raw2 is shorter than raw 1, raw1 is ', num2str(length_1)] )
+%                     end
+%                 elseif strcmp(sessionInfo.mouseType,'jrgeco1a')
+%                     %                     binnedRaw_cam2= raw_unregistered(:,:,[1,2],:);
+%                     %                     load(fullfile(maskDir,wlName),'mytform');
+%                     %                     rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,mytform,sessionInfo.mouseType);
+%                     binnedRaw_cam2= raw_unregistered(:,:,[3,4],:);
+%                     load(fullfile(maskDir,wlName),'transformMat');
+%                     rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,transformMat,sessionInfo.mouseType);
+% 
+% 
+%                 else
+%                     binnedRaw_cam2 = raw_unregistered;
+%                     load(fullfile(maskDir,wlName),'transformMat');
+%                     length_1 = size(binnedRaw_cam1,4);
+%                     length_2 = size(binnedRaw_cam2,4);
+%                     if  length_1==length_2
+%                         rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,transformMat,sessionInfo.mouseType);
+%                     elseif length_1 < length_2
+%                         rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2(:,:,:,1:length_1),transformMat,sessionInfo.mouseType);
+%                         disp(['raw1 is shorter than raw 2, raw1 is ', num2str(length_1)] )
+%                     else
+%                         rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1(:,:,:, 1:length_2),binnedRaw_cam2,transformMat,sessionInfo.mouseType);
+%                         disp(['raw2 is shorter than raw 1, raw1 is ', num2str(length_1)] )
+%                     end
+% 
+%                 end
+%                 clear raw_unregistered
+% 
+% 
+%                 if strcmp(sessionInfo.mouseType,'PV')
+%                 elseif sessionInfo.darkFrameNum ==0
+%                     raw_nondark =rawdata;
+%                     darkName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Dark.mat');
+%                     darkName =  fullfile(rawdataloc,recDate,darkName);
+%                     load(darkName)
+%                     darkFrame = squeeze(mean(rawdata(:,:,:,2:end),4));
+%                     clear rawdata
+%                     raw_baselineMinus = raw_nondark - repmat(darkFrame,1,1,1,size(raw_nondark,4));
+%                     clear raw_baselineMinus
+%                     rawdata = raw_baselineMinus;
+%                 else
+%                     darkFrameInd = 2:sessionInfo.darkFrameNum/size(rawdata,3);
+%                     darkFrame = squeeze(mean(rawdata(:,:,:,darkFrameInd),4));
+%                     raw_baselineMinus = rawdata - repmat(darkFrame,1,1,1,size(rawdata,4));
+%                     clear rawdata
+%                     raw_baselineMinus(:,:,:,1:sessionInfo.darkFrameNum/size(raw_baselineMinus,3))=[];
+%                     rawdata = raw_baselineMinus;
+%                     clear raw_baselineMinus
+% 
+%                 end
+% 
+%                 disp(strcat('QC raw for ',rawName))
+%                 visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
+%                 [mdata, Colors, legendName] = QCcheck_raw(rawdata,isbrain,systemType,sessionInfo.framerate,saveDir,visName,sessionInfo.mouseType);
+%                 save(fullfile(saveDir,rawName),'rawdata','mdata','-v7.3')
+%             end
+%         end
+%     end
+%  end
 
 
 
 
 
 
-%
-%
-% process raw to trace
+
+
+%%%%%process raw to trace
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
     recDate = excelRaw{1}; recDate = string(recDate);
@@ -368,8 +368,8 @@ for excelRow = excelRows
     systemInfo.gsigma = 1.2;
     if strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto3')
         maskDir = fullfile(rawdataloc,recDate);
-        maskName = strcat(recDate,'-N4M326-anes-1mW-opto3-LandmarksAndMask','.mat');
-        load(fullfile(maskDir,maskName),,'affineMarkers','xform_isbrain','isbrain')
+        maskName = strcat(recDate,'-N8M864-opto3-LandmarksAndMask','.mat');
+        load(fullfile(maskDir,maskName),'affineMarkers','xform_isbrain','isbrain')
     else
         maskDir = strcat('J:\RGECO\Kenny\', recDate, '\');
         if exist(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-datahb.mat')),'file')
@@ -398,15 +398,15 @@ for excelRow = excelRows
         if exist(fullfile(saveDir,rawName),'file')
             
             isDatahbGot = false;
-                            if exist(fullfile(saveDir,processedName),'file')
-                                C = who('-file',fullfile(saveDir,processedName));
-            
-                                for  k=1:length(C)
-                                    if strcmp(C(k),'xform_datahb')
-                                        isDatahbGot = true;
-                                    end
-                                end
-                            end
+            if exist(fullfile(saveDir,processedName),'file')
+                C = who('-file',fullfile(saveDir,processedName));
+                
+                for  k=1:length(C)
+                    if strcmp(C(k),'xform_datahb')
+                        isDatahbGot = true;
+                    end
+                end
+            end
             
             if ~isDatahbGot
                 disp(mouseName)
@@ -512,7 +512,11 @@ for excelRow = excelRows
                         dpIn = op_in.dpf/2;
                         dpOut = op_out.dpf/2;
                         
-g
+                        
+                        xform_fluorCorr = mouse.physics.correctHb(xform_fluor,xform_datahb,[E_in(1) E_out(1)],[E_in(2) E_out(2)],dpIn,dpOut);
+                        xform_fluorCorr = process.smoothImage(xform_fluorCorr,systemInfo.gbox,systemInfo.gsigma);
+                        xform_fluor = process.smoothImage(xform_fluor,systemInfo.gbox,systemInfo.gsigma);
+                        
                         switch sessionInfo.mouseType
                             case 'gcamp6f'
                                 clear xform_datahb xform_raw
@@ -560,8 +564,6 @@ g
                                 
                                 load(fullfile(saveDir, processedName),'xform_datahb')%%%need to delete
                                 
-                                
-                                
                                 xform_FADCorr = mouse.physics.correctHb(xform_FAD,xform_datahb,...
                                     [E_in_FAD(1) E_out_FAD(1)],[E_in_FAD(2) E_out_FAD(2)],dpIn_FAD,dpOut_FAD);
                                 clear xform_datahb
@@ -603,7 +605,7 @@ for excelRow = excelRows
     
     sessionInfo.framerate = excelRaw{7};
     systemInfo.numLEDs = 4;
-    maskName_new = strcat(recDate,'-N4M326-anes-1mW-opto3-LandmarksAndMask','.mat');
+    maskName_new = strcat(recDate,'-N8M864-1hz-opto3-LandmarksAndMask','.mat');
     %maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datahb','.mat');
     %load(fullfile(maskDir,maskName), 'xform_isbrain')
     %save(fullfile(maskDir_new,maskName_new),'xform_isbrain')
@@ -652,33 +654,33 @@ for excelRow = excelRows
                         total = squeeze(xform_datahb(:,:,1,:)) + squeeze(xform_datahb(:,:,2,:));
                         clear xform_datahb
                         %                         disp('calculate pds')
-                        %
-                        %                         [hz,powerdata_jrgeco1aCorr] = QCcheck_CalcPDS(real(double(xform_jrgeco1aCorr))/0.01,sessionInfo.framerate,xform_isbrain);
-                        %                         [~,powerdata_jrgeco1a] = QCcheck_CalcPDS(double(xform_jrgeco1a)/0.01,sessionInfo.framerate,xform_isbrain);
-                        %                         [~,powerdata_FADCorr] = QCcheck_CalcPDS(real(double(xform_FADCorr))/0.01,sessionInfo.framerate,xform_isbrain);
-                        %                         [~,powerdata_total] = QCcheck_CalcPDS(real(double(total)*10^6),sessionInfo.framerate,xform_isbrain);
-                        %                         [~,powerdata_oxy] = QCcheck_CalcPDS(real(double(xform_datahb(:,:,1,:)))*10^6,sessionInfo.framerate,xform_isbrain);
-                        %                         [~,powerdata_deoxy] = QCcheck_CalcPDS(real(double(xform_datahb(:,:,2,:)))*10^6,sessionInfo.framerate,xform_isbrain);
-                        %
-                        %                         [hz,powerdata_average_jrgeco1aCorr] = QCcheck_CalcPDSAverage(double(xform_jrgeco1aCorr)/0.01,sessionInfo.framerate,xform_isbrain);
-                        %                         [~,powerdata_average_jrgeco1a] = QCcheck_CalcPDSAverage(double(xform_jrgeco1a)/0.01,sessionInfo.framerate,xform_isbrain);
-                        %                         [~,powerdata_average_FADCorr] = QCcheck_CalcPDSAverage(double(xform_FADCorr)/0.01,sessionInfo.framerate,xform_isbrain);
-                        %                         [~,powerdata_average_total] = QCcheck_CalcPDSAverage(double(total)*10^6,sessionInfo.framerate,xform_isbrain);
-                        %                         [~,powerdata_average_oxy] = QCcheck_CalcPDSAverage(double(xform_datahb(:,:,1,:))*10^6,sessionInfo.framerate,xform_isbrain);
-                        %                         [~,powerdata_average_deoxy] = QCcheck_CalcPDSAverage(double(xform_datahb(:,:,2,:))*10^6,sessionInfo.framerate,xform_isbrain);
-                        %
-                        %
                         
-                        %
-                        %                         disp('calculate power map')
-                        %                         jrgeco1aCorr_ISA_powerMap = QCcheck_CalcPowerMap(double(xform_jrgeco1aCorr)/0.01,sessionInfo.framerate,[sessionInfo.bandtype_ISA{2},sessionInfo.bandtype_ISA{3}]);
-                        %                         FADCorr_ISA_powerMap = QCcheck_CalcPowerMap(double(xform_FADCorr)/0.01,sessionInfo.framerate,[sessionInfo.bandtype_ISA{2},sessionInfo.bandtype_ISA{3}]);
-                        %                         total_ISA_powerMap = QCcheck_CalcPowerMap(double(total)*10^6,sessionInfo.framerate,[sessionInfo.bandtype_ISA{2},sessionInfo.bandtype_ISA{3}]);
-                        %
-                        %                         jrgeco1aCorr_Delta_powerMap = QCcheck_CalcPowerMap(double(xform_jrgeco1aCorr)/0.01,sessionInfo.framerate,[sessionInfo.bandtype_Delta{2},sessionInfo.bandtype_Delta{3}]);
-                        %                         FADCorr_Delta_powerMap = QCcheck_CalcPowerMap(double(xform_FADCorr)/0.01,sessionInfo.framerate,[sessionInfo.bandtype_Delta{2},sessionInfo.bandtype_Delta{3}]);
-                        %                         total_Delta_powerMap = QCcheck_CalcPowerMap(double(total)*10^6,sessionInfo.framerate,[sessionInfo.bandtype_Delta{2},sessionInfo.bandtype_Delta{3}]);
-                        %
+                        [hz,powerdata_jrgeco1aCorr] = QCcheck_CalcPDS(real(double(xform_jrgeco1aCorr))/0.01,sessionInfo.framerate,xform_isbrain);
+                        [~,powerdata_jrgeco1a] = QCcheck_CalcPDS(double(xform_jrgeco1a)/0.01,sessionInfo.framerate,xform_isbrain);
+                        [~,powerdata_FADCorr] = QCcheck_CalcPDS(real(double(xform_FADCorr))/0.01,sessionInfo.framerate,xform_isbrain);
+                        [~,powerdata_total] = QCcheck_CalcPDS(real(double(total)*10^6),sessionInfo.framerate,xform_isbrain);
+                        [~,powerdata_oxy] = QCcheck_CalcPDS(real(double(xform_datahb(:,:,1,:)))*10^6,sessionInfo.framerate,xform_isbrain);
+                        [~,powerdata_deoxy] = QCcheck_CalcPDS(real(double(xform_datahb(:,:,2,:)))*10^6,sessionInfo.framerate,xform_isbrain);
+                        
+                        [hz,powerdata_average_jrgeco1aCorr] = QCcheck_CalcPDSAverage(double(xform_jrgeco1aCorr)/0.01,sessionInfo.framerate,xform_isbrain);
+                        [~,powerdata_average_jrgeco1a] = QCcheck_CalcPDSAverage(double(xform_jrgeco1a)/0.01,sessionInfo.framerate,xform_isbrain);
+                        [~,powerdata_average_FADCorr] = QCcheck_CalcPDSAverage(double(xform_FADCorr)/0.01,sessionInfo.framerate,xform_isbrain);
+                        [~,powerdata_average_total] = QCcheck_CalcPDSAverage(double(total)*10^6,sessionInfo.framerate,xform_isbrain);
+                        [~,powerdata_average_oxy] = QCcheck_CalcPDSAverage(double(xform_datahb(:,:,1,:))*10^6,sessionInfo.framerate,xform_isbrain);
+                        [~,powerdata_average_deoxy] = QCcheck_CalcPDSAverage(double(xform_datahb(:,:,2,:))*10^6,sessionInfo.framerate,xform_isbrain);
+                        
+                        
+                        
+                        
+                        disp('calculate power map')
+                        jrgeco1aCorr_ISA_powerMap = QCcheck_CalcPowerMap(double(xform_jrgeco1aCorr)/0.01,sessionInfo.framerate,[sessionInfo.bandtype_ISA{2},sessionInfo.bandtype_ISA{3}]);
+                        FADCorr_ISA_powerMap = QCcheck_CalcPowerMap(double(xform_FADCorr)/0.01,sessionInfo.framerate,[sessionInfo.bandtype_ISA{2},sessionInfo.bandtype_ISA{3}]);
+                        total_ISA_powerMap = QCcheck_CalcPowerMap(double(total)*10^6,sessionInfo.framerate,[sessionInfo.bandtype_ISA{2},sessionInfo.bandtype_ISA{3}]);
+                        
+                        jrgeco1aCorr_Delta_powerMap = QCcheck_CalcPowerMap(double(xform_jrgeco1aCorr)/0.01,sessionInfo.framerate,[sessionInfo.bandtype_Delta{2},sessionInfo.bandtype_Delta{3}]);
+                        FADCorr_Delta_powerMap = QCcheck_CalcPowerMap(double(xform_FADCorr)/0.01,sessionInfo.framerate,[sessionInfo.bandtype_Delta{2},sessionInfo.bandtype_Delta{3}]);
+                        total_Delta_powerMap = QCcheck_CalcPowerMap(double(total)*10^6,sessionInfo.framerate,[sessionInfo.bandtype_Delta{2},sessionInfo.bandtype_Delta{3}]);
+                        
                         disp('calculate fc')
                         refseeds=GetReferenceSeeds_xw;
                         %refseeds = refseeds(1:14,:);
@@ -696,69 +698,69 @@ for excelRow = excelRows
                         
                         save(fullfile(saveDir, processedName),'R_jrgeco1aCorr_ISA','Rs_jrgeco1aCorr_ISA','R_FADCorr_ISA','Rs_FADCorr_ISA','R_total_ISA','Rs_total_ISA',...
                             'R_jrgeco1aCorr_Delta','Rs_jrgeco1aCorr_Delta','R_FADCorr_Delta','Rs_FADCorr_Delta','R_total_Delta','Rs_total_Delta','xform_isbrain','-append')
-                        %
-                        
-                        %                         save(fullfile(saveDir, processedName),'powerdata_jrgeco1aCorr','powerdata_jrgeco1a','powerdata_FADCorr','powerdata_total','powerdata_oxy','powerdata_deoxy',...
-                        %                             'powerdata_average_jrgeco1aCorr','powerdata_average_jrgeco1a','powerdata_average_FADCorr','powerdata_average_total','powerdata_average_oxy','powerdata_average_deoxy','hz',...
-                        %                             'jrgeco1aCorr_ISA_powerMap','FADCorr_ISA_powerMap','total_ISA_powerMap','jrgeco1aCorr_Delta_powerMap','FADCorr_Delta_powerMap','total_Delta_powerMap',...
-                        %                             'R_jrgeco1aCorr_ISA','Rs_jrgeco1aCorr_ISA','R_FADCorr_ISA','Rs_FADCorr_ISA','R_total_ISA','Rs_total_ISA',...
-                        %                             'R_jrgeco1aCorr_Delta','Rs_jrgeco1aCorr_Delta','R_FADCorr_Delta','Rs_FADCorr_Delta','R_total_Delta','Rs_total_Delta','xform_isbrain','-append','-v7.3')
-                        %
-                        
-                        %                         nameString = fullfile(saveDir,visName);
-                        %
-                        %
-                        %                         leftData = cell(3,1);
-                        %                         leftData{1} = powerdata_jrgeco1aCorr;
-                        %                         leftData{2} = powerdata_jrgeco1a;
-                        %                         leftData{3} = powerdata_FADCorr;
-                        %
-                        %                         rightData = cell(3,1);
-                        %                         rightData{1} = powerdata_oxy;
-                        %                         rightData{2} = powerdata_deoxy;
-                        %                         rightData{3} = powerdata_total;
-                        %
-                        %                         leftLabel = 'Fluor(\DeltaF/F%)^2/Hz)';
-                        %                         rightLabel = 'Hb(\muM^2/Hz)';
-                        %                         leftLineStyle = {'m-','y-','g-'};
-                        %                         rightLineStyle= {'r-','b-','k-'};
-                        %                         legendName = ["Corrected jRGECO1a","jRGECO1a","Corrected FAD","HbO","HbR","HbT"];
-                        %
-                        %
-                        %                         QCcheck_fftVis(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir,strcat(visName, '_powerCurve'))
-                        %
-                        %
-                        %                         leftData = cell(3,1);
-                        %                         leftData{1} = powerdata_average_jrgeco1aCorr;
-                        %                         leftData{2} = powerdata_average_jrgeco1a;
-                        %                         leftData{3} = powerdata_average_FADCorr;
-                        %
-                        %                         rightData = cell(3,1);
-                        %                         rightData{1} = powerdata_average_oxy;
-                        %                         rightData{2} = powerdata_average_deoxy;
-                        %                         rightData{3} = powerdata_average_total;
-                        %
-                        %                         %                 leftLabel = 'Fluor(\DeltaF/F%)^2/Hz)';
-                        %                         %                 rightLabel = 'Hb(\muM^2/Hz)';
-                        %                         %                 leftLineStyle = {'m-','y-','g-'};
-                        %                         %                 rightLineStyle= {'r-','b-','k-'};
-                        %                         %                 legendName = ["Corrected jRGECO1a","jRGECO1a","Corrected FAD","HbO","HbR","HbT"];
-                        %                         %
-                        %                         %                 leftLegend = ["Corrected jRGECO1a","jRGECO1a","Corrected FAD"];
-                        %                         %                 rightLegend = ["HbO","HbR","HbT"];
                         
                         
+                        save(fullfile(saveDir, processedName),'powerdata_jrgeco1aCorr','powerdata_jrgeco1a','powerdata_FADCorr','powerdata_total','powerdata_oxy','powerdata_deoxy',...
+                            'powerdata_average_jrgeco1aCorr','powerdata_average_jrgeco1a','powerdata_average_FADCorr','powerdata_average_total','powerdata_average_oxy','powerdata_average_deoxy','hz',...
+                            'jrgeco1aCorr_ISA_powerMap','FADCorr_ISA_powerMap','total_ISA_powerMap','jrgeco1aCorr_Delta_powerMap','FADCorr_Delta_powerMap','total_Delta_powerMap',...
+                            'R_jrgeco1aCorr_ISA','Rs_jrgeco1aCorr_ISA','R_FADCorr_ISA','Rs_FADCorr_ISA','R_total_ISA','Rs_total_ISA',...
+                            'R_jrgeco1aCorr_Delta','Rs_jrgeco1aCorr_Delta','R_FADCorr_Delta','Rs_FADCorr_Delta','R_total_Delta','Rs_total_Delta','xform_isbrain','-append','-v7.3')
                         
-                        %                         QCcheck_fftVis(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir,strcat(visName, '_powerCurve_average'))
-                        %                         %
-                        %                         %
-                        %                         QCcheck_powerMapVis(jrgeco1aCorr_ISA_powerMap,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, '_RGECOISA'))
-                        %                         QCcheck_powerMapVis(FADCorr_ISA_powerMap,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, '_FADISA'))
-                        %                         QCcheck_powerMapVis(total_ISA_powerMap,xform_isbrain,'\muM',saveDir,strcat(visName, "_TotalISA"))
+                        
+                        nameString = fullfile(saveDir,visName);
+                        
+                        
+                        leftData = cell(3,1);
+                        leftData{1} = powerdata_jrgeco1aCorr;
+                        leftData{2} = powerdata_jrgeco1a;
+                        leftData{3} = powerdata_FADCorr;
+                        
+                        rightData = cell(3,1);
+                        rightData{1} = powerdata_oxy;
+                        rightData{2} = powerdata_deoxy;
+                        rightData{3} = powerdata_total;
+                        
+                        leftLabel = 'Fluor(\DeltaF/F%)^2/Hz)';
+                        rightLabel = 'Hb(\muM^2/Hz)';
+                        leftLineStyle = {'m-','y-','g-'};
+                        rightLineStyle= {'r-','b-','k-'};
+                        legendName = ["Corrected jRGECO1a","jRGECO1a","Corrected FAD","HbO","HbR","HbT"];
+                        
+                        
+                        QCcheck_fftVis(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir,strcat(visName, '_powerCurve'))
+                        
+                        
+                        leftData = cell(3,1);
+                        leftData{1} = powerdata_average_jrgeco1aCorr;
+                        leftData{2} = powerdata_average_jrgeco1a;
+                        leftData{3} = powerdata_average_FADCorr;
+                        
+                        rightData = cell(3,1);
+                        rightData{1} = powerdata_average_oxy;
+                        rightData{2} = powerdata_average_deoxy;
+                        rightData{3} = powerdata_average_total;
+                        
+                        %                 leftLabel = 'Fluor(\DeltaF/F%)^2/Hz)';
+                        %                 rightLabel = 'Hb(\muM^2/Hz)';
+                        %                 leftLineStyle = {'m-','y-','g-'};
+                        %                 rightLineStyle= {'r-','b-','k-'};
+                        %                 legendName = ["Corrected jRGECO1a","jRGECO1a","Corrected FAD","HbO","HbR","HbT"];
                         %
-                        %                         QCcheck_powerMapVis(jrgeco1aCorr_Delta_powerMap,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, "_RGECODelta"))
-                        %                         QCcheck_powerMapVis(FADCorr_Delta_powerMap,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName,"_FADDelta"))
-                        %                         QCcheck_powerMapVis(total_Delta_powerMap,xform_isbrain,'\muM',saveDir,strcat(visName,"_TotalDelta"))
+                        %                 leftLegend = ["Corrected jRGECO1a","jRGECO1a","Corrected FAD"];
+                        %                 rightLegend = ["HbO","HbR","HbT"];
+                        
+                        
+                        
+                        QCcheck_fftVis(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir,strcat(visName, '_powerCurve_average'))
+                        %
+                        %
+                        QCcheck_powerMapVis(jrgeco1aCorr_ISA_powerMap,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, '_RGECOISA'))
+                        QCcheck_powerMapVis(FADCorr_ISA_powerMap,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, '_FADISA'))
+                        QCcheck_powerMapVis(total_ISA_powerMap,xform_isbrain,'\muM',saveDir,strcat(visName, "_TotalISA"))
+                        
+                        QCcheck_powerMapVis(jrgeco1aCorr_Delta_powerMap,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, "_RGECODelta"))
+                        QCcheck_powerMapVis(FADCorr_Delta_powerMap,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName,"_FADDelta"))
+                        QCcheck_powerMapVis(total_Delta_powerMap,xform_isbrain,'\muM',saveDir,strcat(visName,"_TotalDelta"))
                         
                         
                         
@@ -807,7 +809,7 @@ for excelRow = excelRows
                     load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),...
                         'xform_jrgeco1a','xform_jrgeco1aCorr','xform_red','xform_Laser','xform_datahb')
                     load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_Laser')
-             
+                    
                 end
                 
                 
@@ -820,7 +822,8 @@ for excelRow = excelRows
                         peakMap_ROI = process.affineTransform(rawdata(:,:,3,sessionInfo.stimbaseline+1),affineMarkers) ;
                         clear rawdata
                     elseif strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')
-                        peakMap_ROI = mean(xform_Laser(:,:,sessionInfo.stimbaseline+1:sessionInfo.stimbaseline+sessionInfo.stimduration*sessionInfo.framerate),3);
+                        frameInd = sessionInfo.stimbaseline+1:1/sessionInfo.stimFrequency*sessionInfo.framerate:sessionInfo.stimbaseline+sessionInfo.stimduration*sessionInfo.framerate;
+                        peakMap_ROI = mean(xform_Laser(:,:,frameInd),3);
                     elseif strcmp(sessionInfo.mouseType,'jrgeco1a-opto2')
                         peakMap_ROI = rawdata(:,:,3,sessionInfo.stimbaseline+1);
                         clear rawdata
@@ -891,13 +894,13 @@ for excelRow = excelRows
                     [goodBlocks_NoGSR,ROI_NoGSR] = QC_stim(squeeze(xform_datahb(:,:,1,:)),squeeze(xform_datahb(:,:,2,:)),...
                         xform_FAD,xform_FADCorr,xform_green,[],[],[],...
                         xform_isbrain,numBlock,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,ROI);
-               elseif strcmp(sessionInfo.mouseType,'jrgeco1a')
+                elseif strcmp(sessionInfo.mouseType,'jrgeco1a')
                     [goodBlocks_NoGSR,ROI_NoGSR] = QC_stim(squeeze(xform_datahb(:,:,1,:))*10^6,squeeze(xform_datahb(:,:,2,:))*10^6,...
                         xform_FAD*100,xform_FADCorr*100,xform_green*100,xform_jrgeco1a*100,xform_jrgeco1aCorr*100,xform_red*100,...
                         xform_isbrain,numBlock,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,[]);
                     
                 elseif strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')
-                   
+                    
                     [goodBlocks_NoGSR,ROI_NoGSR] = QC_stim(squeeze(xform_datahb(:,:,1,:))*10^6,squeeze(xform_datahb(:,:,2,:))*10^6,...
                         [],[],[],xform_jrgeco1a*100,xform_jrgeco1aCorr*100,xform_red*100,...
                         xform_isbrain,numBlock,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,ROI);
@@ -915,7 +918,7 @@ for excelRow = excelRows
                     
                 end
                 close all
-         save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'goodBlocks_NoGSR','ROI_NoGSR','-append')
+                save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'goodBlocks_NoGSR','ROI_NoGSR','-append')
                 
                 disp('loading GRS data')
                 
@@ -976,9 +979,9 @@ for excelRow = excelRows
                     
                     save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),...
                         'xform_datahb_GSR','xform_jrgeco1a_GSR','xform_jrgeco1aCorr_GSR','xform_red_GSR','-append')
-%                        load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),...
-%                         'xform_datahb_GSR','xform_jrgeco1a_GSR','xform_jrgeco1aCorr_GSR','xform_red_GSR','ROI_NoGSR')
-
+                    %                        load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),...
+                    %                         'xform_datahb_GSR','xform_jrgeco1a_GSR','xform_jrgeco1aCorr_GSR','xform_red_GSR','ROI_NoGSR')
+                    
                     disp('QC on GSR stim')
                     [goodBlocks_GSR] = QC_stim(squeeze(xform_datahb_GSR(:,:,1,:))*10^6,squeeze(xform_datahb_GSR(:,:,2,:))*10^6,...
                         [],[],[],xform_jrgeco1a_GSR*100,xform_jrgeco1aCorr_GSR*100,xform_red_GSR*100,...

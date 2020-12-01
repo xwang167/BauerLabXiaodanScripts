@@ -33,10 +33,10 @@ import mouse.*
 % %
 % %
 % %
- excelRows = [124,126,127];
+ excelRows = [129,133,141,143];%[124,126,127];
 %
 %
- excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
+excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
 numMice = length(excelRows);
 
 miceName = [];
@@ -71,79 +71,79 @@ end
 % for ii = 20
 % %      eval(strcat('gcampCorrMatrix_mice_',num2str(ii),' = zeros(128,128,1200,length(beta),length(excelRows));'));
 % %     k = 1;
-%     for excelRow = excelRows
-%         systemInfo.gbox = 5;
-%         systemInfo.gsigma = 1.2;
-%         
-%         [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':U',num2str(excelRow)]);
-%         
-%         rawdataloc = excelRaw{3};
-%         recDate = excelRaw{1}; recDate = string(recDate);
-%         mouseName = excelRaw{2}; mouseName = string(mouseName);
-%         saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-%         
-%         sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-%         sessionInfo.darkFrameNum = excelRaw{15};
-%         info.nVx = 128;
-%         info.nVy = 128;
-%         sessionInfo.miceType = excelRaw{17};
-%         systemType =excelRaw{5};
-%         sessionInfo.stimblocksize = excelRaw{11};
-%         sessionInfo.stimbaseline=excelRaw{12};
-%         sessionInfo.stimduration = excelRaw{13};
-%         sessionInfo.stimFrequency = excelRaw{16};
-%         sessionInfo.framerate = excelRaw{7};
-%         info.freqout=1;
-%         miceName = strcat(miceName,'-',mouseName);
-%         maskDir = saveDir;
-%         maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-%         
-%         load(fullfile(maskDir,maskName),'xform_isbrain');
-%         %processedName_mouse = strcat(recDate,'-',mouseName,'-',sessionType,'_processed_mouse','.mat');
-%        
-%         
-%         disp('loading processed data')
-%         
-%         
-%     eval(strcat('gcampCorrMatrix_mouse_',num2str(ii),' = zeros(128,128,1200,length(beta),3);'));
-%    
-%         
-%         for n =  1:3
-%             processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
-%             load(fullfile(saveDir,processedName),'xform_datahb','xform_gcamp','E_in', 'E_out', 'op_in', 'op_out')
-%             dpIn = op_in.dpf/2;
-%             dpOut = op_out.dpf/2;
-%             eval(strcat('gcampCorrMatrix_',num2str(ii),' = zeros(128,128,1200, length(beta));'));
-%             for jj = 1:length(beta)
-%                 xform_gcampCorr = correctHb_differentBeta(xform_gcamp,xform_datahb,[E_in(1) E_out(1)],[E_in(2) E_out(2)],dpIn,dpOut,factorMatrix{ii,jj}(1),factorMatrix{ii,jj}(2));
-%                 xform_gcampCorr = process.smoothImage(xform_gcampCorr,systemInfo.gbox,systemInfo.gsigma);
-%                 xform_gcampCorr = reshape(xform_gcampCorr,128,128,1200,[]);
-%                 xform_gcampCorr = mean(xform_gcampCorr,4);
-%                 eval(strcat('gcampCorrMatrix_',num2str(ii),'(:,:,:,jj) = xform_gcampCorr;'));
-%                 disp(num2str(factorMatrix{ii,jj}))
-%             end
-%             
-%             eval(strcat('gcampCorrMatrix_mouse_',num2str(ii),'(:,:,:,:,n) = gcampCorrMatrix_',num2str(ii),';'))
-%             correctName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed_Correction','.mat');
-%             if ii == 1
-%                 eval(strcat('save(fullfile(saveDir,correctName),',char(39),'gcampCorrMatrix_',num2str(ii),char(39),',',char(39),'-v7.3',char(39),');'))
-%             else
-%                 eval(strcat('save(fullfile(saveDir,correctName),',char(39),'gcampCorrMatrix_',num2str(ii),char(39),',',char(39),'-append',char(39),');'))
-%             end
-%            eval(strcat('clear gcampCorrMatrix_',num2str(ii)))
-%         end
-%         eval(strcat('gcampCorrMatrix_mouse_',num2str(ii),' = mean(gcampCorrMatrix_mouse_',num2str(ii),',5);'))
-%         processedName_mouse_Correct =strcat(recDate,'-',mouseName,'-',sessionType,'_processed_mouse_Correction','.mat');
-%         
-%         if ii ==1
-%             eval(strcat('save(fullfile(saveDir,processedName_mouse_Correct),',char(39),'gcampCorrMatrix_mouse_',num2str(ii),char(39),',',char(39),'-v7.3',char(39),');'))
-%         else
-%             eval(strcat('save(fullfile(saveDir,processedName_mouse_Correct),',char(39),'gcampCorrMatrix_mouse_',num2str(ii),char(39),',',char(39),'-append',char(39),');'))
-%         end
-% eval(strcat('clear gcampCorrMatrix_mouse_',num2str(ii)))
-%         eval(strcat('gcampCorrMatrix_mice_',num2str(ii),'(:,:,:,:,k) = gcampCorrMatrix_mouse_',num2str(ii),';'));
-%         k = k+1;
-%     end
+    for excelRow = excelRows
+        systemInfo.gbox = 5;
+        systemInfo.gsigma = 1.2;
+        
+        [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':U',num2str(excelRow)]);
+        
+        rawdataloc = excelRaw{3};
+        recDate = excelRaw{1}; recDate = string(recDate);
+        mouseName = excelRaw{2}; mouseName = string(mouseName);
+        saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+        
+        sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+        sessionInfo.darkFrameNum = excelRaw{15};
+        info.nVx = 128;
+        info.nVy = 128;
+        sessionInfo.miceType = excelRaw{17};
+        systemType =excelRaw{5};
+        sessionInfo.stimblocksize = excelRaw{11};
+        sessionInfo.stimbaseline=excelRaw{12};
+        sessionInfo.stimduration = excelRaw{13};
+        sessionInfo.stimFrequency = excelRaw{16};
+        sessionInfo.framerate = excelRaw{7};
+        info.freqout=1;
+        miceName = strcat(miceName,'-',mouseName);
+        maskDir = saveDir;
+        maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+        
+        load(fullfile(maskDir,maskName),'xform_isbrain');
+        %processedName_mouse = strcat(recDate,'-',mouseName,'-',sessionType,'_processed_mouse','.mat');
+       
+        
+        disp('loading processed data')
+        
+        
+    eval(strcat('gcampCorrMatrix_mouse_',num2str(ii),' = zeros(128,128,1200,length(beta),3);'));
+   
+        
+        for n =  1:3
+            processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
+            load(fullfile(saveDir,processedName),'xform_datahb','xform_gcamp','E_in', 'E_out', 'op_in', 'op_out')
+            dpIn = op_in.dpf/2;
+            dpOut = op_out.dpf/2;
+            eval(strcat('gcampCorrMatrix_',num2str(ii),' = zeros(128,128,1200, length(beta));'));
+            for jj = 1:length(beta)
+                xform_gcampCorr = correctHb_differentBeta(xform_gcamp,xform_datahb,[E_in(1) E_out(1)],[E_in(2) E_out(2)],dpIn,dpOut,factorMatrix{ii,jj}(1),factorMatrix{ii,jj}(2));
+                xform_gcampCorr = process.smoothImage(xform_gcampCorr,systemInfo.gbox,systemInfo.gsigma);
+                xform_gcampCorr = reshape(xform_gcampCorr,128,128,1200,[]);
+                xform_gcampCorr = mean(xform_gcampCorr,4);
+                eval(strcat('gcampCorrMatrix_',num2str(ii),'(:,:,:,jj) = xform_gcampCorr;'));
+                disp(num2str(factorMatrix{ii,jj}))
+            end
+            
+            eval(strcat('gcampCorrMatrix_mouse_',num2str(ii),'(:,:,:,:,n) = gcampCorrMatrix_',num2str(ii),';'))
+            correctName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed_Correction','.mat');
+            if ii == 1
+                eval(strcat('save(fullfile(saveDir,correctName),',char(39),'gcampCorrMatrix_',num2str(ii),char(39),',',char(39),'-v7.3',char(39),');'))
+            else
+                eval(strcat('save(fullfile(saveDir,correctName),',char(39),'gcampCorrMatrix_',num2str(ii),char(39),',',char(39),'-append',char(39),');'))
+            end
+           eval(strcat('clear gcampCorrMatrix_',num2str(ii)))
+        end
+        eval(strcat('gcampCorrMatrix_mouse_',num2str(ii),' = mean(gcampCorrMatrix_mouse_',num2str(ii),',5);'))
+        processedName_mouse_Correct =strcat(recDate,'-',mouseName,'-',sessionType,'_processed_mouse_Correction','.mat');
+        
+        if ii ==1
+            eval(strcat('save(fullfile(saveDir,processedName_mouse_Correct),',char(39),'gcampCorrMatrix_mouse_',num2str(ii),char(39),',',char(39),'-v7.3',char(39),');'))
+        else
+            eval(strcat('save(fullfile(saveDir,processedName_mouse_Correct),',char(39),'gcampCorrMatrix_mouse_',num2str(ii),char(39),',',char(39),'-append',char(39),');'))
+        end
+eval(strcat('clear gcampCorrMatrix_mouse_',num2str(ii)))
+        eval(strcat('gcampCorrMatrix_mice_',num2str(ii),'(:,:,:,:,k) = gcampCorrMatrix_mouse_',num2str(ii),';'));
+        k = k+1;
+    end
 % %     eval(strcat('gcampCorrMatrix_mice_',num2str(ii),' = mean(gcampCorrMatrix_mice_',num2str(ii),',5);'));
 % %     
 % %     
@@ -272,6 +272,7 @@ jj = 1;
 
          figure('units','normalized','outerposition',[0.1 0.3 0.7 0.4]);
     subplot('position', [0.1 0.1 0.2 0.8])
+    
 imagesc(peakMap(:,:,ii,jj)/max(max(peakMap(:,:,ii,jj))),[-1 1])
 title('')
 axis image off

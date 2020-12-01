@@ -427,7 +427,7 @@ load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','WL')
 
 traceImage(oxy_downsampled_blocks,total_downsampled_blocks,deoxy_downsampled_blocks,...
     'HbO','Total','HbR',oxy_active,total_active,deoxy_active,'r','k','b',ROI,'\Delta\muM',...
-    stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[0.5,0.3,0.2])
+    stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[2,1.5,0.5])
 
 
 texttitle2 = strcat(' Block Average for ', {' '},texttitle);
@@ -471,7 +471,7 @@ if ~isempty(jrgeco1a)
     
     traceImage(jrgeco1a_downsampled_blocks,jrgeco1aCorr_downsampled_blocks,red_downsampled_blocks,...
         'jrgeco1a','jrgeco1aCorr','625nm Reflectance',jrgeco1a_active,jrgeco1aCorr_active,red_active,'m','k','r',ROI,'\DeltaF/F%',...
-        stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[2 2.4 0.1])
+        stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[1 1 0.3])
     
     
     

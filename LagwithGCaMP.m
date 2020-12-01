@@ -92,7 +92,7 @@ for excelRow = excelRows
             xform_total_filtered,xform_gcampCorr_filtered,edgeLen,validRange,corrThr, true,true);
         lagTimeTrial_HbTCalcium_ori = lagTimeTrial_HbTCalcium_ori./sessionInfo.framerate;
         
-        clear clear xform_total_filtered xform_FADCorr_filtered xform_gcampCorr_filtered
+        clear clear xform_total_filtered  xform_gcampCorr_filtered
         figure;
         colormap jet;
         subplot(2,1,1); imagesc(lagTimeTrial_HbTCalcium_ori,tLim); axis image off;h = colorbar;ylabel(h,'t(s)');title('HbT Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);
@@ -117,17 +117,10 @@ load('D:\OIS_Process\noVasculaturemask.mat')
 
 lagTimeTrial_HbTCalcium_ori_mice_mean = zeros(128,128,length(excelRows));
 lagAmpTrial_HbTCalcium_ori_mice_mean = zeros(128,128,length(excelRows));
-lagTimeTrial_FADCalcium_mice_mean = zeros(128,128,length(excelRows));
-lagAmpTrial_FADCalcium_mice_mean = zeros(128,128,length(excelRows));
-lagTimeTrial_HbTFAD_mice_mean = zeros(128,128,length(excelRows));
-lagAmpTrial_HbTFAD_mice_mean = zeros(128,128,length(excelRows));
+
 
 lagTimeTrial_HbTCalcium_ori_mice_median = zeros(128,128,length(excelRows));
 lagAmpTrial_HbTCalcium_ori_mice_median = zeros(128,128,length(excelRows));
-lagTimeTrial_FADCalcium_mice_median = zeros(128,128,length(excelRows));
-lagAmpTrial_FADCalcium_mice_median = zeros(128,128,length(excelRows));
-lagTimeTrial_HbTFAD_mice_median = zeros(128,128,length(excelRows));
-lagAmpTrial_HbTFAD_mice_median = zeros(128,128,length(excelRows));
 
 
 
@@ -163,8 +156,7 @@ for excelRow = excelRows
     %save(fullfile(mask_newDir_new,mask_newName_new),'xform_isbrain')
     lagTimeTrial_HbTCalcium_ori_mouse = zeros(128,128,length(runs));
     lagAmpTrial_HbTCalcium_ori_mouse = zeros(128,128,length(runs));
-    lagTimeTrial_FADCalcium_mouse = zeros(128,128,length(runs));
-    lagAmpTrial_FADCalcium_mouse = zeros(128,128,length(runs));
+    
     processedName_mouse = strcat(recDate,'-',mouseName,'-',sessionType,'_processed.mat');
 
     for n = runs
@@ -302,3 +294,17 @@ lagTime_HbTCalcium_ori = nanmean(lagTimeTrial_HbTCalcium_ori_mice_median(logical
 lagTime_HbTFAD = nanmean(lagTimeTrial_HbTFAD_mice_median(logical(mask_new)));
 lagTime_FADCalcium = nanmean(lagTimeTrial_FADCalcium_mice_median(logical(mask_new)));
 
+
+
+
+
+
+
+
+figure;
+colormap jet;
+subplot(2,1,1); imagesc(lagTimeTrial_HbTCalcium_mice,tLim); axis image off;h = colorbar;ylabel(h,'t(s)');title('HbT Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+subplot(2,1,2); imagesc(lagAmpTrial_HbTCalcium_mice,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+suptitle(strcat(recDate,'-',miceName,'-',sessionType,'-median',' 0.02-2Hz'))
+saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_Lag_ori_median.png')));
+saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_Lag_ori_median.fig')));
