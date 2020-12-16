@@ -5,7 +5,7 @@ import mouse.*
 
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
 
-excelRows = 229;
+excelRows = [229];
 
 runs = 2;
 isDetrend = 1;
@@ -275,7 +275,7 @@ nVx = 128;
 
 
 
-
+% 
 %%%%%process raw to trace
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
@@ -371,9 +371,9 @@ for excelRow = excelRows
         maskName = strcat(recDate,'-N8M864-opto3-LandmarksAndMask','.mat');
         load(fullfile(maskDir,maskName),'affineMarkers','xform_isbrain','isbrain')
     else
-        maskDir = strcat('J:\RGECO\Kenny\', recDate, '\');
-        if exist(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-datahb.mat')),'file')
-            load(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-datahb.mat')),'xform_isbrain');
+        maskDir = strcat('L:\RGECO\Kenny\', recDate, '\');
+        if exist(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-dataFluor.mat')),'file')
+            load(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-dataFluor.mat')),'xform_isbrain');
             load(fullfile(maskDir,strcat(recDate,'-',mouseName,'-','LandmarksAndMask.mat')),'affineMarkers')
         else
             maskDir = saveDir;
@@ -416,14 +416,14 @@ for excelRow = excelRows
                 
                 
                 %             disp('substract dark frame again, needes to delete')
-                %             if size(rawdata,4)~=(sessionInfo.framerate*600) && (size(rawdata,4)~=sessionInfo.framerate*300)
-                %                 darkFrameInd = 2:sessionInfo.darkFrameNum/size(rawdata,3);
-                %                 darkFrame = squeeze(mean(rawdata(:,:,:,darkFrameInd),4));
-                %                 raw_baselineMinus = rawdata - repmat(darkFrame,1,1,1,size(rawdata,4));
-                %                 clear rawdata
-                %                 raw_baselineMinus(:,:,:,1:sessionInfo.darkFrameNum/size(raw_baselineMinus,3))=[];
-                %                 rawdata = raw_baselineMinus;
-                %             end
+                            if size(rawdata,4)~=(sessionInfo.framerate*600) && (size(rawdata,4)~=sessionInfo.framerate*300)
+                                darkFrameInd = 2:sessionInfo.darkFrameNum/size(rawdata,3);
+                                darkFrame = squeeze(mean(rawdata(:,:,:,darkFrameInd),4));
+                                raw_baselineMinus = rawdata - repmat(darkFrame,1,1,1,size(rawdata,4));
+                                clear rawdata
+                                raw_baselineMinus(:,:,:,1:sessionInfo.darkFrameNum/size(raw_baselineMinus,3))=[];
+                                rawdata = raw_baselineMinus;
+                            end
                 
                 
                 
@@ -483,7 +483,7 @@ for excelRow = excelRows
                 baselineValues = BaselineFunction(baselineValues);
                 xform_datahb = mouse.process.procOIS(xform_raw(:,:,sessionInfo.hbSpecies,:),baselineValues(:,:,sessionInfo.hbSpecies),op.dpf,E);
                 xform_datahb = process.smoothImage(xform_datahb,systemInfo.gbox,systemInfo.gsigma); % spatially smooth data
-                save(fullfile(saveDir,processedName),'xform_datahb','sessionInfo','systemInfo','op','E','-v7.3')
+                save(fullfile(saveDir,processedName),'xform_datahb','sessionInfo','systemInfo','op','E','-append')
                 
                 
                 if strcmp(char(sessionInfo.mouseType),'gcamp6f')||strcmp(char(sessionInfo.mouseType),'jrgeco1a')||strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto3')||strcmp(char(sessionInfo.mouseType),'Gopto3')||strcmp(char(sessionInfo.mouseType),'Wopto3')
@@ -600,16 +600,17 @@ for excelRow = excelRows
     systemType =excelRaw{5};
     maskDir_new = saveDir;
     rawdataloc = excelRaw{3};
-    %maskDir = strcat('J:\RGECO\Kenny\', recDate, '\');
+   
     
     
     sessionInfo.framerate = excelRaw{7};
     systemInfo.numLEDs = 4;
-    maskName_new = strcat(recDate,'-N8M864-1hz-opto3-LandmarksAndMask','.mat');
-    %maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datahb','.mat');
-    %load(fullfile(maskDir,maskName), 'xform_isbrain')
+    %maskName_new = strcat(recDate,'-N8M864-1hz-opto3-LandmarksAndMask','.mat');
+    maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-dataFluor','.mat');
+    maskDir = strcat('L:\RGECO\Kenny\', recDate, '\');
+    load(fullfile(maskDir,maskName), 'xform_isbrain')
     %save(fullfile(maskDir_new,maskName_new),'xform_isbrain')
-    load(fullfile(rawdataloc,recDate,maskName_new), 'xform_isbrain')
+    %load(fullfile(rawdataloc,recDate,maskName_new), 'xform_isbrain')
     xform_isbrain = double(xform_isbrain);
     if ~isempty(find(isnan(xform_isbrain), 1))
         xform_isbrain(isnan(xform_isbrain))=0;
@@ -652,7 +653,7 @@ for excelRow = excelRows
                         sessionInfo.bandtype_ISA = {"ISA",0.009,0.08};
                         sessionInfo.bandtype_Delta = {"Delta",0.4,4};
                         total = squeeze(xform_datahb(:,:,1,:)) + squeeze(xform_datahb(:,:,2,:));
-                        clear xform_datahb
+               
                         %                         disp('calculate pds')
                         
                         [hz,powerdata_jrgeco1aCorr] = QCcheck_CalcPDS(real(double(xform_jrgeco1aCorr))/0.01,sessionInfo.framerate,xform_isbrain);
@@ -669,7 +670,7 @@ for excelRow = excelRows
                         [~,powerdata_average_oxy] = QCcheck_CalcPDSAverage(double(xform_datahb(:,:,1,:))*10^6,sessionInfo.framerate,xform_isbrain);
                         [~,powerdata_average_deoxy] = QCcheck_CalcPDSAverage(double(xform_datahb(:,:,2,:))*10^6,sessionInfo.framerate,xform_isbrain);
                         
-                        
+                        clear xform_datahb
                         
                         
                         disp('calculate power map')

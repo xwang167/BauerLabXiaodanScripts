@@ -107,8 +107,8 @@ load('D:\OIS_Process\noVasculaturemask.mat')
 
 
 
-excelRows = [181,183,185,228,232,236];%[195 202 204 181 183 185];[181,183,185,228,232,236];%
-miceCat = 'Awake RGECO';
+excelRows = [195 202 204 230 234 240]; %[181,183,185,228,232,236];%[195 202 204 181 183 185];[181,183,185,228,232,236];%
+miceCat = 'Anes RGECO';
 
 runs = 1:3;
 
@@ -330,8 +330,47 @@ save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_processe
     'lagTimeTrial_GSR_0p02_2_HbTCalcium_mice_median', 'lagAmpTrial_GSR_0p02_2_HbTCalcium_mice_median','lagTimeTrial_GSR_0p02_2_FADCalcium_mice_median', 'lagAmpTrial_GSR_0p02_2_FADCalcium_mice_median', 'lagTimeTrial_GSR_0p02_2_HbTFAD_mice_median', 'lagAmpTrial_GSR_0p02_2_HbTFAD_mice_median',...
     '-append');
 
+load('D:\OIS_Process\noVasculatureMask.mat')
 
 
 lagTime_HbTCalcium_GSR_0p02_2 = nanmean(lagTimeTrial_GSR_0p02_2_HbTCalcium_mice_median(logical(mask_new)));
 lagTime_HbTFAD_GSR_0p02_2 = nanmean(lagTimeTrial_GSR_0p02_2_HbTFAD_mice_median(logical(mask_new)));
 lagTime_FADCalcium_GSR_0p02_2 = nanmean(lagTimeTrial_GSR_0p02_2_FADCalcium_mice_median(logical(mask_new)));
+
+lagTime_HbTCalcium = nanmean(lagTimeTrial_HbTCalcium_mice_median(logical(mask_new)));
+lagTime_HbTFAD = nanmean(lagTimeTrial_HbTFAD_mice_median(logical(mask_new)));
+lagTime_FADCalcium = nanmean(lagTimeTrial_FADCalcium_mice_median(logical(mask_new)));
+
+load('191030--R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-fc_processed.mat', 'lagTimeTrial_ISA_FADCalcium_mice_median')
+load('191030--R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-fc_processed.mat', 'lagTimeTrial_ISA_HbTCalcium_mice_median')
+load('191030--R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-fc_processed.mat', 'lagTimeTrial_ISA_HbTFAD_mice_median')
+load('191030--R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-fc_processed.mat', 'lagAmpTrial_GSR_0p02_2_HbTFAD_mice_median')
+load('191030--R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-fc_processed.mat', 'lagTimeTrial_GSR_0p02_2_FADCalcium_mice_median')
+load('191030--R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-fc_processed.mat', 'lagTimeTrial_GSR_0p02_2_HbTCalcium_mice_median')
+
+figure
+GSRdivideNoGSR_HbTCalcium = lagTimeTrial_GSR_0p02_2_HbTCalcium_mice_median./lagTimeTrial_HbTCalcium_mice_median;
+imagesc(GSRdivideNoGSR_HbTCalcium,[0.5 1.5])
+colormap jet
+colorbar
+title('GSR/NoGSR HbT Calcium')
+axis image off
+set(gca,'FontSize',14,'FontWeight','Bold')
+
+figure
+GSRdivideNoGSR_FADCalcium = lagTimeTrial_GSR_0p02_2_FADCalcium_mice_median./lagTimeTrial_FADCalcium_mice_median;
+imagesc(GSRdivideNoGSR_FADCalcium,[0.5 1.5])
+colormap jet
+colorbar
+title('GSR/NoGSR FAD Calcium')
+axis image off
+set(gca,'FontSize',14,'FontWeight','Bold')
+
+figure
+GSRdivideNoGSR_HbTFAD = lagTimeTrial_GSR_0p02_2_HbTFAD_mice_median./lagTimeTrial_HbTFAD_mice_median;
+imagesc(GSRdivideNoGSR_HbTFAD,[0.5 1.5])
+colormap jet
+colorbar
+title('GSR/NoGSR HbT FAD')
+axis image off
+set(gca,'FontSize',14,'FontWeight','Bold')
