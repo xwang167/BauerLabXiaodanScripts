@@ -291,6 +291,10 @@ if ~isempty(goodBlocks)
     cMax = max(abs([oxy_active,deoxy_active,total_active]),[],'all');
     
     
+    if ~isempty(jrgeco1a)
+            
+            fMax = max(abs(jrgeco1aCorr_active),[],'all');
+    end
     
     if ~isempty(greenFluor)
         
@@ -317,6 +321,9 @@ if ~isempty(goodBlocks)
     if ~isempty(jrgeco1a)
         
         plot(x,jrgeco1aCorr_active,'m-');
+        
+        ylim([-1.1*fMax 1.1*fMax])
+        ylabel('Fluorescence(\DeltaF/F)','FontSize',12);
         
         hold on
         
@@ -372,7 +379,7 @@ if ~isempty(goodBlocks)
     
     hold on
     
-    for i  = 0:1/ stimFreq: stimduration-1/ stimFreq
+    for i  = [0, stimduration-1/ stimFreq]
         
         line([ stimbaseline/ framerate+i  stimbaseline/ framerate+i],[-1.3*cMax 1.3*cMax]);
         
@@ -380,9 +387,11 @@ if ~isempty(goodBlocks)
         
     end
     
-    if ~isempty(jrgeco1a)
+    if ~isempty(jrgeco1a)&&~isempty(greenFluor)
         
         legend('jRGECO1aCorr','greenFluorCorr','HbO','HbR','Total','location','southeast')
+    elseif ~isempty(jrgeco1a)&&isempty(greenFluor)
+        legend('jRGECO1aCorr','HbO','HbR','Total','location','southeast')
         
     elseif ~isempty(greenFluor)
         

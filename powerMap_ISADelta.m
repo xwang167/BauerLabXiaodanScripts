@@ -1,117 +1,117 @@
-% for ii = 1:9
-%     
-%     saveDir_cat = 'K:\Glucose\cat\';
-%     load(strcat('K:\Glucose\cat\200313--R9M3-R9M2911-R9M2912-R8M2-R8M2498-R9M2-R8M3-fc',num2str(ii),'.mat'),'R_total_ISA_mice','R_jrgeco1aCorr_ISA_mice','R_FADCorr_ISA_mice',...
-%         'R_total_Delta_mice','R_jrgeco1aCorr_Delta_mice','R_FADCorr_Delta_mice',...
-%         'Rs_total_ISA_mice','Rs_jrgeco1aCorr_ISA_mice','Rs_FADCorr_ISA_mice',...
-%         'Rs_total_Delta_mice','Rs_jrgeco1aCorr_Delta_mice','Rs_FADCorr_Delta_mice','xform_isbrain_mice')
-%    visName = strcat('Glucose_SeedFC-fc',num2str(ii));
-%   refseeds=GetReferenceSeeds;
-%                 refseeds = refseeds(1:14,:);
-%                 refseeds(3,1) = 42;
-%                 refseeds(3,2) = 88;
-%                 refseeds(4,1) = 87;
-%                 refseeds(4,2) = 88;
-%                 refseeds(9,1) = 18;
-%                 refseeds(9,2) = 66;
-%                 refseeds(10,1) = 111;
-%                 refseeds(10,2) = 66;
-%         
-%       QCcheck_fcVis(refseeds,R_jrgeco1aCorr_ISA_mice, Rs_jrgeco1aCorr_ISA_mice(1:14,1:14),'jrgeco1aCorr','m','ISA',saveDir_cat,visName,true,xform_isbrain_mice)
-%         QCcheck_fcVis(refseeds,R_FADCorr_ISA_mice, Rs_FADCorr_ISA_mice(1:14,1:14),'FADCorr','g','ISA',saveDir_cat,visName,true,xform_isbrain_mice)
-%         QCcheck_fcVis(refseeds,R_total_ISA_mice, Rs_total_ISA_mice(1:14,1:14),'total','k','ISA',saveDir_cat,visName,true,xform_isbrain_mice)
-%         
-%         QCcheck_fcVis(refseeds,R_jrgeco1aCorr_Delta_mice, Rs_jrgeco1aCorr_Delta_mice(1:14,1:14),'jrgeco1aCorr','m','Delta',saveDir_cat,visName,true,xform_isbrain_mice)
-%         QCcheck_fcVis(refseeds,R_FADCorr_Delta_mice, Rs_FADCorr_Delta_mice(1:14,1:14),'FADCorr','g','Delta',saveDir_cat,visName,true,xform_isbrain_mice)
-%         QCcheck_fcVis(refseeds,R_total_Delta_mice, Rs_total_Delta_mice(1:14,1:14),'total','k','Delta',saveDir_cat,visName,true,xform_isbrain_mice)
-% 
-% end
-
-
-
-
-% for ii = 1:9
-%     load(strcat('K:\Glucose\cat\200313--R9M3-R9M2911-R9M2912-R8M2-R8M2498-R9M2-R8M3-fc',num2str(ii),'.mat'),'total_Delta_powerMap_mice','total_ISA_powerMap_mice',...
-%         'FADCorr_Delta_powerMap_mice','FADCorr_ISA_powerMap_mice', 'jrgeco1aCorr_Delta_powerMap_mice','jrgeco1aCorr_ISA_powerMap_mice','xform_isbrain_mice')
-%    
-%   figure('units','normalized','outerposition',[0 0 0.5 0.7]);
-%     subplot(2,3,1)
-%     powerMapVis(jrgeco1aCorr_ISA_powerMap_mice,'(\DeltaF/F%)',-20,0)
-%     title('Corr jRGECO1a')
-%     
-%     subplot(2,3,2)
-%     
-%     
-%     powerMapVis(FADCorr_ISA_powerMap_mice,'(\DeltaF/F%)',-20,0)
-%      title('Corr FAD')
-%     
-%     subplot(2,3,3)
-%     
-%     powerMapVis(total_ISA_powerMap_mice,'(\muM)',-20,0)
-%     
-%     title('Total')
-%     
-%     subplot(2,3,4)
-%      powerMapVis(jrgeco1aCorr_Delta_powerMap_mice,'(\DeltaF/F%)',-20,0)
-%     
-%     
-%     subplot(2,3,5)
-%     
-%     powerMapVis(FADCorr_Delta_powerMap_mice,'(\DeltaF/F%)',-20,0)
-%     
-%     
-%     subplot(2,3,6)
-%      powerMapVis(total_Delta_powerMap_mice,'(\muM)',-20,0)
-%      
-%      suptitle(strcat('Glucose Power Map',num2str(ii)))
-%      
-%      saveas(gcf,strcat('K:\Glucose\cat\Glucose_PowerMap-fc',num2str(ii),'.png'));
-%      saveas(gcf,strcat('K:\Glucose\cat\Glucose_PowerMap-fc',num2str(ii),'fig'));
-% end
-% 
+% % for ii = 1:9
+% %     
+% %     saveDir_cat = 'K:\Glucose\cat\';
+% %     load(strcat('K:\Glucose\cat\200313--R9M3-R9M2911-R9M2912-R8M2-R8M2498-R9M2-R8M3-fc',num2str(ii),'.mat'),'R_total_ISA_mice','R_jrgeco1aCorr_ISA_mice','R_FADCorr_ISA_mice',...
+% %         'R_total_Delta_mice','R_jrgeco1aCorr_Delta_mice','R_FADCorr_Delta_mice',...
+% %         'Rs_total_ISA_mice','Rs_jrgeco1aCorr_ISA_mice','Rs_FADCorr_ISA_mice',...
+% %         'Rs_total_Delta_mice','Rs_jrgeco1aCorr_Delta_mice','Rs_FADCorr_Delta_mice','xform_isbrain_mice')
+% %    visName = strcat('Glucose_SeedFC-fc',num2str(ii));
+% %   refseeds=GetReferenceSeeds;
+% %                 refseeds = refseeds(1:14,:);
+% %                 refseeds(3,1) = 42;
+% %                 refseeds(3,2) = 88;
+% %                 refseeds(4,1) = 87;
+% %                 refseeds(4,2) = 88;
+% %                 refseeds(9,1) = 18;
+% %                 refseeds(9,2) = 66;
+% %                 refseeds(10,1) = 111;
+% %                 refseeds(10,2) = 66;
+% %         
+% %       QCcheck_fcVis(refseeds,R_jrgeco1aCorr_ISA_mice, Rs_jrgeco1aCorr_ISA_mice(1:14,1:14),'jrgeco1aCorr','m','ISA',saveDir_cat,visName,true,xform_isbrain_mice)
+% %         QCcheck_fcVis(refseeds,R_FADCorr_ISA_mice, Rs_FADCorr_ISA_mice(1:14,1:14),'FADCorr','g','ISA',saveDir_cat,visName,true,xform_isbrain_mice)
+% %         QCcheck_fcVis(refseeds,R_total_ISA_mice, Rs_total_ISA_mice(1:14,1:14),'total','k','ISA',saveDir_cat,visName,true,xform_isbrain_mice)
+% %         
+% %         QCcheck_fcVis(refseeds,R_jrgeco1aCorr_Delta_mice, Rs_jrgeco1aCorr_Delta_mice(1:14,1:14),'jrgeco1aCorr','m','Delta',saveDir_cat,visName,true,xform_isbrain_mice)
+% %         QCcheck_fcVis(refseeds,R_FADCorr_Delta_mice, Rs_FADCorr_Delta_mice(1:14,1:14),'FADCorr','g','Delta',saveDir_cat,visName,true,xform_isbrain_mice)
+% %         QCcheck_fcVis(refseeds,R_total_Delta_mice, Rs_total_Delta_mice(1:14,1:14),'total','k','Delta',saveDir_cat,visName,true,xform_isbrain_mice)
 % % 
-set(0,'DefaultFigureRenderer','painters')
-% processedName_mice = '191030--R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-fc.mat';
-% miceName = 'R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake';
-
+% % end
+% 
+% 
+% 
+% 
+% % for ii = 1:9
+% %     load(strcat('K:\Glucose\cat\200313--R9M3-R9M2911-R9M2912-R8M2-R8M2498-R9M2-R8M3-fc',num2str(ii),'.mat'),'total_Delta_powerMap_mice','total_ISA_powerMap_mice',...
+% %         'FADCorr_Delta_powerMap_mice','FADCorr_ISA_powerMap_mice', 'jrgeco1aCorr_Delta_powerMap_mice','jrgeco1aCorr_ISA_powerMap_mice','xform_isbrain_mice')
+% %    
+% %   figure('units','normalized','outerposition',[0 0 0.5 0.7]);
+% %     subplot(2,3,1)
+% %     powerMapVis(jrgeco1aCorr_ISA_powerMap_mice,'(\DeltaF/F%)',-20,0)
+% %     title('Corr jRGECO1a')
+% %     
+% %     subplot(2,3,2)
+% %     
+% %     
+% %     powerMapVis(FADCorr_ISA_powerMap_mice,'(\DeltaF/F%)',-20,0)
+% %      title('Corr FAD')
+% %     
+% %     subplot(2,3,3)
+% %     
+% %     powerMapVis(total_ISA_powerMap_mice,'(\muM)',-20,0)
+% %     
+% %     title('Total')
+% %     
+% %     subplot(2,3,4)
+% %      powerMapVis(jrgeco1aCorr_Delta_powerMap_mice,'(\DeltaF/F%)',-20,0)
+% %     
+% %     
+% %     subplot(2,3,5)
+% %     
+% %     powerMapVis(FADCorr_Delta_powerMap_mice,'(\DeltaF/F%)',-20,0)
+% %     
+% %     
+% %     subplot(2,3,6)
+% %      powerMapVis(total_Delta_powerMap_mice,'(\muM)',-20,0)
+% %      
+% %      suptitle(strcat('Glucose Power Map',num2str(ii)))
+% %      
+% %      saveas(gcf,strcat('K:\Glucose\cat\Glucose_PowerMap-fc',num2str(ii),'.png'));
+% %      saveas(gcf,strcat('K:\Glucose\cat\Glucose_PowerMap-fc',num2str(ii),'fig'));
+% % end
+% % 
+% % % 
+% set(0,'DefaultFigureRenderer','painters')
+% % processedName_mice = '191030--R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-fc.mat';
+% % miceName = 'R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake';
+% 
 processedName_mice = '191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-fc.mat';
 miceName = 'R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes';
-saveDir_cat = 'D:\RGECO\cat';
+saveDir_cat = 'L:\RGECO\cat';
 
-saveDir_cat = 'D:\RGECO\cat';
-load(fullfile(saveDir_cat, processedName_mice),'total_Delta_powerMap_GSR_mice','total_ISA_powerMap_GSR_mice',...
-        'FADCorr_Delta_powerMap_GSR_mice','FADCorr_ISA_powerMap_GSR_mice', 'jrgeco1aCorr_Delta_powerMap_GSR_mice','jrgeco1aCorr_ISA_powerMap_GSR_mice','xform_isbrain_mice')
-   
-%   figure('units','normalized','outerposition',[0 0 0.5 0.7]);
-%     subplot(2,3,1)
-    powerMapVis(jrgeco1aCorr_ISA_powerMap_GSR_mice,'(\DeltaF/F%)',-10,0)
-    title('Corr jRGECO1a ISA')
-    
-    %subplot(2,3,2)
-    
-    
-    powerMapVis(FADCorr_ISA_powerMap_GSR_mice,'(\DeltaF/F%)',-10,0)
-     title('Corr FAD ISA')
-    
-   % subplot(2,3,3)
-    
-    powerMapVis(total_ISA_powerMap_GSR_mice,'(\muM)',-10,0)
-    
-    title('Total ISA')
-    
-   % subplot(2,3,4)
-     powerMapVis(jrgeco1aCorr_Delta_powerMap_GSR_mice,'(\DeltaF/F%)',-10,0)
-    title('Corr jRGECO1a Delta')
-    
-   % subplot(2,3,5)
-    
-    powerMapVis(FADCorr_Delta_powerMap_GSR_mice,'(\DeltaF/F%)',-10,0)
-     title('Corr FAD Delta')
-    
-    %subplot(2,3,6)
-     powerMapVis(total_Delta_powerMap_GSR_mice,'(\muM)',-10,0)
-
-
+% saveDir_cat = 'D:\RGECO\cat';
+% load(fullfile(saveDir_cat, processedName_mice),'total_Delta_powerMap_GSR_mice','total_ISA_powerMap_GSR_mice',...
+%         'FADCorr_Delta_powerMap_GSR_mice','FADCorr_ISA_powerMap_GSR_mice', 'jrgeco1aCorr_Delta_powerMap_GSR_mice','jrgeco1aCorr_ISA_powerMap_GSR_mice','xform_isbrain_mice')
+%    
+% %   figure('units','normalized','outerposition',[0 0 0.5 0.7]);
+% %     subplot(2,3,1)
+%     powerMapVis(jrgeco1aCorr_ISA_powerMap_GSR_mice,'(\DeltaF/F%)',-10,0)
+%     title('Corr jRGECO1a ISA')
+%     
+%     %subplot(2,3,2)
+%     
+%     
+%     powerMapVis(FADCorr_ISA_powerMap_GSR_mice,'(\DeltaF/F%)',-10,0)
+%      title('Corr FAD ISA')
+%     
+%    % subplot(2,3,3)
+%     
+%     powerMapVis(total_ISA_powerMap_GSR_mice,'(\muM)',-10,0)
+%     
+%     title('Total ISA')
+%     
+%    % subplot(2,3,4)
+%      powerMapVis(jrgeco1aCorr_Delta_powerMap_GSR_mice,'(\DeltaF/F%)',-10,0)
+%     title('Corr jRGECO1a Delta')
+%     
+%    % subplot(2,3,5)
+%     
+%     powerMapVis(FADCorr_Delta_powerMap_GSR_mice,'(\DeltaF/F%)',-10,0)
+%      title('Corr FAD Delta')
+%     
+%     %subplot(2,3,6)
+%      powerMapVis(total_Delta_powerMap_GSR_mice,'(\muM)',-10,0)
+% 
+% 
 
 
 
@@ -153,7 +153,7 @@ load(fullfile(saveDir_cat, processedName_mice),'total_Delta_powerMap_mice','tota
 
 processedName_mice = '191030--R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-fc.mat';
 miceName = 'R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake';
-saveDir_cat = 'D:\RGECO\cat';
+saveDir_cat = 'L:\RGECO\cat';
 load(fullfile(saveDir_cat, processedName_mice),'total_Delta_powerMap_mice','total_ISA_powerMap_mice',...
         'FADCorr_Delta_powerMap_mice','FADCorr_ISA_powerMap_mice', 'jrgeco1aCorr_Delta_powerMap_mice','jrgeco1aCorr_ISA_powerMap_mice','xform_isbrain_mice')
 load('D:\OIS_Process\noVasculaturemask.mat')
@@ -172,7 +172,7 @@ jrgeco1aCorr_Delta_powerMap_mice_mean_awake = mean(jrgeco1aCorr_Delta_powerMap_m
 
 processedName_mice = '191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-fc.mat';
 miceName = 'R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes';
-saveDir_cat = 'D:\RGECO\cat';
+saveDir_cat = 'L:\RGECO\cat';
 load(fullfile(saveDir_cat, processedName_mice),'total_Delta_powerMap_mice','total_ISA_powerMap_mice',...
         'FADCorr_Delta_powerMap_mice','FADCorr_ISA_powerMap_mice', 'jrgeco1aCorr_Delta_powerMap_mice','jrgeco1aCorr_ISA_powerMap_mice','xform_isbrain_mice')
 load('D:\OIS_Process\noVasculaturemask.mat')
@@ -208,7 +208,7 @@ b_ISA.CData(3,:) = [0 0 0];
 xlim([0.5,3.5])
 yticks([0 0.2 0.4 0.6])
 set(findall(gca, 'Type', 'Line'),'LineWidth',2);
-set(gca,'FontSize',18,'FontWeight','Bold')
+set(gca,'FontSize',14,'FontWeight','Bold')
 %xlabel('Contrasts')
 %ylabel('Awake/Anesthetized Power Ratio')
 title('ISA')
@@ -223,15 +223,18 @@ b_Delta.CData(3,:) = [0 0 0];
 %xticklabels({'Corrected jRGECO1a','Corrected FAD','HbT'})
 xtickangle(0)
 set(gca,'LineWidth',2)
-set(gca,'FontSize',18,'FontWeight','Bold')
+set(gca,'FontSize',14,'FontWeight','Bold')
 %xlabel('Contrasts')
 %ylabel('Awake/Anesthetized Power Ratio')
 xlim([0.5,3.5])
+ylim([0 32])
+yticks([1 5 25 30])
+
 title('Delta')
 xlimVal = get(gca,'xlim');
 hold on
 plot(xlimVal,[1 1],'b--','LineWidth',2)
-
+ breakyaxis([6 24])
 
 
 
@@ -283,6 +286,15 @@ saveas(gcf,fullfile(saveDir,strcat(Name,'.png')));
 saveas(gcf,fullfile(saveDir,strcat(Name,'.fig')));
 
 
+
+
+
+figure
+cb = colorbar( 'EastOutside','AxisLocation','out',...
+    'FontSize',15,'fontweight','bold');
+cb.Ruler.MinorTick = 'on';
+set(cb,'YTick',[-10 -5 0]);
+colormap(mycolormap);
 function powerMapVis(powerMap,unit,minVal,maxVal)
 
 load('D:\OIS_Process\noVasculaturemask.mat')
@@ -301,6 +313,7 @@ figure('Position', [50 50 200 300])
 % ylabel(cb,[unit,'^2'],'FontSize',12)
 mask = leftMask+rightMask;
 powerMap = powerMap.*mask;
+mask_new = logical(mask_new)
 imagesc(10*log10(powerMap/max(powerMap(mask_new),[],'all')),[minVal maxVal]);
 cb = colorbar( 'SouthOutside','AxisLocation','out',...
     'FontSize',15,'fontweight','bold');
@@ -312,7 +325,8 @@ load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xfor
 
 imagesc(xform_WL,'AlphaData',1-mask);
 %imagesc(xform_WL,'AlphaData',1-xform_isbrain.*cerebralmask_new);
-colormap spring
+mycolormap = customcolormap(linspace(0,1,11), {'#a60126','#d7302a','#f36e43','#faac5d','#fedf8d','#fcffbf','#d7f08b','#a5d96b','#68bd60','#1a984e','#006936'});
+colormap(mycolormap);
 axis image off
 %title(titleName,'fontsize',14,'Interpreter', 'none')
 end

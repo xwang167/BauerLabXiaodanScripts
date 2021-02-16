@@ -3,7 +3,7 @@ close all;clearvars;clc
 
 import mouse.*
 
-excelRows =  [380,382,384];%,229,233,237%,
+excelRows =  [367,371,375,397,401,409];%,229,233,237%,
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
 numMice = length(excelRows);
 
@@ -32,6 +32,7 @@ xform_jrgeco1aCorr_mice_NoGSR = [];
 xform_red_mice_GSR = [];
 xform_red_mice_NoGSR = [];
 
+xform_Laser_mice = [];
 %  xform_FAD_mice_GSR = [];
 %  xform_FAD_mice_NoGSR = [];
 %
@@ -83,7 +84,7 @@ for excelRow = excelRows
     
     mouseName = char(mouseName);
     maskDir = rawdataloc;
-    maskName = strcat(recDate,'-',mouseName(1:16),mouseName((end-4):end),'-LandmarksAndMask','.mat');
+    maskName = strcat(recDate,'-',mouseName(1:end-9),'-opto3-LandmarksAndMask','.mat');
     
     load(fullfile(maskDir,recDate,maskName),'xform_isbrain');
 %     xform_isbrain = ones(128,128);
@@ -170,7 +171,10 @@ for excelRow = excelRows
         % %
         %
     elseif strcmp(char(sessionInfo.miceType),'jrgeco1a-opto3')
-        
+        load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'1_processed','.mat')),'xform_Laser')
+        numBlocks = 10;
+        xform_Laser = reshape(xform_Laser,128,128,[],numBlocks);
+        xform_Laser_mice = cat(4,xform_Laser_mice,xform_Laser);
         disp('loading  GRS data')
         sessionInfo.stimblocksize = excelRaw{11};
         load(fullfile(saveDir,processedName_mouse),...
@@ -336,6 +340,7 @@ elseif strcmp(char(sessionInfo.miceType),'jrgeco1a')
     %
     %     clear xofrm_datahb_mice_GSR xform_jrgeco1a_mice_GSR xform_jrgeco1aCorr_mice_GSR xform_red_mice_GSR  xform_FAD_mice_GSR xform_FADCorr_mice_GSR xform_green_mice_GSR
 elseif strcmp(char(sessionInfo.miceType),'jrgeco1a-opto3')
+    xform_Laser_mice = mean(xform_Laser_mice,4);
     xform_jrgeco1a_mice_NoGSR = mean(xform_jrgeco1a_mice_NoGSR,4);
     xform_jrgeco1aCorr_mice_NoGSR = mean(xform_jrgeco1aCorr_mice_NoGSR,4);
     xform_red_mice_NoGSR = mean(xform_red_mice_NoGSR,4);
@@ -356,31 +361,59 @@ elseif strcmp(char(sessionInfo.miceType),'jrgeco1a-opto3')
     numDesample = factor*1;
     
     
-    peakMap_ROI = mean(xform_jrgeco1aCorr_mice_NoGSR(:,:,sessionInfo.stimbaseline+1:sessionInfo.stimbaseline+sessionInfo.stimduration*sessionInfo.framerate),3);   
-   figure
-   colormap jet
-    imagesc(peakMap_ROI,[-0.006 0.006])
-    axis image off
+           peakMap_ROI = mean(xform_Laser_mice(:,:, sessionInfo.stimbaseline+1:sessionInfo.stimbaseline+sessionInfo.stimduration*sessionInfo.framerate),3);
+        figure
+        imagesc(peakMap_ROI)
+        axis image off
+        colormap jet
+        [X,Y] = meshgrid(1:128,1:128);
+        
+        %         [x1,y1] = ginput(1);
+        %         [x2,y2] = ginput(1);
+        %
+        %         radius = sqrt((x1-x2)^2+(y1-y2)^2);
+        %
+        %         ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
+        %         min_ROI = prctile(peakMap_ROI(ROI),1);
+        %         temp = double(peakMap_ROI).*double(ROI);
+        %         ROI = temp<min_ROI*0.75;
+        [~,I] = max(peakMap_ROI,[],'all','linear');
+        [y1,x1] = ind2sub([128 128],I);
+        radius = 5;
+        hold on
+        ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
+        max_ROI = prctile(peakMap_ROI(ROI),99);
+        temp = double(peakMap_ROI).*double(ROI);
+        ROI = temp>max_ROI*0.30;
+        ROI_contour = bwperim(ROI);
+        [~,c] = contour( ROI_contour,'k');
+        c.LineWidth = 0.001; 
     
-    [X,Y] = meshgrid(1:128,1:128);
-        
-        [x1,y1] = ginput(1);
-        [x2,y2] = ginput(1);
-        
-        radius = sqrt((x1-x2)^2+(y1-y2)^2);
-   
-    ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
-    min_ROI = prctile(peakMap_ROI(ROI),1);
-    temp = double(peakMap_ROI).*double(ROI);
-    ROI = temp<min_ROI*0.75;
-    hold on
-    ROI_contour = bwperim(ROI);
-     contour( ROI_contour)   
+%     peakMap_ROI = mean(xform_jrgeco1aCorr_mice_NoGSR(:,:,sessionInfo.stimbaseline+1:sessionInfo.stimbaseline+sessionInfo.stimduration*sessionInfo.framerate),3);   
+%    figure
+%    colormap jet
+%     imagesc(peakMap_ROI,[-0.01 0.01])
+%     axis image off
+%     
+%     [X,Y] = meshgrid(1:128,1:128);
+%         
+%         [x1,y1] = ginput(1);
+%         [x2,y2] = ginput(1);
+%         
+%         radius = sqrt((x1-x2)^2+(y1-y2)^2);
+%    
+%     ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
+%     min_ROI = prctile(peakMap_ROI(ROI),1);
+%     temp = double(peakMap_ROI).*double(ROI);
+%     ROI = temp<min_ROI*0.75;
+%     hold on
+%     ROI_contour = bwperim(ROI);
+%      contour( ROI_contour)   
     
     
     [~,ROI_NoGSR] =  QC_stim(squeeze(xform_datahb_mice_NoGSR(:,:,1,:))*10^6,squeeze(xform_datahb_mice_NoGSR(:,:,2,:))*10^6,...
         [],[],[],xform_jrgeco1a_mice_NoGSR*100,xform_jrgeco1aCorr_mice_NoGSR*100,xform_red_mice_NoGSR*100,...
-        xform_isbrain_mice,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,ROI_contour);
+        xform_isbrain_mice,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,ROI_contour,[]);
     %
 %     clear xform_datahb_mice_NoGSR xform_jrgeco1a_mice_NoGSR xform_jrgeco1aCorr_mice_NoGSR xform_red_mice_NoGSR  xform_FAD_mice_NoGSR xform_FADCorr_mice_NoGSR xform_green_mice_NoGSR
     
@@ -407,7 +440,7 @@ elseif strcmp(char(sessionInfo.miceType),'jrgeco1a-opto3')
     disp('QC on GSR stim')
     QC_stim(squeeze(xform_datahb_mice_GSR(:,:,1,:))*10^6,squeeze(xform_datahb_mice_GSR(:,:,2,:))*10^6,...
         [],[],[],xform_jrgeco1a_mice_GSR*100,xform_jrgeco1aCorr_mice_GSR*100,xform_red_mice_GSR*100,...
-        xform_isbrain_mice,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_GSR,output_GSR,ROI_contour);
+        xform_isbrain_mice,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_GSR,output_GSR,ROI_contour,[]);
     
 %     clear xofrm_datahb_mice_GSR xform_jrgeco1a_mice_GSR xform_jrgeco1aCorr_mice_GSR xform_red_mice_GSR  xform_FAD_mice_GSR xform_FADCorr_mice_GSR xform_green_mice_GSR
     

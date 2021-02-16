@@ -59,7 +59,7 @@ legend(h,{'Corrected jRGECO1a/4','Corrected FAD','HbT'},'location','northwest','
 %     pause
 % end
 % 
-% for ii = 4385:11:4385+11*9;
+% for ii = 4460:11:4460+11*9;
 %     
 %     figure('Position', [50 50 200 300])
 %     colormap cool;
@@ -72,7 +72,7 @@ legend(h,{'Corrected jRGECO1a/4','Corrected FAD','HbT'},'location','northwest','
 % set(cb,'YTick',[-2.5 0 2.5]);
 % 
 % 
-% for ii = 4385:11:4385+11*9;
+% for ii = 4460:11:4460+11*9;
 %     figure('Position', [50 50 200 300])
 %     colormap viridis;
 %     imagesc(FAD_filter(:,:,ii)*100.*mask,[-1 1]);hold on;axis image off;imagesc(WB,'AlphaData',1-mask);title(num2str((ii-3769)/25));
@@ -85,7 +85,7 @@ legend(h,{'Corrected jRGECO1a/4','Corrected FAD','HbT'},'location','northwest','
 % set(cb,'YTick',[-0.7 0 0.7]);
 % 
 % 
-% for ii = 4385:11:4385+11*9;
+% for ii = 4460:11:4460+11*9;
 %     figure('Position', [50 50 200 300])
 %     colormap inferno;imagesc(Hb_filter(:,:,1,ii).*mask*10^6,[-10 10]);hold on;imagesc(WB,'AlphaData',1-mask);axis image off;
 %     title(num2str((ii-3769)/25));

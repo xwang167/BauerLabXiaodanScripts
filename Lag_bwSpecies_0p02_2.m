@@ -81,6 +81,7 @@ for excelRow = excelRows
                                     xform_total_filtered,xform_FADCorr_filtered,edgeLen,validRange,corrThr, true,true);
                                 lagTimeTrial_HbTFAD= lagTimeTrial_HbTFAD./fs;
                                 
+                                
                 clear clear xform_total_filtered xform_FADCorr_filtered xform_jrgeco1aCorr_filtered
                                 figure;
                                 colormap jet;

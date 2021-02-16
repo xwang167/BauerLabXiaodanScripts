@@ -28,7 +28,9 @@ load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xfor
 
 imagesc(xform_WL,'AlphaData',1-mask);
 %imagesc(xform_WL,'AlphaData',1-xform_isbrain.*cerebralMask);
-colormap jet
+ mycolormap = customcolormap(linspace(0,1,11), {'#a60126','#d7302a','#f36e43','#faac5d','#fedf8d','#fcffbf','#d7f08b','#a5d96b','#68bd60','#1a984e','#006936'});
+colormap(mycolormap);
+axis off;
 axis image off
 title(titleName,'fontsize',14,'Interpreter', 'none')
 saveas(gcf,fullfile(saveDir,strcat(titleName,'_FCpowerMap.png')));

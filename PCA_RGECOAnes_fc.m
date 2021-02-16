@@ -11,7 +11,7 @@ load('L:\RGECO\190710\190710-R5M2285-anes-fc1_processed.mat', 'xform_jrgeco1aCor
  mask = logical(leftMask+rightMask);
  xform_jrgeco1aCorr = reshape(xform_jrgeco1aCorr,[],14999);
  xform_jrgeco1aCorr = xform_jrgeco1aCorr(logical(mask),:);
- [coeff,score,latent,tsquared,explained,mu] = pca(xform_jrgeco1aCorr,'NumComponents',20);
+ [coeff,score,latent,tsquared,explained,mu] = pca(xform_jrgeco1aCorr);
   [coeff_def,score_def,latent_def,tsquared_def,explained_def,mu_def] = pca(xform_jrgeco1aCorr);
   
  deltaWave = score(:,1)*coeff(:,1)' + score(:,2)*coeff(:,2)' + score(:,3)*coeff(:,3)';

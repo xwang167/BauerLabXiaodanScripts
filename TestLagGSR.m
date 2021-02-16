@@ -5,6 +5,44 @@ fs =25;
 time = (1:14999)/fs;
 xform_FADCorr_GSR_filtered = mouse.freq.filterData(double(xform_FADCorr_GSR),0.02,2,fs);
 xform_jrgeco1aCorr_GSR_filtered = mouse.freq.filterData(double(xform_jrgeco1aCorr_GSR),0.02,2,fs);
+edgeLen =1;
+tZone = 4;
+corrThr = 0;
+validRange = - edgeLen: round(tZone*fs);
+load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
+load('D:\OIS_Process\noVasculaturemask.mat')
+[lagTimeTrial_FADCalcium, lagAmpTrial_FADCalcium,covResult_FADCalcium] = mouse.conn.dotLag(...
+    xform_FADCorr_GSR_filtered(:,:,200*25:500*25),xform_jrgeco1aCorr_GSR_filtered(:,:,200*25:500*25),edgeLen,validRange,corrThr, true,true);
+lagTimeTrial_FADCalcium = lagTimeTrial_FADCalcium./25;
+imagesc(lagTimeTrial_FADCalcium,[0 1])
+colormap jet
+hold on;imagesc(xform_WL,'AlphaData',1-mask_new);
+axis image off
+colorbar
+
+[lagTimeTrial_FADCalcium_old, lagAmpTrial_FADCalcium,covResult_FADCalcium] = mouse.conn.dotLag(...
+    xform_FADCorr_GSR_filtered(:,:,200*25:end),xform_jrgeco1aCorr_GSR_filtered(:,:,200*25:end),edgeLen,validRange,corrThr, true,true);
+lagTimeTrial_FADCalcium = lagTimeTrial_FADCalcium./25;
+imagesc(lagTimeTrial_FADCalcium,[0 1])
+colormap jet
+hold on;imagesc(xform_WL,'AlphaData',1-mask_new);
+axis image off
+colorbar
+
+[lagTimeTrial_FADCalcium_new, lagAmpTrial_FADCalcium,covResult_FADCalcium] = dotLag_xw(...
+    xform_FADCorr_GSR_filtered,xform_jrgeco1aCorr_GSR_filtered,edgeLen,validRange,corrThr, true,true,0.5*fs);
+
+[lagTimeTrial_FADCalcium, lagAmpTrial_FADCalcium,covResult_FADCalcium] = mouse.conn.dotLag(...
+    xform_FADCorr_GSR_filtered,xform_jrgeco1aCorr_GSR_filtered,edgeLen,validRange,corrThr, true,true);
+lagTimeTrial_FADCalcium = lagTimeTrial_FADCalcium./25;
+imagesc(lagTimeTrial_FADCalcium,[0 1])
+colormap jet
+hold on;imagesc(xform_WL,'AlphaData',1-mask_new);
+axis image off
+colorbar
+
+
+
 figure
 plot(time,normr(transpose(squeeze(xform_FADCorr_GSR_filtered(56,107,:)))),'g')
 hold on
@@ -16,28 +54,19 @@ tZone = 4;
 corrThr = 0;
 validRange = - edgeLen: round(tZone*fs);
 
-[lagTime,lagAmp,covResultPix]...
+[lagTime,lagAmp,covResult,sign,lags]...
     = mouse.conn.findLag(squeeze(xform_FADCorr_GSR_filtered(56,107,:)),...
     squeeze(xform_jrgeco1aCorr_GSR_filtered(56,107,:)),...
     true,true,validRange,...
     edgeLen,corrThr);
 
- uiopen('L:\RGECO\190627\190627-R5M2285-fc2_Lag_GSR.fig',1)
-time = (1:14999)/25;
-hold on
-scatter(97,56,'filled','k')
-figure
-plot(time,normr(transpose(squeeze(xform_FADCorr_GSR_filtered(56,97,:)))),'g')
-hold on
-plot(time,normr(transpose(squeeze(xform_jrgeco1aCorr_GSR_filtered(56,97,:)))),'m')
-legend('Normalized Corrected FAD','Normalized Corrected RGECO')
-
-
-[lagTime,lagAmp,covResultPix]...
-    = mouse.conn.findLag(squeeze(xform_FADCorr_GSR_filtered(56,97,:)),...
-    squeeze(xform_jrgeco1aCorr_GSR_filtered(56,97,:)),...
+[lagTime,lagAmp,,covResult,sign,lags]...
+    = mouse.conn.findLag(squeeze(xform_FADCorr_GSR_filtered(56,107,200*25:500*25)),...
+    squeeze(xform_jrgeco1aCorr_GSR_filtered(56,107,200*25:500*25)),...
     true,true,validRange,...
     edgeLen,corrThr);
+
+
 
 
 
@@ -52,14 +81,41 @@ plot(time,normr(transpose(squeeze(xform_jrgeco1aCorr_GSR_filtered(56,102,:)))),'
 legend('Normalized Corrected FAD','Normalized Corrected RGECO')
 
 
-[lagTime,lagAmp,covResultPix]...
+[lagTime,lagAmp,covResult,sign,lags]...
     = mouse.conn.findLag(squeeze(xform_FADCorr_GSR_filtered(56,102,:)),...
     squeeze(xform_jrgeco1aCorr_GSR_filtered(56,102,:)),...
     true,true,validRange,...
     edgeLen,corrThr);
 
 
+[lagTime,lagAmp,covResult,sign,lags]...
+    = mouse.conn.findLag(squeeze(xform_FADCorr_GSR_filtered(56,102,200*25:end)),...
+    squeeze(xform_jrgeco1aCorr_GSR_filtered(56,102,200*25:end)),...
+    true,true,validRange,...
+    edgeLen,corrThr);
 
+
+uiopen('L:\RGECO\190627\190627-R5M2285-fc2_Lag_GSR.fig',1)
+time = (1:14999)/25;
+hold on
+scatter(97,56,'filled','k')
+figure
+plot(time,normr(transpose(squeeze(xform_FADCorr_GSR_filtered(56,97,:)))),'g')
+hold on
+plot(time,normr(transpose(squeeze(xform_jrgeco1aCorr_GSR_filtered(56,97,:)))),'m')
+legend('Normalized Corrected FAD','Normalized Corrected RGECO')
+
+
+[lagTime,lagAmp,covResult,sign,lags]...
+    = findLag_xw(squeeze(xform_FADCorr_GSR_filtered(56,97,:)),...
+    squeeze(xform_jrgeco1aCorr_GSR_filtered(56,97,:)),...
+    true,true,validRange,...
+    edgeLen,corrThr,fs*0.5);
+[lagTime,lagAmp,covResult,sign,lags]...
+    = mouse.conn.findLag(squeeze(xform_FADCorr_GSR_filtered(56,97,200*25:end)),...
+    squeeze(xform_jrgeco1aCorr_GSR_filtered(56,97,200*25:end)),...
+    true,true,validRange,...
+    edgeLen,corrThr);
 
 
 uiopen('L:\RGECO\190627\190627-R5M2285-fc2_Lag_GSR.fig',1)
@@ -73,12 +129,17 @@ plot(time,normr(transpose(squeeze(xform_jrgeco1aCorr_GSR_filtered(56,92,:)))),'m
 legend('Normalized Corrected FAD','Normalized Corrected RGECO')
 
 
-[lagTime,lagAmp,covResultPix]...
+[lagTime,lagAmp,covResult,sign,lags]...
     = mouse.conn.findLag(squeeze(xform_FADCorr_GSR_filtered(56,92,:)),...
     squeeze(xform_jrgeco1aCorr_GSR_filtered(56,92,:)),...
     true,true,validRange,...
     edgeLen,corrThr);
 
+[lagTime,lagAmp,covResult,sign,lags]...
+    = mouse.conn.findLag(squeeze(xform_FADCorr_GSR_filtered(56,92,200*25:end)),...
+    squeeze(xform_jrgeco1aCorr_GSR_filtered(56,92,200*25:end)),...
+    true,true,validRange,...
+    edgeLen,corrThr);
 
 uiopen('L:\RGECO\190627\190627-R5M2285-fc2_Lag_GSR.fig',1)
 time = (1:14999)/25;
@@ -91,105 +152,55 @@ plot(time,normr(transpose(squeeze(xform_jrgeco1aCorr_GSR_filtered(56,87,:)))),'m
 legend('Normalized Corrected FAD','Normalized Corrected RGECO')
 
 
-[lagTime,lagAmp,covResultPix]...
+[lagTime,lagAmp,covResult,sign,lags]...
     = mouse.conn.findLag(squeeze(xform_FADCorr_GSR_filtered(56,87,:)),...
     squeeze(xform_jrgeco1aCorr_GSR_filtered(56,87,:)),...
     true,true,validRange,...
     edgeLen,corrThr);
 
+[lagTime,lagAmp,covResult,sign,lags]...
+    = mouse.conn.findLag(squeeze(xform_FADCorr_GSR_filtered(56,87,200*25:500*25)),...
+    squeeze(xform_jrgeco1aCorr_GSR_filtered(56,87,200*25:500*25)),...
+    true,true,validRange,...
+    edgeLen,corrThr);
 
 
 
 
 
-load('190707-R5M2286-anes-fc1_processed.mat', 'lagTimeTrial_FADCalcium')
-load('190707-R5M2286-anes-fc1_processed.mat', 'xform_jrgeco1aCorr_GSR')
-load('190707-R5M2286-anes-fc1_processed.mat', 'xform_FADCorr_GSR')
+load('L:\RGECO\191030\191030-R6M2497-awake-fc1_processed.mat', 'lagTimeTrial_FADCalcium','xform_jrgeco1aCorr','xform_FADCorr')
 fs =25;
 time = (1:14999)/fs;
-xform_FADCorr_GSR_filtered = mouse.freq.filterData(double(xform_FADCorr_GSR),0.02,2,fs);
-xform_jrgeco1aCorr_GSR_filtered = mouse.freq.filterData(double(xform_jrgeco1aCorr_GSR),0.02,2,fs);
-figure
-plot(time,normr(transpose(squeeze(xform_FADCorr_GSR_filtered(81,10,:)))),'g')
-hold on
-plot(time,normr(transpose(squeeze(xform_jrgeco1aCorr_GSR_filtered(81,10,:)))),'m')
-legend('Normalized Corrected FAD','Normalized Corrected RGECO')
-xlabel('Time(s)')
+xform_FADCorr(isnan(xform_FADCorr)) = 0;
+xform_jrgeco1aCorr(isnan(xform_jrgeco1aCorr)) = 0;
+xform_FADCorr_filtered = mouse.freq.filterData(double(xform_FADCorr),0.02,2,fs);
+xform_jrgeco1aCorr_filtered = mouse.freq.filterData(double(xform_jrgeco1aCorr),0.02,2,fs);
 edgeLen =1;
 tZone = 4;
-corrThr = 0;
-validRange = - edgeLen: round(tZone*fs);
 
-[lagTime,lagAmp,covResultPix]...
-    = mouse.conn.findLag(squeeze(xform_FADCorr_GSR_filtered(81,10,:)),...
-    squeeze(xform_jrgeco1aCorr_GSR_filtered(81,10,:)),...
-    true,true,validRange,...
-    edgeLen,corrThr);
-
- uiopen('L:\RGECO\190707\190707-R5M2286-anes-fc1_Lag_GSR.fig',1)
-time = (1:14999)/25;
-hold on
-scatter(20,81,'filled','k')
+[lagTimeTrial_FADCalcium_old_NoGSR, lagAmpTrial_FADCalcium,covResult_FADCalcium] = mouse.conn.dotLag(...
+    xform_FADCorr_filtered,xform_jrgeco1aCorr_filtered,edgeLen,validRange,corrThr, true,true);
+lagTimeTrial_FADCalcium = lagTimeTrial_FADCalcium./25;
 figure
-plot(time,normr(transpose(squeeze(xform_FADCorr_GSR_filtered(81,20,:)))),'g')
-hold on
-plot(time,normr(transpose(squeeze(xform_jrgeco1aCorr_GSR_filtered(81,20,:)))),'m')
-legend('Normalized Corrected FAD','Normalized Corrected RGECO')
+imagesc(lagTimeTrial_FADCalcium_old/25,[0 1])
+colormap jet
+hold on;imagesc(xform_WL,'AlphaData',1-mask_new);
+axis image off
+colorbar
+title('Old')
 
-
-[lagTime,lagAmp,covResultPix]...
-    = mouse.conn.findLag(squeeze(xform_FADCorr_GSR_filtered(81,20,:)),...
-    squeeze(xform_jrgeco1aCorr_GSR_filtered(81,20,:)),...
-    true,true,validRange,...
-    edgeLen,corrThr);
-
-
-
- uiopen('L:\RGECO\190707\190707-R5M2286-anes-fc1_Lag_GSR.fig',1)
-hold on
-scatter(15,81,'filled','k')
+[lagTimeTrial_FADCalcium_new_NoGSR, lagAmpTrial_FADCalcium,covResult_FADCalcium] = dotLag_xw(...
+    xform_FADCorr_filtered,xform_jrgeco1aCorr_filtered,edgeLen,validRange,corrThr, true,true,fs);
 figure
-plot(time,normr(transpose(squeeze(xform_FADCorr_GSR_filtered(81,15,:)))),'g')
-hold on
-plot(time,normr(transpose(squeeze(xform_jrgeco1aCorr_GSR_filtered(81,15,:)))),'m')
-legend('Normalized Corrected FAD','Normalized Corrected RGECO')
+imagesc(lagTimeTrial_FADCalcium_new_NoGSR/25,[0 1])
+colormap jet
+hold on;imagesc(xform_WL,'AlphaData',1-mask_new);
+axis image off
+colorbar
+title('New')
 
-
-[lagTime,lagAmp,covResultPix]...
-    = mouse.conn.findLag(squeeze(xform_FADCorr_GSR_filtered(81,15,:)),...
-    squeeze(xform_jrgeco1aCorr_GSR_filtered(81,15,:)),...
-    true,true,validRange,...
-    edgeLen,corrThr);
-
-
- uiopen('L:\RGECO\190707\190707-R5M2286-anes-fc1_Lag_GSR.fig',1)
-hold on
-scatter(25,81,'filled','k')
-figure
-plot(time,normr(transpose(squeeze(xform_FADCorr_GSR_filtered(81,25,:)))),'g')
-hold on
-plot(time,normr(transpose(squeeze(xform_jrgeco1aCorr_GSR_filtered(81,25,:)))),'m')
-legend('Normalized Corrected FAD','Normalized Corrected RGECO')
-
-
-[lagTime,lagAmp,covResultPix]...
-    = mouse.conn.findLag(squeeze(xform_FADCorr_GSR_filtered(81,25,:)),...
-    squeeze(xform_jrgeco1aCorr_GSR_filtered(81,25,:)),...
-    true,true,validRange,...
-    edgeLen,corrThr);
-
- uiopen('L:\RGECO\190707\190707-R5M2286-anes-fc1_Lag_GSR.fig',1)
-hold on
-scatter(30,81,'filled','k')
-figure
-plot(time,normr(transpose(squeeze(xform_FADCorr_GSR_filtered(81,30,:)))),'g')
-hold on
-plot(time,normr(transpose(squeeze(xform_jrgeco1aCorr_GSR_filtered(81,30,:)))),'m')
-legend('Normalized Corrected FAD','Normalized Corrected RGECO')
-
-
-[lagTime,lagAmp,covResultPix]...
-    = mouse.conn.findLag(squeeze(xform_FADCorr_GSR_filtered(81,30,:)),...
-    squeeze(xform_jrgeco1aCorr_GSR_filtered(81,30,:)),...
+[lagTime,lagAmp,covResult,sign,lags]...
+    = mouse.conn.findLag(squeeze(xform_FADCorr_filtered(97,112,:)),...
+    squeeze(xform_jrgeco1aCorr_filtered(97,112,:)),...
     true,true,validRange,...
     edgeLen,corrThr);

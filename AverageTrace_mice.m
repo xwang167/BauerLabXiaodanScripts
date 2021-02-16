@@ -3,7 +3,7 @@ close all;clearvars;clc
 
 import mouse.*
 
-excelRows =  [386,388,390];%,229,233,237%,
+excelRows =  [367,371,375,397,401,409];%,229,233,237%,
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
 numMice = length(excelRows);
 
@@ -28,7 +28,6 @@ ROI_jrgeco1a_mice_NoGSR = [];
 
 ROI_jrgeco1aCorr_mice_NoGSR = [];
 
-ROI_red_mice_GSR = [];
 ROI_red_mice_NoGSR = [];
 
 

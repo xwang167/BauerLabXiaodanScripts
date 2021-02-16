@@ -31,12 +31,10 @@ data(isnan(data)) = 0;
 data(isinf(data)) = 0;
 if isGSR
 disp('gsr');
-data = mouse.process.gsr(data,xform_isbrain.*mask);
+data = mouse.process.gsr(data,xform_isbrain);%.*mask);
 end
 disp(['filtering  with' num2str(freqRange(1)) '-' num2str(freqRange(2)) 'hz'])
 dataBandpass =mouse.freq.filterData(double(data),freqRange(1),freqRange(2),framerate);
-%         eval([dataBandpass, '=', dataBandpass,'.*xform_isbrain;']);
-%         eval([dataBandpass,'(isnan(',dataBandpass,')) = 0;']);
 dataBandpass=reshape(dataBandpass,nVy*nVx,[]);
 
 disp('Calculating R Rs')
