@@ -59,9 +59,9 @@ for excelRow = excelRows
 
                 %%comparing our NVC measures to Hillman (0.02-2)
                 disp('filtering')
-                xform_total_filtered = mouse.freq.filterData(double(xform_total),0.4,4,fs);
-                xform_FADCorr_filtered = mouse.freq.filterData(double(xform_FADCorr),0.4,4,fs);
-                xform_jrgeco1aCorr_filtered = mouse.freq.filterData(double(xform_jrgeco1aCorr),0.4,4,fs);
+                xform_total_filtered = mouse.freq.filterData(double(xform_total),0.009,0.08,fs);
+                xform_FADCorr_filtered = mouse.freq.filterData(double(xform_FADCorr),0.09,0.08,fs);
+                xform_jrgeco1aCorr_filtered = mouse.freq.filterData(double(xform_jrgeco1aCorr),0.009,0.08,fs);
                 edgeLen =1;
                 tZone = 4;
                 corrThr = 0;

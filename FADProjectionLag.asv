@@ -49,11 +49,9 @@ for excelRow = excelRows
             if strcmp(sessionInfo.mouseType,'jrgeco1a')
                 load(fullfile(saveDir, processedName),'xform_FADCorr')
                 %                 load(fullfile(saveDir, processedName),'xform_FADCorr','xform_jrgeco1aCorr')
-                xform_total = squeeze(xform_datahb(:,:,1,:)+ xform_datahb(:,:,2,:));
-                xform_total(isinf(xform_total)) = 0;
-                xform_total(isnan(xform_total)) = 0;
-                
-                clear xform_datahb
+                %                 xform_total = squeeze(xform_datahb(:,:,1,:)+ xform_datahb(:,:,2,:));
+                                xform_total(isinf(xform_total)) = 0;
+                                xform_total(isnan(xform_total)) = 0;
                 xform_FADCorr(isnan(xform_FADCorr)) = 0;
                 xform_FADCorr(isinf(xform_FADCorr)) = 0;
                 %                 xform_jrgeco1aCorr(isinf(xform_jrgeco1aCorr)) = 0;
@@ -76,7 +74,8 @@ for excelRow = excelRows
                 %                 [lagTime_Projection_Calcium_ISA,lagAmp_Projection_Calcium_ISA] = calcProjectionLag(squeeze(xform_jrgeco1aCorr),ISA(1),ISA(2),fs,edgeLen,validRange,corrThr);
                 %                 toc;
                 [lagTime_Projection_FAD_ISA,lagAmp_Projection_FAD_ISA] = calcProjectionLag(xform_FADCorr,ISA(1),ISA(2),fs,edgeLen,validRange,corrThr);
-                
+                xform_total = xform_datahb(:,:,1,:)+xform_datahb(:,:,2,:);
+                clear xform_datahb
                 [lagTime_Projection_total_ISA,lagAmp_Projection_total_ISA] = calcProjectionLag(xform_total,ISA(1),ISA(2),fs,edgeLen,validRange,corrThr);
                 %                 save(fullfile(saveDir,processedName),'lagTime_Projection_total_ISA', 'lagAmp_Projection_total_ISA','lagTime_Projection_FAD_ISA', 'lagAmp_Projection_FAD_ISA','lagTime_Projection_Calcium_ISA','lagAmp_Projection_Calcium_ISA','-append');
                 
@@ -98,7 +97,7 @@ for excelRow = excelRows
                 
                 %[lagTime_Projection_FAD_Delta,lagAmp_Projection_FAD_Delta] = calcProjectionLag(xform_FADCorr,Delta(1),Delta(2),fs,edgeLen,validRange,corrThr);
                 %                 [lagTime_Projection_Calcium_Delta,lagAmp_Projection_Calcium_Delta] = calcProjectionLag(squeeze(xform_jrgeco1aCorr),Delta(1),Delta(2),fs,edgeLen,validRange,corrThr);
-                
+               
                 
                 load(fullfile(saveDir,processedName),'lagTime_Projection_FAD_Delta', 'lagAmp_Projection_FAD_Delta');
                 
@@ -107,25 +106,25 @@ for excelRow = excelRows
                     'lagTime_Projection_FAD_ISA', 'lagAmp_Projection_FAD_ISA','-append');
                 figure
                 colormap jet
-                subplot(2,2,1); imagesc(lagTime_Projection_total_ISA,[-0.5 0.5]); axis image off;h = colorbar;ylabel(h,'t(s)');title('ISA');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
-                subplot(2,2,2); imagesc(lagTime_Projection_total_Delta,[-0.009 0.009]); axis image off;h = colorbar;ylabel(h,'t(s)');title('Delta');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
+                subplot(2,2,1); imagesc(lagTime_Projection_total_ISA,tLim_ISA); axis image off;h = colorbar;ylabel(h,'t(s)');title('ISA');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
+                subplot(2,2,2); imagesc(lagTime_Projection_total_Delta,tLim_Delta); axis image off;h = colorbar;ylabel(h,'t(s)');title('Delta');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
                 subplot(2,2,3); imagesc(lagAmp_Projection_total_ISA,rLim);axis image off;h = colorbar;ylabel(h,'r');title('Total');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
                 subplot(2,2,4); imagesc(lagAmp_Projection_total_Delta,rLim); axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
                 suptitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'total Projection Lag'))
-                saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_total_ProjLag.png')));
-                saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_total_ProjLag.fig')));
+                saveas(gcf,fullfile(saveDir_new,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_total_ProjLag.png')));
+                saveas(gcf,fullfile(saveDir_new,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_total_ProjLag.fig')));
                 
-                figure
+                                figure
                 colormap jet
-                subplot(2,2,1); imagesc(lagTime_Projection_FAD_ISA,[-1 1]); axis image off;h = colorbar;ylabel(h,'t(s)');title('ISA');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
-                subplot(2,2,2); imagesc(lagTime_Projection_FAD_Delta,[-0.5 0.5]); axis image off;h = colorbar;ylabel(h,'t(s)');title('Delta');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
+                subplot(2,2,1); imagesc(lagTime_Projection_FAD_ISA,tLim_ISA); axis image off;h = colorbar;ylabel(h,'t(s)');title('ISA');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
+                subplot(2,2,2); imagesc(lagTime_Projection_FAD_Delta,tLim_Delta); axis image off;h = colorbar;ylabel(h,'t(s)');title('Delta');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
                 subplot(2,2,3); imagesc(lagAmp_Projection_FAD_ISA,rLim);axis image off;h = colorbar;ylabel(h,'r');title('FAD');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
                 subplot(2,2,4); imagesc(lagAmp_Projection_FAD_Delta,rLim); axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
                 suptitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'FAD Projection Lag'))
-                saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_FAD_ProjLag.png')));
-                saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_FAD_ProjLag.fig')));
-                
-                
+                saveas(gcf,fullfile(saveDir_new,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_FAD_ProjLag.png')));
+                saveas(gcf,fullfile(saveDir_new,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_FAD_ProjLag.fig')));
+ 
+
             end
             close all
         end
@@ -445,7 +444,12 @@ for excelRow = excelRows
     lagAmp_Projection_total_ISA_mice_median(:,:,mouseInd) = lagAmp_Projection_total_ISA_mouse_median;
     lagTime_Projection_total_Delta_mice_median(:,:,mouseInd) = lagTime_Projection_total_Delta_mouse_median;
     lagAmp_Projection_total_Delta_mice_median(:,:,mouseInd) = lagAmp_Projection_total_Delta_mouse_median;
-
+    
+    
+    
+    
+    
+    
     mouseInd = mouseInd+1;
 end
 

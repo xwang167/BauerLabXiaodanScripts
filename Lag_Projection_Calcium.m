@@ -75,6 +75,17 @@ for excelRow = excelRows
                 [lagTime_Projection_Calcium_Delta,lagAmp_Projection_Calcium_Delta] = calcProjectionLag(squeeze(xform_jrgeco1aCorr),Delta(1),Delta(2),fs,edgeLen,validRange,corrThr);
              toc
                 save(fullfile(saveDir_new,processedName),'lagTime_Projection_Calcium_ISA','lagAmp_Projection_Calcium_ISA','lagTime_Projection_Calcium_Delta','lagAmp_Projection_Calcium_Delta');
+                
+                figure
+                colormap jet
+                subplot(2,2,1); imagesc(lagTime_Projection_FAD_ISA,tLim_ISA); axis image off;h = colorbar;ylabel(h,'t(s)');title('ISA');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
+                subplot(2,2,2); imagesc(lagTime_Projection_FAD_Delta,tLim_Delta); axis image off;h = colorbar;ylabel(h,'t(s)');title('Delta');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
+                subplot(2,2,3); imagesc(lagAmp_Projection_FAD_ISA,rLim);axis image off;h = colorbar;ylabel(h,'r');title('FAD');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
+                subplot(2,2,4); imagesc(lagAmp_Projection_FAD_Delta,rLim); axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
+                suptitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'FAD Projection Lag'))
+                saveas(gcf,fullfile(saveDir_new,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_FAD_ProjLag.png')));
+                saveas(gcf,fullfile(saveDir_new,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_FAD_ProjLag.fig')));
+                
                 figure;
                 colormap jet
                 subplot(2,2,1); imagesc(lagTime_Projection_Calcium_ISA,tLim_ISA); axis image off;h = colorbar;ylabel(h,'t(s)');title('ISA');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
@@ -84,6 +95,8 @@ for excelRow = excelRows
                 suptitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'jRGECO1aCorr Projection Lag'))
                 saveas(gcf,fullfile(saveDir_new,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_jRGECO1aCorr_ProjLag.png')));
                 saveas(gcf,fullfile(saveDir_new,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_jRGECO1aCorr_ProjLag.fig')));
+                
+                
                 close all
             end
             close all
