@@ -27,7 +27,7 @@ lagAmpProjectionMatrix = zeros(size(data,1),size(data,1));
 for ii = 1:size(data,1)
     for jj = 1:size(data,1)
         if mask(ii)==1 && mask(jj)==1
-            [lagTimeProjectionMatrix(ii,jj),lagAmpProjectionMatrix(ii,jj),~] = mouse.conn.findLag(...
+            [lagTimeProjectionMatrix(ii,jj),lagAmpProjectionMatrix(ii,jj)] = mouse.conn.findLag(...
                 data(ii,:),data(jj,:),true,true,validRange,edgeLen,corrThr);
             
         else

@@ -5,7 +5,7 @@ excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBa
 runs = 1:3;
 load('L:\RGECO\cat\191030--R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-stim_processed_mice','ROI_NoGSR')
 totalBlocksNum = 0;
-excelRows = [182 184 186 229 233];
+excelRows = [182 184 186 229 233];%
 ll = 1;
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
@@ -115,27 +115,17 @@ plot(time,TF/30)
 xform_jrgeco1aCorr_GSR_mice_goodBlocks = reshape(xform_jrgeco1aCorr_GSR_mice_goodBlocks,128,128,[]);
 peakMap_localMax = mean(xform_jrgeco1aCorr_GSR_mice_goodBlocks(:,:,TF),3);
 figure
-imagesc(peakMap_localMax.*xform_isbrain_mice*100,[-3 3])
-[X,Y] = meshgrid(1:128,1:128);
-[x1,y1] = ginput(1);
-[x2,y2] = ginput(1);
-
-radius = sqrt((x1-x2)^2+(y1-y2)^2);
-ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
-max_ROI = prctile(peakMap(ROI),99);
-temp = double(peakMap).*double(ROI);
-ROI = temp>max_ROI*0.50;
-
+imagesc(peakMap_localMax.*xform_isbrain_mice*100,[-2 2])
 
 hold on
-imagesc(xform_WL,'AlphaData', 1-ROI)
+imagesc(xform_WL,'AlphaData', 1-xform_isbrain_mice.*mask)
 
 h = colorbar('FontSize',15,'fontweight','bold');
-h.Ticks =  [-3 0 3];
+h.Ticks =  [-2 0 2];
 ylabel(h,'\DeltaF/F%','FontSize',15,'fontweight','bold');
 axis image off
-colormap jet
-title(['Corrected'  char(10) 'jRGECO1a'])
+colormap magma
+title(['jRGECO1a'])
 
 % peakMap = mean(xform_jrgeco1aCorr_GSR_mice_goodBlocks(:,:,126:250),3);
 % figure
@@ -156,7 +146,7 @@ title(['Corrected'  char(10) 'jRGECO1a'])
 xform_jrgeco1a_GSR_mice_goodBlocks = reshape(xform_jrgeco1a_GSR_mice_goodBlocks,128,128,[]);
 peakMap_localMax = mean(xform_jrgeco1a_GSR_mice_goodBlocks(:,:,TF),3);
 figure
-imagesc(peakMap_localMax.*xform_isbrain_mice*100,[-2.2 2.2])
+imagesc(peakMap_localMax.*xform_isbrain_mice*100,[-1 1])
 h = colorbar('FontSize',15,'fontweight','bold');
 h.Ticks =  [-2,0,2];
 ylabel(h,'\DeltaF/F%','FontSize',15,'fontweight','bold');
@@ -172,7 +162,7 @@ imagesc(xform_WL,'AlphaData',1-xform_isbrain_mice.*mask)
 
 axis image off
 title(['Raw' char(10) 'jRGECO1a'])
-colormap jet
+colormap magma
 
 
 % peakMap = mean(xform_jrgeco1a_GSR_mice_goodBlocks(:,:,126:250),3);
@@ -198,25 +188,11 @@ imagesc(peakMap.*xform_isbrain_mice*100,[-0.7,0.7])
 h = colorbar('FontSize',15,'fontweight','bold');
 h.Ticks =  [-0.7,0,0.7];
 ylabel(h,'\DeltaF/F%','FontSize',15,'fontweight','bold');
-[X,Y] = meshgrid(1:128,1:128);
-[x1,y1] = ginput(1);
-[x2,y2] = ginput(1);
-
-radius = sqrt((x1-x2)^2+(y1-y2)^2);
-ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
-max_ROI = prctile(peakMap(ROI),99);
-temp = double(peakMap).*double(ROI);
-ROI = temp>max_ROI*0.50;
-
-
 hold on
-imagesc(xform_WL,'AlphaData', 1-ROI)
-
-
-
-colormap jet
+imagesc(xform_WL,'AlphaData', 1-xform_isbrain_mice.*mask)
+colormap viridis
 axis image off
-title(['Corrected' char(10) 'FAD'])
+title('FAD')
 
 peakMap = mean(xform_FAD_GSR_mice_goodBlocks(:,:,126:250),3);
 figure
@@ -232,59 +208,49 @@ ylabel(h,'\DeltaF/F%','FontSize',15,'fontweight','bold');
 hold on
 imagesc(xform_WL,'AlphaData',1-xform_isbrain_mice.*mask)
 
-colormap jet
+colormap viridis
 axis image off
 title(['Raw' char(10) 'FAD'])
 %
-% peakMap = mean(xform_datahb_GSR_mice_goodBlocks(:,:,1,126:250)*10^6,4);
-% figure
-% imagesc(peakMap.*xform_isbrain_mice,[-0.6,0.6])
-% h = colorbar('FontSize',15,'fontweight','bold');
-% h.Ticks =  [-1,0,1];
-% ylabel(h,'\DeltaF/F%','FontSize',15,'fontweight','bold');
-% hold on
-%     imagesc(xform_WL,'AlphaData',1-xform_isbrain_mice.*mask)
-%
-% colormap jet
-% axis image off
-% title('Oxy from 5s to 10s')
-%
-% peakMap = mean(xform_datahb_GSR_mice_goodBlocks(:,:,2,126:250)*10^6,4);
-% figure
-% imagesc(peakMap.*xform_isbrain_mice,[-0.4,0.4])
-% h = colorbar('FontSize',15,'fontweight','bold');
-% h.Ticks =  [-0.4,0,0.4];
-% ylabel(h,'\DeltaF/F%','FontSize',15,'fontweight','bold');
-% hold on
-%     imagesc(xform_WL,'AlphaData',1-xform_isbrain_mice.*mask)
-%
-% colormap jet
-% axis image off
-% title('DeOxy from 5s to 10s')
+peakMap = mean(xform_datahb_GSR_mice_goodBlocks(:,:,1,126:250)*10^6,4);
+figure
+imagesc(peakMap.*xform_isbrain_mice,[-1,1])
+h = colorbar('FontSize',15,'fontweight','bold');
+h.Ticks =  [-1,0,1];
+ylabel(h,'\Delta\muM','FontSize',15,'fontweight','bold');
+hold on
+    imagesc(xform_WL,'AlphaData',1-xform_isbrain_mice.*mask)
 
-peakMap = mean(xform_datahb_GSR_mice_goodBlocks(:,:,1,126:250)*10^6+xform_datahb_GSR_mice_goodBlocks(:,:,2,126:250)*10^6,4);
+colormap jet
+axis image off
+title('Oxy from 5s to 10s')
+
+peakMap = mean(xform_datahb_GSR_mice_goodBlocks(:,:,2,126:250)*10^6,4);
 figure
 imagesc(peakMap.*xform_isbrain_mice,[-0.4,0.4])
 h = colorbar('FontSize',15,'fontweight','bold');
 h.Ticks =  [-0.4,0,0.4];
 ylabel(h,'\Delta\muM','FontSize',15,'fontweight','bold');
+hold on
+    imagesc(xform_WL,'AlphaData',1-xform_isbrain_mice.*mask)
+
+colormap jet
+axis image off
+title('DeOxy from 5s to 10s')
+
+peakMap = mean(xform_datahb_GSR_mice_goodBlocks(:,:,1,126:250)*10^6+xform_datahb_GSR_mice_goodBlocks(:,:,2,126:250)*10^6,4);
+figure
+imagesc(peakMap.*xform_isbrain_mice,[-0.6,0.6])
+h = colorbar('FontSize',15,'fontweight','bold');
+h.Ticks =  [-0.6,0,0.6];
+ylabel(h,'\Delta\muM','FontSize',15,'fontweight','bold');
 % hold on
 % barrel = AtlasSeeds == 9;
 % ROI_barrel =  bwperim(barrel);
 % contour(ROI_barrel,'k')
-[X,Y] = meshgrid(1:128,1:128);
-[x1,y1] = ginput(1);
-[x2,y2] = ginput(1);
-
-radius = sqrt((x1-x2)^2+(y1-y2)^2);
-ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
-max_ROI = prctile(peakMap(ROI),99);
-temp = double(peakMap).*double(ROI);
-ROI = temp>max_ROI*0.50;
-
 
 hold on
-imagesc(xform_WL,'AlphaData', 1-ROI)
+imagesc(xform_WL,'AlphaData', 1-xform_isbrain_mice.*mask)
 
 
 colormap jet

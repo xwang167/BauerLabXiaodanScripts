@@ -36,6 +36,12 @@ for excelRow = excelRows
     %load(fullfile(maskDir,maskName), 'xform_isbrain')
     %save(fullfile(maskDir_new,maskName_new),'xform_isbrain')
     maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+    if exist(fullfile(saveDir,maskName),'file')
+    maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+    else
+        maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datahb','.mat');
+    end
+    
     load(fullfile(saveDir,maskName),'xform_isbrain')
     
     saveDir_new =  fullfile(saveDir,'FilterFirst');

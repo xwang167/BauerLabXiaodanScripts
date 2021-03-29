@@ -1,8 +1,8 @@
-excelFile = 'D:\Colonna\ColonnaGCAMPtest.xlsx';
-excelRows = 2:7;
+excelFile = 'D:\Colonna\ColonnaGCAMP.xlsx';
+excelRows = 50:53;
 runsInfo = parseTiffRuns(excelFile,excelRows);
 import mouse.*
- runInd = 0;
+runInd = 0;
 runNum = numel(runsInfo);
 for runInfo = runsInfo;
     % this function gives an example of how excel file is read, the data is
@@ -29,15 +29,15 @@ for runInfo = runsInfo;
     %     rawdataloc = excelRaw{3};
     %     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
     
-      
+    
     %for runInd = runs % for each run
     runInd = runInd+1;
     disp(['Trial # ' num2str(runInd) '/' num2str(runNum)]);
     
-       load(runInfo.saveHbFile,'xform_datahb');
+    load(runInfo.saveHbFile,'xform_datahb');
     load(runInfo.saveFluorFile,'xform_datafluor','fluorTime')
-     [xform_datafluorDs, fluorTimeDs] = mouse.freq.resampledata(xform_datafluor,fluorTime,9);
-     muspFcn = @(x,y) (40*(x/500).^-1.16)'*y;
+    [xform_datafluorDs, fluorTimeDs] = mouse.freq.resampledata(xform_datafluor,fluorTime,9);
+    muspFcn = @(x,y) (40*(x/500).^-1.16)'*y;
     [op_in, E_in] = getHbOpticalProperties_xw(muspFcn,"C:\Users\xiaodanwang\Documents\GitHub\BauerLab\Matlab\parameters\+bauerParams\ledSpectra\M470nm_SPF_pol.txt");%fluorProcInfo.OpticalPropertyIn.LightSourceFiles);
     [op_out, E_out] = getHbOpticalProperties_xw(muspFcn,"C:\Users\xiaodanwang\Documents\GitHub\BauerLab\Matlab\parameters\+bauerParams\probeSpectra\gcamp6f_emission.txt");%fluorProcInfo.OpticalPropertyOut.LightSourceFiles);
     

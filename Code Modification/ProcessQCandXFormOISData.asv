@@ -1,0 +1,162 @@
+%% Get Masks and WL
+excelFiles="D:\Colonna\ColonnaGCAMPtest.xlsx";
+excelRows=[2:3];  % Rows from Excell Database
+runsInfo = parseTiffRuns(excelFiles,excelRows);
+
+%%Add prompt: do you want to do a mask for EACH run or for one
+%%"representative run?"
+
+
+[mice,start_ind_mouse,numruns_per_mouse]=unique({runsInfo.mouseName});
+runNum=start_ind_mouse;
+ 
+
+for runInd=runNum
+
+  runInfo=runsInfo(runInd); % if for each mouse then we want first run
+    % find the full mask file directory. This file will be checked for
+    % mask. If this file does not exist, following if/else statement
+    % creates the file.
+    maskFileName = runInfo.saveMaskFile;
+    saveFolder = runInfo.saveFolder;
+    
+    % create the white light image and mask file if it does not exist
+    if ~exist(maskFileName,'file')
+        
+        % instantiate VideosReader - reads the raw files to output matrix
+      
+        raw = readtiff(runInfo.rawFile{1});
+        raw = reshape(raw,size(raw,1),size(raw,2),runInfo.numCh,[]);
+        [isbrain,xform_isbrain,I,WL,xform_WL] = getMask(raw,runInfo.darkFramesInd,runInfo.invalidFramesInd,runInfo.rgbInd);
+        
+        if ~exist(saveFolder)
+            mkdir(saveFolder);
+        end
+        
+        save(maskFileName,'xform_WL','isbrain','I','xform_isbrain','WL','-v7.3');
+    end
+    
+end
+
+
+
+%% Process Data
+% Process multiple OIS files with the following naming convention:
+
+% filedate: YYMMDD
+% subjname: any alphanumberic convention is ok, e.g. "Mouse1"
+% suffix: filename run number, e.g. "fc1"
+% In Andor Solis, files are saved as "YYMMDD-MouseName-suffixN.tif"
+
+% "directory" is where processed data will be stored. If the
+% folder does not exist, it is created, and if directory is not
+% specified, data will be saved in the current folder:
+
+%%%% Not just readtiff
+
+
+%Start up Parallel Pool
+poolobj = gcp('nocreate'); % If no pool, do not create new one.
+numcores = feature('numcores');
+if isempty(poolobj)
+    parpool('local',numcores-1);
+end
+
+runNum = numel(runsInfo); %this is now for every run
+
+for runInd = 1:runNum
+    runInfo=runsInfo(runInd);
+    if exist(runInfo.saveHbFile,'file') %checks to see if the raw data were already processed
+        disp([runInfo.saveHbFile,' Already processed']) 
+    else
+        disp(['Processing ', runInfo.saveHbFile ' on ', runInfo.system]) 
+        sessionInfo = sysInfo(runInfo.system);
+        raw = readtiff(runInfo.rawFile{1});
+        raw = reshape(raw,size(raw,1),size(raw,2),runInfo.numCh,[]);
+        % remove dark  frames
+        if ~isempty(runInfo.darkFramesInd) 
+            darkFrame = squeeze(mean(raw(:,:,:,runInfo.darkFramesInd),4,'omitnan'));
+            raw = double(raw) - double(repmat(darkFrame,1,1,1,size(raw,4)));
+            raw(:,:,:,1:length(runInfo.darkFramesInd))=[];
+        end
+        %end remove dark frames 
+        %QC raw data
+        disp('rawQC analysis...');
+        if ~isempty(runInfo.fluorChInd)
+            representativeCh = runInfo.fluorChInd;
+        else
+            representativeCh = runInfo.hbChInd(1);
+        end
+        droppedFrames = []; % assume no dropped frames by default
+        rawTime = 1:size(raw,4);
+        rawTime = rawTime/runInfo.samplingRate;
+        load(runInfo.)
+        qcRawFig = qcRaw(runInfo,rawTime,raw,representativeCh,isbrain,droppedFrames,runInfo.system);%%%%%save specific data to both hb and fluor data%%%color of lines 
+        savefig(qcRawFig,runInfo.saveRawQCFig);
+        saveas(qcRawFig,[runInfo.saveRawQCFig '.png']);
+        close(qcRawFig);        
+        
+        % perform check for dropped frames and QC fixed 
+        disp('checking for dropped frames...');
+        fixedData = false; % flag to see if data has been fixed yet or not
+        [dfIndRaw, dfIndFixed, fixedRaw, fixedRawTime] = fixDroppedFrames(runInfo,raw,rawTime,fixedData);
+        
+        if isempty(dfIndRaw) % if no dropped frames, continue as normal
+            disp('No dropped frames detected.');
+            clear dfIndRaw dfIndFixed fixedRaw fixedRawTime;
+        else
+            disp(['Detected and corrected for ' num2str(length(dfIndRaw)) ' dropped frames!']);
+            raw = fixedRaw;
+            rawTime = fixedRawTime;
+            droppedFrames = dfIndFixed;
+            
+            % rerun rawQC after correction
+            representativeCh = runInfo.hbChInd(1);
+            qcRawFig =qcRaw(runInfo,rawTime,raw,representativeCh,isbrain,droppedFrames);
+            newQCSaveLoc = [runInfo.saveRawQCFig '_dropCorr'];
+            saveas(qcRawFig,[newQCSaveLoc '.png']);
+            close(qcRawFig);
+            
+            % check to make sure all dropped frames have been removed
+            fixedData = true;
+            [dfIndRaw, ~, ~, ~] = fixDroppedFrames(runInfo,fixedRaw,fixedRawTime,fixedData);%%%%% delete????
+            if ~isempty(dfIndRaw)
+                currMouseName = [runInfo.recDate '-' runInfo.mouseName '-' runInfo.session...
+                    '' num2str(runInfo.run)];
+                disp(['<<< Potential uncorrected dropped frames in ' currMouseName ' >>>']);
+            end
+            clear fixedRaw fixedRawTime;
+        end
+               
+        [op, E] = getHbOpticalPropertie_new(runInfo.lightSourceFiles{runInfo.hbChInd});%%%%musp to the function
+        
+        
+        datahb = procOIS_xw(raw(:,:,runInfo.hbChInd,:),op.dpf,E);%% not package%%%%%baselinevalue inside of function
+        datahb = smoothImage(datahb,runInfo.gbox,runInfo.gsigma); % spatially smooth data
+        
+        disp('Saving Data')
+        xform_datahb = mouse.process.affineTransform(datahb,I);
+        save(runinfo.saveHbFile,'xform_datahb','sessionInfo','op','E')
+        
+        datafluor = squeeze(raw(:,:,runInfo.fluorChInd,:));
+        datafluor = procFluor(datafluor,mean(raw(:,:,runInfo.fluorChInd,:)),4,'omitnan');
+        [op_in, E_in] = getHbOpticalProperties_new(runInfo.lightSourceFiles{runInfo.fluorChInd});
+        [op_out, E_out] = getHbOpticalProperties_new(runInfo.fluorFiles);
+        
+        dpIn = op_in.dpf/2;
+        dpOut = op_out.dpf/2;
+        
+        datafluorCorr = correctHb_differentBeta(datafluor,datahb,[E_in(1) E_out(1)],[E_in(2) E_out(2)],dpIn,dpOut,0.7,0.8);%%%% gcamp only flag
+        datafluorCorr = smoothImage(datafluorCorr,runInfo.gbox,runInfo.gsigma);
+        datafluor = smoothImage(datafluor,runInfo.gbox,runInfo.gsigma);
+        xform_datafluor = mouse.process.affineTransform(datafluor,I);
+        xform_datafluorCorr= mouse.process.affineTransform(datafluorCorr,I);
+        %%Affine transform all data
+        save(runinfo.saveFluorFile,'xofrm_datafluor','xform_datafluorCorr','op_in', 'E_in', 'op_out', 'E_out','-append')
+        %%%depackage
+%         fcqc
+%         stim
+    end
+end
+
+%% Averaging 

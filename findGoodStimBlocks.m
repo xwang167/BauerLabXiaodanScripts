@@ -65,8 +65,6 @@ for excelRow = excelRows
             
             for ii = 1:10      
                 timetrace_jrgeco1aCorr = mean(xform_jrgeco1aCorr_GSR(ROI_NoGSR,:,ii),1);
-                %                   figure
-                %     plot(timetrace_jrgeco1aCorr);title(['FAD',num2str(ii)]);
                 mean_jrgeco1aCorr = mean(timetrace_jrgeco1aCorr(126:250));
                 std_jrgeco1aCorr= std(timetrace_jrgeco1aCorr(1:125));
                 if mean_jrgeco1aCorr<2*std_jrgeco1aCorr

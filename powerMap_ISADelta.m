@@ -234,7 +234,7 @@ title('Delta')
 xlimVal = get(gca,'xlim');
 hold on
 plot(xlimVal,[1 1],'b--','LineWidth',2)
- breakyaxis([6 24])
+ breakyaxis([3 24])
 
 
 

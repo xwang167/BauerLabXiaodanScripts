@@ -38,7 +38,8 @@ for excelRow = excelRows
         dpIn = op_in.dpf/2;
         dpOut = op_out.dpf/2;
 
-        xform_gcampCorr_1_0p55 = correctHb_differentBeta(xform_gcamp,xform_datahb,[E_in(1) E_out(1)],[E_in(2) E_out(2)],dpIn,dpOut,1,0.55);
+        xform_gcampCorr_1_0p55 = correctHb_differentBeta(xform_gcamp,xform_datahb,...
+            [E_in(1) E_out(1)],[E_in(2) E_out(2)],dpIn,dpOut,0.7,0.8);
         xform_gcampCorr_1_0p55 = process.smoothImage(xform_gcampCorr_1_0p55,systemInfo.gbox,systemInfo.gsigma);
 
         save(fullfile(saveDir,processedName),'xform_gcampCorr_1_0p55','-append')

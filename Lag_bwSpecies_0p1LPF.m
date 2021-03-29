@@ -307,13 +307,16 @@ saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_La
 saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_Lag_0p1LPF_median.fig')));
 
 
-save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_processed.mat')),...
+load(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_processed.mat')),...
     'lagTimeTrial_0p1LPF_HbTCalcium_mice_mean', 'lagAmpTrial_0p1LPF_HbTCalcium_mice_mean','lagTimeTrial_0p1LPF_FADCalcium_mice_mean', 'lagAmpTrial_0p1LPF_FADCalcium_mice_mean','lagTimeTrial_0p1LPF_HbTFAD_mice_mean', 'lagAmpTrial_0p1LPF_HbTFAD_mice_mean',...
     'lagTimeTrial_0p1LPF_HbTCalcium_mice_median', 'lagAmpTrial_0p1LPF_HbTCalcium_mice_median','lagTimeTrial_0p1LPF_FADCalcium_mice_median', 'lagAmpTrial_0p1LPF_FADCalcium_mice_median', 'lagTimeTrial_0p1LPF_HbTFAD_mice_median', 'lagAmpTrial_0p1LPF_HbTFAD_mice_median',...
     '-append');
 
-
+load('D:\OIS_Process\noVasculaturemask.mat')
 lagTime_HbTCalcium = nanmean(lagTimeTrial_0p1LPF_HbTCalcium_mice_median(logical(mask_new)));
 lagTime_HbTFAD = nanmean(lagTimeTrial_0p1LPF_HbTFAD_mice_median(logical(mask_new)));
 lagTime_FADCalcium = nanmean(lagTimeTrial_0p1LPF_FADCalcium_mice_median(logical(mask_new)));
 
+lagTime_HbTCalcium = nanmean(lagTimeTrial_0p1LPF_HbTCalcium_mice_mean(logical(mask_new)));
+lagTime_HbTFAD = nanmean(lagTimeTrial_0p1LPF_HbTFAD_mice_mean(logical(mask_new)));
+lagTime_FADCalcium = nanmean(lagTimeTrial_0p1LPF_FADCalcium_mice_mean(logical(mask_new)));

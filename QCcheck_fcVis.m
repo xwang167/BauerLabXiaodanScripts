@@ -12,7 +12,7 @@ seednames={'Fr','M','Cg','SS','P','RS','A','V'};
 numseeds=numel(seednames);
 colorMax = 1;
     if isZTransform
-colorMax = 2.5;
+colorMax = 1.5;
     end
 
 

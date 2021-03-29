@@ -22,17 +22,17 @@ nVy = 128;
 
 xform_datahb_mice_GSR = [];
 xform_datahb_mice_NoGSR = [];
-
-xform_jrgeco1a_mice_GSR = [];
-xform_jrgeco1a_mice_NoGSR = [];
-
-xform_jrgeco1aCorr_mice_GSR = [];
-xform_jrgeco1aCorr_mice_NoGSR = [];
-
-xform_red_mice_GSR = [];
-xform_red_mice_NoGSR = [];
-
-xform_Laser_mice = [];
+% 
+% xform_jrgeco1a_mice_GSR = [];
+% xform_jrgeco1a_mice_NoGSR = [];
+% 
+% xform_jrgeco1aCorr_mice_GSR = [];
+% xform_jrgeco1aCorr_mice_NoGSR = [];
+% 
+% xform_red_mice_GSR = [];
+% xform_red_mice_NoGSR = [];
+% 
+% xform_Laser_mice = [];
 %  xform_FAD_mice_GSR = [];
 %  xform_FAD_mice_NoGSR = [];
 %
@@ -123,26 +123,26 @@ for excelRow = excelRows
         xform_gcampCorr_mice_NoGSR = cat(4,xform_gcampCorr_mice_NoGSR,xform_gcampCorr_mouse_NoGSR);
         xform_green_mice_NoGSR = cat(4,xform_green_mice_NoGSR,xform_green_mouse_NoGSR);
     elseif strcmp(char(sessionInfo.miceType),'jrgeco1a')
-        disp('loading  GRS data')
-        sessionInfo.stimblocksize = excelRaw{11};
-        load(fullfile(saveDir,processedName_mouse),...
-            'xform_datahb_mouse_GSR','xform_jrgeco1a_mouse_GSR','xform_jrgeco1aCorr_mouse_GSR','xform_red_mouse_GSR','xform_FAD_mouse_GSR','xform_FADCorr_mouse_GSR','xform_green_mouse_GSR')
-        if size(xform_datahb_mouse_GSR,1)>1
-            xform_datahb_mice_GSR = cat(5,xform_datahb_mice_GSR,xform_datahb_mouse_GSR);
-        end
-        clear xform_datahb_mouse_GSR
-        xform_jrgeco1a_mice_GSR = cat(4,xform_jrgeco1a_mice_GSR,xform_jrgeco1a_mouse_GSR);
-        clear xform_jrgeco1a_mouse_GSR
-        xform_jrgeco1aCorr_mice_GSR = cat(4,xform_jrgeco1aCorr_mice_GSR,xform_jrgeco1aCorr_mouse_GSR);
-        clear xform_jrgeco1aCorr_mouse_GSR
-        %        xform_red_mice_GSR = cat(4,xform_red_mice_GSR,xform_red_mouse_GSR);
-        %         clear xform_red_mouse_GSR
-        %
-        xform_FAD_mice_GSR = cat(4,xform_FAD_mice_GSR,xform_FAD_mouse_GSR);
-        clear xform_FAD_mouse_GSR
-        xform_FADCorr_mice_GSR = cat(4,xform_FADCorr_mice_GSR,xform_FADCorr_mouse_GSR);
-        clear xform_FADCorr_mouse_GSR
-        %         xform_green_mice_GSR = cat(4,xform_green_mice_GSR,xform_green_mouse_GSR);
+%         disp('loading  GRS data')
+%         sessionInfo.stimblocksize = excelRaw{11};
+%         load(fullfile(saveDir,processedName_mouse),...
+%             'xform_datahb_mouse_GSR','xform_jrgeco1a_mouse_GSR','xform_jrgeco1aCorr_mouse_GSR','xform_red_mouse_GSR','xform_FAD_mouse_GSR','xform_FADCorr_mouse_GSR','xform_green_mouse_GSR')
+%         if size(xform_datahb_mouse_GSR,1)>1
+%             xform_datahb_mice_GSR = cat(5,xform_datahb_mice_GSR,xform_datahb_mouse_GSR);
+%         end
+%         clear xform_datahb_mouse_GSR
+%         xform_jrgeco1a_mice_GSR = cat(4,xform_jrgeco1a_mice_GSR,xform_jrgeco1a_mouse_GSR);
+%         clear xform_jrgeco1a_mouse_GSR
+%         xform_jrgeco1aCorr_mice_GSR = cat(4,xform_jrgeco1aCorr_mice_GSR,xform_jrgeco1aCorr_mouse_GSR);
+%         clear xform_jrgeco1aCorr_mouse_GSR
+%         %        xform_red_mice_GSR = cat(4,xform_red_mice_GSR,xform_red_mouse_GSR);
+%         %         clear xform_red_mouse_GSR
+%         %
+%         xform_FAD_mice_GSR = cat(4,xform_FAD_mice_GSR,xform_FAD_mouse_GSR);
+%         clear xform_FAD_mouse_GSR
+%         xform_FADCorr_mice_GSR = cat(4,xform_FADCorr_mice_GSR,xform_FADCorr_mouse_GSR);
+%         clear xform_FADCorr_mouse_GSR
+%         %         xform_green_mice_GSR = cat(4,xform_green_mice_GSR,xform_green_mouse_GSR);
         %                 clear xform_green_mouse_GSR
         %
         

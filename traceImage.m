@@ -15,10 +15,10 @@ maxmum = max([active1 active2 active3],[],'all');
 
 set(findall(gca, 'Type', 'Line'),'LineWidth',2);
 
-% for i  = 0:1/stimFrequency:stimduration-1/stimFrequency
-%     line([stimbaseline/framerate+i stimbaseline/framerate+i],[ 1.1*minimum 1.1*maxmum]);
-%     hold on
-% end
+for i  = 0:1/stimFrequency:stimduration-1/stimFrequency
+    line([stimbaseline/framerate+i stimbaseline/framerate+i],[ 1.1*minimum 1.1*maxmum]);
+    hold on
+end
 
 ax = gca;
 ax.FontSize = 8;
