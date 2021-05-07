@@ -32,41 +32,41 @@ for excelRow = excelRows
     %     if ~isempty(find(isnan(xform_isbrain), 1))
     %         xform_isbrain(isnan(xform_isbrain))=0;
     %     end
-    xform_datahb_GSR_mouse_goodBlocks = [];
-    xform_FAD_GSR_mouse_goodBlocks = [];
-    xform_FADCorr_GSR_mouse_goodBlocks = [];
-    xform_jrgeco1a_GSR_mouse_goodBlocks = [];
-    xform_jrgeco1aCorr_GSR_mouse_goodBlocks = [];
-    for n = runs
-        goodBlocks = ones(1,10);
-        visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
-        
-        processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
-        try
-            load(fullfile(saveDir,processedName), 'xform_FADCorr_GSR','goodBlocks')
-            
-            %             sessionInfo.stimblocksize = excelRaw{11};
-            sessionInfo.stimbaseline=excelRaw{12};
-            sessionInfo.stimduration = excelRaw{13};
-            sessionInfo.stimFrequency = excelRaw{16};
-            stimStartTime = 5;
-            
-            totalBlocksNum = totalBlocksNum + sum(goodBlocks);
-            goodBlocks = logical(goodBlocks);
-            xform_FADCorr_GSR = reshape(xform_FADCorr_GSR,128,128,750,10);
-            xform_FADCorr_GSR_mouse_goodBlocks = cat(4,xform_FADCorr_GSR_mouse_goodBlocks,xform_FADCorr_GSR(:,:,:,goodBlocks));
-            
-        catch
-            disp(['Did not load file',processedName]);
-        end
-    end
-    
-    xform_FADCorr_GSR_mouse_goodBlocks = nanmean(xform_FADCorr_GSR_mouse_goodBlocks,4);
-    
-    processedName_mouse = strcat(recDate,'-',mouseName,'-',sessionType,'_processed','.mat');
-    
-    save(fullfile(saveDir, processedName_mouse),'xform_FADCorr_GSR_mouse_goodBlocks','-append')
-    load(fullfile(saveDir, processedName_mouse),'xform_FAD_GSR_mouse_goodBlocks','xform_jrgeco1a_GSR_mouse_goodBlocks','xform_jrgeco1aCorr_GSR_mouse_goodBlocks','xform_datahb_GSR_mouse_goodBlocks')
+%     xform_datahb_GSR_mouse_goodBlocks = [];
+%     xform_FAD_GSR_mouse_goodBlocks = [];
+%     xform_FADCorr_GSR_mouse_goodBlocks = [];
+%     xform_jrgeco1a_GSR_mouse_goodBlocks = [];
+%     xform_jrgeco1aCorr_GSR_mouse_goodBlocks = [];
+%     for n = runs
+%         goodBlocks = ones(1,10);
+%         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
+%         
+%         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
+%         try
+%             load(fullfile(saveDir,processedName), 'xform_FADCorr_GSR','goodBlocks')
+%             
+%             %             sessionInfo.stimblocksize = excelRaw{11};
+%             sessionInfo.stimbaseline=excelRaw{12};
+%             sessionInfo.stimduration = excelRaw{13};
+%             sessionInfo.stimFrequency = excelRaw{16};
+%             stimStartTime = 5;
+%             
+%             totalBlocksNum = totalBlocksNum + sum(goodBlocks);
+%             goodBlocks = logical(goodBlocks);
+%             xform_FADCorr_GSR = reshape(xform_FADCorr_GSR,128,128,750,10);
+%             xform_FADCorr_GSR_mouse_goodBlocks = cat(4,xform_FADCorr_GSR_mouse_goodBlocks,xform_FADCorr_GSR(:,:,:,goodBlocks));
+%             
+%         catch
+%             disp(['Did not load file',processedName]);
+%         end
+%     end
+%     
+%     xform_FADCorr_GSR_mouse_goodBlocks = nanmean(xform_FADCorr_GSR_mouse_goodBlocks,4);
+%     
+   processedName_mouse = strcat(recDate,'-',mouseName,'-',sessionType,'_processed','.mat');
+%     
+%     save(fullfile(saveDir, processedName_mouse),'xform_FADCorr_GSR_mouse_goodBlocks','-append')
+    load(fullfile(saveDir, processedName_mouse),'xform_FAD_GSR_mouse_goodBlocks','xform_FADCorr_GSR_mouse_goodBlocks','xform_jrgeco1a_GSR_mouse_goodBlocks','xform_jrgeco1aCorr_GSR_mouse_goodBlocks','xform_datahb_GSR_mouse_goodBlocks')
     
     
     if ~isnan(xform_FADCorr_GSR_mouse_goodBlocks(64,64,1,1))
@@ -114,6 +114,8 @@ plot(time,TF/30)
 
 xform_jrgeco1aCorr_GSR_mice_goodBlocks = reshape(xform_jrgeco1aCorr_GSR_mice_goodBlocks,128,128,[]);
 peakMap_localMax = mean(xform_jrgeco1aCorr_GSR_mice_goodBlocks(:,:,TF),3);
+baseline =  mean(xform_jrgeco1aCorr_GSR_mice_goodBlocks(:,:,1:125),3);
+peakMap_localMax = peakMap_localMax - baseline;
 figure
 imagesc(peakMap_localMax.*xform_isbrain_mice*100,[-2 2])
 
@@ -121,7 +123,7 @@ hold on
 imagesc(xform_WL,'AlphaData', 1-xform_isbrain_mice.*mask)
 
 h = colorbar('FontSize',15,'fontweight','bold');
-h.Ticks =  [-2 0 2];
+h.Ticks =  [-1.5 0 1.5];
 ylabel(h,'\DeltaF/F%','FontSize',15,'fontweight','bold');
 axis image off
 colormap magma
@@ -145,10 +147,12 @@ title(['jRGECO1a'])
 
 xform_jrgeco1a_GSR_mice_goodBlocks = reshape(xform_jrgeco1a_GSR_mice_goodBlocks,128,128,[]);
 peakMap_localMax = mean(xform_jrgeco1a_GSR_mice_goodBlocks(:,:,TF),3);
+baseline = mean(xform_jrgeco1a_GSR_mice_goodBlocks(:,:,1:125),3);
+peakMap_localMax = peakMap_localMax - baseline;
 figure
 imagesc(peakMap_localMax.*xform_isbrain_mice*100,[-1 1])
 h = colorbar('FontSize',15,'fontweight','bold');
-h.Ticks =  [-2,0,2];
+h.Ticks =  [-1.5,0,1.5];
 ylabel(h,'\DeltaF/F%','FontSize',15,'fontweight','bold');
 
 % hold on
@@ -183,10 +187,12 @@ colormap magma
 % title('RGECO from 5s to 10s')
 
 peakMap = mean(xform_FADCorr_GSR_mice_goodBlocks(:,:,126:250),3);
+baseline = mean(xform_FADCorr_GSR_mice_goodBlocks(:,:,1:125),3);
+peakMap = peakMap - baseline;
 figure
 imagesc(peakMap.*xform_isbrain_mice*100,[-0.7,0.7])
 h = colorbar('FontSize',15,'fontweight','bold');
-h.Ticks =  [-0.7,0,0.7];
+h.Ticks =  [-0.6,0,0.6];
 ylabel(h,'\DeltaF/F%','FontSize',15,'fontweight','bold');
 hold on
 imagesc(xform_WL,'AlphaData', 1-xform_isbrain_mice.*mask)
@@ -195,10 +201,12 @@ axis image off
 title('FAD')
 
 peakMap = mean(xform_FAD_GSR_mice_goodBlocks(:,:,126:250),3);
+baseline = mean(xform_FAD_GSR_mice_goodBlocks(:,:,1:125),3);
+peakMap = peakMap-baseline;
 figure
 imagesc(peakMap.*xform_isbrain_mice*100,[-0.7,0.7])
 h = colorbar('FontSize',15,'fontweight','bold');
-h.Ticks =  [-0.7,0,0.7];
+h.Ticks =  [-0.6,0,0.6];
 ylabel(h,'\DeltaF/F%','FontSize',15,'fontweight','bold');
 % hold on
 % load('D:\OIS_Process\atlas.mat','AtlasSeeds')
@@ -213,6 +221,23 @@ axis image off
 title(['Raw' char(10) 'FAD'])
 %
 peakMap = mean(xform_datahb_GSR_mice_goodBlocks(:,:,1,126:250)*10^6,4);
+baseline = mean(xform_datahb_GSR_mice_goodBlocks(:,:,1,1:125)*10^6,4);
+peakMap = peakMap - baseline;
+figure
+imagesc(peakMap.*xform_isbrain_mice,[-3,3])
+h = colorbar('FontSize',15,'fontweight','bold');
+h.Ticks =  [-2.5,0,2.5];
+ylabel(h,'\Delta\muM','FontSize',15,'fontweight','bold');
+hold on
+    imagesc(xform_WL,'AlphaData',1-xform_isbrain_mice.*mask)
+
+colormap jet
+axis image off
+title('Oxy from 5s to 10s')
+
+peakMap = mean(xform_datahb_GSR_mice_goodBlocks(:,:,2,126:250)*10^6,4);
+baseline = mean(xform_datahb_GSR_mice_goodBlocks(:,:,2,1:125)*10^6,4);
+peakMap = peakMap-baseline;
 figure
 imagesc(peakMap.*xform_isbrain_mice,[-1,1])
 h = colorbar('FontSize',15,'fontweight','bold');
@@ -223,26 +248,15 @@ hold on
 
 colormap jet
 axis image off
-title('Oxy from 5s to 10s')
-
-peakMap = mean(xform_datahb_GSR_mice_goodBlocks(:,:,2,126:250)*10^6,4);
-figure
-imagesc(peakMap.*xform_isbrain_mice,[-0.4,0.4])
-h = colorbar('FontSize',15,'fontweight','bold');
-h.Ticks =  [-0.4,0,0.4];
-ylabel(h,'\Delta\muM','FontSize',15,'fontweight','bold');
-hold on
-    imagesc(xform_WL,'AlphaData',1-xform_isbrain_mice.*mask)
-
-colormap jet
-axis image off
 title('DeOxy from 5s to 10s')
 
 peakMap = mean(xform_datahb_GSR_mice_goodBlocks(:,:,1,126:250)*10^6+xform_datahb_GSR_mice_goodBlocks(:,:,2,126:250)*10^6,4);
+baseline = mean(xform_datahb_GSR_mice_goodBlocks(:,:,1,1:125)*10^6+xform_datahb_GSR_mice_goodBlocks(:,:,2,1:125)*10^6,4);
+peakMap = peakMap-baseline;
 figure
-imagesc(peakMap.*xform_isbrain_mice,[-0.6,0.6])
+imagesc(peakMap.*xform_isbrain_mice,[-2,2])
 h = colorbar('FontSize',15,'fontweight','bold');
-h.Ticks =  [-0.6,0,0.6];
+h.Ticks =  [-2,0,2];
 ylabel(h,'\Delta\muM','FontSize',15,'fontweight','bold');
 % hold on
 % barrel = AtlasSeeds == 9;

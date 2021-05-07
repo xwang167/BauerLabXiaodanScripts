@@ -6,8 +6,8 @@ excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBa
 nVx = 128;
 nVy = 128;
 %
-excelRows = [181 183 185 195 202 204 228 230 232 234 236 240];
-runs = 1:3;
+excelRows = 437;%[181 183 185 195 202 204 228 230 232 234 236 240];
+runs = 2:3;
 length_runs = length(runs);
 
 for ii = 1
@@ -347,8 +347,7 @@ for ii = 1
      save(fullfile(saveDir, processedName_mouse),'R_total_ISA_mouse','R_jrgeco1aCorr_ISA_mouse','R_FADCorr_ISA_mouse',...
                 'R_total_Delta_mouse','R_jrgeco1aCorr_Delta_mouse','R_FADCorr_Delta_mouse',...
                 'Rs_total_ISA_mouse','Rs_jrgeco1aCorr_ISA_mouse','Rs_FADCorr_ISA_mouse',...
-                'Rs_total_Delta_mouse','Rs_jrgeco1aCorr_Delta_mouse','Rs_FADCorr_Delta_mouse',...
-                         'hz','-append')
+                'Rs_total_Delta_mouse','Rs_jrgeco1aCorr_Delta_mouse','Rs_FADCorr_Delta_mouse')
 
             
 %             save(fullfile(saveDir, processedName_mouse),'R_total_ISA_mouse','R_jrgeco1aCorr_ISA_mouse','R_FADCorr_ISA_mouse',...

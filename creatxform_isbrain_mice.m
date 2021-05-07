@@ -2,7 +2,8 @@ excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBa
 runs = 1:3;
 totalBlocksNum = 0;
 %excelRows = [182 184 186 229 233 237];
-excelRows = [120,133,139,123,122];
+%excelRows = [120,133,139,123,122];
+excelRows = [195 202 204 230 234 240];
 xform_isbrain_mice = 1;
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
@@ -28,8 +29,12 @@ for excelRow = excelRows
 end
 
 
-
-save('L:\GCaMP\cat\190506--G6M2-G9M7-G11M1-G7M7-G7M6-fc_processed.mat',...
-    'xform_isbrain_mice','-append')
+% 
+% save('L:\GCaMP\cat\190506--G6M2-G9M7-G11M1-G7M7-G7M6-fc_processed.mat',...
+%     'xform_isbrain_mice','-append')
 % save('L:\RGECO\cat\191030--R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-stim_processed_mice.mat',...
 %     'xform_isbrain_mice','-append')
+
+
+save('L:\RGECO\cat\191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-fc.mat',...
+ 'xform_isbrain_mice','-append')

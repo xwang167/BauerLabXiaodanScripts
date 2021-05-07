@@ -6,9 +6,9 @@ miceCat = 'Awake RGECO';
 import mouse.*
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
 GoodRuns = {1:3,3,[];
+    1:3,[],1:3;
     1:3,1:3,1:3;
-    1:3,1:3,1:3;
-    1:3,1:3,[2,3];
+    1:3,[],[2,3];
     [2,3],[2,3],1:3;
     [],[2,3],1:3};
 
@@ -255,9 +255,9 @@ saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_La
 
 figure;
 colormap jet;
-subplot(2,3,1); imagesc(lagTimeTrial_HbTCalcium_mice_median_GoodRuns,tLim); axis image off;h = colorbar;ylabel(h,'t(s)');title('Calcium HbT');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+subplot(2,3,1); imagesc(lagTimeTrial_HbTCalcium_mice_median_GoodRuns,[0 2]); axis image off;h = colorbar;ylabel(h,'t(s)');title('Calcium HbT');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
 subplot(2,3,2); imagesc(lagTimeTrial_FADCalcium_mice_median_GoodRuns,[0 0.3]);axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
-subplot(2,3,3); imagesc(lagTimeTrial_HbTFAD_mice_median_GoodRuns,[0 1.5]); axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD HbT');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+subplot(2,3,3); imagesc(lagTimeTrial_HbTFAD_mice_median_GoodRuns,[0 2]); axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD HbT');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
 
 subplot(2,3,4); imagesc(lagAmpTrial_HbTCalcium_mice_median_GoodRuns,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
 subplot(2,3,5); imagesc(lagAmpTrial_FADCalcium_mice_median_GoodRuns,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')

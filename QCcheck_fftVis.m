@@ -16,7 +16,7 @@ end
 %ylim([10^-3 10^2])
 % ylim([10^-4 2])
 % yticks([10^-4  10^-3 10^-2  10^-1 10^0])
-ylim([-30 20])
+ylim([-40 20])
 xticks([0.01 0.1 1 10])
 ylabel(leftLabel)
 
@@ -35,7 +35,7 @@ ylabel(rightLabel)
 %ylim([10^-3 10^2])
 % ylim([10^-4 2])
 % yticks([10^-4 10^-3 10^-2  10^-1 10^0])
-ylim([-30 20])
+ylim([-40 20])
 
 
 xlabel('Frequency (Hz)')

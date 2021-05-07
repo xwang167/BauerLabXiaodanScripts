@@ -1,6 +1,8 @@
 function FCMatrix = calcFCMatrix(data,minFreq,maxFreq,fs,isbrain)
-load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\CerebMask.mat')
-mask = cerebralMask.*isbrain;
+load('D:\OIS_Process\noVasculatureMask.mat')
+data = imresize(data,0.5);
+mask = (leftMask+rightMask).*isbrain;
+mask = imresize(mask,0.5);
 mask = logical(mask); 
 for ii = 1:length(data)
     data(:,:,ii) = data(:,:,ii).*double(mask);

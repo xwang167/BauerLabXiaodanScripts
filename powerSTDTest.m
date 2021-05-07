@@ -174,7 +174,7 @@ set(gca,'FontSize',14,'FontWeight','Bold')
 %ylabel('Awake/Anesthetized Power Ratio')
 xlim([0.5,3.5])
 title('Delta')
-ylim([0 70])
+ylim([0 50])
 set(gca,'LineWidth',2)
 hold on
 xlimVal = get(gca,'xlim');
@@ -186,7 +186,7 @@ yticks([5 10 20 35 40 50 60 70])
 
  %breakyaxis([5 33])
 
-breakyaxis([6 32])
+breakyaxis([6 33])
 set(gca,'yscale','log')
 
 %yticks([1 5 25 30 35 40 45 47])

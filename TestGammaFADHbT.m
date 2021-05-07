@@ -34,22 +34,25 @@ end
 n = 1;
 visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
 processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
-load(fullfile(saveDir,processedName),'xform_FADCorr','xform_jrgeco1aCorr')
+load(fullfile(saveDir,processedName),'xform_FADCorr','xform_datahb')
 
 xform_FADCorr(isinf(xform_FADCorr)) = 0;
 xform_FADCorr(isnan(xform_FADCorr)) = 0;
-xform_jrgeco1aCorr(isinf(xform_jrgeco1aCorr)) = 0;
-xform_jrgeco1aCorr(isnan(xform_jrgeco1aCorr)) = 0;
+xform_datahb(isinf(xform_datahb)) = 0;
+xform_datahb(isnan(xform_datahb)) = 0;
 
 FAD_filter = mouse.freq.filterData(double(squeeze(xform_FADCorr)),0.02,2,25);
-Calcium_filter = mouse.freq.filterData(double(squeeze(xform_jrgeco1aCorr)),0.02,2,25);
-clear xform_FADCorr xform_jrgeco1aCorr
+clear xform_FADCorr
+Hb_filter = mouse.freq.filterData(double(xform_datahb),0.02,2,25);
+clear xform_datahb
+HbT_filter = Hb_filter(:,:,1,:) + Hb_filter(:,:,2,:);
+HbT_filter = squeeze(HbT_filter);
 
-       Calcium_filter = reshape(Calcium_filter,128*128,[]);
+       HbT_filter = reshape(HbT_filter,128*128,[]);
        FAD_filter = reshape(FAD_filter,128*128,[]);
-       Calcium_filter = normRow(Calcium_filter);
+       HbT_filter = normRow(HbT_filter);
        FAD_fitler = normRow(FAD_filter);
-       Calcium_filter = reshape(Calcium_filter,128,128,[]);
+       HbT_filter = reshape(HbT_filter,128,128,[]);
        FAD_filter = reshape(FAD_filter,128,128,[]);
 
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\CerebMask.mat')
@@ -58,12 +61,12 @@ load('D:\OIS_Process\noVasculatureMask.mat')
 mask = leftMask+rightMask;
 
 t = (1:750)/25;
-%[T_big,W_big,A_big,r_big,r2_big,hemoPred_big] = interSpeciesGammaFit_xw(Calcium_filter,FAD_filter,t);
-%[T_small,W_small,A_small,r_small,r2_small,hemoPred_small] = interSpeciesGammaFit_CalciumFAD(Calcium_filter,FAD_filter,t);
-[T_small,W_small,A_small,r_small,r2_small,hemoPred_small] = interSpeciesGammaFit_CalciumFAD(Calcium_filter,FAD_filter,t);
+%[T_big,W_big,A_big,r_big,r2_big,hemoPred_big] = interSpeciesGammaFit_xw(HbT_filter,FAD_filter,t);
+%[T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_HbTFAD(HbT_filter,FAD_filter,t);
+[T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_xw(FAD_filter,HbT_filter,t);
 figure
 subplot(2,3,1)
-imagesc(T_small,[0 5*10^-4])
+imagesc(T,[0 5*10^-4])
 colorbar
 axis image off
 colormap jet
@@ -73,7 +76,7 @@ imagesc(xform_WL,'AlphaData',1-mask_new);
 set(gca,'FontSize',14,'FontWeight','Bold')
 
 subplot(2,3,2)
-imagesc(W_small,[0 0.05])
+imagesc(W,[0 0.05])
 colorbar
 axis image off
 colormap jet
@@ -83,7 +86,7 @@ imagesc(xform_WL,'AlphaData',1-mask_new);
 set(gca,'FontSize',14,'FontWeight','Bold')
 
 subplot(2,3,3)
-imagesc(A_small,[0 0.04])
+imagesc(A,[0 0.04])
 colorbar
 axis image off
 colormap jet
@@ -93,7 +96,7 @@ imagesc(xform_WL,'AlphaData',1-mask_new);
 set(gca,'FontSize',14,'FontWeight','Bold')
 
 subplot(2,3,4)
-imagesc(r_small,[-1 1])
+imagesc(r,[-1 1])
 colorbar
 axis image off
 colormap jet
@@ -103,7 +106,7 @@ imagesc(xform_WL,'AlphaData',1-mask_new);
 set(gca,'FontSize',14,'FontWeight','Bold')
 
 subplot(2,3,5)
-imagesc(r2_small,[0 1])
+imagesc(r2,[0 1])
 colorbar
 axis image off
 colormap jet
@@ -111,7 +114,7 @@ title('R^2')
 hold on;
 imagesc(xform_WL,'AlphaData',1-mask_new);
 set(gca,'FontSize',14,'FontWeight','Bold')
-suptitle('Awake 1 run: Calcium FAD Gamma Fit with [3*10^-4,0.02,0.03]]')
+suptitle('Awake 1 run: HbT FAD Gamma Fit with [3*10^-4,0.02,0.03]]')
 
 
 figure
@@ -164,13 +167,13 @@ title('R^2')
 hold on;
 imagesc(xform_WL,'AlphaData',1-mask_new);
 set(gca,'FontSize',14,'FontWeight','Bold')
-suptitle('Awake 1 run: Calcium FAD Gamma Fit with [2,3,0.0001]')
+suptitle('Awake 1 run: HbT FAD Gamma Fit with [2,3,0.0001]')
 
 % Difference between different start position big - small
 
 figure
 subplot(2,3,1)
-imagesc(T_big-T_small,[0 5*10^-4])
+imagesc(T_big-T,[0 5*10^-4])
 colorbar
 axis image off
 colormap jet
@@ -180,7 +183,7 @@ imagesc(xform_WL,'AlphaData',1-mask_new);
 set(gca,'FontSize',14,'FontWeight','Bold')
 
 subplot(2,3,2)
-imagesc(W_big-W_small,[0 0.05])
+imagesc(W_big-W,[0 0.05])
 colorbar
 axis image off
 colormap jet
@@ -190,7 +193,7 @@ imagesc(xform_WL,'AlphaData',1-mask_new);
 set(gca,'FontSize',14,'FontWeight','Bold')
 
 subplot(2,3,3)
-imagesc(A_big-A_small,[0 0.04])
+imagesc(A_big-A,[0 0.04])
 colorbar
 axis image off
 colormap jet
@@ -200,7 +203,7 @@ imagesc(xform_WL,'AlphaData',1-mask_new);
 set(gca,'FontSize',14,'FontWeight','Bold')
 
 subplot(2,3,4)
-imagesc(r_big-r_small,[-1 1])
+imagesc(r_big-r,[-1 1])
 colorbar
 axis image off
 colormap jet
@@ -210,7 +213,7 @@ imagesc(xform_WL,'AlphaData',1-mask_new);
 set(gca,'FontSize',14,'FontWeight','Bold')
 
 subplot(2,3,5)
-imagesc(r2_big-r2_small,[0 1])
+imagesc(r2_big-r2,[0 1])
 colorbar
 axis image off
 colormap jet
@@ -244,22 +247,22 @@ nanmean(r2_big(mask_new))
 nanmedian(r2_big(mask_new))
 
 %Calculate mean and median for small value
-mean(T_small(mask_new))
-median(T_small(mask_new))
+mean(T(mask_new))
+median(T(mask_new))
 
 figure
-histogram(T_small(mask_new))
+histogram(T(mask_new))
 title('T_s_m_a_l_l')
-median(W_small(mask_new))
-mean(W_small(mask_new))
+median(W(mask_new))
+mean(W(mask_new))
 figure
-histogram(W_small(mask_new))
+histogram(W(mask_new))
 title('W_s_m_a_l_l')
-mean(A_small(mask_new))
-median(A_small(mask_new))
+mean(A(mask_new))
+median(A(mask_new))
 
-nanmean(r_small(mask_new))
-nanmedian(r_small(mask_new))
+nanmean(r(mask_new))
+nanmedian(r(mask_new))
 
-nanmean(r2_small(mask_new))
-nanmedian(r2_small(mask_new))
+nanmean(r2(mask_new))
+nanmedian(r2(mask_new))

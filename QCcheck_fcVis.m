@@ -8,8 +8,9 @@ seedradpix=seedradmm/mpp;
 xform_isbrain = ones(128,128);
 xform_isbrain(isnan(R_fluor_band(:,:,1))) = 0;
 disp('QC visualization')
-seednames={'Fr','M','Cg','SS','P','RS','A','V'};
-numseeds=numel(seednames);
+seednames= {'Fr-L'  'Cing-L' 'M-L' 'SS-L' 'RS-L' 'P-L' 'V-L' 'Aud-L'...
+    'Fr-R' 'Cing-R' 'M-R' 'SS-R' 'RS-R' 'P-R' 'V-R' 'Aud-R'};
+numseeds=numel(seednames)/2;
 colorMax = 1;
     if isZTransform
 colorMax = 1.5;
@@ -38,7 +39,8 @@ for s=1:numseeds
     hold on;
     circles(refseeds(2*(s-1)+1,1),refseeds(2*(s-1)+1,2),seedradpix,'facecolor','none');
     axis image off
-    title([seednames{s},'L'],'FontSize',10)
+    title([seednames{2*(s-1)+1}],'FontSize',10)
+    %title([seednames{s},'L'],'FontSize',10)
     
     p1 = subplot('position', [(OE+0.1)*2 (0.47-((round(s/2)-1)*0.15))+0.3 0.10*2 0.12]);
     %             Im2=overlaymouse(R_oxy(:,:,(2*(s-1)+2)),double(xform_WL_atlas), xform_isbrain,'jet',-1,1);
@@ -49,7 +51,8 @@ for s=1:numseeds
     hold on;
     circles(refseeds(2*(s-1)+2,1),refseeds(2*(s-1)+2,2),seedradpix,'facecolor','none');
     axis image off
-    title([seednames{s},'R'],'FontSize',10)
+    title([seednames{2*(s-1)+2}],'FontSize',10)
+    %title([seednames{s},'R'],'FontSize',10)
     hold off;
     
 end

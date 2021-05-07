@@ -1,4 +1,4 @@
-function [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_CalciumFAD(neural,hemo,t)
+function [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_CalciumHbT(neural,hemo,t)
 %UNTITLED2 Summary of this function goes here
 %   neural = 3D
 %   hemo = 3D
@@ -33,7 +33,7 @@ for xInd = 1:size(neural,2)
             %             [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[1,3,0.0001],[0,0.5,0],[4,10,inf],options)');
             %             [~,pixHrfParam] = evalc('fminsearch(fcn,[2,3,0.0001],options)');
             %[2,3,0.0001]
-            [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[0.2,0.4,1],[0.001,0.001,0],[0.6,1.2,100000],options)');
+            [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[2,3,0.0001],[0.006,0.01,0.04],[4,6,inf],options)');
             %             [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[2,3,0.0001],[0,0,0],[inf,inf,inf],options)');
             %             [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[2,3,0.0001],[0,-inf,-inf],[4,-inf,inf],options)');
             
