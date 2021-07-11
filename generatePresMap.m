@@ -1,8 +1,5 @@
-function [goodBlocks] = pickGoodBlocks(stimStartTime,stimEndTime,numBlock,oxyDownSampled, ...
+function generatePresMap(stimStartTime,stimEndTime,numBlock,oxyDownSampled, ...
     deoxyDownSampled,totalDownSampled,greenFluorCorrDownSampled,jrgecoCorrDownSampled,ROI)
-
-
-%load('J:\RGECO\cat\ROI_NoGSR_Awake.mat')
 
 subplot(1,3,1)
 imagesc(squeeze(mean(oxyDownSampled(:,:,stimStartTime+1:stimEndTime,1),3)))
@@ -74,7 +71,7 @@ if ~isempty(jrgecoCorrDownSampled)&&~isempty(greenFluorCorrDownSampled)
     
 elseif ~isempty(greenFluorCorrDownSampled)
     title('gcampCorr')
-    
+
     pause;
     prompt = {'Enter gcampCorr limit:'};
     title1 = 'Selet scale';
@@ -84,21 +81,21 @@ elseif ~isempty(greenFluorCorrDownSampled)
     temp_greenFluorCorr_max = str2double(answer{1});
     
     numRows = 4;
-    
+
 elseif ~isempty(jrgecoCorrDownSampled)
-    title('jrgeco1aCorr')
-    
-    %     pause;
-    %     prompt = {'Enter jrgeco1aCorr limit:'};
-    %     title1 = 'Selet scale';
-    %     dims = [1 35];
-    %     definput = {'0.01'};
-    %     answer = inputdlg(prompt,title1,dims,definput);
-    %     temp_jrgeco1aCorr_max = str2double(answer{1});
+        title('jrgeco1aCorr')
+
+%     pause;
+%     prompt = {'Enter jrgeco1aCorr limit:'};
+%     title1 = 'Selet scale';
+%     dims = [1 35];
+%     definput = {'0.01'};
+%     answer = inputdlg(prompt,title1,dims,definput);
+%     temp_jrgeco1aCorr_max = str2double(answer{1});
     temp_jrgeco1aCorr_max = 4;
     numRows = 4;
-else
-    numRows = 3;
+    else
+        numRows = 3;
 end
 
 
@@ -107,7 +104,7 @@ end
 % close all
 % T1 = length(InstMvMt_detrend);
 % time=linspace(1,T1,T1)/frameRate;
-%
+% 
 % figure('units','normalized','outerposition',[0 0.2 0.2 0.4]);
 % subplot(2,1,1);plot(1:length(oxy_active),oxy_active);
 % subplot(2,1,2);plotyy(time, InstMvMt_detrend/1e6,time, LTMvMt_detrend/1e6);
@@ -122,9 +119,9 @@ for ii = 1:numBlock
     set(gca, 'YTick', []);
     if ii == 1
         ylabel('oxy')
-        
+
     end
-    hold on
+                hold on   
     contour( ROI,'k');
     subplot(numRows,numBlock,numBlock+ii)
     imagesc(squeeze(mean(deoxyDownSampled(:,:,stimStartTime+1:stimEndTime,ii),3)),[-temp_deoxy_max temp_deoxy_max]);
@@ -134,7 +131,7 @@ for ii = 1:numBlock
     if ii == 1
         ylabel('deoxy')
     end
-    hold on
+                hold on   
     contour( ROI,'k');
     
     subplot(numRows,numBlock,2*numBlock+ii)
@@ -144,10 +141,10 @@ for ii = 1:numBlock
     set(gca, 'XTick', []);
     set(gca, 'YTick', []);
     if ii == 1
-        ylabel('total')
-        
+        ylabel('total')    
+
     end
-    hold on
+    hold on   
     contour( ROI,'k');
     if ~isempty(greenFluorCorrDownSampled)
         subplot(numRows,numBlock,3*numBlock+ii)
@@ -160,8 +157,8 @@ for ii = 1:numBlock
             end
             
         end
-        hold on
-        contour( ROI,'k');
+                        hold on
+    contour( ROI,'k');
         axis image
         set(gca, 'XTick', []);
         set(gca, 'YTick', []);
@@ -179,24 +176,15 @@ for ii = 1:numBlock
         set(gca, 'YTick', []);
         if ii == 1
             ylabel('jrgeco1aCorr')
-            
+
         end
-        hold on
-        contour( ROI,'k');
+                        hold on
+    contour( ROI,'k');
     end
     
 end
-hold on
-contour( ROI,'k');
+    hold on
+    contour( ROI,'k');
 
-prompt = {'Bad blocks to remove:'};
-title1 = 'Pick block';
-dims = [1 35];
-definput = {'[]'};
-answer = inputdlg(prompt,title1,dims,definput);
-blocks = 1:numBlock;
-if ~isempty(str2num(answer{1}))
-    blocks(str2num(answer{1})) = [];
-end
-goodBlocks = blocks;
+
 % end

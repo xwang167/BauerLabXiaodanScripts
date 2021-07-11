@@ -45,7 +45,9 @@ subplot('position',[0.8,0.1,0.2,0.25])
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','WL')
 for b=stimStartTime-2: stimEndTime+6
     p = subplot('position', [0.015+(b-stimStartTime)*0.09 0.80 0.07 0.12]);
-    imagesc(downSampledBlocks1(:,:,b), [-1.1*maxVal(1) 1.1*maxVal(1)]);
+    imagesc(downSampledBlocks1(:,:,b), [-maxVal(1) maxVal(1)]);
+    hold on
+contour(ROI_contour,'k')
     if b == stimEndTime+6
         colorbar
         set(p,'Position',[0.015+(b-stimStartTime)*0.09 0.80 0.07 0.12]);
@@ -65,7 +67,9 @@ end
 
 for b=stimStartTime-2: stimEndTime+6
     p = subplot('position', [0.015+(b-stimStartTime)*0.09 0.64 0.07 0.12]);
-    imagesc(downSampledBlocks2(:,:,b), [-1.1*maxVal(2) 1.1*maxVal(2)]);
+    imagesc(downSampledBlocks2(:,:,b), [-maxVal(2) maxVal(2)]);
+    hold on
+contour(ROI_contour,'k')
     if b == stimEndTime+6
         colorbar
         set(p,'Position',[0.015+(b-stimStartTime)*0.09 0.64 0.07 0.12]);
@@ -89,7 +93,9 @@ end
 
 for b=stimStartTime-2: stimEndTime+6
     p = subplot('position', [0.015+(b-stimStartTime)*0.09 0.48 0.07 0.12]);
-    imagesc(downSampledBlocks3(:,:,b), [-1.1*maxVal(3) 1.1*maxVal(3)]);
+    imagesc(downSampledBlocks3(:,:,b), [-maxVal(3) maxVal(3)]);
+    hold on
+contour(ROI_contour,'k')
     if b == stimEndTime+6
         colorbar
         set(p,'Position',[0.015+(b-stimStartTime)*0.09 0.48 0.07 0.12]);

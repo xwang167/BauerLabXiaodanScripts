@@ -13,9 +13,7 @@ info.T1=size(rawdata,4);
 %             save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(run),'.mat')),'info', '-append');
 %             break
 %         end
-load('D:\OIS_Process\noVasculatureMask.mat')
-mask = leftMask+rightMask;
-isbrain = isbrain.*mask;
+isbrain = isbrain;
 ibi=find(isbrain==1);
 rawdata=single(reshape(rawdata,info.nVy*info.nVx,numLED,[]));
 
@@ -75,14 +73,15 @@ elseif strcmp(system, 'EastOIS2')
         %     legendName = {'Blue Green fluorescence', 'Green red fluorescence','green LED', 'red LED'};
     end
 elseif strcmp(system,'EastOIS2_OneCam')
-    
+    if strcmp(mouseType,'jrgeco1a')
+    TickLabels = {'Fluor','R','O'};
+    Colors = [ 1 0 1;1 0 0;1 0.5 0];
+    legendName = {'RGECO', 'Red LED','Orange LED'};   
+    elseif strcmp(mouseType,'gcamp')
     TickLabels = {'Fluor','G','R'};
     Colors = [ 0 0 1;0 1 0;1 0 0];
-    legendName = {'Green fluorescence', 'GreenLED','Red LED'};
-    
-    
-    
-    
+    legendName = {'Green fluorescence', 'Green LED','Red LED'};
+    end    
 end
 
 

@@ -1,4 +1,6 @@
-function   [goodBlocks,ROI] = QC_stim(oxy,deoxy,greenFluor,greenFluorCorr,green,jrgeco1a,jrgeco1aCorr,red,xform_isbrain,numBlock,numDesample,stimStartTime,stimduration,stimFreq,framerate,stimblocksize,stimbaseline,texttitle,output,input_ROI,ifGoodBlocks)
+function   [goodBlocks,ROI] = QC_stim_range(oxy,deoxy,greenFluor,greenFluorCorr,green,jrgeco1a,jrgeco1aCorr,red,...
+    oxy_Max,total_Max,deoxy_Max,greenFluor_Max,greenFluorCorr_Max,green_Max,jrgeco1a_Max,jrgeco1aCorr_Max,red_Max,...
+    xform_isbrain,numBlock,numDesample,stimStartTime,stimduration,stimFreq,framerate,stimblocksize,stimbaseline,texttitle,output,input_ROI,ifGoodBlocks)
 
 
 
@@ -44,7 +46,7 @@ goodBlocks = 1:numBlock;
 
 
 
-[goodBlocks] = pickGoodBlocks(stimStartTime,stimEndTime,numBlock,oxy_downsampled,deoxy_downsampled,total_downsampled,...
+generatePresMap(stimStartTime,stimEndTime,numBlock,oxy_downsampled,deoxy_downsampled,total_downsampled,...
     greenFluorCorr_downsampled,jrgeco1aCorr_downsampled,input_ROI);
 if ~isempty(ifGoodBlocks)
     goodBlocks = goodBlocks(ifGoodBlocks);
@@ -410,7 +412,7 @@ if ~isempty(goodBlocks)
     
     traceImage(oxy_downsampled_blocks,total_downsampled_blocks,deoxy_downsampled_blocks,...
         'HbO','Total','HbR',oxy_active,total_active,deoxy_active,'r','k','b',ROI,'\Delta\muM',...
-        stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[3,2,1])
+        stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[oxy_Max,total_Max,deoxy_Max])
     
     
     texttitle2 = strcat(' Block Average for ', {' '},texttitle);
@@ -423,29 +425,29 @@ if ~isempty(goodBlocks)
     
     
     
-    figure
-    imagesc(total_downsampled_blocks(:,:,stimEndTime),...
-        [min(total_downsampled_blocks(:,:,stimEndTime),[],'all'),max(total_downsampled_blocks(:,:,stimEndTime),[],'all')])
-    
-    colorbar
-    
-    hold on
-    
-    imagesc(WL,'AlphaData',1-ROI)
-    
-    axis image off
-    
-    title('Total');
-    
-    saveas(gcf,strcat(output,'HbTpeak.fig'))
-    
-    saveas(gcf,strcat(output,'Hbpeak.png'))
+%     figure
+%     imagesc(total_downsampled_blocks(:,:,stimEndTime),...
+%         [min(total_downsampled_blocks(:,:,stimEndTime),[],'all'),max(total_downsampled_blocks(:,:,stimEndTime),[],'all')])
+%     
+%     colorbar
+%     
+%     hold on
+%     
+%     imagesc(WL,'AlphaData',1-ROI)
+%     
+%     axis image off
+%     
+%     title('Total');
+%     
+%     saveas(gcf,strcat(output,'HbTpeak.fig'))
+%     
+%     saveas(gcf,strcat(output,'Hbpeak.png'))
     
     if ~isempty(jrgeco1a)
         
         traceImage(jrgeco1a_downsampled_blocks,jrgeco1aCorr_downsampled_blocks,red_downsampled_blocks,...
             'jrgeco1a','jrgeco1aCorr','625nm Reflectance',jrgeco1a_active,jrgeco1aCorr_active,red_active,'m','k','r',ROI,'\DeltaF/F%',...
-            stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[2 2 0.2])
+            stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[jrgeco1a_Max,jrgeco1aCorr_Max,red_Max])
         
         
         
@@ -479,7 +481,7 @@ if ~isempty(goodBlocks)
             
             traceImage(greenFluor_downsampled_blocks,greenFluorCorr_downsampled_blocks,green_downsampled_blocks,...
                 'FAD','FADCorr','525nm Reflectance',greenFluor_active,greenFluorCorr_active,green_active,'g','k',[ 0 0.6 0],ROI,'\DeltaF/F%',...
-                stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[2,1,1.5])
+                stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[greenFluor_Max,greenFluorCorr_Max,green_Max])
             
             
             

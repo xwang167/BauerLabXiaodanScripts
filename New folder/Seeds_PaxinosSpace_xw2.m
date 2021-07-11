@@ -1,4 +1,4 @@
-function [Seeds, L]=Seeds_PaxinosSpace
+function [Seeds, L]=Seeds_PaxinosSpace_xw2
 
 %These are the atlas coordinates of our seed locations
 

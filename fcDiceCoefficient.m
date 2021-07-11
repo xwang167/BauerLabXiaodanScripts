@@ -292,6 +292,8 @@ VL_FADCorr_ISA_anes(isnan(VL_FADCorr_ISA_anes)) = 0;
 similarity_VL_FADCorr_ISA_anes_anes = dice(VL_jrgeco1aCorr_ISA_awake,...
     VL_FADCorr_ISA_anes);
 
+
+
 VL_total_ISA_awake = R_total_ISA_mice_awake(:,:,15);
 VL_total_ISA_awake(VL_total_ISA_awake>0.5) = 1;
 VL_total_ISA_awake(VL_total_ISA_awake<0.5) = 0;
@@ -299,17 +301,13 @@ VL_total_ISA_awake(isnan(VL_total_ISA_awake)) = 0;
 similarity_VL_total_ISA_awake_awake = dice(VL_jrgeco1aCorr_ISA_awake,...
     VL_total_ISA_awake);
 
+
 VL_total_ISA_anes = R_total_ISA_mice_anes(:,:,15);
 VL_total_ISA_anes(VL_total_ISA_anes>0.5) = 1;
 VL_total_ISA_anes(VL_total_ISA_anes<0.5) = 0;
 VL_total_ISA_anes(isnan(VL_total_ISA_anes)) = 0;
 similarity_VL_total_ISA_anes_anes = dice(VL_jrgeco1aCorr_ISA_awake,...
     VL_total_ISA_anes);
-
-
-
-
-
 
 
 CingL_jrgeco1aCorr_Delta_awake = R_jrgeco1aCorr_Delta_mice_awake(:,:,5);
@@ -589,6 +587,19 @@ similarity_VL_total_Delta_anes_anes = dice(VL_jrgeco1aCorr_Delta_awake,...
 
 
 
+ISA_Awake_FAD = [similarity_CingL_FADCorr_ISA_awake_awake,similarity_ML_FADCorr_ISA_awake_awake,similarity_SSL_FADCorr_ISA_awake_awake,similarity_RSL_FADCorr_ISA_awake_awake,similarity_PL_FADCorr_ISA_awake_awake,similarity_VL_FADCorr_ISA_awake_awake];
+ISA_Anes_FAD = [similarity_CingL_FADCorr_ISA_anes_anes,similarity_ML_FADCorr_ISA_anes_anes,similarity_SSL_FADCorr_ISA_anes_anes,similarity_RSL_FADCorr_ISA_anes_anes,similarity_PL_FADCorr_ISA_anes_anes,similarity_VL_FADCorr_ISA_anes_anes];
 
+ISA_Awake_HbT = [similarity_CingL_total_ISA_awake_awake,similarity_ML_total_ISA_awake_awake,similarity_SSL_total_ISA_awake_awake,similarity_RSL_total_ISA_awake_awake,similarity_PL_total_ISA_awake_awake,similarity_VL_total_ISA_awake_awake];
+ISA_Anes_HbT = [similarity_CingL_total_ISA_anes_anes,similarity_ML_total_ISA_anes_anes,similarity_SSL_total_ISA_anes_anes,similarity_RSL_total_ISA_anes_anes,similarity_PL_total_ISA_anes_anes,similarity_VL_total_ISA_anes_anes];
 
+ISA_Awake_jrgeco1a = [similarity_CingL_jrgeco1aCorr_ISA_awake_anes,similarity_ML_jrgeco1aCorr_ISA_awake_anes,similarity_SSL_jrgeco1aCorr_ISA_awake_anes,similarity_RSL_jrgeco1aCorr_ISA_awake_anes,similarity_PL_jrgeco1aCorr_ISA_awake_anes,similarity_VL_jrgeco1aCorr_ISA_awake_anes];
+ISA_Anes_jrgeco1a = [similarity_CingL_jrgeco1aCorr_ISA_awake_anes,similarity_ML_jrgeco1aCorr_ISA_awake_anes,similarity_SSL_jrgeco1aCorr_ISA_awake_anes,similarity_RSL_jrgeco1aCorr_ISA_awake_anes,similarity_PL_jrgeco1aCorr_ISA_awake_anes,similarity_VL_jrgeco1aCorr_ISA_awake_anes];
 
+Delta_Awake_FAD = [similarity_CingL_FADCorr_Delta_awake_awake,similarity_ML_FADCorr_Delta_awake_awake,similarity_SSL_FADCorr_Delta_awake_awake,similarity_RSL_FADCorr_Delta_awake_awake,similarity_PL_FADCorr_Delta_awake_awake,similarity_VL_FADCorr_Delta_awake_awake];
+Delta_Awake_HbT = [similarity_CingL_total_Delta_awake_awake,similarity_ML_total_Delta_awake_awake,similarity_SSL_total_Delta_awake_awake,similarity_RSL_total_Delta_awake_awake,similarity_PL_total_Delta_awake_awake,similarity_VL_total_Delta_awake_awake];
+
+Delta_Anes_FAD = [similarity_CingL_FADCorr_Delta_anes_anes,similarity_ML_FADCorr_Delta_anes_anes,similarity_SSL_FADCorr_Delta_anes_anes,similarity_RSL_FADCorr_Delta_anes_anes,similarity_PL_FADCorr_Delta_anes_anes,similarity_VL_FADCorr_Delta_anes_anes];
+Delta_Anes_HbT = [similarity_CingL_total_Delta_anes_anes,similarity_ML_total_Delta_anes_anes,similarity_SSL_total_Delta_anes_anes,similarity_RSL_total_Delta_anes_anes,similarity_PL_total_Delta_anes_anes,similarity_VL_total_Delta_anes_anes];
+
+Delta_Anes_jrgeco1a = [similarity_CingL_jrgeco1aCorr_Delta_awake_anes,similarity_ML_jrgeco1aCorr_Delta_awake_anes,similarity_SSL_jrgeco1aCorr_Delta_awake_anes,similarity_RSL_jrgeco1aCorr_Delta_awake_anes,similarity_PL_jrgeco1aCorr_Delta_awake_anes,similarity_VL_jrgeco1aCorr_Delta_awake_anes];

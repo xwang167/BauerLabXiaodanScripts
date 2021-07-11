@@ -6,8 +6,8 @@ excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBa
 nVx = 128;
 nVy = 128;
 %
-excelRows = 437;%[181 183 185 195 202 204 228 230 232 234 236 240];
-runs = 2:3;
+excelRows = [181 183 185 228 232 236];%[181 183 185 195 202 204 228 230 232 234 236 240];
+runs = 1:3;
 length_runs = length(runs);
 
 for ii = 1
@@ -35,11 +35,15 @@ for ii = 1
         elseif strcmp(char(sessionInfo.mouseType),'gcamp6f')
             systemInfo.numLEDs = 3;
         end
-        maskName = strcat(recDate,'-',mouseName,'-LandmarksandMask','.mat');
-        load(fullfile(saveDir,maskName), 'xform_isbrain')
-        %         maskDir = strcat('J:\RGECO\Kenny\', recDate, '\');
-        %         load(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-dataHb','.mat')),'xform_isbrain');
-        
+        maskDir = strcat('L:\RGECO\Kenny\', recDate, '\');
+        if exist(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-dataFluor','.mat')))
+            
+            load(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-dataFluor','.mat')),'xform_isbrain');
+            
+        else
+            maskName = strcat(recDate,'-',mouseName,'-LandmarksandMask','.mat');
+            load(fullfile(saveDir,maskName), 'xform_isbrain')
+        end
         xform_isbrain(xform_isbrain ==2)=1;
         xform_isbrain = double(xform_isbrain);
         if ~isempty(find(isnan(xform_isbrain), 1))
@@ -57,18 +61,18 @@ for ii = 1
         R_total_ISA_mouse  = zeros(info.nVy,info.nVx,16,length_runs);
         Rs_total_Delta_mouse = zeros(16,16,length_runs);
         Rs_total_ISA_mouse = zeros(16,16,length_runs);
-%         total_Delta_powerMap_mouse = zeros(info.nVy,info.nVx,length_runs);
-%         total_ISA_powerMap_mouse = zeros(info.nVy,info.nVx,length_runs);
-%         powerdata_average_oxy_mouse = [];
-%         powerdata_oxy_mouse = [];
-%         
-%         powerdata_average_deoxy_mouse = [];
-%         powerdata_deoxy_mouse = [];
-%         
-%         powerdata_average_total_mouse = [];
-%         powerdata_total_mouse = [];
-%         
-%         
+        %         total_Delta_powerMap_mouse = zeros(info.nVy,info.nVx,length_runs);
+        %         total_ISA_powerMap_mouse = zeros(info.nVy,info.nVx,length_runs);
+        %         powerdata_average_oxy_mouse = [];
+        %         powerdata_oxy_mouse = [];
+        %
+        %         powerdata_average_deoxy_mouse = [];
+        %         powerdata_deoxy_mouse = [];
+        %
+        %         powerdata_average_total_mouse = [];
+        %         powerdata_total_mouse = [];
+        %
+        %
         
         if strcmp(char(sessionInfo.mouseType),'gcamp6f')
             R_gcampCorr_Delta_mouse = zeros(info.nVy,info.nVx,14,length_runs);
@@ -85,19 +89,19 @@ for ii = 1
             R_jrgeco1aCorr_ISA_mouse  = zeros(info.nVy,info.nVx,16,length_runs);
             Rs_jrgeco1aCorr_Delta_mouse = zeros(16,16,length_runs);
             Rs_jrgeco1aCorr_ISA_mouse = zeros(16,16,length_runs);
-%             jrgeco1aCorr_Delta_powerMap_mouse = zeros(info.nVy,info.nVx,length_runs);
-%             jrgeco1aCorr_ISA_powerMap_mouse = zeros(info.nVy,info.nVx,length_runs);
-%             powerdata_average_jrgeco1aCorr_mouse = [];
-%             powerdata_jrgeco1aCorr_mouse = [];
-%             
+            %             jrgeco1aCorr_Delta_powerMap_mouse = zeros(info.nVy,info.nVx,length_runs);
+            %             jrgeco1aCorr_ISA_powerMap_mouse = zeros(info.nVy,info.nVx,length_runs);
+            %             powerdata_average_jrgeco1aCorr_mouse = [];
+            %             powerdata_jrgeco1aCorr_mouse = [];
+            %
             R_FADCorr_Delta_mouse  = zeros(info.nVy,info.nVx,16,length_runs);
             R_FADCorr_ISA_mouse  = zeros(info.nVy,info.nVx,16,length_runs);
             Rs_FADCorr_Delta_mouse = zeros(16,16,length_runs);
             Rs_FADCorr_ISA_mouse = zeros(16,16,length_runs);
-%             FADCorr_Delta_powerMap_mouse = zeros(info.nVy,info.nVx,length_runs);
-%             FADCorr_ISA_powerMap_mouse = zeros(info.nVy,info.nVx,length_runs);
-%             powerdata_average_FADCorr_mouse = [];
-%             powerdata_FADCorr_mouse = [];
+            %             FADCorr_Delta_powerMap_mouse = zeros(info.nVy,info.nVx,length_runs);
+            %             FADCorr_ISA_powerMap_mouse = zeros(info.nVy,info.nVx,length_runs);
+            %             powerdata_average_FADCorr_mouse = [];
+            %             powerdata_FADCorr_mouse = [];
             
         end
         for n = runs
@@ -123,23 +127,23 @@ for ii = 1
                     Rs_total_Delta_mouse(:,:,n) = Rs_total_Delta;
                     Rs_total_ISA_mouse(:,:,n) = Rs_total_ISA;
                     
-%                     if ismember(n,goodRuns)
-%                         powerdata_average_gcampCorr_mouse = cat(1,powerdata_average_gcampCorr_mouse,squeeze(powerdata_average_gcamp6fCorr));
-%                         powerdata_average_oxy_mouse = cat(1,powerdata_average_oxy_mouse,squeeze(powerdata_average_oxy));
-%                         powerdata_average_deoxy_mouse = cat(1,powerdata_average_deoxy_mouse,squeeze(powerdata_average_deoxy));
-%                         powerdata_average_total_mouse = cat(1,powerdata_average_total_mouse,squeeze(powerdata_average_total));
-%                         
-%                         powerdata_gcampCorr_mouse = cat(1,powerdata_gcampCorr_mouse,squeeze(powerdata_gcamp6fCorr));
-%                         powerdata_oxy_mouse = cat(1,powerdata_oxy_mouse,squeeze(powerdata_oxy));
-%                         powerdata_deoxy_mouse = cat(1,powerdata_deoxy_mouse,squeeze(powerdata_deoxy));
-%                         powerdata_total_mouse = cat(1,powerdata_total_mouse,squeeze(powerdata_total));
-%                    end
-%                     
-%                     gcampCorr_Delta_powerMap_mouse(:,:,n) = gcamp6fCorr_Delta_powerMap;
-%                     gcampCorr_ISA_powerMap_mouse(:,:,n) = gcamp6fCorr_ISA_powerMap;
-%                     total_Delta_powerMap_mouse(:,:,n) = total_Delta_powerMap;
-%                     total_ISA_powerMap_mouse(:,:,n) = total_ISA_powerMap;
-                 elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
+                    %                     if ismember(n,goodRuns)
+                    %                         powerdata_average_gcampCorr_mouse = cat(1,powerdata_average_gcampCorr_mouse,squeeze(powerdata_average_gcamp6fCorr));
+                    %                         powerdata_average_oxy_mouse = cat(1,powerdata_average_oxy_mouse,squeeze(powerdata_average_oxy));
+                    %                         powerdata_average_deoxy_mouse = cat(1,powerdata_average_deoxy_mouse,squeeze(powerdata_average_deoxy));
+                    %                         powerdata_average_total_mouse = cat(1,powerdata_average_total_mouse,squeeze(powerdata_average_total));
+                    %
+                    %                         powerdata_gcampCorr_mouse = cat(1,powerdata_gcampCorr_mouse,squeeze(powerdata_gcamp6fCorr));
+                    %                         powerdata_oxy_mouse = cat(1,powerdata_oxy_mouse,squeeze(powerdata_oxy));
+                    %                         powerdata_deoxy_mouse = cat(1,powerdata_deoxy_mouse,squeeze(powerdata_deoxy));
+                    %                         powerdata_total_mouse = cat(1,powerdata_total_mouse,squeeze(powerdata_total));
+                    %                    end
+                    %
+                    %                     gcampCorr_Delta_powerMap_mouse(:,:,n) = gcamp6fCorr_Delta_powerMap;
+                    %                     gcampCorr_ISA_powerMap_mouse(:,:,n) = gcamp6fCorr_ISA_powerMap;
+                    %                     total_Delta_powerMap_mouse(:,:,n) = total_Delta_powerMap;
+                    %                     total_ISA_powerMap_mouse(:,:,n) = total_ISA_powerMap;
+                elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a')
                     load(fullfile(saveDir, processedName),'R_total_Delta','R_total_ISA','R_jrgeco1aCorr_Delta','R_jrgeco1aCorr_ISA','R_FADCorr_Delta','R_FADCorr_ISA',...
                         'Rs_total_Delta','Rs_total_ISA','Rs_jrgeco1aCorr_Delta','Rs_jrgeco1aCorr_ISA', 'Rs_FADCorr_Delta','Rs_FADCorr_ISA',...
                         'total_Delta_powerMap','total_ISA_powerMap','jrgeco1aCorr_Delta_powerMap','jrgeco1aCorr_ISA_powerMap', 'FADCorr_Delta_powerMap','FADCorr_ISA_powerMap',...
@@ -151,24 +155,24 @@ for ii = 1
                     Rs_total_Delta_mouse(:,:,n) = Rs_total_Delta;
                     Rs_total_ISA_mouse(:,:,n) = Rs_total_ISA;
                     
-%                     total_Delta_powerMap_mouse(:,:,n) = total_Delta_powerMap;
-%                     total_ISA_powerMap_mouse(:,:,n) = total_ISA_powerMap;
-%                     
+                    %                     total_Delta_powerMap_mouse(:,:,n) = total_Delta_powerMap;
+                    %                     total_ISA_powerMap_mouse(:,:,n) = total_ISA_powerMap;
+                    %
                     
                     if ismember(n,goodRuns)
-%                         load(fullfile(saveDir, processedName),'powerdata_oxy','powerdata_deoxy','powerdata_jrgeco1aCorr','powerdata_total','powerdata_FADCorr',...
-%                             'powerdata_average_oxy','powerdata_average_deoxy','powerdata_average_jrgeco1aCorr','powerdata_average_total','powerdata_average_FADCorr')
-%                         powerdata_jrgeco1aCorr_mouse = cat(1,powerdata_jrgeco1aCorr_mouse,squeeze(powerdata_jrgeco1aCorr));
-%                         powerdata_FADCorr_mouse = cat(1,powerdata_FADCorr_mouse,squeeze(powerdata_FADCorr));
-%                         powerdata_oxy_mouse = cat(1,powerdata_oxy_mouse,squeeze(powerdata_oxy));
-%                         powerdata_deoxy_mouse = cat(1,powerdata_deoxy_mouse,squeeze(powerdata_deoxy));
-%                         powerdata_total_mouse = cat(1,powerdata_total_mouse,squeeze(powerdata_total));
-%                         
-%                         powerdata_average_jrgeco1aCorr_mouse = cat(1,powerdata_average_jrgeco1aCorr_mouse,squeeze(powerdata_average_jrgeco1aCorr'));
-%                         powerdata_average_FADCorr_mouse = cat(1,powerdata_average_FADCorr_mouse,squeeze(powerdata_average_FADCorr'));
-%                         powerdata_average_oxy_mouse = cat(1,powerdata_average_oxy_mouse,squeeze(powerdata_average_oxy'));
-%                         powerdata_average_deoxy_mouse = cat(1,powerdata_average_deoxy_mouse,squeeze(powerdata_average_deoxy'));
-%                         powerdata_average_total_mouse = cat(1,powerdata_average_total_mouse,squeeze(powerdata_average_total'));
+                        %                         load(fullfile(saveDir, processedName),'powerdata_oxy','powerdata_deoxy','powerdata_jrgeco1aCorr','powerdata_total','powerdata_FADCorr',...
+                        %                             'powerdata_average_oxy','powerdata_average_deoxy','powerdata_average_jrgeco1aCorr','powerdata_average_total','powerdata_average_FADCorr')
+                        %                         powerdata_jrgeco1aCorr_mouse = cat(1,powerdata_jrgeco1aCorr_mouse,squeeze(powerdata_jrgeco1aCorr));
+                        %                         powerdata_FADCorr_mouse = cat(1,powerdata_FADCorr_mouse,squeeze(powerdata_FADCorr));
+                        %                         powerdata_oxy_mouse = cat(1,powerdata_oxy_mouse,squeeze(powerdata_oxy));
+                        %                         powerdata_deoxy_mouse = cat(1,powerdata_deoxy_mouse,squeeze(powerdata_deoxy));
+                        %                         powerdata_total_mouse = cat(1,powerdata_total_mouse,squeeze(powerdata_total));
+                        %
+                        %                         powerdata_average_jrgeco1aCorr_mouse = cat(1,powerdata_average_jrgeco1aCorr_mouse,squeeze(powerdata_average_jrgeco1aCorr'));
+                        %                         powerdata_average_FADCorr_mouse = cat(1,powerdata_average_FADCorr_mouse,squeeze(powerdata_average_FADCorr'));
+                        %                         powerdata_average_oxy_mouse = cat(1,powerdata_average_oxy_mouse,squeeze(powerdata_average_oxy'));
+                        %                         powerdata_average_deoxy_mouse = cat(1,powerdata_average_deoxy_mouse,squeeze(powerdata_average_deoxy'));
+                        %                         powerdata_average_total_mouse = cat(1,powerdata_average_total_mouse,squeeze(powerdata_average_total'));
                         
                     end
                     
@@ -178,30 +182,30 @@ for ii = 1
                     Rs_jrgeco1aCorr_Delta_mouse(:,:,n) = Rs_jrgeco1aCorr_Delta;
                     Rs_jrgeco1aCorr_ISA_mouse(:,:,n) = Rs_jrgeco1aCorr_ISA;
                     
-%                     jrgeco1aCorr_Delta_powerMap_mouse(:,:,n) = jrgeco1aCorr_Delta_powerMap;
-%                     jrgeco1aCorr_ISA_powerMap_mouse(:,:,n) = jrgeco1aCorr_ISA_powerMap;
-%                     
+                    %                     jrgeco1aCorr_Delta_powerMap_mouse(:,:,n) = jrgeco1aCorr_Delta_powerMap;
+                    %                     jrgeco1aCorr_ISA_powerMap_mouse(:,:,n) = jrgeco1aCorr_ISA_powerMap;
+                    %
                     R_FADCorr_Delta_mouse(:,:,:,n) = R_FADCorr_Delta;
                     R_FADCorr_ISA_mouse(:,:,:,n) = R_FADCorr_ISA;
                     Rs_FADCorr_Delta_mouse(:,:,n) = Rs_FADCorr_Delta;
                     Rs_FADCorr_ISA_mouse(:,:,n) = Rs_FADCorr_ISA;
                     
-%                     FADCorr_Delta_powerMap_mouse(:,:,n) = FADCorr_Delta_powerMap;
-%                     FADCorr_ISA_powerMap_mouse(:,:,n) = FADCorr_ISA_powerMap;
+                    %                     FADCorr_Delta_powerMap_mouse(:,:,n) = FADCorr_Delta_powerMap;
+                    %                     FADCorr_ISA_powerMap_mouse(:,:,n) = FADCorr_ISA_powerMap;
                 end
             end
         end
         
         %if goodRuns~=0
-            
-%             powerdata_average_oxy_mouse = mean(powerdata_average_oxy_mouse,1);
-%             powerdata_oxy_mouse = mean(powerdata_oxy_mouse,1);
-%             powerdata_average_deoxy_mouse = mean(powerdata_average_deoxy_mouse,1);
-%             powerdata_deoxy_mouse = mean(powerdata_deoxy_mouse,1);
-%             powerdata_average_total_mouse = mean(powerdata_average_total_mouse,1);
-%             powerdata_total_mouse = mean(powerdata_total_mouse,1);
-%             
-            
+        
+        %             powerdata_average_oxy_mouse = mean(powerdata_average_oxy_mouse,1);
+        %             powerdata_oxy_mouse = mean(powerdata_oxy_mouse,1);
+        %             powerdata_average_deoxy_mouse = mean(powerdata_average_deoxy_mouse,1);
+        %             powerdata_deoxy_mouse = mean(powerdata_deoxy_mouse,1);
+        %             powerdata_average_total_mouse = mean(powerdata_average_total_mouse,1);
+        %             powerdata_total_mouse = mean(powerdata_total_mouse,1);
+        %
+        
         %end
         
         R_total_Delta_mouse  = mean(R_total_Delta_mouse,4);
@@ -210,9 +214,9 @@ for ii = 1
         Rs_total_ISA_mouse = mean(Rs_total_ISA_mouse,3);
         
         
-%         total_Delta_powerMap_mouse = mean(total_Delta_powerMap_mouse,3);
-%         total_ISA_powerMap_mouse = mean(total_ISA_powerMap_mouse,3);
-%         
+        %         total_Delta_powerMap_mouse = mean(total_Delta_powerMap_mouse,3);
+        %         total_ISA_powerMap_mouse = mean(total_ISA_powerMap_mouse,3);
+        %
         
         disp(char(['QC check on ', processedName_mouse]))
         if strcmp(char(sessionInfo.mouseType),'gcamp6f')
@@ -220,10 +224,10 @@ for ii = 1
             R_gcampCorr_ISA_mouse  = mean(R_gcampCorr_ISA_mouse,4);
             Rs_gcampCorr_Delta_mouse = mean(Rs_gcampCorr_Delta_mouse,3);
             Rs_gcampCorr_ISA_mouse = mean(Rs_gcampCorr_ISA_mouse,3);
-%             powerdata_average_gcampCorr_mouse = mean(powerdata_average_gcampCorr_mouse,1);
-%             powerdata_gcampCorr_mouse = mean(powerdata_gcampCorr_mouse,1);
-%             gcampCorr_Delta_powerMap_mouse = mean(gcampCorr_Delta_powerMap_mouse,3);
-%             gcampCorr_ISA_powerMap_mouse = mean(gcampCorr_ISA_powerMap_mouse,3);
+            %             powerdata_average_gcampCorr_mouse = mean(powerdata_average_gcampCorr_mouse,1);
+            %             powerdata_gcampCorr_mouse = mean(powerdata_gcampCorr_mouse,1);
+            %             gcampCorr_Delta_powerMap_mouse = mean(gcampCorr_Delta_powerMap_mouse,3);
+            %             gcampCorr_ISA_powerMap_mouse = mean(gcampCorr_ISA_powerMap_mouse,3);
             save(fullfile(saveDir, processedName_mouse),'R_gcampCorr_Delta_mouse','R_gcampCorr_ISA_mouse','R_total_Delta_mouse','R_total_ISA_mouse','Rs_gcampCorr_Delta_mouse','Rs_gcampCorr_ISA_mouse','Rs_total_Delta_mouse','Rs_total_ISA_mouse','powerdata_average_deoxy_mouse','powerdata_average_oxy_mouse','powerdata_average_gcampCorr_mouse','powerdata_average_total_mouse','powerdata_deoxy_mouse','powerdata_oxy_mouse','powerdata_gcampCorr_mouse','powerdata_total_mouse','gcampCorr_Delta_powerMap_mouse','gcampCorr_ISA_powerMap_mouse','total_Delta_powerMap_mouse','total_ISA_powerMap_mouse','hz','hz2')
             
             refseeds=GetReferenceSeeds;
@@ -334,96 +338,96 @@ for ii = 1
             R_jrgeco1aCorr_ISA_mouse  = mean(R_jrgeco1aCorr_ISA_mouse,4);
             Rs_jrgeco1aCorr_Delta_mouse = mean(Rs_jrgeco1aCorr_Delta_mouse,3);
             Rs_jrgeco1aCorr_ISA_mouse = mean(Rs_jrgeco1aCorr_ISA_mouse,3);
-%             jrgeco1aCorr_Delta_powerMap_mouse = mean(jrgeco1aCorr_Delta_powerMap_mouse,3);
-%             jrgeco1aCorr_ISA_powerMap_mouse = mean(jrgeco1aCorr_ISA_powerMap_mouse,3);
-%             
+            %             jrgeco1aCorr_Delta_powerMap_mouse = mean(jrgeco1aCorr_Delta_powerMap_mouse,3);
+            %             jrgeco1aCorr_ISA_powerMap_mouse = mean(jrgeco1aCorr_ISA_powerMap_mouse,3);
+            %
             R_FADCorr_Delta_mouse = mean(R_FADCorr_Delta_mouse,4);
             R_FADCorr_ISA_mouse  = mean(R_FADCorr_ISA_mouse,4);
             Rs_FADCorr_Delta_mouse = mean(Rs_FADCorr_Delta_mouse,3);
             Rs_FADCorr_ISA_mouse = mean(Rs_FADCorr_ISA_mouse,3);
             
-%             FADCorr_Delta_powerMap_mouse = mean(FADCorr_Delta_powerMap_mouse,3);
-%             FADCorr_ISA_powerMap_mouse = mean(FADCorr_ISA_powerMap_mouse,3);
-     save(fullfile(saveDir, processedName_mouse),'R_total_ISA_mouse','R_jrgeco1aCorr_ISA_mouse','R_FADCorr_ISA_mouse',...
+            %             FADCorr_Delta_powerMap_mouse = mean(FADCorr_Delta_powerMap_mouse,3);
+            %             FADCorr_ISA_powerMap_mouse = mean(FADCorr_ISA_powerMap_mouse,3);
+            save(fullfile(saveDir, processedName_mouse),'R_total_ISA_mouse','R_jrgeco1aCorr_ISA_mouse','R_FADCorr_ISA_mouse',...
                 'R_total_Delta_mouse','R_jrgeco1aCorr_Delta_mouse','R_FADCorr_Delta_mouse',...
                 'Rs_total_ISA_mouse','Rs_jrgeco1aCorr_ISA_mouse','Rs_FADCorr_ISA_mouse',...
-                'Rs_total_Delta_mouse','Rs_jrgeco1aCorr_Delta_mouse','Rs_FADCorr_Delta_mouse')
-
+                'Rs_total_Delta_mouse','Rs_jrgeco1aCorr_Delta_mouse','Rs_FADCorr_Delta_mouse','-append')
             
-%             save(fullfile(saveDir, processedName_mouse),'R_total_ISA_mouse','R_jrgeco1aCorr_ISA_mouse','R_FADCorr_ISA_mouse',...
-%                 'R_total_Delta_mouse','R_jrgeco1aCorr_Delta_mouse','R_FADCorr_Delta_mouse',...
-%                 'Rs_total_ISA_mouse','Rs_jrgeco1aCorr_ISA_mouse','Rs_FADCorr_ISA_mouse',...
-%                 'Rs_total_Delta_mouse','Rs_jrgeco1aCorr_Delta_mouse','Rs_FADCorr_Delta_mouse',...
-%                 'total_ISA_powerMap_mouse','jrgeco1aCorr_ISA_powerMap_mouse','FADCorr_ISA_powerMap_mouse',...
-%                 'total_Delta_powerMap_mouse','jrgeco1aCorr_Delta_powerMap_mouse','FADCorr_Delta_powerMap_mouse',...
-%                 'hz','-append')
+            
+            %             save(fullfile(saveDir, processedName_mouse),'R_total_ISA_mouse','R_jrgeco1aCorr_ISA_mouse','R_FADCorr_ISA_mouse',...
+            %                 'R_total_Delta_mouse','R_jrgeco1aCorr_Delta_mouse','R_FADCorr_Delta_mouse',...
+            %                 'Rs_total_ISA_mouse','Rs_jrgeco1aCorr_ISA_mouse','Rs_FADCorr_ISA_mouse',...
+            %                 'Rs_total_Delta_mouse','Rs_jrgeco1aCorr_Delta_mouse','Rs_FADCorr_Delta_mouse',...
+            %                 'total_ISA_powerMap_mouse','jrgeco1aCorr_ISA_powerMap_mouse','FADCorr_ISA_powerMap_mouse',...
+            %                 'total_Delta_powerMap_mouse','jrgeco1aCorr_Delta_powerMap_mouse','FADCorr_Delta_powerMap_mouse',...
+            %                 'hz','-append')
             visName = strcat(recDate,'-',mouseName,'-',sessionType);
             if goodRuns ~=0
-%                 
-%                 powerdata_average_jrgeco1aCorr_mouse = mean(powerdata_average_jrgeco1aCorr_mouse,1);
-%                 powerdata_jrgeco1aCorr_mouse = mean(powerdata_jrgeco1aCorr_mouse,1);
-%                 powerdata_average_FADCorr_mouse = mean(powerdata_average_FADCorr_mouse,1);
-%                 powerdata_FADCorr_mouse = mean(powerdata_FADCorr_mouse,1);
-%                 
-%                 save(fullfile(saveDir, processedName_mouse), 'powerdata_average_oxy_mouse','powerdata_average_deoxy_mouse','powerdata_average_total_mouse','powerdata_average_jrgeco1aCorr_mouse','powerdata_average_FADCorr_mouse',...
-%                     'powerdata_oxy_mouse','powerdata_deoxy_mouse','powerdata_total_mouse','powerdata_jrgeco1aCorr_mouse','powerdata_FADCorr_mouse','-append')
-%                 leftData = cell(2,1);
-%                 leftData{1} = powerdata_jrgeco1aCorr_mouse;
-%                 leftData{2} = powerdata_FADCorr_mouse;
-%                 
-%                 rightData = cell(3,1);
-%                 rightData{1} = powerdata_oxy_mouse;
-%                 rightData{2} = powerdata_deoxy_mouse;
-%                 rightData{3} = powerdata_total_mouse;
-%                 
-%                 leftLabel = 'Fluor(\DeltaF/F%)^2/Hz)';
-%                 rightLabel = 'Hb(\muM^2/Hz)';
-%                 leftLineStyle = {'m-','g-'};
-%                 rightLineStyle= {'r-','b-','k-'};
-%                 legendName = ["Corrected jRGECO1a","Corrected FAD","HbO","HbR","HbT"];
-%                                
-%                 QCcheck_fftVis(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir,strcat(visName, '_powerCurve'))
-%                 
-%                 
-%                 
-%                 leftData = cell(2,1);
-%                 leftData{1} = powerdata_average_jrgeco1aCorr_mouse;
-%                 
-%                 leftData{2} = powerdata_average_FADCorr_mouse;
-%                 
-%                 rightData = cell(3,1);
-%                 rightData{1} = powerdata_average_oxy_mouse;
-%                 rightData{2} = powerdata_average_deoxy_mouse;
-%                 rightData{3} = powerdata_average_total_mouse;
-%                 
-%                 leftLabel = 'Fluor(\DeltaF/F%)^2/Hz)';
-%                 rightLabel = 'Hb(\muM^2/Hz)';
-%                 leftLineStyle = {'m-','g-'};
-%                 rightLineStyle= {'r-','b-','k-'};
-%                 legendName = ["Corrected jRGECO1a","Corrected FAD","HbO","HbR","HbT"];
-%                                QCcheck_fftVis(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir,strcat(visName, '_powerCurve_average'))
-%                 
+                %
+                %                 powerdata_average_jrgeco1aCorr_mouse = mean(powerdata_average_jrgeco1aCorr_mouse,1);
+                %                 powerdata_jrgeco1aCorr_mouse = mean(powerdata_jrgeco1aCorr_mouse,1);
+                %                 powerdata_average_FADCorr_mouse = mean(powerdata_average_FADCorr_mouse,1);
+                %                 powerdata_FADCorr_mouse = mean(powerdata_FADCorr_mouse,1);
+                %
+                %                 save(fullfile(saveDir, processedName_mouse), 'powerdata_average_oxy_mouse','powerdata_average_deoxy_mouse','powerdata_average_total_mouse','powerdata_average_jrgeco1aCorr_mouse','powerdata_average_FADCorr_mouse',...
+                %                     'powerdata_oxy_mouse','powerdata_deoxy_mouse','powerdata_total_mouse','powerdata_jrgeco1aCorr_mouse','powerdata_FADCorr_mouse','-append')
+                %                 leftData = cell(2,1);
+                %                 leftData{1} = powerdata_jrgeco1aCorr_mouse;
+                %                 leftData{2} = powerdata_FADCorr_mouse;
+                %
+                %                 rightData = cell(3,1);
+                %                 rightData{1} = powerdata_oxy_mouse;
+                %                 rightData{2} = powerdata_deoxy_mouse;
+                %                 rightData{3} = powerdata_total_mouse;
+                %
+                %                 leftLabel = 'Fluor(\DeltaF/F%)^2/Hz)';
+                %                 rightLabel = 'Hb(\muM^2/Hz)';
+                %                 leftLineStyle = {'m-','g-'};
+                %                 rightLineStyle= {'r-','b-','k-'};
+                %                 legendName = ["Corrected jRGECO1a","Corrected FAD","HbO","HbR","HbT"];
+                %
+                %                 QCcheck_fftVis(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir,strcat(visName, '_powerCurve'))
+                %
+                %
+                %
+                %                 leftData = cell(2,1);
+                %                 leftData{1} = powerdata_average_jrgeco1aCorr_mouse;
+                %
+                %                 leftData{2} = powerdata_average_FADCorr_mouse;
+                %
+                %                 rightData = cell(3,1);
+                %                 rightData{1} = powerdata_average_oxy_mouse;
+                %                 rightData{2} = powerdata_average_deoxy_mouse;
+                %                 rightData{3} = powerdata_average_total_mouse;
+                %
+                %                 leftLabel = 'Fluor(\DeltaF/F%)^2/Hz)';
+                %                 rightLabel = 'Hb(\muM^2/Hz)';
+                %                 leftLineStyle = {'m-','g-'};
+                %                 rightLineStyle= {'r-','b-','k-'};
+                %                 legendName = ["Corrected jRGECO1a","Corrected FAD","HbO","HbR","HbT"];
+                %                                QCcheck_fftVis(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir,strcat(visName, '_powerCurve_average'))
+                %
             end
             
+            %
+            %             refseeds=GetReferenceSeeds_xw;
             
-            refseeds=GetReferenceSeeds_xw;
-           
-%             QCcheck_powerMapVis(jrgeco1aCorr_ISA_powerMap_mouse,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, '_RGECOISA'))
-%             QCcheck_powerMapVis(FADCorr_ISA_powerMap_mouse,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, '_FADISA'))
-%             QCcheck_powerMapVis(total_ISA_powerMap_mouse,xform_isbrain,'\muM',saveDir,strcat(visName, "_TotalISA"))
-%             
-%             QCcheck_powerMapVis(jrgeco1aCorr_Delta_powerMap_mouse,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, "_RGECODelta"))
-%             QCcheck_powerMapVis(FADCorr_Delta_powerMap_mouse,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName,"_FADDelta"))
-%             QCcheck_powerMapVis(total_Delta_powerMap_mouse,xform_isbrain,'\muM',saveDir,strcat(visName,"_TotalDelta"))
-%             
-%             
-            QCcheck_fcVis(refseeds,R_jrgeco1aCorr_ISA_mouse, Rs_jrgeco1aCorr_ISA_mouse,'jrgeco1aCorr','m','ISA',saveDir,visName,false,xform_isbrain)
-            QCcheck_fcVis(refseeds,R_FADCorr_ISA_mouse, Rs_FADCorr_ISA_mouse,'FADCorr','g','ISA',saveDir,visName,false,xform_isbrain)
-            QCcheck_fcVis(refseeds,R_total_ISA_mouse, Rs_total_ISA_mouse,'total','k','ISA',saveDir,visName,false,xform_isbrain)
-            
-            QCcheck_fcVis(refseeds,R_jrgeco1aCorr_Delta_mouse, Rs_jrgeco1aCorr_Delta_mouse,'jrgeco1aCorr','m','Delta',saveDir,visName,false,xform_isbrain)
-            QCcheck_fcVis(refseeds,R_FADCorr_Delta_mouse, Rs_FADCorr_Delta_mouse,'FADCorr','g','Delta',saveDir,visName,false,xform_isbrain)
-            QCcheck_fcVis(refseeds,R_total_Delta_mouse, Rs_total_Delta_mouse,'total','k','Delta',saveDir,visName,false,xform_isbrain)
+            %             QCcheck_powerMapVis(jrgeco1aCorr_ISA_powerMap_mouse,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, '_RGECOISA'))
+            %             QCcheck_powerMapVis(FADCorr_ISA_powerMap_mouse,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, '_FADISA'))
+            %             QCcheck_powerMapVis(total_ISA_powerMap_mouse,xform_isbrain,'\muM',saveDir,strcat(visName, "_TotalISA"))
+            %
+            %             QCcheck_powerMapVis(jrgeco1aCorr_Delta_powerMap_mouse,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, "_RGECODelta"))
+            %             QCcheck_powerMapVis(FADCorr_Delta_powerMap_mouse,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName,"_FADDelta"))
+            %             QCcheck_powerMapVis(total_Delta_powerMap_mouse,xform_isbrain,'\muM',saveDir,strcat(visName,"_TotalDelta"))
+            %
+            %
+            %             QCcheck_fcVis(refseeds,R_jrgeco1aCorr_ISA_mouse, Rs_jrgeco1aCorr_ISA_mouse,'jrgeco1aCorr','m','ISA',saveDir,visName,false,xform_isbrain)
+            %             QCcheck_fcVis(refseeds,R_FADCorr_ISA_mouse, Rs_FADCorr_ISA_mouse,'FADCorr','g','ISA',saveDir,visName,false,xform_isbrain)
+            %             QCcheck_fcVis(refseeds,R_total_ISA_mouse, Rs_total_ISA_mouse,'total','k','ISA',saveDir,visName,false,xform_isbrain)
+            %
+            %             QCcheck_fcVis(refseeds,R_jrgeco1aCorr_Delta_mouse, Rs_jrgeco1aCorr_Delta_mouse,'jrgeco1aCorr','m','Delta',saveDir,visName,false,xform_isbrain)
+            %             QCcheck_fcVis(refseeds,R_FADCorr_Delta_mouse, Rs_FADCorr_Delta_mouse,'FADCorr','g','Delta',saveDir,visName,false,xform_isbrain)
+            %             QCcheck_fcVis(refseeds,R_total_Delta_mouse, Rs_total_Delta_mouse,'total','k','Delta',saveDir,visName,false,xform_isbrain)
             
             
             
