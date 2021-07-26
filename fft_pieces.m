@@ -180,18 +180,18 @@ fft_pieces_rgeco_mice = mean(fft_pieces_rgeco_mice,2);
 %     powerdata_average_total_mice = mean(powerdata_average_total_mice,1);
     
      hz = linspace(0,framerate,window);    
-    figure
-    loglog(hz,fft_pieces_oxy_mice/interp1(hz,fft_pieces_oxy_mice,0.01),'r')
-    hold on
-    loglog(hz,fft_pieces_deoxy_mice/interp1(hz,fft_pieces_deoxy_mice,0.01),'b')
-    hold on
-    loglog(hz,fft_pieces_total_mice/interp1(hz,fft_pieces_total_mice,0.01),'k')
-    hold on
-    loglog(hz,fft_pieces_rgeco_mice/interp1(hz,fft_pieces_rgeco_mice,0.01),'m')
-    
-    xlim([0.01 12.5])
-    legend('Oxy','DeOxy','Total','RGECO')
-    title(strcat('fft with pieces'))
+%     figure
+%     loglog(hz,fft_pieces_oxy_mice/interp1(hz,fft_pieces_oxy_mice,0.01),'r')
+%     hold on
+%     loglog(hz,fft_pieces_deoxy_mice/interp1(hz,fft_pieces_deoxy_mice,0.01),'b')
+%     hold on
+%     loglog(hz,fft_pieces_total_mice/interp1(hz,fft_pieces_total_mice,0.01),'k')
+%     hold on
+%     loglog(hz,fft_pieces_rgeco_mice/interp1(hz,fft_pieces_rgeco_mice,0.01),'m')
+%     
+%     xlim([0.01 12.5])
+%     legend('Oxy','DeOxy','Total','RGECO')
+%     title(strcat('fft with pieces'))
     
     figure
     loglog(hz,fft_pieces_oxy_mice/interp1(hz,fft_pieces_oxy_mice,0.01),'r')

@@ -43,6 +43,7 @@ for excelRow = excelRows
     for n = runs
         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
+        tic
         load(fullfile(saveDir,processedName),'xform_datahb','xform_jrgeco1aCorr')
 
         xform_datahb(isinf(xform_datahb)) = 0;
@@ -68,6 +69,7 @@ for excelRow = excelRows
        Calcium_filter = reshape(Calcium_filter,128,128,[]);
        HbT_filter = reshape(HbT_filter,128,128,[]);
        [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_xw(Calcium_filter,HbT_filter,t);
+       toc
         save(fullfile(saveDir,processedName),'T','W','A','r','r2','hemoPred','-append')
         figure
         subplot(2,3,1)

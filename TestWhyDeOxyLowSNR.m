@@ -80,7 +80,7 @@ for excelRow = excelRows
     mouseName = excelRaw{2}; mouseName = string(mouseName);
     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-    sessionInfo.darkFrameNum = excelRaw{15};
+    sessionInfo.darkFrameNum = excelRaw{1};
     rawdataloc = excelRaw{3};
     info.nVx = 128;
     info.nVy = 128;

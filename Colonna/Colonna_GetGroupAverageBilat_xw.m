@@ -1,5 +1,5 @@
-excelFileName='V:\CTREM\CTREM.xlsx';
-excelfiles=[2:11,17:22,27:63];  % Rows from Excell Database
+excelFile='V:\CTREM\CTREM.xlsx';
+excelRows=[2:11,17:22,27:63];  % Rows from Excell Database
 % % for ii = [2:11,17:22,27:63]
 % %     exampleBilateralFCAnalysis(excelFileName,ii,[0.009 0.08])
 % %     exampleBilateralFCAnalysis(excelFileName,ii,[0.4 4])
@@ -7,29 +7,45 @@ excelfiles=[2:11,17:22,27:63];  % Rows from Excell Database
 % 
 % 
 % 
-% WTFile = 'V:\CTREM\WT.xlsx';
-%     exampleBilateralFCAnalysis(WTFile,2:15,[0.009 0.08])
-% exampleBilateralFCAnalysis(WTFile,2:15,[0.4 4])
-% 
-% WTFADFile = 'V:\CTREM\WTFAD.xlsx';
-%     exampleBilateralFCAnalysis(WTFADFile,2:14,[0.009 0.08])
-% exampleBilateralFCAnalysis(WTFADFile,2:14,[0.4 4])
-% 
-% HETFile = 'V:\CTREM\HET.xlsx';
-%     exampleBilateralFCAnalysis(HETFile,2:7,[0.009 0.08])
-% exampleBilateralFCAnalysis(HETFile,2:7,[0.4 4])
-% 
-% HETFADFile = 'V:\CTREM\HETFAD.xlsx';
-%     exampleBilateralFCAnalysis(HETFADFile,2:7,[0.009 0.08])
-% exampleBilateralFCAnalysis(HETFADFile,2:7,[0.4 4])
-% 
-% KOFile = 'V:\CTREM\KO.xlsx';
-%     exampleBilateralFCAnalysis(KOFile,2:8,[0.009 0.08])
-%  exampleBilateralFCAnalysis(KOFile,2:8,[0.4 4])
-% 
-% KOFADFile = 'V:\CTREM\KOFAD.xlsx';
-%     exampleBilateralFCAnalysis(KOFADFile,2:8,[0.009 0.08])
-% exampleBilateralFCAnalysis(KOFADFile,2:8,[0.4 4])
+symisbrainall = 1;
+for excelRow = excelRows
+    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+    recDate = excelRaw{1}; recDate = string(recDate);
+    mouseName = excelRaw{9}; mouseName = string(mouseName);%2
+    saveDir = excelRaw{12}; saveDir = fullfile(string(saveDir),recDate);%4
+    sessionType = excelRaw{14}; sessionType = sessionType(3:end-2);%6
+    sessionInfo.mouseType = excelRaw{17};
+    systemType =excelRaw{13};%5;
+    mask_newDir_new = saveDir;
+    mask_newName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datahb','.mat');
+    load(fullfile(mask_newDir_new,mask_newName),'xform_isbrain')
+    symisbrainall = symisbrainall.*xform_isbrain;
+end
+symisbrainall = symisbrainall & fliplr(symisbrainall);
+
+WTFile = 'V:\CTREM\WT.xlsx';
+    exampleBilateralFCAnalysis_xw(WTFile,2:15,[0.009 0.08],symisbrainall)
+exampleBilateralFCAnalysis_xw(WTFile,2:15,[0.4 4],symisbrainall)
+
+WTFADFile = 'V:\CTREM\WTFAD.xlsx';
+    exampleBilateralFCAnalysis_xw(WTFADFile,2:14,[0.009 0.08],symisbrainall)
+exampleBilateralFCAnalysis_xw(WTFADFile,2:14,[0.4 4],symisbrainall)
+
+HETFile = 'V:\CTREM\HET.xlsx';
+    exampleBilateralFCAnalysis_xw(HETFile,2:7,[0.009 0.08],symisbrainall)
+exampleBilateralFCAnalysis_xw(HETFile,2:7,[0.4 4],symisbrainall)
+
+HETFADFile = 'V:\CTREM\HETFAD.xlsx';
+    exampleBilateralFCAnalysis_xw(HETFADFile,2:7,[0.009 0.08],symisbrainall)
+exampleBilateralFCAnalysis_xw(HETFADFile,2:7,[0.4 4],symisbrainall)
+
+KOFile = 'V:\CTREM\KO.xlsx';
+    exampleBilateralFCAnalysis_xw(KOFile,2:8,[0.009 0.08],symisbrainall)
+ exampleBilateralFCAnalysis_xw(KOFile,2:8,[0.4 4],symisbrainall)
+
+KOFADFile = 'V:\CTREM\KOFAD.xlsx';
+    exampleBilateralFCAnalysis_xw(KOFADFile,2:8,[0.009 0.08],symisbrainall)
+exampleBilateralFCAnalysis_xw(KOFADFile,2:8,[0.4 4],symisbrainall)
 
 
 
