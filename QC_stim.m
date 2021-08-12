@@ -46,20 +46,20 @@ goodBlocks = 1:numBlock;
 
 [goodBlocks] = pickGoodBlocks(stimStartTime,stimEndTime,numBlock,oxy_downsampled,deoxy_downsampled,total_downsampled,...
     greenFluorCorr_downsampled,jrgeco1aCorr_downsampled,input_ROI);
-if ~isempty(ifGoodBlocks)
-    goodBlocks = goodBlocks(ifGoodBlocks);
-else
-    prompt = {'Bad blocks to remove:'};
-    title1 = 'Pick block';
-    dims = [1 35];
-    definput = {'[]'};
-    answer = inputdlg(prompt,title1,dims,definput);
-    blocks = 1:numBlock;
-    if ~isempty(str2num(answer{1}))
-        blocks(str2num(answer{1})) = [];
-    end
-    goodBlocks = blocks;
-end
+% if ~isempty(ifGoodBlocks)
+%     goodBlocks = goodBlocks(ifGoodBlocks);
+% else
+%     prompt = {'Bad blocks to remove:'};
+%     title1 = 'Pick block';
+%     dims = [1 35];
+%     definput = {'[]'};
+%     answer = inputdlg(prompt,title1,dims,definput);
+%     blocks = 1:numBlock;
+%     if ~isempty(str2num(answer{1}))
+%         blocks(str2num(answer{1})) = [];
+%     end
+%     goodBlocks = blocks;
+% end
 texttitle1 = strcat(' Peak Map for each block', {' '},texttitle,{' '}, 'blocks ',{' '}, num2str(goodBlocks),{' '},'are picked');
 
 annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',texttitle1,'FontWeight','bold','Color',[1 0 0],'FontSize',16);
@@ -410,7 +410,7 @@ if ~isempty(goodBlocks)
     
     traceImage(oxy_downsampled_blocks,total_downsampled_blocks,deoxy_downsampled_blocks,...
         'HbO','Total','HbR',oxy_active,total_active,deoxy_active,'r','k','b',ROI,'\Delta\muM',...
-        stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[3,2,1])
+        stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[1 1 0.1])%]3,2,1
     
     
     texttitle2 = strcat(' Block Average for ', {' '},texttitle);
@@ -445,7 +445,7 @@ if ~isempty(goodBlocks)
         
         traceImage(jrgeco1a_downsampled_blocks,jrgeco1aCorr_downsampled_blocks,red_downsampled_blocks,...
             'jrgeco1a','jrgeco1aCorr','625nm Reflectance',jrgeco1a_active,jrgeco1aCorr_active,red_active,'m','k','r',ROI,'\DeltaF/F%',...
-            stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[2 2 0.2])
+            stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[2 2 0.2])%2 2 0.2
         
         
         
@@ -479,7 +479,7 @@ if ~isempty(goodBlocks)
             
             traceImage(greenFluor_downsampled_blocks,greenFluorCorr_downsampled_blocks,green_downsampled_blocks,...
                 'FAD','FADCorr','525nm Reflectance',greenFluor_active,greenFluorCorr_active,green_active,'g','k',[ 0 0.6 0],ROI,'\DeltaF/F%',...
-                stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[2,1,1.5])
+                stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[0.5 0.5 0.5]) %2,1,1.5
             
             
             

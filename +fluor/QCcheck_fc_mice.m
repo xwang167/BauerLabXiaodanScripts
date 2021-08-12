@@ -1,17 +1,17 @@
 close all;clearvars -except hz;clc
 import mice.*
-excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
+excelFile = "L:\Stroke\Stroke.xlsx";
 isZTransform = true;
 set(0,'defaultaxesfontsize',12);
 
 info.nVx = 128;
 info.nVy = 128;
 %
-excelRows =  [195 202 204 230 234 240] ;%[ 181 183 185  228 232 236 ];[181 183 185  228 232 236];%
+excelRows =  [3,6,7] ;%[ 181 183 185  228 232 236 ];[181 183 185  228 232 236];%
 numMice = length(excelRows);
 xform_isbrain_mice = 1;
 sessionInfo.miceType = 'jrgeco1a';
-saveDir_cat = 'L:\RGECO\cat';
+saveDir_cat = 'L:\Stroke\cat';
 
 R_total_Delta_mice  = zeros(info.nVy,info.nVx,16,numMice);
 R_total_ISA_mice  = zeros(info.nVy,info.nVx,16,numMice);
@@ -190,20 +190,20 @@ FADCorr_ISA_powerMap_mice = mean(FADCorr_ISA_powerMap_mice,3);
 
 
 
-processedName_mice = '191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-fc.mat';
-miceName = 'R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes';
+% processedName_mice = '191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-fc.mat';
+% miceName = 'R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes';
 % 
 % processedName_mice = '191030--R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-fc.mat';
 % miceName = 'R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake';
-load(fullfile(saveDir_cat, processedName_mice),'R_total_ISA_mice','R_jrgeco1aCorr_ISA_mice','R_FADCorr_ISA_mice',...
-    'R_total_Delta_mice','R_jrgeco1aCorr_Delta_mice','R_FADCorr_Delta_mice',...
-    'Rs_total_ISA_mice','Rs_jrgeco1aCorr_ISA_mice','Rs_FADCorr_ISA_mice',...
-    'Rs_total_Delta_mice','Rs_jrgeco1aCorr_Delta_mice','Rs_FADCorr_Delta_mice',...
-    'powerdata_average_oxy_mice','powerdata_average_deoxy_mice','powerdata_average_total_mice','powerdata_average_jrgeco1aCorr_mice','powerdata_average_FADCorr_mice',...
-    'powerdata_oxy_mice','powerdata_deoxy_mice','powerdata_total_mice','powerdata_jrgeco1aCorr_mice','powerdata_FADCorr_mice',...
-    'total_ISA_powerMap_mice','jrgeco1aCorr_ISA_powerMap_mice','FADCorr_ISA_powerMap_mice',...
-    'total_Delta_powerMap_mice','jrgeco1aCorr_Delta_powerMap_mice','FADCorr_Delta_powerMap_mice',...
-    'hz')
+% load(fullfile(saveDir_cat, processedName_mice),'R_total_ISA_mice','R_jrgeco1aCorr_ISA_mice','R_FADCorr_ISA_mice',...
+%     'R_total_Delta_mice','R_jrgeco1aCorr_Delta_mice','R_FADCorr_Delta_mice',...
+%     'Rs_total_ISA_mice','Rs_jrgeco1aCorr_ISA_mice','Rs_FADCorr_ISA_mice',...
+%     'Rs_total_Delta_mice','Rs_jrgeco1aCorr_Delta_mice','Rs_FADCorr_Delta_mice',...
+%     'powerdata_average_oxy_mice','powerdata_average_deoxy_mice','powerdata_average_total_mice','powerdata_average_jrgeco1aCorr_mice','powerdata_average_FADCorr_mice',...
+%     'powerdata_oxy_mice','powerdata_deoxy_mice','powerdata_total_mice','powerdata_jrgeco1aCorr_mice','powerdata_FADCorr_mice',...
+%     'total_ISA_powerMap_mice','jrgeco1aCorr_ISA_powerMap_mice','FADCorr_ISA_powerMap_mice',...
+%     'total_Delta_powerMap_mice','jrgeco1aCorr_Delta_powerMap_mice','FADCorr_Delta_powerMap_mice',...
+%     'hz')
 
 % save(fullfile(saveDir_cat, processedName_mice),'R_total_ISA_mice','R_jrgeco1aCorr_ISA_mice','R_FADCorr_ISA_mice',...
 %     'R_total_Delta_mice','R_jrgeco1aCorr_Delta_mice','R_FADCorr_Delta_mice',...
@@ -219,11 +219,11 @@ save(fullfile(saveDir_cat, processedName_mice),'R_total_ISA_mice','R_jrgeco1aCor
     'powerdata_oxy_mice','powerdata_deoxy_mice','powerdata_total_mice','powerdata_jrgeco1aCorr_mice','powerdata_FADCorr_mice',...
     'total_ISA_powerMap_mice','jrgeco1aCorr_ISA_powerMap_mice','FADCorr_ISA_powerMap_mice',...
     'total_Delta_powerMap_mice','jrgeco1aCorr_Delta_powerMap_mice','FADCorr_Delta_powerMap_mice',...
-    'hz','-append')
+    'hz')
 
 disp(char(['QC check on ', processedName_mice]))
 if strcmp(char(sessionInfo.miceType),'jrgeco1a')
-    visName = miceName;
+    visName = 'Pre Stroke';
     %if goodRuns ~=0
     
     
@@ -242,7 +242,7 @@ if strcmp(char(sessionInfo.miceType),'jrgeco1a')
     rightLineStyle= {'r-','b-','k-'};
     legendName = ["Corrected jRGECO1a","Corrected FAD","HbO","HbR","HbT"];
     
-    QCcheck_fftVis_substract(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir_cat,strcat(miceName_powerdata, '_powerCurve'))
+    QCcheck_fftVis(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir_cat,strcat(miceName_powerdata, '_powerCurve'))
     
     
     
@@ -261,20 +261,17 @@ if strcmp(char(sessionInfo.miceType),'jrgeco1a')
     leftLineStyle = {'m-','g-'};
     rightLineStyle= {'r-','b-','k-'};
     legendName = ["Corrected jRGECO1a","Corrected FAD","HbO","HbR","HbT"];
-    QCcheck_fftVis_substract(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir_cat,strcat(visName, '_powerCurve_average'))
+    QCcheck_fftVis(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir_cat,strcat(visName, '_powerCurve_average'))
     
     %end
-        saveDir_cat = 'L:\RGECO\cat';
-        processedName_mice = '191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-fc.mat';
-
-    
+  
     load(fullfile(saveDir_cat, processedName_mice),'R_total_ISA_mice','R_jrgeco1aCorr_ISA_mice','R_FADCorr_ISA_mice',...
     'R_total_Delta_mice','R_jrgeco1aCorr_Delta_mice','R_FADCorr_Delta_mice',...
     'Rs_total_ISA_mice','Rs_jrgeco1aCorr_ISA_mice','Rs_FADCorr_ISA_mice',...
     'Rs_total_Delta_mice','Rs_jrgeco1aCorr_Delta_mice','Rs_FADCorr_Delta_mice')
     
     
-    refseeds=GetReferenceSeeds_xw;
+    refseeds=GetReferenceSeeds;
 
    
     xform_isbrain_mice =ones(128,128);
@@ -289,7 +286,7 @@ if strcmp(char(sessionInfo.miceType),'jrgeco1a')
     
 
    
-visName = 'Anes RGECO';
+visName = 'Pre Stroke';
     QCcheck_fcVis(refseeds,R_jrgeco1aCorr_ISA_mice, Rs_jrgeco1aCorr_ISA_mice,'jrgeco1aCorr','m','ISA',saveDir_cat,visName,true,xform_isbrain_mice)
     QCcheck_fcVis(refseeds,R_FADCorr_ISA_mice, Rs_FADCorr_ISA_mice,'FADCorr','g','ISA',saveDir_cat,visName,true,xform_isbrain_mice)
     QCcheck_fcVis(refseeds,R_total_ISA_mice, Rs_total_ISA_mice,'total','k','ISA',saveDir_cat,visName,true,xform_isbrain_mice)

@@ -109,7 +109,7 @@ for c = 1:size(logData,1)
     logData(c,:) = logData(c,:)/distance(c);
 end
 [logData]=highpass(double(logData),0.009,29.76);
-[logData]=lowpass(double(logData),0.08,29.76);
+[logData]=lowpass(double(logData),0.5,29.76);
 % Spectroscopy
 output = dotspect(logData, log(10)*extCoeff);
 output = resampledata_ori(output,29.76,1,10^-5);

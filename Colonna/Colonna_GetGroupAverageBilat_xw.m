@@ -1,12 +1,12 @@
 excelFile='V:\CTREM\CTREM.xlsx';
 excelRows=[2:11,17:22,27:63];  % Rows from Excell Database
-% % for ii = [2:11,17:22,27:63]
-% %     exampleBilateralFCAnalysis(excelFileName,ii,[0.009 0.08])
-% %     exampleBilateralFCAnalysis(excelFileName,ii,[0.4 4])
-% % end
-% 
-% 
-% 
+% % % for ii = [2:11,17:22,27:63]
+% % %     exampleBilateralFCAnalysis(excelFileName,ii,[0.009 0.08])
+% % %     exampleBilateralFCAnalysis(excelFileName,ii,[0.4 4])
+% % % end
+% % 
+% % 
+% % 
 symisbrainall = 1;
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
@@ -22,34 +22,36 @@ for excelRow = excelRows
     symisbrainall = symisbrainall.*xform_isbrain;
 end
 symisbrainall = symisbrainall & fliplr(symisbrainall);
-
-WTFile = 'V:\CTREM\WT.xlsx';
-    exampleBilateralFCAnalysis_xw(WTFile,2:15,[0.009 0.08],symisbrainall)
-exampleBilateralFCAnalysis_xw(WTFile,2:15,[0.4 4],symisbrainall)
-
-WTFADFile = 'V:\CTREM\WTFAD.xlsx';
-    exampleBilateralFCAnalysis_xw(WTFADFile,2:14,[0.009 0.08],symisbrainall)
-exampleBilateralFCAnalysis_xw(WTFADFile,2:14,[0.4 4],symisbrainall)
-
-HETFile = 'V:\CTREM\HET.xlsx';
-    exampleBilateralFCAnalysis_xw(HETFile,2:7,[0.009 0.08],symisbrainall)
-exampleBilateralFCAnalysis_xw(HETFile,2:7,[0.4 4],symisbrainall)
-
-HETFADFile = 'V:\CTREM\HETFAD.xlsx';
-    exampleBilateralFCAnalysis_xw(HETFADFile,2:7,[0.009 0.08],symisbrainall)
-exampleBilateralFCAnalysis_xw(HETFADFile,2:7,[0.4 4],symisbrainall)
-
-KOFile = 'V:\CTREM\KO.xlsx';
-    exampleBilateralFCAnalysis_xw(KOFile,2:8,[0.009 0.08],symisbrainall)
- exampleBilateralFCAnalysis_xw(KOFile,2:8,[0.4 4],symisbrainall)
-
-KOFADFile = 'V:\CTREM\KOFAD.xlsx';
-    exampleBilateralFCAnalysis_xw(KOFADFile,2:8,[0.009 0.08],symisbrainall)
-exampleBilateralFCAnalysis_xw(KOFADFile,2:8,[0.4 4],symisbrainall)
-
-
+% 
+% WTFile = 'V:\CTREM\WT.xlsx';
+%     exampleBilateralFCAnalysis_xw(WTFile,2:15,[0.009 0.08],symisbrainall)
+% exampleBilateralFCAnalysis_xw(WTFile,2:15,[0.4 4],symisbrainall)
+% 
+% WTFADFile = 'V:\CTREM\WTFAD.xlsx';
+%     exampleBilateralFCAnalysis_xw(WTFADFile,2:14,[0.009 0.08],symisbrainall)
+% exampleBilateralFCAnalysis_xw(WTFADFile,2:14,[0.4 4],symisbrainall)
+% 
+% HETFile = 'V:\CTREM\HET.xlsx';
+%     exampleBilateralFCAnalysis_xw(HETFile,2:7,[0.009 0.08],symisbrainall)
+% exampleBilateralFCAnalysis_xw(HETFile,2:7,[0.4 4],symisbrainall)
+% 
+% HETFADFile = 'V:\CTREM\HETFAD.xlsx';
+%     exampleBilateralFCAnalysis_xw(HETFADFile,2:7,[0.009 0.08],symisbrainall)
+% exampleBilateralFCAnalysis_xw(HETFADFile,2:7,[0.4 4],symisbrainall)
+% 
+% KOFile = 'V:\CTREM\KO.xlsx';
+%     exampleBilateralFCAnalysis_xw(KOFile,2:8,[0.009 0.08],symisbrainall)
+%  exampleBilateralFCAnalysis_xw(KOFile,2:8,[0.4 4],symisbrainall)
+% 
+% KOFADFile = 'V:\CTREM\KOFAD.xlsx';
+%     exampleBilateralFCAnalysis_xw(KOFADFile,2:8,[0.009 0.08],symisbrainall)
+% exampleBilateralFCAnalysis_xw(KOFADFile,2:8,[0.4 4],symisbrainall)
 
 
+
+paramPath = what('bauerParams');
+stdMask = load(fullfile(paramPath.path,'stdMask.mat'));
+mask = stdMask.isbrain.*symisbrainall;
 
 a=0;
 b=0;
@@ -58,9 +60,9 @@ d=0;
 e=0;
 f=0;
 
-for n=excelfiles;
+for n=excelRows;
     
-    [~, ~, raw]=xlsread(excelFileName,1, ['A',num2str(n),':K',num2str(n)]);
+    [~, ~, raw]=xlsread(excelFile,1, ['A',num2str(n),':K',num2str(n)]);
     Date=num2str(raw{1});
     Mouse=raw{2};
     Group=raw{8};
@@ -73,7 +75,7 @@ for n=excelfiles;
     load(file);
     
    for ii = 1:4
-    tempISAfc(:,:,ii) = atanh(cell2mat(bilatFCMapCat(1,ii)));
+    tempISAfc(:,:,ii) = atanh(cell2mat(bilatFCMapCat(1,ii))).*mask;
     end
 
         
@@ -115,9 +117,9 @@ d=0;
 e=0;
 f=0;
 
-for n=excelfiles;
+for n=excelRows;
     
-    [~, ~, raw]=xlsread(excelFileName,1, ['A',num2str(n),':K',num2str(n)]);
+    [~, ~, raw]=xlsread(excelFile,1, ['A',num2str(n),':K',num2str(n)]);
     Date=num2str(raw{1});
     Mouse=raw{2};
     Group=raw{8};
@@ -130,7 +132,7 @@ for n=excelfiles;
     load(file);
     
     for ii = 1:4
-    tempDeltafc(:,:,ii) = atanh(cell2mat(bilatFCMapCat(1,ii)));
+    tempDeltafc(:,:,ii) = atanh(cell2mat(bilatFCMapCat(1,ii))).*mask;
     end
         
     if strcmp(Group,'GP5.5(+)Trem2(WT)')

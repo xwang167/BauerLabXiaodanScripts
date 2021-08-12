@@ -6,7 +6,7 @@ data(isnan(data)) = 0;
 data(isinf(data)) = 0;
 data = reshape(data,size(data,1),size(data,2),[]);
 import mouse.*
-downSampledData = resampledata(data,size(data,3),numDesample,10^-5);
+downSampledData = resampledata_ori(data,size(data,3),numDesample,10^-5);
 downSampledData = reshape(downSampledData,size(data,1),size(data,2),[],numBlock);
 downSampledDataBlockAvg = squeeze(mean(downSampledData,4));
 downSampledDataBaseline = squeeze(mean(downSampledDataBlockAvg(:,:,1:stimStartTime),3));

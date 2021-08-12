@@ -6,20 +6,21 @@ runNum = numel(runsInfo);
 for runInd = 1:runNum
     clearvars -except runsInfo runNum runInd fRange_ISA fRange_delta
     runInfo=runsInfo(runInd);
-%     load(runInfo.saveHbFile,'xform_datahb')
-load(runInfo.saveHbFile,'datahb')
-    load(runInfo.saveMaskFile,'isbrain','I')
+   load(runInfo.saveHbFile,'xform_datahb')
+%load(runInfo.saveHbFile,'datahb')
+    load(runInfo.saveMaskFile,'xform_isbrain','I')
     load(fullfile('V:\ARB-Old',runInfo.recDate,strcat(runInfo.recDate,'-',runInfo.mouseName,'-LandmarksandMask.mat')),'seedcenter','WL')
 %     I_new.bregma = I.bregma*128;
 %     I_new.tent = I.tent*128;
 %     I_new.OF = I.OF*128;
-%     datahb = InvAffine(I_new,xform_datahb,'new');
-%     datahb = highpass(datahb,0.009,29.76);
-%     datahb = lowpass(datahb,0.08,29.76);
-%     datahb=resampledata_ori(datahb,29.76,1,10^-5);
+    datahb = xform_datahb;
+   % datahb = InvAffine(I_new,xform_datahb,'new');
+    datahb = highpass(datahb,0.009,29.76);
+    datahb = lowpass(datahb,0.5,29.76);
+    datahb=resampledata_ori(datahb,29.76,1,10^-5);
     datahb=real(datahb);
-    [Oxy]=gsr(squeeze(datahb(:,:,1,:)),isbrain);
-    [DeOxy]=gsr(squeeze(datahb(:,:,2,:)),isbrain);
+    [Oxy]=gsr(squeeze(datahb(:,:,1,:)),xform_isbrain);
+    [DeOxy]=gsr(squeeze(datahb(:,:,2,:)),xform_isbrain);
     Oxy=reshape(Oxy, 128, 128, []); % -added MDR 1/22
     DeOxy=reshape(DeOxy, 128, 128, []); % -added MDR 1/22
     
@@ -131,7 +132,7 @@ load(runInfo.saveHbFile,'datahb')
         title('Avg Total')
         
         save(runInfo.saveHbFile, 'AvgOxy', 'AvgDeOxy', 'AvgTotal', 'Oxy', 'DeOxy', '-append');
-        annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',[runInfo.recDate,'-',runInfo.mouseName,'-',runInfo.session,runInfo.run,' Data Visualization'],'FontWeight','bold','Color',[1 0 0]);
+        annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',[runInfo.recDate,'-',runInfo.mouseName,'-',runInfo.session,num2str(runInfo.run),' Data Visualization'],'FontWeight','bold','Color',[1 0 0]);
         
         output=[runInfo.saveFilePrefix,'_DataVis.jpg'];
         orient portrait
