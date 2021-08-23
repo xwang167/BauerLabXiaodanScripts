@@ -1,4 +1,4 @@
-function [refseeds, I]=GetReferenceSeeds_xw2
+function [refseeds, I]=GetReferenceSeeds
 
 %Get seed locations in reference mouse space. 
 
@@ -26,7 +26,7 @@ function [refseeds, I]=GetReferenceSeeds_xw2
 % ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 % POSSIBILITY OF SUCH DAMAGE.
 
-[Seeds, L]=Seeds_PaxinosSpace_xw2;  % Normal 16 seed map
+[Seeds, L]=Seeds_PaxinosSpace;  % Normal 16 seed map
 
 F=fieldnames(Seeds);
 numf=numel(F);

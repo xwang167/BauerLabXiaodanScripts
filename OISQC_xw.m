@@ -1,23 +1,23 @@
 
-excelFile = "X:\XW\CodeModification\CodeModification.xlsx";
-excelRows = [6];
+excelFile = "X:\XW\CodeModification\CodeMeeting.xlsx";
+excelRows = [9];
 runsInfo = parseRuns(excelFile,excelRows);
 runNum = numel(runsInfo);
 for runInd = 1:runNum
     clearvars -except runsInfo runNum runInd fRange_ISA fRange_delta
     runInfo=runsInfo(runInd);
-   load(runInfo.saveHbFile,'xform_datahb')
-%load(runInfo.saveHbFile,'datahb')
+    load(runInfo.saveHbFile,'xform_datahb')
+    %load(runInfo.saveHbFile,'datahb')
     load(runInfo.saveMaskFile,'xform_isbrain','I')
-    load(fullfile('V:\ARB-Old',runInfo.recDate,strcat(runInfo.recDate,'-',runInfo.mouseName,'-LandmarksandMask.mat')),'seedcenter','WL')
-%     I_new.bregma = I.bregma*128;
-%     I_new.tent = I.tent*128;
-%     I_new.OF = I.OF*128;
+    load(fullfile('W:\ARB-Old',runInfo.recDate,strcat(runInfo.recDate,'-',runInfo.mouseName,'-LandmarksandMask.mat')),'seedcenter','WL')
+    %     I_new.bregma = I.bregma*128;
+    %     I_new.tent = I.tent*128;
+    %     I_new.OF = I.OF*128;
     datahb = xform_datahb;
-   % datahb = InvAffine(I_new,xform_datahb,'new');
-    datahb = highpass(datahb,0.009,29.76);
-    datahb = lowpass(datahb,0.5,29.76);
-    datahb=resampledata_ori(datahb,29.76,1,10^-5);
+    % datahb = InvAffine(I_new,xform_datahb,'new');
+    datahb = highpass(datahb,0.009,runInfo.samplingRate);
+    datahb = lowpass(datahb,0.5,runInfo.samplingRate);
+    datahb=resampledata_ori(datahb,runInfo.samplingRate,1,10^-5);
     datahb=real(datahb);
     [Oxy]=gsr(squeeze(datahb(:,:,1,:)),xform_isbrain);
     [DeOxy]=gsr(squeeze(datahb(:,:,2,:)),xform_isbrain);
@@ -139,7 +139,47 @@ for runInd = 1:runNum
         print ('-djpeg', '-r300', output);
         
         figure('visible', 'on');
+        
+        figure
+        imagesc(temp, [-max(max(temp)) max(max(temp))]);
+        axis image off
+        colormap jet
+        
+        [X,Y] = meshgrid(1:128,1:128);
+        [x1,y1] = ginput(1);
+        radius = 4;       
+        ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
+        hold on
+        contour(ROI,'k')
         close all
+        
+        iROI = reshape(ROI,1,[]);
+        Total = Oxy + DeOxy;
+        Oxy = reshape(Oxy,128*128,[]);
+        DeOxy = reshape(DeOxy,128*128,[]);
+        Total = reshape(Total,128*128,[]);
+        Oxy_timetrace = mean(Oxy(iROI,:),1);
+        DeOxy_timetrace = mean(DeOxy(iROI,:),1);
+        Total_timetrace = mean(Total(iROI,:),1);
+        figure
+        subplot(1,2,1)
+        plot(Oxy_timetrace,'r')
+        hold on
+        plot(DeOxy_timetrace,'b')
+        hold on
+        plot(Total_timetrace,'k')
+        
+        Oxy_timetrace_average = mean(reshape(Oxy_timetrace,30,10),2);  
+        DeOxy_timetrace_average = mean(reshape(DeOxy_timetrace,30,10),2);      
+        Total_timetrace_average = mean(reshape(Total_timetrace,30,10),2);
+        
+        subplot(1,2,2)
+                plot(Oxy_timetrace_average,'r')
+        hold on
+        plot(DeOxy_timetrace_average,'b')
+        hold on
+        plot(Total_timetrace_average,'k')
+        
     elseif strcmp(runInfo.session, 'fc')
         Oxy=reshape(Oxy,128*128,[]);
         seednames={'Olf','Fr','Cg','M','SS','RS','V'};

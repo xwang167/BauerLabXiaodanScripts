@@ -52,11 +52,13 @@ contour(ROI_contour,'k')
         colorbar
         set(p,'Position',[0.015+(b-stimStartTime)*0.09 0.80 0.07 0.12]);
     end
-    axis image off
+                axis image
+            set(gca, 'XTick', []);
+            set(gca, 'YTick', []);
     hold on
     imagesc(WL,'AlphaData',1-xform_isbrain)
     
-    if b == stimStartTime-2
+    if b == stimStartTime
         ylabel(name1,'FontWeight','bold')
     end
     title([num2str(b),'s']);
@@ -74,9 +76,9 @@ contour(ROI_contour,'k')
         colorbar
         set(p,'Position',[0.015+(b-stimStartTime)*0.09 0.64 0.07 0.12]);
     end
-    axis image off;
-%     set(gca, 'XTick', []);
-%     set(gca, 'YTick', []);
+                axis image
+            set(gca, 'XTick', []);
+            set(gca, 'YTick', []);
  hold on
     imagesc(WL,'AlphaData',1-xform_isbrain)
     
@@ -100,7 +102,9 @@ contour(ROI_contour,'k')
         colorbar
         set(p,'Position',[0.015+(b-stimStartTime)*0.09 0.48 0.07 0.12]);
     end
-    axis image off;
+                axis image
+            set(gca, 'XTick', []);
+            set(gca, 'YTick', []);
      hold on
     imagesc(WL,'AlphaData',1-xform_isbrain)
 

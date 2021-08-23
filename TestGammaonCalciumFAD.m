@@ -48,7 +48,7 @@ clear xform_FADCorr xform_jrgeco1aCorr
        Calcium_filter = reshape(Calcium_filter,128*128,[]);
        FAD_filter = reshape(FAD_filter,128*128,[]);
        Calcium_filter = normRow(Calcium_filter);
-       FAD_fitler = normRow(FAD_filter);
+       FAD_filter = normRow(FAD_filter);
        Calcium_filter = reshape(Calcium_filter,128,128,[]);
        FAD_filter = reshape(FAD_filter,128,128,[]);
 
@@ -262,4 +262,43 @@ nanmean(r_small(mask_new))
 nanmedian(r_small(mask_new))
 
 nanmean(r2_small(mask_new))
+
+
+
+ load('L:\RGECO\190627\190627-R5M2286-fc3_processed.mat', 'xform_jrgeco1aCorr')
+load('L:\RGECO\190627\190627-R5M2286-fc3_processed.mat', 'xform_FADCorr')
+FAD = transpose(double(squeeze(xform_FADCorr(72,35,:))));
+Calcium = transpose(double(squeeze(xform_jrgeco1aCorr(72,35,1,:))));
+%clear xform_FADCorr xform_jrgeco1aCorr
+Calcium_filter = mouse.freq.filterData(Calcium,0.02,2,25);
+FAD_filter = mouse.freq.filterData(FAD,0.02,2,25);
+
+ Calcium_filter = normRow(Calcium_filter);
+ FAD_filter = normRow(FAD_filter);
+ 
+ Calcium_filter = reshape(Calcium_filter,1,1,[]);
+ FAD_filter = reshape(FAD_filter,1,1,[]);
+ 
+ t = (1:750)/25;
+[T_small,W_small,A_small,r_small,r2_small,hemoPred_small] = interSpeciesGammaFit_CalciumFAD(Calcium_filter,FAD_filter,t);
+
+
+xform_FADCorr(isinf(xform_FADCorr)) = 0;
+xform_FADCorr(isnan(xform_FADCorr)) = 0;
+xform_jrgeco1aCorr(isinf(xform_jrgeco1aCorr)) = 0;
+xform_jrgeco1aCorr(isnan(xform_jrgeco1aCorr)) = 0;
+
+Calcium_filter = mouse.freq.filterData(double(squeeze(xform_jrgeco1aCorr)),0.02,2,25);
+FAD_filter = mouse.freq.filterData(double(squeeze(xform_FADCorr)),0.02,2,25);
+
+Calcium_filter = reshape(Calcium_filter,128*128,[]);
+FAD_filter = reshape(FAD_filter,128*128,[]);
+
+Calcium_filter = normRow(Calcium_filter);
+FAD_filter = normRow(FAD_filter);
+
+Calcium_filter = reshape(Calcium_filter,128,128,[]);
+FAD_filter = reshape(FAD_filter,128,128,[]);
+
+[T_small,W_small,A_small,r_small,r2_small,hemoPred_small] = interSpeciesGammaFit_CalciumFAD(Calcium_filter,FAD_filter,t);
 nanmedian(r2_small(mask_new))
