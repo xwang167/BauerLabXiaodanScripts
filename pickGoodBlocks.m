@@ -39,9 +39,9 @@ deoxy_peak = abs(mean(deoxy_avg(:,:,stimStartTime+1:stimEndTime),3));
 total_peak = abs(mean(total_avg(:,:,stimStartTime+1:stimEndTime),3));
 
 
-temp_oxy_max = prctile(oxy_peak(mask_new),90,'all')*1.1;
-temp_deoxy_max = prctile(deoxy_peak(mask_new),90,'all')*1.1;
-temp_total_max = prctile(total_peak(mask_new),90,'all')*1.1;
+temp_oxy_max = prctile(oxy_peak(mask_new),90,'all')*1.4;
+temp_deoxy_max = prctile(deoxy_peak(mask_new),90,'all')*1.4;
+temp_total_max = prctile(total_peak(mask_new),90,'all')*1.4;
 % temp_oxy_max = 6;%0.5;
 % temp_deoxy_max = 2;%0.25;
 % temp_total_max = 4;%0.5;
@@ -78,14 +78,14 @@ if ~isempty(jrgecoCorrDownSampled)&&~isempty(greenFluorCorrDownSampled)
 %     dims = [1 35];
 %     definput = {'3','3'};
 %     answer = inputdlg(prompt,title1,dims,definput);
-jrgeco1aCorr_avg = mean(jrgeco1aCorrDownSampled,4);
+jrgeco1aCorr_avg = mean(jrgecoCorrDownSampled,4);
 greenFluorCorr_avg = mean(greenFluorCorrDownSampled,4);
 
 jrgeco1aCorr_peak = abs(mean(jrgeco1aCorr_avg(:,:,stimStartTime+1:stimEndTime),3));
 greenFluorCorr_peak = abs(mean(greenFluorCorr_avg(:,:,stimStartTime+1:stimEndTime),3));
 
-temp_jrgeco1aCorr_max = prctile(jrgeco1aCorr_peak(mask_new),90,'all')*1.1;
-temp_greenFluorCorr_max = prctile(greenFluorCorr_peak(mask_new),90,'all')*1.1;
+temp_jrgeco1aCorr_max = prctile(jrgeco1aCorr_peak(mask_new),90,'all')*1.4;
+temp_greenFluorCorr_max = prctile(greenFluorCorr_peak(mask_new),90,'all')*1.4;
     numRows = 5;
     
 elseif ~isempty(greenFluorCorrDownSampled)
@@ -99,7 +99,7 @@ elseif ~isempty(greenFluorCorrDownSampled)
 %     answer = inputdlg(prompt,title1,dims,definput);
 greenFluorCorr_avg = mean(greenFluorCorrDownSampled,4);
 greenFluorCorr_peak = abs(mean(greenFluorCorr_avg(:,:,stimStartTime+1:stimEndTime),3));
-temp_greenFluorCorr_max = prctile(greenFluorCorr_peak(mask_new),90,'all')*1.1;
+temp_greenFluorCorr_max = prctile(greenFluorCorr_peak(mask_new),90,'all')*1.4;
     
     numRows = 4;
     
@@ -115,7 +115,7 @@ elseif ~isempty(jrgecoCorrDownSampled)
     %     temp_jrgeco1aCorr_max = str2double(answer{1});
     jrgeco1aCorr_avg = mean(jrgeco1aCorrDownSampled,4);;
 jrgeco1aCorr_peak = abs(mean(jrgeco1aCorr_avg(:,:,stimStartTime+1:stimEndTime),3));
-temp_jrgeco1aCorr_max = prctile(jrgeco1aCorr_peak(mask_new),90,'all')*1.1;
+temp_jrgeco1aCorr_max = prctile(jrgeco1aCorr_peak(mask_new),90,'all')*1.4;
     numRows = 4;
 else
     numRows = 3;

@@ -1,8 +1,12 @@
 
 close all;clearvars;clc
-excelRows = 397:400; %[182,184,186,237];%182,184,186,203,
-excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
-runs = 1:6;
+% excelRows = 397:400; %[182,184,186,237];%182,184,186,203,
+% excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
+% runs = 1:6;
+
+excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
+excelRows = [15,12];%[13 15 12];
+runs = 1:3;
 stimStartTime = 5;
 
 nVx = 128;
@@ -29,18 +33,25 @@ for excelRow = excelRows
     info.freqout=1;
     goodRuns = str2num(excelRaw{18});
     
-    maskDir = saveDir;
-    % maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-    mouseName = char(mouseName);
-    maskDir = fullfile(rawdataloc,recDate);
-    maskName = strcat(recDate,'-N8M861-opto3-LandmarksAndMask','.mat');
-    
-    %maskName = strcat(recDate,'-',mouseName(1:11),mouseName((end-4):end),'-LandmarksAndMask','.mat');
-    load(fullfile(maskDir,maskName),'xform_isbrain','isbrain');
+%     maskDir = saveDir;
+%     % maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+%     maskDir = fullfile(rawdataloc,recDate);
+%     maskName = strcat(recDate,'-N8M861-opto3-LandmarksAndMask','.mat');
+%     
+%     %maskName = strcat(recDate,'-',mouseName(1:11),mouseName((end-4):end),'-LandmarksAndMask','.mat');
+%     load(fullfile(maskDir,maskName),'xform_isbrain','isbrain');
     
     sessionInfo.framerate = excelRaw{7};
     processedName_mouse = strcat(recDate,'-',mouseName,'-',sessionType,'_processed_mouse','.mat');
-    
+        maskDir = strcat('L:\RGECO\Kenny\', recDate, '\');
+    if exist(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-dataFluor.mat')),'file')
+        load(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-dataFluor.mat')),'xform_isbrain');
+        load(fullfile(maskDir,strcat(recDate,'-',mouseName,'-','LandmarksAndMask.mat')),'affineMarkers')
+    else
+        maskDir = saveDir;
+        maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+        load(fullfile(maskDir,maskName),'affineMarkers','xform_isbrain','isbrain')
+    end
     xform_datahb_mouse_GSR = [];
     xform_datahb_mouse_NoGSR = [];
     
@@ -53,13 +64,13 @@ for excelRow = excelRows
     xform_red_mouse_GSR = [];
     xform_red_mouse_NoGSR = [];
     
-    xform_Laser_mouse_NoGSR = [];
+    %xform_Laser_mouse_NoGSR = [];
     %     %
-    %     xform_FAD_mouse_GSR = [];
-    %     xform_FAD_mouse_NoGSR = [];
-    %     %
-    %     xform_FADCorr_mouse_GSR = [];
-    %     xform_FADCorr_mouse_NoGSR = [];
+        xform_FAD_mouse_GSR = [];
+        xform_FAD_mouse_NoGSR = [];
+        %
+        xform_FADCorr_mouse_GSR = [];
+        xform_FADCorr_mouse_NoGSR = [];
     %     %
     %
     %  xform_gcamp_mouse_GSR = [];
@@ -68,8 +79,8 @@ for excelRow = excelRows
     % xform_gcampCorr_mouse_GSR = [];
     %     xform_gcampCorr_mouse_NoGSR = [];
     %
-    %   xform_green_mouse_GSR = [];
-    %     xform_green_mouse_NoGSR = [];
+      xform_green_mouse_GSR = [];
+        xform_green_mouse_NoGSR = [];
     
     %if ~exist(fullfile(saveDir,processedName_mouse),'file')
     for n = runs
@@ -80,7 +91,7 @@ for excelRow = excelRows
             disp('loading processed data')
                             %goodBlocks_GSR = 1:10;
                 %goodBlocks_NoGSR = 1:10;
-            load(fullfile(saveDir, processedName),'xform_datahb','goodBlocks_NoGSR','ROI_NoGSR')
+            load(fullfile(saveDir, processedName),'xform_datahb','goodBlocks_NoGSR')
             numBlocks = size(xform_datahb,4)/sessionInfo.stimblocksize;
             
             xform_datahb_NoGSR = reshape(xform_datahb,128,128,2,[],numBlocks);
@@ -276,6 +287,8 @@ for excelRow = excelRows
                     clear xform_FAD_GSR
                     xform_FADCorr_mouse_GSR = cat(4,xform_FADCorr_mouse_GSR,xform_FADCorr_GSR(:,:,:,goodBlocks_GSR));
                     clear xform_FADCorr_GSR
+                    xform_green_mouse_GSR = cat(4,xform_green_mouse_GSR,xform_green_GSR(:,:,:,goodBlocks_GSR));
+                    clear xform_green_GSR
                 elseif strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto3')
                     disp('loading gsr data')
                     xform_jrgeco1a_mouse_GSR = cat(4,xform_jrgeco1a_mouse_GSR,xform_jrgeco1a_GSR(:,:,:,goodBlocks_GSR));
@@ -287,25 +300,12 @@ for excelRow = excelRows
                     clear xform_red_GSR
                     
                 end
-                %
-                %
-                %
-                %
-                %
-                %
-                %
-                %             %             xform_green_mouse_GSR = cat(4,xform_green_mouse_GSR,xform_green_GSR(:,:,:,goodBlocks_GSR));
-                %             %
-                %             %
-                %             clear xform_green_GSR
-                %
-                %         end
             end
         end
     end
     xform_datahb_mouse_GSR = mean(xform_datahb_mouse_GSR,5);
     xform_datahb_mouse_NoGSR = mean(xform_datahb_mouse_NoGSR,5);
-    save(fullfile(saveDir,processedName_mouse),'xform_datahb_mouse_GSR','xform_datahb_mouse_NoGSR','ROI_NoGSR','-v7.3');
+    save(fullfile(saveDir,processedName_mouse),'xform_datahb_mouse_GSR','xform_datahb_mouse_NoGSR','-v7.3');
     
     %     save(fullfile(saveDir,processedName_mouse),'xform_datahb_mouse_GSR','-append');
     %save(fullfile(saveDir,processedName_mouse),'xform_datahb_mouse_NoGSR','ROI_NoGSR','-v7.3');
@@ -365,11 +365,11 @@ for excelRow = excelRows
         
         disp('QC on non GSR stim')
         
-        load(fullfile(saveDir,'ROI.mat'))
+        %load(fullfile(saveDir,'ROI.mat'))
         %             if strcmp(char(sessionInfo.mouseType),'jrgeco1a')
         QC_stim(squeeze(xform_datahb_mouse_NoGSR(:,:,1,:))*10^6,squeeze(xform_datahb_mouse_NoGSR(:,:,2,:))*10^6,...
             xform_FAD_mouse_NoGSR*100,xform_FADCorr_mouse_NoGSR*100,xform_green_mouse_NoGSR*100,xform_jrgeco1a_mouse_NoGSR*100,xform_jrgeco1aCorr_mouse_NoGSR*100,xform_red_mouse_NoGSR*100,...
-            xform_isbrain,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,ROI);
+            xform_isbrain,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,[]);
         %             else
         %                 QC_stim(squeeze(xform_datahb_mouse_NoGSR(:,:,1,:))*10^6,squeeze(xform_datahb_mouse_NoGSR(:,:,2,:))*10^6,...
         %                     xform_FAD_mouse_NoGSR/3,xform_FADCorr_mouse_NoGSR/3,xform_green_mouse_NoGSR/3,xform_jrgeco1a_mouse_NoGSR*100,xform_jrgeco1aCorr_mouse_NoGSR*100,xform_red_mouse_NoGSR*100,...
@@ -378,7 +378,8 @@ for excelRow = excelRows
         %             clear xform_datahb_mouse_NoGSR xform_jrgeco1a_mouse_NoGSR xform_jrgeco1aCorr_mouse_NoGSR xform_red_mouse_NoGSR  xform_FAD_mouse_NoGSR xform_FADCorr_mouse_NoGSR xform_green_mouse_NoGSR
         
         
-        
+        clear xform_datahb_mouse_NoGSR xform_jrgeco1a_mouse_NoGSR xform_jrgeco1aCorr_mouse_NoGSR xform_red_mouse_NoGSR  xform_FAD_mouse_NoGSR xform_FADCorr_mouse_NoGSR xform_green_mouse_NoGSR
+ 
         %
         xform_jrgeco1a_mouse_GSR = mean(xform_jrgeco1a_mouse_GSR,4);
         xform_jrgeco1aCorr_mouse_GSR = mean(xform_jrgeco1aCorr_mouse_GSR,4);
@@ -472,39 +473,8 @@ for excelRow = excelRows
         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'ROI.fig')))
         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'ROI.png')))
     end
-    if strcmp(char(sessionInfo.mouseType),'jrgeco1a')
-        QC_stim(squeeze(xform_datahb_mouse_NoGSR(:,:,1,:))*10^6,squeeze(xform_datahb_mouse_NoGSR(:,:,2,:))*10^6,...
-            [],[],[],xform_jrgeco1a_mouse_NoGSR*100,xform_jrgeco1aCorr_mouse_NoGSR*100,xform_red_mouse_NoGSR*100,...
-            xform_isbrain,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,ROI_NoGSR,[]);
-        %             else
-        %                 QC_stim(squeeze(xform_datahb_mouse_NoGSR(:,:,1,:))*10^6,squeeze(xform_datahb_mouse_NoGSR(:,:,2,:))*10^6,...
-        %                     xform_FAD_mouse_NoGSR/3,xform_FADCorr_mouse_NoGSR/3,xform_green_mouse_NoGSR/3,xform_jrgeco1a_mouse_NoGSR*100,xform_jrgeco1aCorr_mouse_NoGSR*100,xform_red_mouse_NoGSR*100,...
-        %                     isbrain,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,ROI);
-    end
-    clear xform_datahb_mouse_NoGSR xform_jrgeco1a_mouse_NoGSR xform_jrgeco1aCorr_mouse_NoGSR xform_red_mouse_NoGSR  xform_FAD_mouse_NoGSR xform_FADCorr_mouse_NoGSR xform_green_mouse_NoGSR
-    
-    
-    
-    %
-    xform_jrgeco1a_mouse_GSR = mean(xform_jrgeco1a_mouse_GSR,4);
-    xform_jrgeco1aCorr_mouse_GSR = mean(xform_jrgeco1aCorr_mouse_GSR,4);
-    xform_red_mouse_GSR = mean(xform_red_mouse_GSR,4);
-    
-    %
-    save(fullfile(saveDir,processedName_mouse),'xform_jrgeco1aCorr_mouse_GSR','xform_jrgeco1a_mouse_GSR','xform_red_mouse_GSR','-append')
-    
-    %
-    texttitle_GSR = strcat(mouseName,'-stim'," ",'with GSR without filtering');
-    output_GSR= fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim','_GSR'));
-    
-    
-    disp('QC on GSR stim')
-    QC_stim(squeeze(xform_datahb_mouse_GSR(:,:,1,:))*10^6,squeeze(xform_datahb_mouse_GSR(:,:,2,:))*10^6,...
-        [],[],[],xform_jrgeco1a_mouse_GSR*100,xform_jrgeco1aCorr_mouse_GSR*100,xform_red_mouse_GSR*100,...
-        xform_isbrain,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_GSR,output_GSR,ROI_NoGSR,[]);
-    
-    clear xform_datahb_mouse_GSR xform_jrgeco1a_mouse_GSR xform_jrgeco1aCorr_mouse_GSR xform_red_mouse_GSR
-    close all
+close all
+  
     
 end
 

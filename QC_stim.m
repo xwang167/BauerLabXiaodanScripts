@@ -1,7 +1,8 @@
-function   [goodBlocks,ROI] = QC_stim(oxy,deoxy,greenFluor,greenFluorCorr,green,jrgeco1a,jrgeco1aCorr,red,xform_isbrain,numBlock,numDesample,stimStartTime,stimduration,stimFreq,framerate,stimblocksize,stimbaseline,texttitle,output,input_ROI,ifGoodBlocks)
+function   [goodBlocks,ROI] = QC_stim(oxy,deoxy,greenFluor,greenFluorCorr,green,jrgeco1a,jrgeco1aCorr,red,xform_isbrain,numBlock,numDesample,stimStartTime,stimduration,stimFreq,framerate,stimblocksize,stimbaseline,texttitle,output,input_ROI)
 
 
-
+ load('D:\OIS_Process\noVasculatureMask.mat')
+mask_new = logical(mask_new);
 disp('downsampling')
 
 
@@ -409,7 +410,7 @@ if ~isempty(goodBlocks)
     
     traceImage(oxy_downsampled_blocks,deoxy_downsampled_blocks,total_downsampled_blocks,...
         'HbO','HbR','Total',oxy_active,deoxy_active,total_active,'r','b','k',ROI,'\Delta\muM',...
-        stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[temp_oxy_max,temp_deoxy_max,temp_total_max])%]3,2,1
+        stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[temp_oxy_max*1.2,temp_deoxy_max*1.2,temp_total_max*1.2])%]3,2,1
     
     
     texttitle2 = strcat(' Block Average for ', {' '},texttitle);
@@ -421,34 +422,34 @@ if ~isempty(goodBlocks)
     saveas(gcf,strcat(output,'HbTraceImage.png'))
     
     
-    
-    figure
-    imagesc(total_downsampled_blocks(:,:,stimEndTime),...
-        [min(total_downsampled_blocks(:,:,stimEndTime),[],'all'),max(total_downsampled_blocks(:,:,stimEndTime),[],'all')])
-    
-    colorbar
-    
-    hold on
-    
-    imagesc(WL,'AlphaData',1-ROI)
-    
-    axis image off
-    
-    title('Total');
-    
-    saveas(gcf,strcat(output,'HbTpeak.fig'))
-    
-    saveas(gcf,strcat(output,'Hbpeak.png'))
+%     
+%     figure
+%     imagesc(total_downsampled_blocks(:,:,stimEndTime),...
+%         [min(total_downsampled_blocks(:,:,stimEndTime),[],'all'),max(total_downsampled_blocks(:,:,stimEndTime),[],'all')])
+%     
+%     colorbar
+%     
+%     hold on
+%     
+%     imagesc(WL,'AlphaData',1-ROI)
+%     
+%     axis image off
+%     
+%     title('Total');
+%     
+%     saveas(gcf,strcat(output,'HbTpeak.fig'))
+%     
+%     saveas(gcf,strcat(output,'Hbpeak.png'))
     
     if ~isempty(jrgeco1a)
         jrgeco1a_peak = abs(mean(jrgeco1a_downsampled_blocks(:,:,stimStartTime+1:stimEndTime),3));
         red_peak = abs(mean(red_downsampled_blocks(:,:,stimStartTime+1:stimEndTime),3));
-        temp_jrgeco1a_max = prctile(jrgeco1a_peak(mask_new),90,'all')*1.1;
-        temp_red_max = prctile(red_peak(mask_new),90,'all')*1.1;
+        temp_jrgeco1a_max = prctile(jrgeco1a_peak(mask_new),90,'all')*1.4;
+        temp_red_max = prctile(red_peak(mask_new),90,'all')*1.4;
         
         traceImage(jrgeco1a_downsampled_blocks,jrgeco1aCorr_downsampled_blocks,red_downsampled_blocks,...
             'jrgeco1a','jrgeco1aCorr','625nm Reflectance',jrgeco1a_active,jrgeco1aCorr_active,red_active,'m','k','r',ROI,'\DeltaF/F%',...
-            stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[temp_jrgeco1a_max temp_jrgeco1aCorr_max temp_red_max])%2 2 0.2
+            stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[temp_jrgeco1a_max*1.2 temp_jrgeco1aCorr_max*1.2 temp_red_max*1.2])%2 2 0.2
         
         
         
@@ -480,12 +481,12 @@ if ~isempty(goodBlocks)
             
             greenFluor_peak = abs(mean(greenFluor_downsampled_blocks(:,:,stimStartTime+1:stimEndTime),3));
             green_peak = abs(mean(green_downsampled_blocks(:,:,stimStartTime+1:stimEndTime),3));
-            temp_greenFluor_max = prctile(greenFluor_peak(mask_new),90,'all')*1.1;
-            temp_green_max = prctile(green_peak(mask_new),90,'all')*1.1;
+            temp_greenFluor_max = prctile(greenFluor_peak(mask_new),90,'all')*1.4;
+            temp_green_max = prctile(green_peak(mask_new),90,'all')*1.4;
             
             traceImage(greenFluor_downsampled_blocks,greenFluorCorr_downsampled_blocks,green_downsampled_blocks,...
                 'FAD','FADCorr','525nm Reflectance',greenFluor_active,greenFluorCorr_active,green_active,'g','k',[ 0 0.6 0],ROI,'\DeltaF/F%',...
-                stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[temp_greenFluor_max temp_greenFluorCorr_max temp_green_max]) %2,1,1.5
+                stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[temp_greenFluor_max*1.2 temp_greenFluorCorr_max*1.2 temp_green_max*1.2]) %2,1,1.5
             
             
             
@@ -522,11 +523,11 @@ if ~isempty(goodBlocks)
     elseif ~isempty(greenFluor)
         greenFluor_peak = abs(mean(greenFluor_downsampled_blocks(:,:,stimStartTime+1:stimEndTime),3));
         green_peak = abs(mean(green_downsampled_blocks(:,:,stimStartTime+1:stimEndTime),3));
-        temp_greenFluor_max = prctile(greenFluor_peak(mask_new),90,'all')*1.1;
-        temp_green_max = prctile(green_peak(mask_new),90,'all')*1.1;
+        temp_greenFluor_max = prctile(greenFluor_peak(mask_new),90,'all')*1.4;
+        temp_green_max = prctile(green_peak(mask_new),90,'all')*1.4;
         traceImage(greenFluor_downsampled_blocks,greenFluorCorr_downsampled_blocks,green_downsampled_blocks,...
             'gcamp','gcampCorr','525nm Reflectance',greenFluor_active,greenFluorCorr_active,green_active,'g','k',[ 0 0.6 0],ROI,'\DeltaF/F%',...
-            stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[temp_greenFluor_max temp_greenFluorCorr_max temp_green_max]) %2,1,1.5
+            stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[temp_greenFluor_max*1.2 temp_greenFluorCorr_max*1.2 temp_green_max*1.2]) %2,1,1.5
         
         annotation('textbox',[0.125 0.95 0.75 0.05],'HorizontalAlignment','center','LineStyle','none','String',texttitle2,'FontWeight','bold','Color',[1 0 0],'FontSize',16);
         

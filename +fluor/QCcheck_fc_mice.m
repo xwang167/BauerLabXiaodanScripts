@@ -1,17 +1,18 @@
 close all;clearvars -except hz;clc
 import mice.*
-excelFile = "L:\Stroke\Stroke.xlsx";
+excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
+excelRows = [5,8,11];%:450;
 isZTransform = true;
 set(0,'defaultaxesfontsize',12);
 
 info.nVx = 128;
 info.nVy = 128;
 %
-excelRows =  [14,17] ;%[ 181 183 185  228 232 236 ];[181 183 185  228 232 236];%
+%excelRows =  [14,17] ;%;[181 183 185  228 232 236];%
 numMice = length(excelRows);
 xform_isbrain_mice = 1;
 sessionInfo.miceType = 'jrgeco1a';
-saveDir_cat = 'L:\Stroke\cat';
+saveDir_cat = 'X:\XW\Paper\WT\cat';
 
 R_total_Delta_mice  = zeros(info.nVy,info.nVx,16,numMice);
 R_total_ISA_mice  = zeros(info.nVy,info.nVx,16,numMice);
@@ -223,7 +224,7 @@ save(fullfile(saveDir_cat, processedName_mice),'R_total_ISA_mice','R_jrgeco1aCor
 
 disp(char(['QC check on ', processedName_mice]))
 if strcmp(char(sessionInfo.miceType),'jrgeco1a')
-    visName = 'Post Stroke';
+    visName = 'Anes WT';
     %if goodRuns ~=0
     
     
@@ -286,7 +287,7 @@ if strcmp(char(sessionInfo.miceType),'jrgeco1a')
     
 
    
-visName = 'Post Stroke';
+visName = 'Anes WT';
     QCcheck_fcVis(refseeds,R_jrgeco1aCorr_ISA_mice, Rs_jrgeco1aCorr_ISA_mice,'jrgeco1aCorr','m','ISA',saveDir_cat,visName,true,xform_isbrain_mice)
     QCcheck_fcVis(refseeds,R_FADCorr_ISA_mice, Rs_FADCorr_ISA_mice,'FADCorr','g','ISA',saveDir_cat,visName,true,xform_isbrain_mice)
     QCcheck_fcVis(refseeds,R_total_ISA_mice, Rs_total_ISA_mice,'total','k','ISA',saveDir_cat,visName,true,xform_isbrain_mice)

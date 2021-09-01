@@ -32,7 +32,8 @@ hold on
 plot(lambda_extCoeff,extCoeff(:,2),'b')
 yyaxis right
 hold on
-plot(lambda_spectrum,spectrum,'k-');
+plot(lambda_extCoeff,spectrum_zeroNoise,'k')
+plot(,spectrum,'k-');
 
 
 

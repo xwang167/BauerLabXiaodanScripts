@@ -3,12 +3,16 @@ close all;clearvars;clc
 
 import mouse.*
 
-excelRows =  459:461;%[462 464 466];%[367,371,375,397,401,409];%,229,233,237%,
-excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
+% excelRows =  459:461;%[462 464 466];%[367,371,375,397,401,409];%,229,233,237%,
+% excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
+excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
+excelRows = [13 15 12];
+runs = 1:3;
+
 numMice = length(excelRows);
 
 miceName = [];
-catDir = 'K:\OptoRGECO\cat' ;
+catDir = 'X:\XW\Paper\WT\cat' ;
 
 stimStartTime = 5;
 
@@ -27,12 +31,12 @@ xform_jrgeco1aCorr_mice_NoGSR = [];
 xform_red_mice_GSR = [];
 xform_red_mice_NoGSR = [];
 % 
-xform_Laser_mice = [];
-%  xform_FAD_mice_GSR = [];
-%  xform_FAD_mice_NoGSR = [];
-%
-% xform_FADCorr_mice_GSR = [];
-% xform_FADCorr_mice_NoGSR = [];
+%xform_Laser_mice = [];
+ xform_FAD_mice_GSR = [];
+ xform_FAD_mice_NoGSR = [];
+
+xform_FADCorr_mice_GSR = [];
+xform_FADCorr_mice_NoGSR = [];
 %
 %
 % xform_gcamp_mice_GSR = [];
@@ -40,9 +44,9 @@ xform_Laser_mice = [];
 %
 % xform_gcampCorr_mice_GSR = [];
 % xform_gcampCorr_mice_NoGSR = [];
-%
-% xform_green_mice_GSR = [];
-%  xform_green_mice_NoGSR = [];
+
+xform_green_mice_GSR = [];
+ xform_green_mice_NoGSR = [];
 
 
 xform_isbrain_mice = ones(nVx ,nVy);
@@ -84,7 +88,7 @@ for excelRow = excelRows
 %     xform_isbrain = ones(128,128);
     processedName_mouse = strcat(recDate,'-',mouseName,'-',sessionType,'_processed_mouse','.mat');
     
-    %xform_isbrain_mice = xform_isbrain_mice.*xform_isbrain;
+    xform_isbrain_mice = xform_isbrain_mice.*xform_isbrain;
     
     %    isbrain_mice = isbrain_mice.*isbrain;
     
@@ -117,52 +121,52 @@ for excelRow = excelRows
         xform_gcampCorr_mice_NoGSR = cat(4,xform_gcampCorr_mice_NoGSR,xform_gcampCorr_mouse_NoGSR);
         xform_green_mice_NoGSR = cat(4,xform_green_mice_NoGSR,xform_green_mouse_NoGSR);
     elseif strcmp(char(sessionInfo.miceType),'jrgeco1a')
-%         disp('loading  GRS data')
-%         sessionInfo.stimblocksize = excelRaw{11};
-%         load(fullfile(saveDir,processedName_mouse),...
-%             'xform_datahb_mouse_GSR','xform_jrgeco1a_mouse_GSR','xform_jrgeco1aCorr_mouse_GSR','xform_red_mouse_GSR','xform_FAD_mouse_GSR','xform_FADCorr_mouse_GSR','xform_green_mouse_GSR')
-%         if size(xform_datahb_mouse_GSR,1)>1
-%             xform_datahb_mice_GSR = cat(5,xform_datahb_mice_GSR,xform_datahb_mouse_GSR);
-%         end
-%         clear xform_datahb_mouse_GSR
-%         xform_jrgeco1a_mice_GSR = cat(4,xform_jrgeco1a_mice_GSR,xform_jrgeco1a_mouse_GSR);
-%         clear xform_jrgeco1a_mouse_GSR
-%         xform_jrgeco1aCorr_mice_GSR = cat(4,xform_jrgeco1aCorr_mice_GSR,xform_jrgeco1aCorr_mouse_GSR);
-%         clear xform_jrgeco1aCorr_mouse_GSR
-%         %        xform_red_mice_GSR = cat(4,xform_red_mice_GSR,xform_red_mouse_GSR);
-%         %         clear xform_red_mouse_GSR
-%         %
-%         xform_FAD_mice_GSR = cat(4,xform_FAD_mice_GSR,xform_FAD_mouse_GSR);
-%         clear xform_FAD_mouse_GSR
-%         xform_FADCorr_mice_GSR = cat(4,xform_FADCorr_mice_GSR,xform_FADCorr_mouse_GSR);
-%         clear xform_FADCorr_mouse_GSR
-%         %         xform_green_mice_GSR = cat(4,xform_green_mice_GSR,xform_green_mouse_GSR);
-        %                 clear xform_green_mouse_GSR
+        disp('loading  GSR data')
+        sessionInfo.stimblocksize = excelRaw{11};
+        load(fullfile(saveDir,processedName_mouse),...
+            'xform_datahb_mouse_GSR','xform_jrgeco1a_mouse_GSR','xform_jrgeco1aCorr_mouse_GSR','xform_red_mouse_GSR','xform_FAD_mouse_GSR','xform_FADCorr_mouse_GSR','xform_green_mouse_GSR')
+      
+            xform_datahb_mice_GSR = cat(5,xform_datahb_mice_GSR,xform_datahb_mouse_GSR);
+      
+        clear xform_datahb_mouse_GSR
+        xform_jrgeco1a_mice_GSR = cat(4,xform_jrgeco1a_mice_GSR,xform_jrgeco1a_mouse_GSR);
+        clear xform_jrgeco1a_mouse_GSR
+        xform_jrgeco1aCorr_mice_GSR = cat(4,xform_jrgeco1aCorr_mice_GSR,xform_jrgeco1aCorr_mouse_GSR);
+        clear xform_jrgeco1aCorr_mouse_GSR
+               xform_red_mice_GSR = cat(4,xform_red_mice_GSR,xform_red_mouse_GSR);
+                clear xform_red_mouse_GSR
         %
+        xform_FAD_mice_GSR = cat(4,xform_FAD_mice_GSR,xform_FAD_mouse_GSR);
+        clear xform_FAD_mouse_GSR
+        xform_FADCorr_mice_GSR = cat(4,xform_FADCorr_mice_GSR,xform_FADCorr_mouse_GSR);
+        clear xform_FADCorr_mouse_GSR
+        xform_green_mice_GSR = cat(4,xform_green_mice_GSR,xform_green_mouse_GSR);
+                        clear xform_green_mouse_GSR
         
         
-        %         disp('loading  Non GRS data')
+        
+                disp('loading  Non GRS data')
+        
+               load(fullfile(saveDir,processedName_mouse),...
+                     'xform_datahb_mouse_NoGSR','xform_jrgeco1a_mouse_NoGSR','xform_jrgeco1aCorr_mouse_NoGSR','xform_red_mouse_NoGSR','xform_FAD_mouse_NoGSR','xform_FADCorr_mouse_NoGSR','xform_green_mouse_NoGSR')
         %
-        %        load(fullfile(saveDir,processedName_mouse),...
-        %              'xform_datahb_mouse_NoGSR','xform_jrgeco1a_mouse_NoGSR','xform_jrgeco1aCorr_mouse_NoGSR','xform_red_mouse_NoGSR','xform_FAD_mouse_NoGSR','xform_FADCorr_mouse_NoGSR','xform_green_mouse_NoGSR')
-        % %
-        %         xform_datahb_mice_NoGSR = cat(5,xform_datahb_mice_NoGSR,xform_datahb_mouse_NoGSR);
-        %         clear xform_datahb_mouse_NoGSR
-        %    xform_jrgeco1a_mice_NoGSR = cat(4,xform_jrgeco1a_mice_NoGSR,xform_jrgeco1a_mouse_NoGSR);
-        %          clear xform_jrgeco1a_mouse_NoGSR
-        %        xform_jrgeco1aCorr_mice_NoGSR = cat(4,xform_jrgeco1aCorr_mice_NoGSR,xform_jrgeco1aCorr_mouse_NoGSR);
-        %         clear xform_jrgeco1aCorr_mouse_NoGSR
-        %      xform_red_mice_NoGSR = cat(4,xform_red_mice_NoGSR,xform_red_mouse_NoGSR);
-        %         clear xform_red_mouse_NoGSR
-        % %
-        %     xform_FAD_mice_NoGSR = cat(4,xform_FAD_mice_NoGSR,xform_FAD_mouse_NoGSR);
-        %         clear xform_FAD_mouse_NoGSR
-        %        xform_FADCorr_mice_NoGSR = cat(4,xform_FADCorr_mice_NoGSR,xform_FADCorr_mouse_NoGSR);
-        %         clear xform_FADCorr_mouse_NoGSR
-        %       xform_green_mice_NoGSR = cat(4,xform_green_mice_NoGSR,xform_green_mouse_NoGSR);
-        % clear xform_green_mouse_NoGSR
-        % %
-        % %
+                xform_datahb_mice_NoGSR = cat(5,xform_datahb_mice_NoGSR,xform_datahb_mouse_NoGSR);
+                clear xform_datahb_mouse_NoGSR
+           xform_jrgeco1a_mice_NoGSR = cat(4,xform_jrgeco1a_mice_NoGSR,xform_jrgeco1a_mouse_NoGSR);
+                 clear xform_jrgeco1a_mouse_NoGSR
+               xform_jrgeco1aCorr_mice_NoGSR = cat(4,xform_jrgeco1aCorr_mice_NoGSR,xform_jrgeco1aCorr_mouse_NoGSR);
+                clear xform_jrgeco1aCorr_mouse_NoGSR
+             xform_red_mice_NoGSR = cat(4,xform_red_mice_NoGSR,xform_red_mouse_NoGSR);
+                clear xform_red_mouse_NoGSR
+        %
+            xform_FAD_mice_NoGSR = cat(4,xform_FAD_mice_NoGSR,xform_FAD_mouse_NoGSR);
+                clear xform_FAD_mouse_NoGSR
+               xform_FADCorr_mice_NoGSR = cat(4,xform_FADCorr_mice_NoGSR,xform_FADCorr_mouse_NoGSR);
+                clear xform_FADCorr_mouse_NoGSR
+              xform_green_mice_NoGSR = cat(4,xform_green_mice_NoGSR,xform_green_mouse_NoGSR);
+        clear xform_green_mouse_NoGSR
+        %
+        %
         %
     elseif strcmp(char(sessionInfo.miceType),'jrgeco1a-opto3')
         load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'1_processed','.mat')),'xform_Laser')
@@ -263,24 +267,24 @@ if strcmp(char(sessionInfo.miceType),'gcamp6f')
     
     
 elseif strcmp(char(sessionInfo.miceType),'jrgeco1a')
-    %   xform_jrgeco1a_mice_NoGSR = mean(xform_jrgeco1a_mice_NoGSR,4);
-    %      xform_jrgeco1aCorr_mice_NoGSR = mean(xform_jrgeco1aCorr_mice_NoGSR,4);
-    %   xform_red_mice_NoGSR = mean(xform_red_mice_NoGSR,4);
-    %
-    %   xform_FAD_mice_NoGSR = mean(xform_FAD_mice_NoGSR,4);
-    %     xform_FADCorr_mice_NoGSR = mean(xform_FADCorr_mice_NoGSR,4);
-    %    xform_green_mice_NoGSR = mean(xform_green_mice_NoGSR,4);
-    %             xform_jrgeco1aCorr_mice_NoGSR(isinf(xform_jrgeco1aCorr_mice_NoGSR)) = 0;
-    %         xform_jrgeco1aCorr_mice_NoGSR(isnan(xform_jrgeco1aCorr_mice_NoGSR)) = 0;
-    %     %     xform_jrgeco1aCorr_mice_NoGSR = mouse.freq.highpass(xform_jrgeco1aCorr_mice_NoGSR,1,25);
-    %     %
-    %         xform_jrgeco1a_mice_NoGSR(isinf(xform_jrgeco1a_mice_NoGSR)) = 0;
-    %         xform_jrgeco1a_mice_NoGSR(isnan(xform_jrgeco1a_mice_NoGSR)) = 0;
-    %     %     xform_jrgeco1a_mice_NoGSR = mouse.freq.highpass(xform_jrgeco1a_mice_NoGSR,1,25);
-    %
-    %  save(fullfile(catDir,processedName_mice),'xform_jrgeco1a_mice_NoGSR','xform_jrgeco1aCorr_mice_NoGSR','xform_red_mice_NoGSR','xform_FAD_mice_NoGSR','xform_FADCorr_mice_NoGSR','xform_green_mice_NoGSR','-append')
-    %     texttitle_NoGSR = strcat(miceName,'-stim'," ",'without GSR nor filtering');
-    %     output_NoGSR= fullfile(catDir,strcat(recDate,'-',miceName,'-stim','_NoGSR'));
+      xform_jrgeco1a_mice_NoGSR = mean(xform_jrgeco1a_mice_NoGSR,4);
+         xform_jrgeco1aCorr_mice_NoGSR = mean(xform_jrgeco1aCorr_mice_NoGSR,4);
+      xform_red_mice_NoGSR = mean(xform_red_mice_NoGSR,4);
+    
+      xform_FAD_mice_NoGSR = mean(xform_FAD_mice_NoGSR,4);
+        xform_FADCorr_mice_NoGSR = mean(xform_FADCorr_mice_NoGSR,4);
+       xform_green_mice_NoGSR = mean(xform_green_mice_NoGSR,4);
+                xform_jrgeco1aCorr_mice_NoGSR(isinf(xform_jrgeco1aCorr_mice_NoGSR)) = 0;
+            xform_jrgeco1aCorr_mice_NoGSR(isnan(xform_jrgeco1aCorr_mice_NoGSR)) = 0;
+        %     xform_jrgeco1aCorr_mice_NoGSR = mouse.freq.highpass(xform_jrgeco1aCorr_mice_NoGSR,1,25);
+        %
+            xform_jrgeco1a_mice_NoGSR(isinf(xform_jrgeco1a_mice_NoGSR)) = 0;
+            xform_jrgeco1a_mice_NoGSR(isnan(xform_jrgeco1a_mice_NoGSR)) = 0;
+        %     xform_jrgeco1a_mice_NoGSR = mouse.freq.highpass(xform_jrgeco1a_mice_NoGSR,1,25);
+    
+     save(fullfile(catDir,processedName_mice),'xform_jrgeco1a_mice_NoGSR','xform_jrgeco1aCorr_mice_NoGSR','xform_red_mice_NoGSR','xform_FAD_mice_NoGSR','xform_FADCorr_mice_NoGSR','xform_green_mice_NoGSR','-append')
+        texttitle_NoGSR = strcat(miceName,'-stim'," ",'without GSR nor filtering');
+        output_NoGSR= fullfile(catDir,strcat(recDate,'-',miceName,'-stim','_NoGSR'));
     numDesample = size(xform_green_mice_NoGSR,3)/sessionInfo.framerate*info.freqout;
     factor = round(numDesample/1);
     numDesample = factor*1;
@@ -289,11 +293,11 @@ elseif strcmp(char(sessionInfo.miceType),'jrgeco1a')
     %
     %
     %     if strcmp(char(sessionInfo.miceType),'jrgeco1a')
-    %         disp('QC on non GSR stim')
-    %         [~,ROI_NoGSR] =  QC_stim(squeeze(xform_datahb_mice_NoGSR(:,:,1,:))*10^6,squeeze(xform_datahb_mice_NoGSR(:,:,2,:))*10^6,...
-    %             xform_FAD_mice_NoGSR*100,xform_FADCorr_mice_NoGSR*100,xform_green_mice_NoGSR*100,xform_jrgeco1a_mice_NoGSR*100,xform_jrgeco1aCorr_mice_NoGSR*100,xform_red_mice_NoGSR*100,...
-    %             xform_isbrain_mice,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,[],[],[]);
-    %
+            disp('QC on non GSR stim')
+            [~,ROI_NoGSR] =  QC_stim(squeeze(xform_datahb_mice_NoGSR(:,:,1,:))*10^6,squeeze(xform_datahb_mice_NoGSR(:,:,2,:))*10^6,...
+                xform_FAD_mice_NoGSR*100,xform_FADCorr_mice_NoGSR*100,xform_green_mice_NoGSR*100,xform_jrgeco1a_mice_NoGSR*100,xform_jrgeco1aCorr_mice_NoGSR*100,xform_red_mice_NoGSR*100,...
+                xform_isbrain_mice,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,[]);
+    
     
     
     
@@ -310,30 +314,30 @@ elseif strcmp(char(sessionInfo.miceType),'jrgeco1a')
     %
     xform_jrgeco1a_mice_GSR = mean(xform_jrgeco1a_mice_GSR,4);
     xform_jrgeco1aCorr_mice_GSR = mean(xform_jrgeco1aCorr_mice_GSR,4);
-    %     xform_red_mice_GSR = mean(xform_red_mice_GSR,4);
+  xform_red_mice_GSR = mean(xform_red_mice_GSR,4);
     %
     xform_FAD_mice_GSR = mean(xform_FAD_mice_GSR,4);
     xform_FADCorr_mice_GSR = mean(xform_FADCorr_mice_GSR,4);
-    %     xform_green_mice_GSR = mean(xform_green_mice_GSR,4);
+     xform_green_mice_GSR = mean(xform_green_mice_GSR,4);
     %
     
     
     
     %save(fullfile(catDir,processedName_mice),'xform_jrgeco1aCorr_mice_NoGSR','xform_FADCorr_mice_NoGSR','-append')
-    %save(fullfile(catDir,processedName_mice),'xform_jrgeco1a_mice_GSR','xform_jrgeco1aCorr_mice_GSR','xform_red_mice_GSR','xform_FAD_mice_GSR','xform_FADCorr_mice_GSR','xform_green_mice_GSR','-append')
-    save(fullfile(catDir,processedName_mice),'xform_jrgeco1a_mice_GSR','xform_jrgeco1aCorr_mice_GSR','xform_FAD_mice_GSR','xform_FADCorr_mice_GSR','-append')
+    save(fullfile(catDir,processedName_mice),'xform_jrgeco1a_mice_GSR','xform_jrgeco1aCorr_mice_GSR','xform_red_mice_GSR','xform_FAD_mice_GSR','xform_FADCorr_mice_GSR','xform_green_mice_GSR','-append')
+    %save(fullfile(catDir,processedName_mice),'xform_jrgeco1a_mice_GSR','xform_jrgeco1aCorr_mice_GSR','xform_FAD_mice_GSR','xform_FADCorr_mice_GSR','-append')
     
     %
     texttitle_GSR = strcat(miceName,'-stim'," ",'with GSR without filtering');
     output_GSR= fullfile(catDir,strcat(recDate,'-',miceName,'-stim','_GSR'));
     
     %
-    %     disp('QC on GSR stim')
-    %         QC_stim(squeeze(xform_datahb_mice_GSR(:,:,1,:)),squeeze(xform_datahb_mice_GSR(:,:,2,:)),...
-    %           xform_FAD_mice_GSR,xform_FADCorr_mice_GSR,xform_green_mice_GSR,xform_jrgeco1a_mice_GSR,xform_jrgeco1aCorr_mice_GSR,xform_red_mice_GSR,...
-    %             xform_isbrain_mice,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_GSR,output_GSR,ROI_NoGSR);
-    %
-    %     clear xofrm_datahb_mice_GSR xform_jrgeco1a_mice_GSR xform_jrgeco1aCorr_mice_GSR xform_red_mice_GSR  xform_FAD_mice_GSR xform_FADCorr_mice_GSR xform_green_mice_GSR
+        disp('QC on GSR stim')
+            QC_stim(squeeze(xform_datahb_mice_GSR(:,:,1,:))*10^6,squeeze(xform_datahb_mice_GSR(:,:,2,:))*10^6,...
+              xform_FAD_mice_GSR*100,xform_FADCorr_mice_GSR*100,xform_green_mice_GSR*100,xform_jrgeco1a_mice_GSR*100,xform_jrgeco1aCorr_mice_GSR*100,xform_red_mice_GSR*100,...
+                xform_isbrain_mice,1,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_GSR,output_GSR,[]);
+    
+        clear xform_datahb_mice_GSR xform_jrgeco1a_mice_GSR xform_jrgeco1aCorr_mice_GSR xform_red_mice_GSR  xform_FAD_mice_GSR xform_FADCorr_mice_GSR xform_green_mice_GSR
 elseif strcmp(char(sessionInfo.miceType),'jrgeco1a-opto3')
     xform_Laser_mice = mean(xform_Laser_mice,4);
     xform_jrgeco1a_mice_NoGSR = mean(xform_jrgeco1a_mice_NoGSR,4);
