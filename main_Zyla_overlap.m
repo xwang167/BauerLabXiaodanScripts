@@ -3,7 +3,7 @@
 close all;clear all;clc
 import mouse.*
 excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
-excelRows = [19,23];%[3,5,7,8,10,11,12,13];%:450;
+excelRows = [17,18,21,22];%[3,5,7,8,10,11,12,13];%:450;
 runs = 1:3;
 isDetrend = 1;
 nVy = 128;
@@ -114,131 +114,131 @@ nVx = 128;
 % % % % %
 % % % % % % %get registered together, dark frame removed raw and QC_raw check
 % % % %
-for excelRow = excelRows
-    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
-    recDate = excelRaw{1}; recDate = string(recDate);
-    mouseName = excelRaw{2}; mouseName = string(mouseName);
-    rawdataloc = excelRaw{3};
-    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-    if ~exist(saveDir)
-        mkdir(saveDir)
-    end
-    sessionInfo.mouseType = excelRaw{17};
-    sessionInfo.darkFrameNum = excelRaw{15};
-    systemType = excelRaw{5};
-    sessionInfo.framerate = excelRaw{7};
-    
-    maskDir = saveDir;
-    
-    %mouseName = 'N4M330-opto3';
-    %maskDir = strcat('J:\RGECO\Kenny\', recDate, '\');
-    maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-    %maskName = strcat(recDate,'-N8M864-opto3-LandmarksAndMask','.mat');
-    
-    load(fullfile(maskDir,maskName),'isbrain')
-    
-    for n = runs
-        
-        rawName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'.mat');
-        if exist(fullfile(saveDir,rawName),'file')
-            disp(strcat('registered rawdata file already exist for ',rawName ))
-            
-        else
-            wlName = maskName;
-            %wlName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-            
-            %             fileName_cam1 = strcat(recDate,'-',mouseName,'-cam1','-',sessionType,num2str(n),'.mat');%
-            fileName_cam1 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam1.mat');
-            fileName_cam1 = fullfile(rawdataloc,recDate,fileName_cam1);
-            %             fileName_cam2 = strcat(recDate,'-',mouseName,'-cam2','-',sessionType,num2str(n),'.mat');%
-            fileName_cam2 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam2.mat');
-            fileName_cam2 = fullfile(rawdataloc,recDate,fileName_cam2);
-            if exist(fileName_cam1)&&exist(fileName_cam2)
-                disp('loading unregistered data')
-                
-                load(fileName_cam1)
-                if sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4-1),'all')>5
-                    numCh = size(raw_unregistered,3);
-                    raw_unregistered = reshape(raw_unregistered,128,128,[]);
-                    raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
-                    raw_unregistered = reshape(raw_unregistered,128,128,numCh,[]);
-                end
-                %                 if raw_unregistered(40,40,end,end) ==0
-                %                     numCh = size(raw_unregistered,3);
-                %                     raw_unregistered = reshape(raw_unregistered,128,128,[]);
-                %                     raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
-                %                     raw_unregistered = reshape(raw_unregistered,128,128,numCh,[]);
-                %                 end
-                if sessionInfo.darkFrameNum>0
-                    %if sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4-1),'all')>5
-                    if raw_unregistered(40,40,1,sessionInfo.darkFrameNum/4) > 10000
-                        raw_unregistered(:,:,1,2:end) = raw_unregistered(:,:,1,1:end-1);
-                    end
-                end
-                
-                binnedRaw_cam1 = raw_unregistered(:,:,[1,3],:);
-                
-                clear raw_unregistered
-                load(fileName_cam2)
-                if sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4-1),'all')>5
-                    numCh = size(raw_unregistered,3);
-                    raw_unregistered = reshape(raw_unregistered,128,128,[]);
-                    raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
-                    raw_unregistered = reshape(raw_unregistered,128,128,numCh,[]);
-                end
-                %                 if raw_unregistered(40,40,end,end) ==0
-                %                     numCh = size(raw_unregistered,3);
-                %                     raw_unregistered = reshape(raw_unregistered,128,128,[]);
-                %                     raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
-                %                     raw_unregistered = reshape(raw_unregistered,128,128,numCh,[]);
-                %                 end
-                %                 if sessionInfo.darkFrameNum>0
-                %                     %if sum(raw_unregistered(:,:,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,sessionInfo.darkFrameNum/4-1),'all')>5
-                %                     if raw_unregistered(40,40,1,sessionInfo.darkFrameNum/4) > 10000
-                %                         raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
-                %                     end
-                %                 end
-                disp(strcat('Register and Combine two cameras for ', rawName))
-                %                     binnedRaw_cam2= raw_unregistered(:,:,[1,2],:);
-                %                     load(fullfile(maskDir,wlName),'mytform');
-                %                     rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,mytform,sessionInfo.mouseType);
-                binnedRaw_cam2= raw_unregistered(:,:,[2,4],:);
-                load(fullfile(maskDir,wlName),'transformMat');
-                length_1 = size(binnedRaw_cam1,4);
-                length_2 = size(binnedRaw_cam2,4);
-                if  length_1==length_2
-                    rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,transformMat,sessionInfo.mouseType);
-                elseif length_1 < length_2
-                    rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2(:,:,:,1:length_1),transformMat,sessionInfo.mouseType);
-                    disp(['raw1 is shorter than raw 2, raw1 is ', num2str(length_1)] )
-                else
-                    rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1(:,:,:, 1:length_2),binnedRaw_cam2,transformMat,sessionInfo.mouseType);
-                    disp(['raw2 is shorter than raw 1, raw1 is ', num2str(length_1)] )
-                end
-                
-                clear raw_unregistered
-                
-                
-                
-                darkFrameInd = 2:sessionInfo.darkFrameNum/size(rawdata,3);
-                darkFrame = squeeze(mean(rawdata(:,:,:,darkFrameInd),4));
-                raw_baselineMinus = rawdata - repmat(darkFrame,1,1,1,size(rawdata,4));
-                clear rawdata
-                raw_baselineMinus(:,:,:,1:sessionInfo.darkFrameNum/size(raw_baselineMinus,3))=[];
-                rawdata = raw_baselineMinus;
-                clear raw_baselineMinus
-                
-                
-                disp(strcat('QC raw for ',rawName))
-                visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
-                [mdata] = QCcheck_raw(rawdata,isbrain,systemType,sessionInfo.framerate,saveDir,visName,sessionInfo.mouseType);
-                save(fullfile(saveDir,rawName),'rawdata','mdata','-v7.3')
-                close all
-            end
-        end
-    end
-end
+% for excelRow = excelRows
+%     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+%     recDate = excelRaw{1}; recDate = string(recDate);
+%     mouseName = excelRaw{2}; mouseName = string(mouseName);
+%     rawdataloc = excelRaw{3};
+%     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+%     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+%     if ~exist(saveDir)
+%         mkdir(saveDir)
+%     end
+%     sessionInfo.mouseType = excelRaw{17};
+%     sessionInfo.darkFrameNum = excelRaw{15};
+%     systemType = excelRaw{5};
+%     sessionInfo.framerate = excelRaw{7};
+%     
+%     maskDir = saveDir;
+%     
+%     %mouseName = 'N4M330-opto3';
+%     %maskDir = strcat('J:\RGECO\Kenny\', recDate, '\');
+%     maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+%     %maskName = strcat(recDate,'-N8M864-opto3-LandmarksAndMask','.mat');
+%     
+%     load(fullfile(maskDir,maskName),'isbrain')
+%     
+%     for n = runs
+%         
+%         rawName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'.mat');
+%         if exist(fullfile(saveDir,rawName),'file')
+%             disp(strcat('registered rawdata file already exist for ',rawName ))
+%             
+%         else
+%             wlName = maskName;
+%             %wlName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+%             
+%             %             fileName_cam1 = strcat(recDate,'-',mouseName,'-cam1','-',sessionType,num2str(n),'.mat');%
+%             fileName_cam1 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam1.mat');
+%             fileName_cam1 = fullfile(rawdataloc,recDate,fileName_cam1);
+%             %             fileName_cam2 = strcat(recDate,'-',mouseName,'-cam2','-',sessionType,num2str(n),'.mat');%
+%             fileName_cam2 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam2.mat');
+%             fileName_cam2 = fullfile(rawdataloc,recDate,fileName_cam2);
+%             if exist(fileName_cam1)&&exist(fileName_cam2)
+%                 disp('loading unregistered data')
+%                 
+%                 load(fileName_cam1)
+%                 if sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4-1),'all')>5
+%                     numCh = size(raw_unregistered,3);
+%                     raw_unregistered = reshape(raw_unregistered,128,128,[]);
+%                     raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
+%                     raw_unregistered = reshape(raw_unregistered,128,128,numCh,[]);
+%                 end
+%                 %                 if raw_unregistered(40,40,end,end) ==0
+%                 %                     numCh = size(raw_unregistered,3);
+%                 %                     raw_unregistered = reshape(raw_unregistered,128,128,[]);
+%                 %                     raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
+%                 %                     raw_unregistered = reshape(raw_unregistered,128,128,numCh,[]);
+%                 %                 end
+%                 if sessionInfo.darkFrameNum>0
+%                     %if sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4-1),'all')>5
+%                     if raw_unregistered(40,40,1,sessionInfo.darkFrameNum/4) > 10000
+%                         raw_unregistered(:,:,1,2:end) = raw_unregistered(:,:,1,1:end-1);
+%                     end
+%                 end
+%                 
+%                 binnedRaw_cam1 = raw_unregistered(:,:,[1,3],:);
+%                 
+%                 clear raw_unregistered
+%                 load(fileName_cam2)
+%                 if sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4-1),'all')>5
+%                     numCh = size(raw_unregistered,3);
+%                     raw_unregistered = reshape(raw_unregistered,128,128,[]);
+%                     raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
+%                     raw_unregistered = reshape(raw_unregistered,128,128,numCh,[]);
+%                 end
+%                 %                 if raw_unregistered(40,40,end,end) ==0
+%                 %                     numCh = size(raw_unregistered,3);
+%                 %                     raw_unregistered = reshape(raw_unregistered,128,128,[]);
+%                 %                     raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
+%                 %                     raw_unregistered = reshape(raw_unregistered,128,128,numCh,[]);
+%                 %                 end
+%                 %                 if sessionInfo.darkFrameNum>0
+%                 %                     %if sum(raw_unregistered(:,:,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,sessionInfo.darkFrameNum/4-1),'all')>5
+%                 %                     if raw_unregistered(40,40,1,sessionInfo.darkFrameNum/4) > 10000
+%                 %                         raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
+%                 %                     end
+%                 %                 end
+%                 disp(strcat('Register and Combine two cameras for ', rawName))
+%                 %                     binnedRaw_cam2= raw_unregistered(:,:,[1,2],:);
+%                 %                     load(fullfile(maskDir,wlName),'mytform');
+%                 %                     rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,mytform,sessionInfo.mouseType);
+%                 binnedRaw_cam2= raw_unregistered(:,:,[2,4],:);
+%                 load(fullfile(maskDir,wlName),'transformMat');
+%                 length_1 = size(binnedRaw_cam1,4);
+%                 length_2 = size(binnedRaw_cam2,4);
+%                 if  length_1==length_2
+%                     rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,transformMat,sessionInfo.mouseType);
+%                 elseif length_1 < length_2
+%                     rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2(:,:,:,1:length_1),transformMat,sessionInfo.mouseType);
+%                     disp(['raw1 is shorter than raw 2, raw1 is ', num2str(length_1)] )
+%                 else
+%                     rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1(:,:,:, 1:length_2),binnedRaw_cam2,transformMat,sessionInfo.mouseType);
+%                     disp(['raw2 is shorter than raw 1, raw1 is ', num2str(length_1)] )
+%                 end
+%                 
+%                 clear raw_unregistered
+%                 
+%                 
+%                 
+%                 darkFrameInd = 2:sessionInfo.darkFrameNum/size(rawdata,3);
+%                 darkFrame = squeeze(mean(rawdata(:,:,:,darkFrameInd),4));
+%                 raw_baselineMinus = rawdata - repmat(darkFrame,1,1,1,size(rawdata,4));
+%                 clear rawdata
+%                 raw_baselineMinus(:,:,:,1:sessionInfo.darkFrameNum/size(raw_baselineMinus,3))=[];
+%                 rawdata = raw_baselineMinus;
+%                 clear raw_baselineMinus
+%                 
+%                 
+%                 disp(strcat('QC raw for ',rawName))
+%                 visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
+%                 [mdata] = QCcheck_raw(rawdata,isbrain,systemType,sessionInfo.framerate,saveDir,visName,sessionInfo.mouseType);
+%                 save(fullfile(saveDir,rawName),'rawdata','mdata','-v7.3')
+%                 close all
+%             end
+%         end
+%     end
+% end
 
 %
 
@@ -781,7 +781,7 @@ for excelRow = excelRows
                     ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
                     max_ROI = prctile(peakMap_ROI(ROI),99);
                     temp = double(peakMap_ROI).*double(ROI);
-                    ROI = temp>max_ROI*0.5;
+                    ROI = temp>max_ROI*0.75;
                     hold on
                     ROI_contour = bwperim(ROI);
                     [~,c] = contour( ROI_contour,'r');

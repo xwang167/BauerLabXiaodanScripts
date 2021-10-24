@@ -5,7 +5,7 @@ close all;clearvars;clc
 % runs = 1:6;
 
 excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
-excelRows = [15,12];%[13 15 12];
+excelRows = [19,23];%[13 15 12];
 runs = 1:3;
 stimStartTime = 5;
 

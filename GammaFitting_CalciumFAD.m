@@ -1,125 +1,125 @@
 
-% clear all;close all;clc
-% import mouse.*
-% excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
-% excelRows = [230,234,240]; % excelRows_awake = [181 183 185 228  232  236 ]; excelRows_anes = [ 202 195 204 230 234 240];
-% runs = 1:3;%
+clear all;close all;clc
+import mouse.*
+excelFile = "L:\RGECO\RGECO.xlsx";
+excelRows = [2]; % excelRows_awake = [181 183 185 228  232  236 ]; excelRows_anes = [ 202 195 204 230 234 240];
+runs = 1;%
 % 
-% load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
-% load('D:\OIS_Process\noVasculatureMask.mat')
-% mask = leftMask+rightMask;
-% for excelRow = excelRows
-%     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
-%     recDate = excelRaw{1}; recDate = string(recDate);
-%     mouseName = excelRaw{2}; mouseName = string(mouseName);
-%     rawdataloc = excelRaw{3};
-%     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-%     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-%     if ~exist(saveDir)
-%         mkdir(saveDir)
-%     end
-%     sessionInfo.mouseType = excelRaw{17};
-%     sessionInfo.darkFrameNum = excelRaw{15};
-%     systemType = excelRaw{5};
-%     sessionInfo.framerate = excelRaw{7};
-%     if strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto3')
-%         maskDir = fullfile(rawdataloc,recDate);
-%     else
-%         maskDir = saveDir;
-%     end
-% 
-%     saveDir_new = strcat('L:\RGECO\Kenny\', recDate, '\');
-%     maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datafluor','.mat');
-% 
-%     if ~exist(fullfile(saveDir_new,maskName),'file')
-%         maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-%         load(fullfile(saveDir,maskName),'xform_isbrain')
-%     else
-%         load(fullfile(saveDir_new,maskName),'xform_isbrain')
-%     end
-% 
-%     for n = runs
-%         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
-%         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
-%         load(fullfile(saveDir,processedName),'xform_FADCorr','xform_jrgeco1aCorr')
-%         xform_FADCorr(isinf(xform_FADCorr)) = 0;
-%         xform_FADCorr(isnan(xform_FADCorr)) = 0;
-%         xform_jrgeco1aCorr(isinf(xform_jrgeco1aCorr)) = 0;
-%         xform_jrgeco1aCorr(isnan(xform_jrgeco1aCorr)) = 0;
-% 
-%         FAD_filter = mouse.freq.filterData(double(xform_FADCorr),0.02,2,25);
-%         clear xform_FADCorr
-%         Calcium_filter = mouse.freq.filterData(double(squeeze(xform_jrgeco1aCorr)),0.02,2,25);
-%         clear xform_jrgeco1aCorr
-%         t = (0:750)./25;
-%        %[T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_xw(Calcium_filter,FAD_filter*10^6,t);
-%        %[T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_xw(Calcium_filter,FAD_filter,t);
-%        Calcium_filter = reshape(Calcium_filter,128*128,[]);
-%        FAD_filter = reshape(FAD_filter,128*128,[]);
-%        Calcium_filter = normRow(Calcium_filter);
-%        FAD_filter = normRow(FAD_filter);
-%        Calcium_filter = reshape(Calcium_filter,128,128,[]);
-%        FAD_filter = reshape(FAD_filter,128,128,[]);
-%        tic
-%        [T_CalciumFAD,W_CalciumFAD,A_CalciumFAD,r_CalciumFAD,r2_CalciumFAD,FADPred_CalciumFAD] = interSpeciesGammaFit_CalciumFAD(Calcium_filter,FAD_filter,t);
-%        toc
-%         save(fullfile(saveDir,processedName),'T_CalciumFAD','W_CalciumFAD','A_CalciumFAD','r_CalciumFAD','r2_CalciumFAD','FADPred_CalciumFAD','-append')
-%         figure
-%         subplot(2,3,1)
-%         imagesc(T_CalciumFAD,[0,0.2])
-%         colorbar
-%         axis image off
-%         colormap jet
-%         title('T(s)')
-%         hold on;
-%         imagesc(xform_WL,'AlphaData',1-mask);
-%         set(gca,'FontSize',14,'FontWeight','Bold')
-% 
-%         subplot(2,3,2)
-%         imagesc(W_CalciumFAD,[0 0.06])
-%         colorbar
-%         axis image off
-%         colormap jet
-%         title('W(s)')
-%         hold on;
-%         imagesc(xform_WL,'AlphaData',1-mask);
-%         set(gca,'FontSize',14,'FontWeight','Bold')
-% 
-%         subplot(2,3,3)
-%         imagesc(A_CalciumFAD,[0 1.2])
-%         colorbar
-%         axis image off
-%         colormap jet
-%         title('A')
-%         hold on;
-%         imagesc(xform_WL,'AlphaData',1-mask);
-%         set(gca,'FontSize',14,'FontWeight','Bold')
-% 
-%         subplot(2,3,4)
-%         imagesc(r_CalciumFAD,[-1 1])
-%         colorbar
-%         axis image off
-%         colormap jet
-%         title('r')
-%         hold on;
-%         imagesc(xform_WL,'AlphaData',1-mask);
-%         set(gca,'FontSize',14,'FontWeight','Bold')
-% 
-%         subplot(2,3,5)
-%         imagesc(r2_CalciumFAD,[0 1])
-%         colorbar
-%         axis image off
-%         colormap jet
-%         title('R^2')
-%         hold on;
-%         imagesc(xform_WL,'AlphaData',1-mask);
-%         set(gca,'FontSize',14,'FontWeight','Bold')
-% 
-%         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit.png')));
-%         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit.fig')));
-%         close all
-%     end
-% end
+load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
+load('D:\OIS_Process\noVasculatureMask.mat')
+mask = leftMask+rightMask;
+for excelRow = excelRows
+    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+    recDate = excelRaw{1}; recDate = string(recDate);
+    mouseName = excelRaw{2}; mouseName = string(mouseName);
+    rawdataloc = excelRaw{3};
+    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+    if ~exist(saveDir)
+        mkdir(saveDir)
+    end
+    sessionInfo.mouseType = excelRaw{17};
+    sessionInfo.darkFrameNum = excelRaw{15};
+    systemType = excelRaw{5};
+    sessionInfo.framerate = excelRaw{7};
+    if strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto3')
+        maskDir = fullfile(rawdataloc,recDate);
+    else
+        maskDir = saveDir;
+    end
+
+    saveDir_new = strcat('L:\RGECO\Kenny\', recDate, '\');
+    maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datafluor','.mat');
+
+    if ~exist(fullfile(saveDir_new,maskName),'file')
+        maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+        load(fullfile(saveDir,maskName),'xform_isbrain')
+    else
+        load(fullfile(saveDir_new,maskName),'xform_isbrain')
+    end
+
+    for n = runs
+        visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
+        processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
+        load(fullfile(saveDir,processedName),'xform_FADCorr','xform_jrgeco1aCorr')
+        xform_FADCorr(isinf(xform_FADCorr)) = 0;
+        xform_FADCorr(isnan(xform_FADCorr)) = 0;
+        xform_jrgeco1aCorr(isinf(xform_jrgeco1aCorr)) = 0;
+        xform_jrgeco1aCorr(isnan(xform_jrgeco1aCorr)) = 0;
+
+        FAD_filter = mouse.freq.filterData(double(xform_FADCorr),0.02,2,25);
+        clear xform_FADCorr
+        Calcium_filter = mouse.freq.filterData(double(squeeze(xform_jrgeco1aCorr)),0.02,2,25);
+        clear xform_jrgeco1aCorr
+        t = (0:750)./25;
+       %[T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_xw(Calcium_filter,FAD_filter*10^6,t);
+       %[T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_xw(Calcium_filter,FAD_filter,t);
+       Calcium_filter = reshape(Calcium_filter,128*128,[]);
+       FAD_filter = reshape(FAD_filter,128*128,[]);
+       Calcium_filter = normRow(Calcium_filter);
+       FAD_filter = normRow(FAD_filter);
+       Calcium_filter = reshape(Calcium_filter,128,128,[]);
+       FAD_filter = reshape(FAD_filter,128,128,[]);
+       tic
+       [T_CalciumFAD,W_CalciumFAD,A_CalciumFAD,r_CalciumFAD,r2_CalciumFAD,FADPred_CalciumFAD] = interSpeciesGammaFit_CalciumFAD(Calcium_filter,FAD_filter,t);
+       toc
+        save(fullfile(saveDir,processedName),'T_CalciumFAD','W_CalciumFAD','A_CalciumFAD','r_CalciumFAD','r2_CalciumFAD','FADPred_CalciumFAD','-append')
+        figure
+        subplot(2,3,1)
+        imagesc(T_CalciumFAD,[0,0.2])
+        colorbar
+        axis image off
+        colormap jet
+        title('T(s)')
+        hold on;
+        imagesc(xform_WL,'AlphaData',1-mask);
+        set(gca,'FontSize',14,'FontWeight','Bold')
+
+        subplot(2,3,2)
+        imagesc(W_CalciumFAD,[0 0.06])
+        colorbar
+        axis image off
+        colormap jet
+        title('W(s)')
+        hold on;
+        imagesc(xform_WL,'AlphaData',1-mask);
+        set(gca,'FontSize',14,'FontWeight','Bold')
+
+        subplot(2,3,3)
+        imagesc(A_CalciumFAD,[0 1.2])
+        colorbar
+        axis image off
+        colormap jet
+        title('A')
+        hold on;
+        imagesc(xform_WL,'AlphaData',1-mask);
+        set(gca,'FontSize',14,'FontWeight','Bold')
+
+        subplot(2,3,4)
+        imagesc(r_CalciumFAD,[-1 1])
+        colorbar
+        axis image off
+        colormap jet
+        title('r')
+        hold on;
+        imagesc(xform_WL,'AlphaData',1-mask);
+        set(gca,'FontSize',14,'FontWeight','Bold')
+
+        subplot(2,3,5)
+        imagesc(r2_CalciumFAD,[0 1])
+        colorbar
+        axis image off
+        colormap jet
+        title('R^2')
+        hold on;
+        imagesc(xform_WL,'AlphaData',1-mask);
+        set(gca,'FontSize',14,'FontWeight','Bold')
+
+        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit.png')));
+        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit.fig')));
+        close all
+    end
+end
 
 excelRows = [181,183,185,228,232,236,202,195,204,230,234,240]; % excelRows_awake = [181 183 185 228  232  236 ]; excelRows_anes = [ 202 195 204 230 234 240];
 % runs = 1:3;%
@@ -861,16 +861,23 @@ excelRows = [181,183,185,228,232,236,202,195,204,230,234,240]; % excelRows_awake
 % % plot((1:14999)/25,hemoPred,'k')
 % %
 % % legend('HbT','Predicted HbT')
-load('L:\RGECO\cat\191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-fc_processed.mat', 'A_mice')
-load('L:\RGECO\cat\191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-fc_processed.mat', 'T_mice')
-load('L:\RGECO\cat\191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-fc_processed.mat', 'W_mice')
-load('L:\RGECO\cat\191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-fc_processed.mat', 'r2_mice')
-load('L:\RGECO\cat\191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-fc_processed.mat', 'r_mice')
-load('D:\OIS_Process\noVasculatureMask.mat')
-mask = leftMask+rightMask;
-mask = logical(mask);
-A_avg = mean(A_CalciumFAD_mice(mask),'All');
-r2_avg = mean(r2_CalciumFAD_mice(mask),'All');
-r_avg = mean(r_CalciumFAD_mice(mask), 'All');
-T_avg = mean(T_CalciumFAD_mice(mask), 'All');
-W_avg = mean(W_CalciumFAD_mice(mask), 'All');
+% load('L:\RGECO\cat\191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-fc_processed.mat', 'A_mice')
+% load('L:\RGECO\cat\191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-fc_processed.mat', 'T_mice')
+% load('L:\RGECO\cat\191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-fc_processed.mat', 'W_mice')
+% load('L:\RGECO\cat\191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-fc_processed.mat', 'r2_mice')
+% load('L:\RGECO\cat\191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-fc_processed.mat', 'r_mice')
+% load('D:\OIS_Process\noVasculatureMask.mat')
+% mask = leftMask+rightMask;
+% mask = logical(mask);
+% A_avg = mean(A_CalciumFAD_mice(mask),'All');
+% r2_avg = mean(r2_CalciumFAD_mice(mask),'All');
+% r_avg = mean(r_CalciumFAD_mice(mask), 'All');
+% T_avg = mean(T_CalciumFAD_mice(mask), 'All');
+% W_avg = mean(W_CalciumFAD_mice(mask), 'All');
+% © 2021 GitHub, Inc.
+% Terms
+% Privacy
+% Security
+% Status
+% Docs
+% Con

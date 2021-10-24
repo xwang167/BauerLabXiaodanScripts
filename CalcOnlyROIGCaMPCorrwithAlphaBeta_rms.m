@@ -1,8 +1,8 @@
 Alpha =  0.5:0.01:1;
 Beta = 0.5:0.01:1;  
+factorMatrix = cell(length(Alpha),length(Beta));
 for ii = 1:length(Alpha)
-    for jj = 1:length(Beta)
-        
+    for jj = 1:length(Beta)        
         factorMatrix{ii,jj} = [Alpha(ii),Beta(jj)];
     end
 end

@@ -10,6 +10,8 @@ xform_isbrain(isnan(R_fluor_band(:,:,1))) = 0;
 disp('QC visualization')
 seednames= {'Fr-L'  'Cing-L' 'M-L' 'SS-L' 'RS-L' 'P-L' 'V-L' 'Aud-L'...
     'Fr-R' 'Cing-R' 'M-R' 'SS-R' 'RS-R' 'P-R' 'V-R' 'Aud-R'};
+% seednames = {'Fr-L' 'Fr-R' 'Cing-L' 'Cing-R' 'M-L' 'M-R' 'SS-L' 'SS-R'...
+%     'RS-L' 'RS-R' 'P-L' 'P-R' 'V-L' 'V-R' 'Aud-L' 'Aud-R'};
 numseeds=numel(seednames)/2;
 colorMax = 1;
     if isZTransform
@@ -73,8 +75,13 @@ imagesc(Rs_fluor_band,[-colorMax colorMax]);
 axis image
 set(gca,'XTick',(1:16));
 set(gca,'YTick',(1:16));
-set(gca,'XTickLabel',{'FL','ML','CL','SL','PL','RL','AL','VL','FR','MR','CR','SR','PR','RR','AR','VR'},'Fontsize',8);
-set(gca,'YTickLabel',{'FL','ML','CL','SL','PL','RL','AL','VL','FR','MR','CR','SR','PR','RR','AR','VR'},'Fontsize',8);
+set(gca,'XTickLabel',{'FL','CL','ML','SL','RL','PL','VL','AL','FR','CR','MR','SR','RR','PR','VR','AR'},'Fontsize',8);
+set(gca,'YTickLabel',{'FL','CL','ML','SL','RL','PL','VL','AL','FR','CR','MR','SR','RR','PR','VR','AR'},'Fontsize',8);
+
+
+% set(gca,'XTickLabel',{'FL' 'FR' 'CL' 'CR' 'ML' 'MR' 'SL' 'SR' 'RL' 'RR' 'PL' 'PR' 'VL' 'VR' 'AL' 'AR'},'Fontsize',8);
+% set(gca,'YTickLabel',{'FL' 'FR' 'CL' 'CR' 'ML' 'MR' 'SL' 'SR' 'RL' 'RR' 'PL' 'PR' 'VL' 'VR' 'AL' 'AR'},'Fontsize',8);
+
 title('Correlation Matrix')
 
 

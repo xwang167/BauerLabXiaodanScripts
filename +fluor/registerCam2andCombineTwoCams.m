@@ -28,7 +28,12 @@ end
     elseif strcmp(mouseType,'Gopto3')||strcmp(mouseType,'Wopto3')
         channels = 4;
         cam1Chan = [1 2 3];
-        cam2Chan = [4];    
+        cam2Chan = [4];  
+    
+     elseif strcmp(mouseType,'gcamp6f')
+        channels = 3;
+        cam1Chan = [1,2];
+        cam2Chan = [3];        
             
     else
         channels = 4;
@@ -37,5 +42,5 @@ end
     end
     raw = zeros(size(rawdata_cam1,1),size(rawdata_cam1,2),channels,size(rawdata_cam1,4));
     raw(:,:,cam1Chan,:) = rawdata_cam1;
-    raw(:,:,cam2Chan,:) = rawdata_cam2;
+    raw(:,:,cam2Chan,:) = registered_cam2;
 

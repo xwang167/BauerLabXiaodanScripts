@@ -43,19 +43,18 @@ R= strace2R(strace,dataBandpass , nVx, nVy);                 % R is the function
 
 idx=find(isnan(SeedsUsed(:,1)));
 R(:,:,idx)=0;
+Rs=normRow(strace)*normRow(strace)';
 
-
-if size(refseeds,1)>3
-    R_AP = makeRs(dataBandpass ,strace);                     % R_AP is a matrix of the seed-to-seed fc values
-    clear dataBandpass
-    R_AP(idx, idx)=0;
-    Rs = single(R_AP(map, map));
-    clear strace R_AP
-else
-    Rs = [];
-end
+% if size(refseeds,1)>3
+%     R_AP = makeRs(dataBandpass ,strace);                     % R_AP is a matrix of the seed-to-seed fc values
+%     clear dataBandpass
+%     R_AP(idx, idx)=0;
+%     Rs = single(R_AP(map, map));
+%     clear strace R_AP
+% else
+%     Rs = [];
+% end
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
-
 
 
