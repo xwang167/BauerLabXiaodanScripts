@@ -326,7 +326,7 @@ runs = 1:3;
 %     R_FADCorr_inter_mice = mean(R_FADCorr_inter_mice,4);
 %     R_FADCorr_ISA_mice = mean(R_FADCorr_ISA_mice,4);
 %     Rs_FADCorr_Delta_mice = mean(Rs_FADCorr_Delta_mice,3);
-%     Rs_FADCorr_inter_mice = mean(Rs_FADCorr_Delta_mice,3);
+%     Rs_FADCorr_inter_mice = mean(Rs_FADCorr_inter_mice,3);
 %     Rs_FADCorr_ISA_mice = mean(Rs_FADCorr_ISA_mice,3);
 % processedName_mice = strcat(recDate,'-',miceName,'-',sessionType,'.mat');
 % 
@@ -462,7 +462,7 @@ end
     R_FADCorr_inter_mice = mean(R_FADCorr_inter_mice,4);
     R_FADCorr_ISA_mice = mean(R_FADCorr_ISA_mice,4);
     Rs_FADCorr_Delta_mice = mean(Rs_FADCorr_Delta_mice,3);
-    Rs_FADCorr_inter_mice = mean(Rs_FADCorr_Delta_mice,3);
+    Rs_FADCorr_inter_mice = mean(Rs_FADCorr_inter_mice,3);
     Rs_FADCorr_ISA_mice = mean(Rs_FADCorr_ISA_mice,3);
 processedName_mice = strcat(recDate,'-',miceName,'-',sessionType,'.mat');
 

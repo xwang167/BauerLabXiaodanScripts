@@ -16,7 +16,7 @@ end
 %ylim([10^-3 10^2])
 % ylim([10^-4 2])
 % yticks([10^-4  10^-3 10^-2  10^-1 10^0])
-ylim([-40 20])
+ylim([-50,25])
 xticks([0.01 0.1 1 10])
 ylabel(leftLabel)
 
@@ -35,7 +35,7 @@ ylabel(rightLabel)
 %ylim([10^-3 10^2])
 % ylim([10^-4 2])
 % yticks([10^-4 10^-3 10^-2  10^-1 10^0])
-ylim([-40 20])
+ylim([-50 25])
 
 
 xlabel('Frequency (Hz)')
@@ -45,6 +45,7 @@ xlim([10^-2 10])
 xticks([0.01 0.1 1 10]);
 set(gca,'FontSize',20,'FontWeight','Bold')
  set(findall(gca, 'Type', 'Line'),'LineWidth',2);
+ grid on
 %legend(legendName,'location','southwest','FontSize',13)
 saveas(gcf,fullfile(saveDir,strcat(Name,'.png')));
 saveas(gcf,fullfile(saveDir,strcat(Name,'.fig')));

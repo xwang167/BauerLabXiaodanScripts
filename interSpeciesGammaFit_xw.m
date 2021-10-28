@@ -33,6 +33,7 @@ for xInd = 1:size(neural,2)
             fcn = @(param)he.fcn(param);
             %             [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[1,3,0.0001],[0,0.5,0],[4,10,inf],options)');
             %             [~,pixHrfParam] = evalc('fminsearch(fcn,[2,3,0.0001],options)');
+            %[~,pixHrfParam] = evalc('fminsearchbnd(fcn,[2,3,1],[0,0,0],[4,6,inf],options)');
             [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[2,3,0.0001],[0,0,0],[4,6,inf],options)');
             %             [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[2,3,0.0001],[0,0,0],[inf,inf,inf],options)');
             %             [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[2,3,0.0001],[0,-inf,-inf],[4,-inf,inf],options)');

@@ -1,6 +1,6 @@
 runs = 1:3;%
 excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
-excelRows = [3,7,10,17,21];%:450;
+excelRows = 2:6;%:450;
 RedEmissionLightlevel_mice_WT_awake = [];
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
@@ -23,7 +23,7 @@ for excelRow = excelRows
     RedEmissionLightlevel_mouse = mean(RedEmissionLightlevel_mouse);
     RedEmissionLightlevel_mice_WT_awake = [RedEmissionLightlevel_mice_WT_awake,RedEmissionLightlevel_mouse];
 end
-RedEmissionLightlevel_mice_WT_awake = mean(RedEmissionLightlevel_mice_WT_awake);
+%RedEmissionLightlevel_mice_WT_awake = mean(RedEmissionLightlevel_mice_WT_awake);
 
 
 
@@ -63,13 +63,13 @@ for excelRow = excelRows
     RedEmissionLightlevel_mouse = mean(RedEmissionLightlevel_mouse);
     RedEmissionLightlevel_mice_RGECO_awake = [RedEmissionLightlevel_mice_RGECO_awake,RedEmissionLightlevel_mouse];
 end
-RedEmissionLightlevel_mice_RGECO_awake = mean(RedEmissionLightlevel_mice_RGECO_awake);
+%RedEmissionLightlevel_mice_RGECO_awake = mean(RedEmissionLightlevel_mice_RGECO_awake);
 
 
 
 
 excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
-excelRows = [5,8,11,18,22];%:450;
+excelRows = 7:11;%:450;
 RedEmissionLightlevel_mice_WT_anes = [];
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
@@ -92,7 +92,7 @@ for excelRow = excelRows
     RedEmissionLightlevel_mouse = mean(RedEmissionLightlevel_mouse);
     RedEmissionLightlevel_mice_WT_anes = [RedEmissionLightlevel_mice_WT_anes,RedEmissionLightlevel_mouse];
 end
-RedEmissionLightlevel_mice_WT_anes = mean(RedEmissionLightlevel_mice_WT_anes);
+%RedEmissionLightlevel_mice_WT_anes = mean(RedEmissionLightlevel_mice_WT_anes);
 
 
 
@@ -132,7 +132,7 @@ for excelRow = excelRows
     RedEmissionLightlevel_mouse = mean(RedEmissionLightlevel_mouse);
     RedEmissionLightlevel_mice_RGECO_anes = [RedEmissionLightlevel_mice_RGECO_anes,RedEmissionLightlevel_mouse];
 end
-RedEmissionLightlevel_mice_RGECO_anes = mean(RedEmissionLightlevel_mice_RGECO_anes);
+%RedEmissionLightlevel_mice_RGECO_anes = mean(RedEmissionLightlevel_mice_RGECO_anes);
 
 
 
@@ -142,7 +142,7 @@ RedEmissionLightlevel_mice_RGECO_anes = mean(RedEmissionLightlevel_mice_RGECO_an
 
 runs = 1:3;%
 excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
-excelRows = [12,13,15,19,23];%:450;
+excelRows = 12:16;%:450;
 RedEmissionLightlevel_mice_WT_awake_evoke = [];
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
@@ -165,7 +165,7 @@ for excelRow = excelRows
     RedEmissionLightlevel_mouse = mean(RedEmissionLightlevel_mouse);
     RedEmissionLightlevel_mice_WT_awake_evoke = [RedEmissionLightlevel_mice_WT_awake_evoke,RedEmissionLightlevel_mouse];
 end
-RedEmissionLightlevel_mice_WT_awake_evoke = mean(RedEmissionLightlevel_mice_WT_awake_evoke);
+%RedEmissionLightlevel_mice_WT_awake_evoke = mean(RedEmissionLightlevel_mice_WT_awake_evoke);
 
 
 
@@ -205,7 +205,7 @@ for excelRow = excelRows
     RedEmissionLightlevel_mouse = mean(RedEmissionLightlevel_mouse);
     RedEmissionLightlevel_mice_RGECO_awake_evoke = [RedEmissionLightlevel_mice_RGECO_awake_evoke,RedEmissionLightlevel_mouse];
 end
-RedEmissionLightlevel_mice_RGECO_awake_evoke = mean(RedEmissionLightlevel_mice_RGECO_awake_evoke);
+%RedEmissionLightlevel_mice_RGECO_awake_evoke = mean(RedEmissionLightlevel_mice_RGECO_awake_evoke);
 
 
 excelFile = "L:\RGECO\RGECO.xlsx";
@@ -244,11 +244,13 @@ for excelRow = excelRows
     RedEmissionLightlevel_mouse = mean(RedEmissionLightlevel_mouse);
     RedEmissionLightlevel_mice_RGECO_anes_evoke = [RedEmissionLightlevel_mice_RGECO_anes_evoke,RedEmissionLightlevel_mouse];
 end
-RedEmissionLightlevel_mice_RGECO_anes_evoke = mean(RedEmissionLightlevel_mice_RGECO_anes_evoke);
+%RedEmissionLightlevel_mice_RGECO_anes_evoke = mean(RedEmissionLightlevel_mice_RGECO_anes_evoke);
 
 
 
-
+[h,p] = ttest2(RedEmissionLightlevel_mice_RGECO_anes,RedEmissionLightlevel_mice_RGECO_awake)
+[h,p] = ttest2(RedEmissionLightlevel_mice_RGECO_anes_evoke,RedEmissionLightlevel_mice_RGECO_awake_evoke)
+[h,p] = ttest2(RedEmissionLightlevel_mice_WT_anes,RedEmissionLightlevel_mice_WT_awake)
 
 
 

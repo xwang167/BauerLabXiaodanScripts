@@ -1,10 +1,11 @@
 function QCcheck_powerMapVis_dB(powerMap,xform_isbrain,saveDir,titleName)
 load('D:\OIS_Process\noVasculatureMask.mat')
-mask = leftMask+rightMask;
+mask = leftMask_small+rightMask_small;
+%mask = leftMask+rightMask;
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\CerebMask.mat')
 
 xform_isbrain(isnan(xform_isbrain)) = 0;
-maxVal = max(max(powerMap(logical(xform_isbrain.*(double(leftMask)+double(rightMask))))));
+maxVal = max(max(powerMap(logical(xform_isbrain.*mask))));
 
 figure('Position', [50 50 200 300])
 imagesc(10*log10(powerMap/maxVal),[-10 0]);

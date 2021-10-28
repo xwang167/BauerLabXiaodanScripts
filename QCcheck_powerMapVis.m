@@ -1,13 +1,13 @@
 function QCcheck_powerMapVis(powerMap,xform_isbrain,unit,saveDir,titleName)
 load('D:\OIS_Process\noVasculatureMask.mat')
-mask = leftMask+rightMask;
+mask = leftMask_small+rightMask_small;
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\CerebMask.mat')
 
 xform_isbrain(isnan(xform_isbrain)) = 0;
 % maxVal = max(max(powerMap(logical(xform_isbrain.*(double(leftMask)+double(rightMask))))));
 % minVal = min(min(powerMap(logical(xform_isbrain.*(double(leftMask)+double(rightMask))))));
-maxVal = max(max(log10(powerMap(logical(xform_isbrain.*(double(leftMask)+double(rightMask)))))));
-minVal = min(min(log10(powerMap(logical(xform_isbrain.*(double(leftMask)+double(rightMask)))))));
+maxVal = max(max(log10(powerMap(logical(xform_isbrain.*(double(mask)))))));
+minVal = min(min(log10(powerMap(logical(xform_isbrain.*(double(mask)))))));
 figure('Position', [50 50 200 300])
 % imagesc(powerMap,[0.5 1.5]);
 % colorbar
