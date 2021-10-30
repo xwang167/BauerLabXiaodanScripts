@@ -1,29 +1,29 @@
 
 load('L:\RGECO\190627\190627-R5M2286-fc3_processed.mat', 'xform_jrgeco1aCorr','xform_datahb')
 xform_jrgeco1aCorr = squeeze(xform_jrgeco1aCorr);
-calcium = squeeze(xform_jrgeco1aCorr(76,91,:));
+calcium = squeeze(xform_jrgeco1aCorr(76,40,:));
 calcium = reshape(calcium,1,1,[]);
 calcium = mouse.freq.filterData(calcium,0.02,2,25);
-% calcium = normRow(reshape(calcium,1,[]));
-% calcium = reshape(calcium,1,1,[]);
+calcium = normRow(reshape(calcium,1,[]));
+calcium = reshape(calcium,1,1,[]);
 
-HbO = squeeze(xform_datahb(76,91,1,:));
-HbR = squeeze(xform_datahb(76,91,2,:));
+HbO = squeeze(xform_datahb(76,40,1,:));
+HbR = squeeze(xform_datahb(76,40,2,:));
 HbO = reshape(HbO,1,1,[]);
 HbR = reshape(HbR,1,1,[]);
 HbO = mouse.freq.filterData(HbO,0.02,2,25);
 HbR = mouse.freq.filterData(HbR,0.02,2,25);
 HbT = HbO + HbR;
-% HbT = normRow(reshape(HbT,1,[]));
-% HbT = reshape(HbT,1,1,[]);
+HbT = normRow(reshape(HbT,1,[]));
+HbT = reshape(HbT,1,1,[]);
 figure
 plot((1:2500)/25,transpose(squeeze(HbT(1,1,1:2500))*10^6),'k')
 hold on
 plot((1:2500)/25,transpose(squeeze(calcium(1,1,1:2500))),'m')
 
 
-t = (1:750)/25;
-[T_test,W_test,A_test,r_test,r2_test,hemoPred_test] = interSpeciesGammaFit_xw(calcium,HbT*10*6,t);
+t = (0:750)/25;
+[T_test,W_test,A_test,r_test,r2_test,hemoPred_test] = interSpeciesGammaFit_xw(calcium,HbT*10^6,t);
 
 
 

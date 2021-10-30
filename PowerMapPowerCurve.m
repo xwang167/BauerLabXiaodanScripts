@@ -1,6 +1,8 @@
 import mouse.*
-excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
-excelRows = 4:11;%:450;
+
+excelFile = "L:\RGECO\RGECO.xlsx";
+%excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
+excelRows = 11:13;%:450;
 runs = 1:3;
 % 
 % for excelRow = excelRows
@@ -72,7 +74,7 @@ runs = 1:3;
 %         
 %         
 %         leftData = cell(3,1);
-%         leftData{1} = powerdata_FAD;
+%         leftData{1} = double(powerdata_FAD);
 %         leftData{2} = powerdata_jrgeco1a;
 %         leftData{3} = powerdata_FADCorr;
 %         
@@ -106,7 +108,7 @@ runs = 1:3;
 
 
 
-
+% excelRows = 11:13;%:450;
 % runs = 1:3;
 % length_runs = 3;
 % for excelRow = excelRows
@@ -232,7 +234,7 @@ runs = 1:3;
 %         'powerdata_oxy_mouse','powerdata_deoxy_mouse','powerdata_total_mouse',...
 %         'powerdata_jrgeco1a_mouse','powerdata_FADCorr_mouse','powerdata_FAD_mouse','hz','-append')
 %     leftData = cell(3,1);
-%     leftData{1} = powerdata_FAD_mouse;
+%     leftData{1} = double(powerdata_FAD_mouse);
 %     leftData{2} = powerdata_jrgeco1a_mouse;
 %     leftData{3} = powerdata_FADCorr_mouse;
 %     
@@ -270,8 +272,10 @@ runs = 1:3;
 
 close all;clearvars -except hz;clc
 import mice.*
-excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
-excelRows = 7:11;%:450;
+excelFile = "L:\RGECO\RGECO.xlsx";
+%excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
+excelRows = 8:13;%:450;
+
 isZTransform = true;
 set(0,'defaultaxesfontsize',12);
 
@@ -279,7 +283,7 @@ info.nVx = 128;
 info.nVy = 128;
 
 numMice = length(excelRows);
-saveDir_cat = 'X:\XW\Paper\WT\cat';
+saveDir_cat = 'L:\RGECO\cat';
 powerdata_oxy_mice = [];
 powerdata_deoxy_mice = [];
 powerdata_total_mice = [];
@@ -397,9 +401,9 @@ save(fullfile(saveDir_cat, processedName_mice), 'powerdata_oxy_mice','powerdata_
     'hz')
 
 disp(strcat('QC check on ', processedName_mice))
-    visName = 'Anes WT';  
+    visName = 'Anes RGECO';  
         leftData = cell(3,1);
-    leftData{1} = powerdata_FAD_mice;
+    leftData{1} = double(powerdata_FAD_mice);
     leftData{2} = powerdata_jrgeco1a_mice;
     leftData{3} = powerdata_FADCorr_mice;
     
