@@ -34,7 +34,7 @@ hold on
 plot((1:750)/250,jrgeco1aCorr_timetrace,'m-')
 
 
-load('X:\XW\Paper\WT\RGECO Emission\cat\210830--W30M1-W30M2-W30M3-W31M1-W31M2-stim_processed_mice.mat', 'xform_jrgeco1a_mice_NoGSR')
+load('X:\XW\Paper\WT\RGECO Emission\cat\210830--W30M1-W30M2-W30M3-W31M1-W31M2-stim_processed_mice.mat', 'xform_jrgeco1a_mice_NoGSR','ROI')
 iROI = reshape(ROI,1,[]);
 xform_jrgeco1a_mice_NoGSR_WT = reshape(xform_jrgeco1a_mice_NoGSR,128*128,[]);
 
@@ -46,9 +46,9 @@ hold on
 plot((1:750)/250,jrgeco1a_timetrace,'r:')
 
 
-load('L:\RGECO\cat\191030--R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-stim_processed_mice.mat', 'xform_jrgeco1a_mice_NoGSR')
+load('L:\RGECO\cat\191030--R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-stim_processed_mice.mat', 'xform_jrgeco1a_mice_NoGSR','ROI')
 
-iROI = reshape(ROI_NoGSR,1,[]);
+iROI = reshape(ROI,1,[]);
 xform_jrgeco1a_mice_NoGSR_rgeco = reshape(xform_jrgeco1a_mice_NoGSR,128*128,[]);
 
 jrgeco1a_timetrace = mean(xform_jrgeco1a_mice_NoGSR_rgeco(iROI,:),1);

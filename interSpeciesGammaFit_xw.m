@@ -1,4 +1,4 @@
-function [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_xw(neural,hemo,t)
+function [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_xw(neural,hemo,t,mask)
 %UNTITLED2 Summary of this function goes here
 %   neural = 3D
 %   hemo = 3D
@@ -23,7 +23,7 @@ for xInd = 1:size(neural,2)
         
         pixHemo = squeeze(hemo(yInd,xInd,:))';
         
-        if sum(pixHemo.^2) > 0
+        if logical(mask(yInd,xInd))
             pixNeural = squeeze(neural(yInd,xInd,:))';
             %t = (0:25)./25;
             %t = (0:750)./25;
@@ -34,7 +34,8 @@ for xInd = 1:size(neural,2)
             %             [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[1,3,0.0001],[0,0.5,0],[4,10,inf],options)');
             %             [~,pixHrfParam] = evalc('fminsearch(fcn,[2,3,0.0001],options)');
             %[~,pixHrfParam] = evalc('fminsearchbnd(fcn,[2,3,1],[0,0,0],[4,6,inf],options)');
-            [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[2,3,0.0001],[0,0,0],[4,6,inf],options)');
+            
+           [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[1,1,0.05],[0.008,0,0],[4,6,1],options)');
             %             [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[2,3,0.0001],[0,0,0],[inf,inf,inf],options)');
             %             [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[2,3,0.0001],[0,-inf,-inf],[4,-inf,inf],options)');
             

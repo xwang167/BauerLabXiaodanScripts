@@ -3,10 +3,10 @@ import mouse.*
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
 excelRows = [219,222,225];%:450;
 runs = 1:3;
-mean_gcamp_cat = [];
+max_gcamp_cat = [];
 std_gcamp_cat = [];
 
-mean_gcamp_blocks_cat = [];
+max_gcamp_blocks_cat = [];
 std_gcamp_blocks_cat = [];
 saveDir_cat = 'O:\GCaMP\Xiaodan_dpf\cat';
 miceName = [];
@@ -58,7 +58,7 @@ for excelRow = excelRows
     iROI = reshape(ROI,1,[]);
     gcampCorr_ROI_mouse = [];
     for n = runs
-        mean_gcamp = nan(1,10);
+        max_gcamp = nan(1,10);
         sd_gcamp = nan(1,10);
         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
@@ -74,16 +74,16 @@ for excelRow = excelRows
         figure('Renderer', 'painters', 'Position', [100 100 1420 370])
         plot((1:6000)/20,timeTrace,'g')
           xlabel('Time(s)')
-         ylabel('?F\F')
+         ylabel('\DeltaF/F')
         title(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-TimeTrace'))
         savefig(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-TimeTrace','.fig')))
         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-TimeTrace','.png')))
         gcampCorr_ROI_mouse = cat(2,gcampCorr_ROI_mouse,gcampCorr_ROI);
         for ii = 1:10
-            mean_gcamp = squeeze(max(gcampCorr_ROI(101:200,ii),[],'all'));
+            max_gcamp = squeeze(max(gcampCorr_ROI(101:200,ii),[],'all'));
             std_gcamp = squeeze(std(gcampCorr_ROI(1:100,ii),0,1));
             %             if mean_gcamp >0
-            mean_gcamp_cat = [mean_gcamp_cat,mean_gcamp];
+            max_gcamp_cat = [max_gcamp_cat,max_gcamp];
             std_gcamp_cat = [std_gcamp_cat,std_gcamp];
             %             end
         end
@@ -92,47 +92,49 @@ for excelRow = excelRows
     figure
     plot((1:600)/20,gcampCorr_ROI_mouse,'g')
     xlabel('Time(s)')
-    ylabel('?F\F')
+    ylabel('\DeltaF/F')
     title(strcat(recDate,'-',mouseName,'-average across blocks'))
     savefig(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'-TimeTrace-AverageAcrossBlock','.fig')))
     saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'-TimeTrace-AverageAcrossBlock','.png')))
-    mean_gcamp_mouse = mean(gcampCorr_ROI_mouse(101:200),1);
+    max_gcamp_mouse = max(gcampCorr_ROI_mouse(101:200),[],'all');
     std_gcamp_mouse =std(gcampCorr_ROI_mouse(1:100));
-    mean_gcamp_blocks_cat = cat(2,mean_gcamp_blocks_cat,mean_gcamp_mouse);
+    max_gcamp_blocks_cat = cat(2,max_gcamp_blocks_cat,max_gcamp_mouse);
     std_gcamp_blocks_cat = cat(2,std_gcamp_blocks_cat,std_gcamp_mouse);
 end
 figure
 yyaxis left
-plot(mean_gcamp_cat,'r-')
+plot(max_gcamp_cat,'r-')
 hold on
 plot(std_gcamp_cat,'g-')
 ylim([-0.01 0.09])
-ylabel('?F\F')
+ylabel('\DeltaF/F')
 hold on
 yyaxis right
 ylabel('SNR')
-plot(mean_gcamp_cat./std_gcamp_cat,'b-')
+plot(max_gcamp_cat./std_gcamp_cat,'b-')
 ylim([-20 20])
-legend('mean','standard deviation','SNR')
+xlabel('Blocks')
+legend('Maximum','standard deviation','SNR')
 title(strcat(recDate,'-GCaMP-SNR'))
-savefig(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mouseName,'-',sessionType,'-mean-std-ratio','.fig')))
-saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mouseName,'-',sessionType,'-mean-std-ratio','.png')))
+savefig(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mouseName,'-',sessionType,'-max-std-ratio','.fig')))
+saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mouseName,'-',sessionType,'-max-std-ratio','.png')))
 
 
 figure
 yyaxis left
-plot(mean_gcamp_blocks_cat,'r-')
+plot(max_gcamp_blocks_cat,'r-')
 hold on
 plot(std_gcamp_blocks_cat,'g-')
 ylim([-0.01 0.09])
-ylabel('?F\F')
+ylabel('\DeltaF/F')
 hold on
 yyaxis right
 ylabel('SNR')
-plot(mean_gcamp_blocks_cat./std_gcamp_blocks_cat,'b-')
-xticks(1:0.5:3)
-ylim([-20 20])
-legend('mean','standard deviation','SNR')
+plot(max_gcamp_blocks_cat./std_gcamp_blocks_cat,'b-')
+xticks(1:3)
+
+ylim([0 30])
+legend('Maximum','standard deviation','SNR')
 title(strcat(recDate,'-GCaMP-SNR-averaged across block'))
-savefig(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mouseName,'-',sessionType,'-mean-std-ratio-blocks','.fig')))
-saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mouseName,'-',sessionType,'-mean-std-ratio-blocks','.png')))
+savefig(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mouseName,'-',sessionType,'-max-std-ratio-blocks','.fig')))
+saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mouseName,'-',sessionType,'-max-std-ratio-blocks','.png')))

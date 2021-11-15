@@ -62,7 +62,7 @@ mask = logical(leftMask+rightMask);
 % title('Aensthetized 2285')
 % colormap jet
 % ylim([0.4 4])
-% 
+%
 excelFile = "L:\RGECO\RGECO.xlsx";
 excelRows = 2:13;
 
@@ -77,7 +77,7 @@ for excelRow = excelRows
     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
     figure('Renderer', 'painters', 'Position', [100 100 1420 740])
-    ps_mouse = []; 
+    ps_mouse = [];
     for ii = 1:3
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(ii),'_processed','.mat');
         load(fullfile(saveDir,processedName),'xform_jrgeco1aCorr')
@@ -86,11 +86,30 @@ for excelRow = excelRows
         tic
         for jj = 1:size(xform_jrgeco1aCorr,1)
             for ll = 1:size(xform_jrgeco1aCorr,1)
-                  if mask(jj,ll)
-                      timetrace = squeeze(xform_jrgeco1aCorr(jj,ll,:));
-                      [~,f,t,ps] = spectrogram(timetrace,750,375,750,25,'yaxis');
-                      ps_mask = cat(3,ps_mask,ps);
-                  end
+                if mask(jj,ll)
+                    timetrace = squeeze(xform_jrgeco1aCorr(jj,ll,:));
+                    [~,f,t,ps] = spectrogram(timetrace,750,375,750,25,'yaxis');
+                    figure
+                    imagesc(10*log10(flip(ps)))
+                    xticks(0:19:114)
+                    xticklabels({'0','5','10','15','20','25','30'})
+                    yticks(flip(376:-60.16:75.2))
+                    yticklabels(flip({'0','2','4','6','8','10'}))
+                    ylim([75.2 376])
+                    colormap jet
+                    hfig = gcf;
+                    hfig.CurrentAxes.CLim = [-80 -20];
+                    xlabel('Time(minutes)')
+                    ylabel('Frequency(Hz)')
+                    h = colorbar;
+                    ylabel(h, 'Power/Frequency(dB/Hz)')
+                    title(strcat(recDate,'-',mouseName,'-',sessionType,...
+                       '-PixSpectrogram','-',num2str(jj),'-',num2str(ll)))
+                   saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,...
+                       '-PixSpectrogram','-',num2str(jj),'-',num2str(ll),'.png')))
+                   close all
+                    ps_mask = cat(3,ps_mask,ps);
+                end
             end
         end
         toc
@@ -100,10 +119,10 @@ for excelRow = excelRows
     
     figure
     imagesc(10*log10(flip(ps_mouse)))
-    xticks(0:19:114)    
+    xticks(0:19:114)
     xticklabels({'0','5','10','15','20','25','30'})
     
-    yticks(flip(376:-60.16:75.2))   
+    yticks(flip(376:-60.16:75.2))
     yticklabels(flip({'0','2','4','6','8','10'}))
     ylim([75.2 376])
     colormap jet
@@ -146,10 +165,10 @@ end
 %         xlabel('Frequence(Hz)')
 %         ylabel('standard deviation(dB/Hz)')
 %         title('standard deviation')
-%         suptitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(ii)))        
+%         suptitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(ii)))
 %         savefig(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(ii),'-Spectrogram_mean_std','.fig')))
 %         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(ii),'-Spectrogram_mean_std','.png')))
-%     end   
+%     end
 %     close all
 % end
 % for excelRow = excelRows
@@ -178,50 +197,50 @@ end
 %         xticks(1:14)
 %         grid on
 %         xlabel('Frequence(Hz)')
-%         ylabel('Power/frequency(dB/Hz)')       
+%         ylabel('Power/frequency(dB/Hz)')
 %         legend('Median','25th quantile','75th quantile')
 %         xlim([0 12.5])
-%         title(strcat(recDate,'-',mouseName,'-',sessionType,num2str(ii)))        
+%         title(strcat(recDate,'-',mouseName,'-',sessionType,num2str(ii)))
 %         savefig(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(ii),'-Spectrogram_median_25_75','.fig')))
 %         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(ii),'-Spectrogram_median_25_75','.png')))
-%     end   
+%     end
 %     close all
 % end
 
 
-
-excelFile = "L:\RGECO\RGECO.xlsx";
-excelRows = 13;
-
-load('D:\OIS_Process\noVasculatureMask.mat')
-mask = logical(leftMask+rightMask);
-
-for excelRow = excelRows
-    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
-    recDate = excelRaw{1}; recDate = string(recDate);
-    mouseName = excelRaw{2}; mouseName = string(mouseName);
-    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-    figure('Renderer', 'painters', 'Position', [100 100 500 300])
-    gs3 = [];
-    for ii = 2:3
-        processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(ii),'_processed','.mat');
-        load(fullfile(saveDir,processedName),'xform_jrgeco1aCorr')
-        mask = reshape(mask,[],1);
-        xform_jrgeco1aCorr = reshape(xform_jrgeco1aCorr,128*128,[]);
-        gs = mean(xform_jrgeco1aCorr(mask,:),1);
-        gs3 = [gs3,gs];    
-        disp(strcat(recDate,'-',mouseName))
-    end
-%     spectrogram(gs3,750,375,750,25,'yaxis')
-%     ylim([0 10])
-%     colormap jet
-%     hfig = gcf;
-%     hfig.CurrentAxes.CLim = [-80 -20];
-%     title(strcat(recDate,'-',mouseName))
-%     
-%     savefig(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'-Spectrogram_thirtyMinutes','.fig')))
-%     saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'-Spectrogram_thirtyMinutes','.png')))
-%     close all
-end
-
+% 
+% excelFile = "L:\RGECO\RGECO.xlsx";
+% excelRows = 13;
+% 
+% load('D:\OIS_Process\noVasculatureMask.mat')
+% mask = logical(leftMask+rightMask);
+% 
+% for excelRow = excelRows
+%     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+%     recDate = excelRaw{1}; recDate = string(recDate);
+%     mouseName = excelRaw{2}; mouseName = string(mouseName);
+%     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+%     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+%     figure('Renderer', 'painters', 'Position', [100 100 500 300])
+%     gs3 = [];
+%     for ii = 2:3
+%         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(ii),'_processed','.mat');
+%         load(fullfile(saveDir,processedName),'xform_jrgeco1aCorr')
+%         mask = reshape(mask,[],1);
+%         xform_jrgeco1aCorr = reshape(xform_jrgeco1aCorr,128*128,[]);
+%         gs = mean(xform_jrgeco1aCorr(mask,:),1);
+%         gs3 = [gs3,gs];
+%         disp(strcat(recDate,'-',mouseName))
+%     end
+%     %     spectrogram(gs3,750,375,750,25,'yaxis')
+%     %     ylim([0 10])
+%     %     colormap jet
+%     %     hfig = gcf;
+%     %     hfig.CurrentAxes.CLim = [-80 -20];
+%     %     title(strcat(recDate,'-',mouseName))
+%     %
+%     %     savefig(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'-Spectrogram_thirtyMinutes','.fig')))
+%     %     saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'-Spectrogram_thirtyMinutes','.png')))
+%     %     close all
+% end
+% 
