@@ -20,7 +20,7 @@ r2 = nan(128);
 
 for xInd = 1:size(neural,2)
     for yInd = 1:size(neural,1)
-         if mask(yInd,xInd)
+         %if mask(yInd,xInd)
             pixFAD = squeeze(FAD(yInd,xInd,:))';
             
             pixNeural = squeeze(neural(yInd,xInd,:))';
@@ -46,7 +46,7 @@ for xInd = 1:size(neural,2)
             r2(yInd,xInd) = 1-sumsqr(pixFAD-pixFADPred)/sumsqr(pixFAD-mean(pixFAD));
             end
             %1 - var(pixHemoPred - pixHemo)/var(pixHemo);
-         end
+         %end
     end
 end 
 

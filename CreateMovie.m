@@ -1,7 +1,7 @@
-load('L:\RGECO\190707\190707-R5M2286-anes-fc1_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M86-fc1
+load('L:\RGECO\190707\190707-R5M2286-anes-fc1_processed.mat', 'xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M86-fc1
 mouseName = '190707-R5M2286-anes';
-xform_datahb(isinf(xform_datahb)) = 0;
-xform_datahb(isnan(xform_datahb)) = 0;
+% xform_datahb(isinf(xform_datahb)) = 0;
+% xform_datahb(isnan(xform_datahb)) = 0;
 xform_FADCorr(isinf(xform_FADCorr)) = 0;
 xform_FADCorr(isnan(xform_FADCorr)) = 0;
 
@@ -39,7 +39,7 @@ for ii=1:nFrames
     disp(num2str(ii));
     sgtitle(['t=' sprintf('%.2f',(ii-1)/25) 's']);
     
-    subplot(1,3,1);
+    subplot(1,2,1);
     imagesc(xform_jrgeco1aCorr(:,:,ii),'Alphadata',meanMask,[-0.08 0.08]);
     set(gca,'Visible','off');
     colorbar; colormap('jet');
@@ -47,7 +47,7 @@ for ii=1:nFrames
     titleObj = title('Calcium Corr');
     set(titleObj,'Visible','on');
     
-    subplot(1,3,2);
+    subplot(1,2,2);
     imagesc(xform_FADCorr(:,:,ii),'Alphadata',meanMask,[-0.015 0.015]);
     set(gca,'Visible','off');
     colorbar; colormap('jet');
@@ -55,13 +55,13 @@ for ii=1:nFrames
     titleObj = title('FAD Corr');
     set(titleObj,'Visible','on');
     
-    subplot(1,3,3);imagesc(xform_datahb(:,:,1,ii)+xform_datahb(:,:,2,ii),'Alphadata',meanMask,[-0.4e-5 0.4e-5])
-    set(gca,'Visible','off');
-    colorbar; colormap('jet');
-    axis(gca,'square');
-    titleObj = title('Total Hb');
-    set(titleObj,'Visible','on');
-    
+%     subplot(1,3,3);imagesc(xform_datahb(:,:,1,ii)+xform_datahb(:,:,2,ii),'Alphadata',meanMask,[-0.4e-5 0.4e-5])
+%     set(gca,'Visible','off');
+%     colorbar; colormap('jet');
+%     axis(gca,'square');
+%     titleObj = title('Total Hb');
+%     set(titleObj,'Visible','on');
+%     
     Frames(ii) = getframe(fig1);
     drawnow;
     

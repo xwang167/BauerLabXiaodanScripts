@@ -1,4 +1,4 @@
-function [data2 currHz]=resampledata(data,framerate,tHz,tol)
+function [data2 currHz]=resampledata_ori(data,framerate,tHz,tol)
 
 % resampledata() is an alternative to MATLAB's Signal Processing Toolbox
 % resample() command. It has three advantages for DOT applications.

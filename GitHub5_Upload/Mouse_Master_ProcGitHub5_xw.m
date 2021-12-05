@@ -87,7 +87,7 @@ for i=1:length(mice)
             % coded 128 below.
             dark=imresize(single(imread('Dark.tif')),(oi.npixels/128)*(1/mice(i).info.spat_ds));
             % load data
-            [rawdata,dark]=load_image_stack([mice(i).filename,num2str(n)],dark,mice(i),n,oi);
+            [rawdata,dark]=load_image_stack_xw([mice(i).filename,num2str(n)],dark,mice(i),n,oi);
             % process data, system dependent 
 %             [rawdata_f,fulldetrend,all_contrasts,WL_ms]=Proc1_sys_dep(rawdata,dark,mice(i),oi); %use this one for discrete 
             [rawdata_f,fulldetrend,all_contrasts,WL_ms]=Proc1_sys_dep_LEDShifting(rawdata,dark,mice(i),oi,LEDrotate); %use this one for continuous recordings broken up into multiple files
@@ -98,7 +98,7 @@ for i=1:length(mice)
             Landmarks.tent=Landmarks.tent*(1/mice(i).info.spat_ds);
             Landmarks.OF=Landmarks.OF*(1/mice(i).info.spat_ds);
             [all_contrasts2,isbrain2]= Affine(all_contrasts,isbrain,Landmarks,mice(i),oi);
-            % Save the data
+            %  the data
             mkdir([mice(i).savepath]);
             save([mice(i).savename,num2str(n),'-Affine_GSR_BroadBand'],'-v7.3','all_contrasts2','isbrain2','WL_ms','mice','rawdata_f','fulldetrend');
             
