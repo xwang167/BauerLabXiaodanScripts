@@ -1,4 +1,4 @@
-database='C:\Users\Adam\Box\Colonna data SOS\ColonnaGCAMPtest.xlsx';
+database='Y:\CTREM\CTREM_new.xlsx';
 excelfiles=[2:27];  % Rows from Excell Database
 
 isbrainall=ones(128);

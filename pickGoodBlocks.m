@@ -100,7 +100,7 @@ elseif ~isempty(greenFluorCorrDownSampled)
 greenFluorCorr_avg = mean(greenFluorCorrDownSampled,4);
 greenFluorCorr_peak = abs(mean(greenFluorCorr_avg(:,:,stimStartTime+1:stimEndTime),3));
 temp_greenFluorCorr_max = prctile(greenFluorCorr_peak(mask_new),90,'all')*1.4;
-    
+ temp_jrgeco1aCorr_max = [];   
     numRows = 4;
     
 elseif ~isempty(jrgecoCorrDownSampled)

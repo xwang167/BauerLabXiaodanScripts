@@ -1,6 +1,6 @@
 clear all;close all;clc
-database='V:\CTREM\CTREM.xlsx';
-excelfiles=[2:11,17:22,27:63];  % Rows from Excell Database???34,63
+database='Y:\CTREM\CTREM_new.xlsx';
+excelfiles=[2:11,17:22,27:66];  % Rows from Excell Database???34,63
 % for ii = [34,63]
 %     exampleSeedFCAnalysis(database,ii,[0.4 4]);
 % end
@@ -19,12 +19,14 @@ for n=excelfiles;
     Date=num2str(raw{1});
     Mouse=raw{9};
     Group=raw{8};
-    directory=['V:\CTREM\Mouse level averages\'];
+    directory=['Y:\CTREM\Mouse level averages\'];
     cd(directory)
     
     disp(['Loading ', Mouse, ' n= ' , num2str(n)])
     file=['CTREM-seedFC-rows',num2str(n),'~',num2str(n),'-0p4-4.mat'];
-   
+    if ~exist(file,'file')
+        file=['CTREM_new-seedFC-rows',num2str(n),'~',num2str(n),'-0p4-4.mat'];
+    end
     load(file);
     tempDeltafc=zeros(128,128,16,4);
     tempDeltaR = atanh(seedFCCat);

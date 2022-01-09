@@ -47,3 +47,19 @@ axis image off
         h = colorbar;
         colormap jet
     ylabel(h, 'Temperature(Celcius)')
+    
+    
+    
+    
+    
+    awake = 'FLIR0041';
+ imagesc(valsArray(130:end,109:231),[20,38])
+    
+    colormap jet
+    axis image off
+    
+      anes = 'FLIR0036';
+imagesc(valsArray(100:230,49:195),[20,38])
+
+    colormap jet
+    axis image off

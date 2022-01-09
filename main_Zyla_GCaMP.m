@@ -2,8 +2,8 @@
 % This script is used to add the FAD process and analysis to the processed data
 close all;clear all;clc
 import mouse.*
-excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
-excelRows = [219,222,225];%:450;
+excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
+excelRows = 36:38;%[3,5,7,8,10,11,12,13];%:450;
 runs = 1:3;
 isDetrend = 1;
 nVy = 128;
@@ -13,12 +13,16 @@ nVx = 128;
 %
 % % % % % % %
 % % % %make mask and transform matrix
+% previousDate = [];
 % for excelRow = excelRows
 %     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
 %     recDate = excelRaw{1}; recDate = string(recDate);
+%     currentDate = recDate;
 %     mouseName = excelRaw{2}; mouseName = string(mouseName);
 %     rawdataloc = excelRaw{3};
 %     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+%     
+%     oriDir = "D:\"; oriDir = fullfile(oriDir,recDate);
 %     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
 %     if ~exist(saveDir)
 %         mkdir(saveDir)
@@ -33,9 +37,8 @@ nVx = 128;
 %     
 %     
 %     wlName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-%     if exist(fullfile(saveDir,wlName),'file')
-%         load(fullfile(saveDir,wlName),'transformMat','WL');
-%         disp(strcat('WL and transform file already exists for ', recDate,'-', mouseName))
+%     if exist(fullfile(saveDir,strcat(recDate,'-tform.mat')),'file')
+%         disp(strcat('transform file already exists for ', recDate,'-', mouseName))
 %         %     elseif strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')
 %         %         disp(strcat('WL and transform file already exists for ', recDate,'-', mouseName))
 %         %         load(fullfile(rawdataloc,recDate,wlName),'mytform','WL');
@@ -46,31 +49,67 @@ nVx = 128;
 %         fileName_cam1 = fullfile(rawdataloc,recDate,fileName_cam1);
 %         load(fileName_cam1)
 %         
-%         firtFrame_cam1  = squeeze(raw_unregistered(:,:,2,sessionInfo.darkFrameNum/4+1));
+%         if sessionInfo.darkFrameNum>0
+%             if sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,sessionInfo.darkFrameNum/4-1),'all')>5 %%% check if drop frame
+%                 numCh = size(raw_unregistered,3);
+%                 raw_unregistered = reshape(raw_unregistered,128,128,[]);
+%                 raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
+%                 raw_unregistered = reshape(raw_unregistered,128,128,numCh,[]);
+%             end
+%         end
+%         
+%         
+%         firstFrame_cam1  = squeeze(raw_unregistered(:,:,2,sessionInfo.darkFrameNum/4+1));
 %         
 %         clear raw_unregistered
 %         fileName_cam2 = strcat(recDate,'-',mouseName,'-',sessionType,'1-cam2.mat');
 %         fileName_cam2 = fullfile(rawdataloc,recDate,fileName_cam2);
 %         load(fileName_cam2)
 %         
-%         firtFrame_cam2  = squeeze(raw_unregistered(:,:,2,sessionInfo.darkFrameNum/4+1));
-%         
+%         if sessionInfo.darkFrameNum>0
+%             if sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4-1),'all')>5
+%                 numCh = size(raw_unregistered,3);
+%                 raw_unregistered = reshape(raw_unregistered,128,128,[]);
+%                 raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
+%                 raw_unregistered = reshape(raw_unregistered,128,128,numCh,[]);
+%             end
+%         end
+%         firstFrame_cam2  = squeeze(raw_unregistered(:,:,3,sessionInfo.darkFrameNum/4+1));
 %         
 %         clear raw_unregistered
-%         [WL,transformMat] = fluor.getTransformationandWL_Zyla(firtFrame_cam1, firtFrame_cam2,nVy,nVx,[]);
-%         save(fullfile(saveDir,wlName),'transformMat','WL');
-%         close all
-%         
-%         
-%         
 %         maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
 %         
 %         % need to be modified to see if WL exist
 %         
 %         disp(strcat('get landmarks and mask for',recDate,'-', mouseName))
+%         if ~exist(fullfile(saveDir,strcat(recDate,'-tform.mat')),'file')
+%         if ~strcmp(previousDate,currentDate)
+%             load(strcat('\\10.23.92.192\RawData_EastOIS2\',recDate,'\',recDate,'-grid-WL-cam1.mat'))
+%             cam1 = raw_unregistered(:,:,1,21);
+%             clear raw_unregistered
+%             load(strcat('\\10.23.92.192\RawData_EastOIS2\',recDate,'\',recDate,'-grid-WL-cam2.mat'))
+%             cam2 = raw_unregistered(:,:,1,21);
+%             clear raw_unregistered
+%             [mytform,fixed_cam1,registered_cam2] = getTransformation(cam1,cam2);
+%             if ~exist(saveDir)
+%                 mkdir(saveDir)
+%             end
+%             save(fullfile(saveDir,strcat(recDate,'-tform.mat')),'mytform')
+%         end
+%         end
+%         load(fullfile(saveDir,strcat(recDate,'-tform.mat')),'mytform')
+%         previousDate = currentDate;
+%         fixed = firstFrame_cam1./max(max(firstFrame_cam1));
+%         unregistered = firstFrame_cam2./max(max(firstFrame_cam2));
+%         registered = imwarp(unregistered, mytform,'OutputView',imref2d(size(unregistered)));
+%         %Create White Light Image
+%         WL = zeros(128,128,3);
+%         WL(:,:,1) = registered;
+%         WL(:,:,2) = fixed;
+%         WL(:,:,3) = fixed;
 %         [isbrain,xform_isbrain,affineMarkers,seedcenter,WLcrop,xform_WLcrop,xform_WL] = getLandMarksandMask_xw(WL);
 %         isbrain_contour = bwperim(isbrain);
-%         save(fullfile(saveDir,maskName),'isbrain', 'WL','WLcrop', 'xform_WLcrop', 'xform_isbrain', 'isbrain', 'WL', 'xform_WL', 'affineMarkers', 'seedcenter','-append')
+%         save(fullfile(saveDir,maskName),'isbrain', 'WL','WLcrop', 'xform_WLcrop', 'xform_isbrain', 'isbrain', 'WL', 'xform_WL', 'affineMarkers', 'seedcenter')
 %         figure;
 %         imagesc(WL); %changed 3/1/1
 %         axis off
@@ -91,85 +130,81 @@ nVx = 128;
 %         contour(isbrain_contour,'r')
 %         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'_WLandMarks.jpg')))
 %         close all
-%         clearvars -except excelFile nVx nVy excelRows runs isDetrend
+%         clearvars -except excelFile nVx nVy excelRows runs isDetrend previousDate
 %     end
 % end
 % % %
 % % % % %get registered together, dark frame removed raw and QC_raw check
 % % %
-% for excelRow = excelRows
-%     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
-%     recDate = excelRaw{1}; recDate = string(recDate);
-%     mouseName = excelRaw{2}; mouseName = string(mouseName);
-%     rawdataloc = excelRaw{3};
-%     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-%     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-%     if ~exist(saveDir)
-%         mkdir(saveDir)
-%     end
-%     sessionInfo.mouseType = excelRaw{17};
-%     sessionInfo.darkFrameNum = excelRaw{15};
-%     systemType = excelRaw{5};
-%     sessionInfo.framerate = excelRaw{7};
-%     
-%     maskDir = saveDir;
-%     
-%     %mouseName = 'N4M330-opto3';
-%     %maskDir = strcat('J:\RGECO\Kenny\', recDate, '\');
-%     maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-%     %maskName = strcat(recDate,'-N8M864-opto3-LandmarksAndMask','.mat');
-%     
-%     load(fullfile(maskDir,maskName),'isbrain')
-%     
-%     for n = runs
-%         
-%         rawName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'.mat');
-%         if exist(fullfile(saveDir,rawName),'file')
-%             disp(strcat('registered rawdata file already exist for ',rawName ))
-%             
-%         else
-%             wlName = maskName;
-%             %wlName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-%             
-%             %             fileName_cam1 = strcat(recDate,'-',mouseName,'-cam1','-',sessionType,num2str(n),'.mat');%
-%             fileName_cam1 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam1.mat');
-%             fileName_cam1 = fullfile(rawdataloc,recDate,fileName_cam1);
-%             %             fileName_cam2 = strcat(recDate,'-',mouseName,'-cam2','-',sessionType,num2str(n),'.mat');%
-%             fileName_cam2 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam2.mat');
-%             fileName_cam2 = fullfile(rawdataloc,recDate,fileName_cam2);
-%             
-%             disp('loading unregistered data')
-%             load(fileName_cam1)
-%             binnedRaw_cam1 = raw_unregistered;
-%             clear raw_unregistered
-%             load(fileName_cam2)
-%             binnedRaw_cam2 = raw_unregistered(:,:,2,:);
-%             clear raw_unregistered
-%             disp(strcat('Register and Combine two cameras for ', rawName))
-%             load(fullfile(maskDir,wlName),'transformMat');
-%             rawdata = fluor.registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,transformMat,sessionInfo.mouseType);
-%             
-%             darkFrameInd = 2:sessionInfo.darkFrameNum/size(rawdata,3);
-%             darkFrame = squeeze(mean(rawdata(:,:,:,darkFrameInd),4));
-%             raw_baselineMinus = rawdata - repmat(darkFrame,1,1,1,size(rawdata,4));
-%             clear rawdata
-%             raw_baselineMinus(:,:,:,1:sessionInfo.darkFrameNum/size(raw_baselineMinus,3))=[];
-%             rawdata = raw_baselineMinus;
-%             clear raw_baselineMinus
-%             
-%             disp(strcat('QC raw for ',rawName))
-%             visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
-%             [mdata] = QCcheck_raw(rawdata,isbrain,systemType,sessionInfo.framerate,saveDir,visName,sessionInfo.mouseType);
-%             save(fullfile(saveDir,rawName),'rawdata','mdata','-v7.3')
-%             close all
-%         end
-%     end
-% end
-% 
+for excelRow = excelRows
+    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+    recDate = excelRaw{1}; recDate = string(recDate);
+    mouseName = excelRaw{2}; mouseName = string(mouseName);
+    rawdataloc = excelRaw{3};
+    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+    if ~exist(saveDir)
+        mkdir(saveDir)
+    end
+    sessionInfo.mouseType = excelRaw{17};
+    sessionInfo.darkFrameNum = excelRaw{15};
+    systemType = excelRaw{5};
+    sessionInfo.framerate = excelRaw{7};
+    maskDir = saveDir;
+
+    maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+    load(fullfile(maskDir,maskName),'isbrain')
+    
+    for n = runs
+        
+        rawName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'.mat');
+        if exist(fullfile(saveDir,rawName),'file')
+            disp(strcat('registered rawdata file already exist for ',rawName ))
+            
+        else
+            wlName = maskName;
+            %wlName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+            
+            %             fileName_cam1 = strcat(recDate,'-',mouseName,'-cam1','-',sessionType,num2str(n),'.mat');%
+            fileName_cam1 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam1.mat');
+            fileName_cam1 = fullfile(rawdataloc,recDate,fileName_cam1);
+            %             fileName_cam2 = strcat(recDate,'-',mouseName,'-cam2','-',sessionType,num2str(n),'.mat');%
+            fileName_cam2 = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-cam2.mat');
+            fileName_cam2 = fullfile(rawdataloc,recDate,fileName_cam2);
+            
+            disp('loading unregistered data')
+            load(fileName_cam1)
+            binnedRaw_cam1 = raw_unregistered(:,:,[1,2],:);
+            clear raw_unregistered
+            load(fileName_cam2)
+            binnedRaw_cam2 = raw_unregistered(:,:,3,:);
+            clear raw_unregistered
+            disp(strcat('Register and Combine two cameras for ', rawName))
+    
+            load(fullfile(saveDir,strcat(recDate,'-tform.mat')),'mytform')
+            rawdata = registerCam2andCombineTwoCams(binnedRaw_cam1,binnedRaw_cam2,mytform,[1,2],3);
+            
+            darkFrameInd = 2:sessionInfo.darkFrameNum/size(rawdata,3);
+            darkFrame = squeeze(mean(rawdata(:,:,:,darkFrameInd),4));
+            raw_baselineMinus = rawdata - repmat(darkFrame,1,1,1,size(rawdata,4));
+            clear rawdata
+            raw_baselineMinus(:,:,:,1:sessionInfo.darkFrameNum/size(raw_baselineMinus,3))=[];
+            rawdata = raw_baselineMinus;
+            clear raw_baselineMinus
+            
+            disp(strcat('QC raw for ',rawName))
+            visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
+            [mdata] = QCcheck_raw(rawdata,isbrain,systemType,sessionInfo.framerate,saveDir,visName,sessionInfo.mouseType);
+            save(fullfile(saveDir,rawName),'rawdata','mdata','-v7.3')
+            close all
+        end
+    end
+end
 
 
 
-%
+
+
 
 
 %
@@ -296,12 +331,12 @@ for excelRow = excelRows
                     
                     disp('get FLuor data')
                     xform_fluor = squeeze(xform_raw(:,:,sessionInfo.fluorSpecies,:));
-                    xform_fluor = mouse.expSpecific.procFluor(xform_fluor,baselineValues(:,:,sessionInfo.fluorSpecies));
+                    xform_fluor = procFluor(xform_fluor,baselineValues(:,:,sessionInfo.fluorSpecies));
                     
                     
                     xform_Reflectance = squeeze(xform_raw(:,:,2,:));
                     
-                    xform_Reflectance = mouse.expSpecific.procFluor(xform_Reflectance,baselineValues(:,:,2)); % make the data ratiometric
+                    xform_Reflectance = procFluor(xform_Reflectance,baselineValues(:,:,2)); % make the data ratiometric
                     
                     [op_in, E_in] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.fluorSpecies)));
                     [op_out, E_out] = getHbOpticalProperties_xw(muspFcn,fullfile(fluorDir,sessionInfo.fluorEmissionFile));
@@ -310,7 +345,7 @@ for excelRow = excelRows
                     dpOut = op_out.dpf/2;
                     
                     
-                    xform_fluorCorr = mouse.physics.correctHb(xform_fluor,xform_datahb,[E_in(1) E_out(1)],[E_in(2) E_out(2)],dpIn,dpOut);
+                    xform_fluorCorr = correctHb_differentBeta(xform_fluor,xform_datahb,[E_in(1) E_out(1)],[E_in(2) E_out(2)],dpIn,dpOut,0.7,0.8);
                     xform_fluorCorr = process.smoothImage(xform_fluorCorr,systemInfo.gbox,systemInfo.gsigma);
                     xform_fluor = process.smoothImage(xform_fluor,systemInfo.gbox,systemInfo.gsigma);
                     
@@ -323,7 +358,7 @@ for excelRow = excelRows
                     clear xform_fluorCorr
                     xform_green = xform_Reflectance;
                     clear xform_Reflectance
-                    save(fullfile(saveDir, processedName),'xform_gcamp','xform_gcampCorr','xform_green','xform_Laser','op_in', 'E_in','op_out', 'E_out','-append','-v7.3')
+                    save(fullfile(saveDir, processedName),'xform_gcamp','xform_gcampCorr','xform_green','op_in', 'E_in','op_out', 'E_out','-append','-v7.3')
                     
             
                 
@@ -352,19 +387,10 @@ for excelRow = excelRows
     systemType =excelRaw{5};
     maskDir_new = saveDir;
     rawdataloc = excelRaw{3};
-    
-    
-    
-    sessionInfo.framerate = excelRaw{7};
-    systemInfo.numLEDs = 4;
-    maskName_new = strcat(recDate,'-N8M864-opto3-LandmarksAndMask','.mat');
-    maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-    maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-dataFluor','.mat');
-    maskDir = strcat('L:\RGECO\Kenny\', recDate, '\');
     maskDir = saveDir;
+    sessionInfo.framerate = excelRaw{7};
+    maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
     load(fullfile(maskDir,maskName), 'xform_isbrain')
-    save(fullfile(maskDir_new,maskName_new),'xform_isbrain')
-    load(fullfile(rawdataloc,recDate,maskName_new), 'xform_isbrain')
     xform_isbrain = double(xform_isbrain);
     if ~isempty(find(isnan(xform_isbrain), 1))
         xform_isbrain(isnan(xform_isbrain))=0;
@@ -578,7 +604,9 @@ for excelRow = excelRows
                 
                 
                 
-                if strcmp(sessionInfo.mouseType,'PV')||strcmp(sessionInfo.mouseType,'jrgeco1a-opto2')||strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')||strcmp(sessionInfo.mouseType,'Gopto3')||strcmp(sessionInfo.mouseType,'Wopto3')
+                if strcmp(sessionInfo.mouseType,'PV')||strcmp(sessionInfo.mouseType,'jrgeco1a-opto2')...
+                        ||strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')||strcmp(sessionInfo.mouseType,'Gopto3')...
+                        ||strcmp(sessionInfo.mouseType,'Wopto3')
                     
                     load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'.mat')))
                     if strcmp(sessionInfo.mouseType,'PV')
@@ -595,7 +623,7 @@ for excelRow = excelRows
                         peakMap_ROI = rawdata(:,:,1,sessionInfo.darkFrameNum/4+sessionInfo.stimbaseline+1);
                         clear rawdata
                     end
-                    
+                                   
                     imagesc(peakMap_ROI)
                     axis image off
                     colormap jet
@@ -641,9 +669,6 @@ for excelRow = excelRows
                 texttitle_NoGSR = strcat(mouseName,'-stim',num2str(n)," ",'without GSR nor filtering');
                 output_NoGSR= fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'-NoGSR'));
                 disp('QC on non GSR stim')
-                
-                
-                load(fullfile(saveDir,'ROI.mat'))
                 
                 
                 if strcmp(sessionInfo.mouseType,'gcamp6f')

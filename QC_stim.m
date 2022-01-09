@@ -1,7 +1,7 @@
 function   [goodBlocks,ROI] = QC_stim(oxy,deoxy,greenFluor,greenFluorCorr,green,jrgeco1a,jrgeco1aCorr,red,xform_isbrain,numBlock,numDesample,stimStartTime,stimduration,stimFreq,framerate,stimblocksize,stimbaseline,texttitle,output,input_ROI)
 
 
- load('D:\OIS_Process\noVasculatureMask.mat')
+load('D:\OIS_Process\noVasculatureMask.mat')
 mask_new = logical(mask_new);
 disp('downsampling')
 
@@ -145,6 +145,18 @@ if ~isempty(goodBlocks)
         
         
     else
+        [greenFluorCorr_downsampled_blocks,greenFluorCorr_blocks] = blockAverage...
+            (greenFluorCorr_downsampled, greenFluorCorr,goodBlocks,numBlock,stimbaseline);
+        
+        clear greenFluorCorr
+        
+        [greenFluor_downsampled_blocks,greenFluor_blocks] = blockAverage...
+            (greenFluor_downsampled, greenFluor,goodBlocks,numBlock,stimbaseline);
+        
+        [green_downsampled_blocks,green_blocks] = blockAverage...
+            (green_downsampled, green,goodBlocks,numBlock,stimbaseline);
+        
+        clear green
         
         peakMap_ROI= greenFluorCorr_downsampled_blocks(:,:,stimEndTime);
         
@@ -422,24 +434,24 @@ if ~isempty(goodBlocks)
     saveas(gcf,strcat(output,'HbTraceImage.png'))
     
     
-%     
-%     figure
-%     imagesc(total_downsampled_blocks(:,:,stimEndTime),...
-%         [min(total_downsampled_blocks(:,:,stimEndTime),[],'all'),max(total_downsampled_blocks(:,:,stimEndTime),[],'all')])
-%     
-%     colorbar
-%     
-%     hold on
-%     
-%     imagesc(WL,'AlphaData',1-ROI)
-%     
-%     axis image off
-%     
-%     title('Total');
-%     
-%     saveas(gcf,strcat(output,'HbTpeak.fig'))
-%     
-%     saveas(gcf,strcat(output,'Hbpeak.png'))
+    %
+    %     figure
+    %     imagesc(total_downsampled_blocks(:,:,stimEndTime),...
+    %         [min(total_downsampled_blocks(:,:,stimEndTime),[],'all'),max(total_downsampled_blocks(:,:,stimEndTime),[],'all')])
+    %
+    %     colorbar
+    %
+    %     hold on
+    %
+    %     imagesc(WL,'AlphaData',1-ROI)
+    %
+    %     axis image off
+    %
+    %     title('Total');
+    %
+    %     saveas(gcf,strcat(output,'HbTpeak.fig'))
+    %
+    %     saveas(gcf,strcat(output,'Hbpeak.png'))
     
     if ~isempty(jrgeco1a)
         jrgeco1a_peak = abs(mean(jrgeco1a_downsampled_blocks(:,:,stimStartTime+1:stimEndTime),3));

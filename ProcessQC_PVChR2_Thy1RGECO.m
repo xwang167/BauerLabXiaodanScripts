@@ -9,8 +9,8 @@ end
 % excelFile="C:\Users\xiaodanwang\Documents\GitHub\BauerLab\MATLAB\examples\Code Modification\exampleTiffOIS+Gcamp.xlsx";
 % excelRows=[15];  % Rows from Excell Database
 %clear all;close all;
-excelFile="J:\PVRGECO\PVRGECO.xlsx";
-excelRows=[2];
+excelFile="X:\XW\Paper\PaperExperiment.xlsx";
+excelRows=26:28;
 
 fRange_ISA = [0.01 0.08];
 fRange_delta = [0.5 4];

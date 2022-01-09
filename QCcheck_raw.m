@@ -117,7 +117,6 @@ xlim([time(1) time(end)])
 
 subplot('position', [0.42 0.09 0.14 0.18])
 plot(stddatanorm*100');
-ylim([0,2])
 set(gca,'XTick',(1:numLED));
 set(gca,'XTickLabel',TickLabels)
 title('Std Deviation');

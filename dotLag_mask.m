@@ -41,13 +41,13 @@ lagAmp = nan(size(data1,1),size(data1,2));
 
 for pixRow = 1:size(data1,1) % for each pixel
     for pixCol = 1:size(data1,2)
-        if logical(mask(pixRow,pixCol))
+        %if logical(mask(pixRow,pixCol))
             lagData1 = squeeze(data1(pixRow,pixCol,:)); 
             lagData2 = squeeze(data2(pixRow,pixCol,:));
             [lagTime(pixRow,pixCol),lagAmp(pixRow,pixCol),~]...
                 = mouse.conn.findLag(lagData1,lagData2,quadFitUse,positiveSignOnly,validRange,...
                 edgeLen,corrThr); % finding lag; data 1 lags data 2 by how much
-        end
+        %end
     end
 end
 end

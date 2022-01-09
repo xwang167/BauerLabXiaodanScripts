@@ -1,5 +1,6 @@
 import mouse.*
-% excelFile='V:\CTREM\CTREM.xlsx';
+% excelFile='Y:\CTREM\CTREM_new.xlsx';
+% excelRows = 64:66;
 % excelRows=[8:11,17:22,27:63];
 % 
 % % excelFile = "M:\Radiation Project\Radiation Project Highlight.xlsx";
@@ -16,9 +17,6 @@ mask_new = logical(mask_new);
 %     mouseName = excelRaw{9}; mouseName = string(mouseName);%2
 %     saveDir = excelRaw{12}; saveDir = fullfile(string(saveDir),recDate);%4
 %     sessionType = excelRaw{14}; sessionType = sessionType(3:end-2);%6
-%     sessionInfo.darkFrameNum = excelRaw{16};%15
-%     sessionInfo.mouseType = excelRaw{17};
-%     systemType =excelRaw{13};%5;
 %     mask_newDir_new = saveDir;
 %     sessionInfo.framerate = excelRaw{7};
 %     systemInfo.numLEDs = 4;
@@ -66,7 +64,7 @@ mask_new = logical(mask_new);
 %         lagTimeTrial_HbTCalcium = lagTimeTrial_HbTCalcium./fs;
 %         
 %    toc     
-%         clear xform_total_filtered xform_FADCorr_filtered xform_jrgeco1aCorr_filtered
+%         clear xform_total_filtered xform_datafluorCorr_filtered
 %         figure;
 %         colormap jet;
 %         subplot(2,1,1); imagesc(lagTimeTrial_HbTCalcium,tLim); axis image off;h = colorbar;ylabel(h,'t(s)');title('Calcium HbT');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);
@@ -79,34 +77,41 @@ mask_new = logical(mask_new);
 %         
 %     end
 % end
-% 
-% tLim = [0 2];
-% rLim = [-1 1];
-% excelRows=[2:11,17:22,27:63];
+
+tLim = [0 2];
+rLim = [-1 1];
+
 % for excelRow = excelRows
 %     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
-%     recDate = excelRaw{1}; recDate = string(recDate);
-%     mouseName = excelRaw{2}; mouseName = string(mouseName);
-%     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-%     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-%     sessionInfo.darkFrameNum = excelRaw{15};
-%     sessionInfo.mouseType = excelRaw{17};
-%     systemType =excelRaw{5};
-%     sessionInfo.framerate = excelRaw{7};
-%     systemInfo.numLEDs = 4;
-%     fs = excelRaw{7};
+%     recDate = excelRaw{1}; recDate = string(recDate);    
+%     mouseName = excelRaw{9}; mouseName = string(mouseName);
+%     saveDir = excelRaw{12}; saveDir = fullfile(string(saveDir),recDate);
+%     sessionType = excelRaw{14}; sessionType = sessionType(3:end-2);     
+% %   % for old excel sheet  
+% %     mouseName = excelRaw{2}; mouseName = string(mouseName);
+% %     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+% %     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+% %     sessionInfo.darkFrameNum = excelRaw{15};
+% %     sessionInfo.mouseType = excelRaw{17};
+% %     systemType =excelRaw{5};
 %     mask_newName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datahb','.mat');
 %     load(fullfile(saveDir,mask_newName), 'xform_isbrain')
-%     runs = 1:excelRaw{13};
+%     if ischar(excelRaw{10})
+%        runs = str2num(excelRaw{10}); %1:excelRaw{13};
+%     else
+%         runs = excelRaw{10};
+%     end
 %     lagTimeTrial_HbTCalcium_mouse = zeros(128,128,length(runs));
 %     lagAmpTrial_HbTCalcium_mouse = zeros(128,128,length(runs));    
+%     ii = 1;
 %     for n = runs
 %         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
 %         processedName_crossLag = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-crossLag','.mat');
 %         disp('loading lag data')
 %         load(fullfile(saveDir,processedName_crossLag))
-%         lagTimeTrial_HbTCalcium_mouse(:,:,n) =  lagTimeTrial_HbTCalcium;
-%         lagAmpTrial_HbTCalcium_mouse(:,:,n) = lagAmpTrial_HbTCalcium;      
+%         lagTimeTrial_HbTCalcium_mouse(:,:,ii) =  lagTimeTrial_HbTCalcium;
+%         lagAmpTrial_HbTCalcium_mouse(:,:,ii) = lagAmpTrial_HbTCalcium;  
+%         ii = ii+1;
 %     end
 %             
 %     lagTimeTrial_HbTCalcium_mouse_mean = nanmean(lagTimeTrial_HbTCalcium_mouse,3);
@@ -127,18 +132,18 @@ mask_new = logical(mask_new);
 % end
 
 
-% excelFile = 'V:\CTREM\WT.xlsx';
-% excelRows = 2:15;
-% miceCat = 'TremWT';
-% 
-% lagTimeTrial_HbTCalcium_mice = zeros(128,128,length(excelRows));
-% lagAmpTrial_HbTCalcium_mice = zeros(128,128,length(excelRows));
-% 
-% tLim = [0 2];
-% rLim = [-1 1];
+excelFile = 'Y:\CTREM\WT.xlsx';
+excelRows = 2:15;
+miceCat = 'TremWT';
+
+lagTimeTrial_HbTCalcium_mice = zeros(128,128,length(excelRows));
+lagAmpTrial_HbTCalcium_mice = zeros(128,128,length(excelRows));
+
+tLim = [0 2];
+rLim = [-1 1];
 % 
 miceName = 'TremWT';
-saveDir_cat = 'V:\CTREM\Group level averages';
+saveDir_cat = 'Y:\CTREM\Group level averages';
 mouseInd =1;
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
@@ -189,7 +194,7 @@ save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'-crossLag
     
 
 
-excelFile = 'V:\CTREM\HET.xlsx';
+excelFile = 'Y:\CTREM\HET.xlsx';
 excelRows = 2:7;
 miceCat = 'TremHet';
 
@@ -250,8 +255,8 @@ save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'-crossLag
 
 
 
-excelFile = 'V:\CTREM\KO.xlsx';
-excelRows = 2:8;
+excelFile = 'Y:\CTREM\KO.xlsx';
+excelRows = 2:9;
 miceCat = 'TremKO';
 
 lagTimeTrial_HbTCalcium_mice = zeros(128,128,length(excelRows));
@@ -310,8 +315,8 @@ save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'-crossLag
     'lagAmp_mean_KO','lagAmp_std_KO')
 
 
-
-excelFile = 'V:\CTREM\WTFAD.xlsx';
+% 
+excelFile = 'Y:\CTREM\WTFAD.xlsx';
 excelRows = 2:14;
 miceCat = 'TremWTFAD';
 
@@ -373,7 +378,7 @@ save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'-crossLag
 
 
 
-excelFile = 'V:\CTREM\HETFAD.xlsx';
+excelFile = 'Y:\CTREM\HETFAD.xlsx';
 excelRows = 2:7;
 miceCat = 'TremHetFAD';
 
@@ -433,8 +438,8 @@ save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'-crossLag
     'lagAmp_mean_HetFAD','lagAmp_std_HetFAD')
 
 
-excelFile = 'V:\CTREM\KOFAD.xlsx';
-excelRows = 2:7;
+excelFile = 'Y:\CTREM\KOFAD.xlsx';
+excelRows = 2:10;
 miceCat = 'TremKOFAD';
 
 lagTimeTrial_HbTCalcium_mice = zeros(128,128,length(excelRows));
@@ -501,7 +506,8 @@ save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'-crossLag
 figure
 b = bar(1:6,[lagTime_mean_WT,lagTime_mean_Het,lagTime_mean_KO,lagTime_mean_WTFAD,lagTime_mean_HetFAD,lagTime_mean_KOFAD],0.5);
 hold on
-er = errorbar(1:6,[lagTime_mean_WT,lagTime_mean_Het,lagTime_mean_KO,lagTime_mean_WTFAD,lagTime_mean_HetFAD,lagTime_mean_KOFAD],zeros(1,6),[lagTime_std_WT,lagTime_std_Het,lagTime_std_KO,lagTime_std_WTFAD,lagTime_std_HetFAD,lagTime_std_KOFAD]);
+er = errorbar(1:6,[lagTime_mean_WT,lagTime_mean_Het,lagTime_mean_KO,lagTime_mean_WTFAD,lagTime_mean_HetFAD,lagTime_mean_KOFAD],zeros(1,6),...
+    [lagTime_std_WT,lagTime_std_Het,lagTime_std_KO,lagTime_std_WTFAD,lagTime_std_HetFAD,lagTime_std_KOFAD]);
 er.Color = [0 0 0];
 er.LineStyle = 'none';
 hold off

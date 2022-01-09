@@ -1,6 +1,6 @@
 import mouse.*
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
-excelFile = 'V:\CTREM\WT.xlsx';
+excelFile = 'Y:\CTREM\WT.xlsx';
 excelRows = 2:15;
 miceCat = 'TremWT';
 
@@ -12,7 +12,7 @@ tLim = [0 2];
 rLim = [-1 1];
 % 
 miceName = 'TremWT';
-saveDir_cat = 'V:\CTREM\Group level averages';
+saveDir_cat = 'Y:\CTREM\Group level averages';
 mouseInd =1;
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
@@ -64,7 +64,7 @@ save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'-crossLag
     
 
 
-excelFile = 'V:\CTREM\HET.xlsx';
+excelFile = 'Y:\CTREM\HET.xlsx';
 excelRows = 2:7;
 miceCat = 'TremHet';
 
@@ -126,8 +126,8 @@ save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'-crossLag
 
 
 
-excelFile = 'V:\CTREM\KO.xlsx';
-excelRows = 2:8;
+excelFile = 'Y:\CTREM\KO.xlsx';
+excelRows = 2:9;
 miceCat = 'TremKO';
 
 lagTimeTrial_HbTCalcium_mice = zeros(128,128,length(excelRows));
@@ -188,7 +188,7 @@ save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'-crossLag
 
 
 
-excelFile = 'V:\CTREM\WTFAD.xlsx';
+excelFile = 'Y:\CTREM\WTFAD.xlsx';
 excelRows = 2:14;
 miceCat = 'TremWTFAD';
 
@@ -251,7 +251,7 @@ save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'-crossLag
 
 
 
-excelFile = 'V:\CTREM\HETFAD.xlsx';
+excelFile = 'Y:\CTREM\HETFAD.xlsx';
 excelRows = 2:7;
 miceCat = 'TremHetFAD';
 
@@ -312,8 +312,8 @@ save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'-crossLag
     'lagAmp_mean_HetFAD','lagAmp_std_HetFAD')
 
 
-excelFile = 'V:\CTREM\KOFAD.xlsx';
-excelRows = 2:7;
+excelFile = 'Y:\CTREM\KOFAD.xlsx';
+excelRows = 2:10;
 miceCat = 'TremKOFAD';
 
 lagTimeTrial_HbTCalcium_mice = zeros(128,128,length(excelRows));
@@ -381,13 +381,14 @@ save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'-crossLag
 figure
 b = bar(1:6,[lagTime_mean_WT,lagTime_mean_Het,lagTime_mean_KO,lagTime_mean_WTFAD,lagTime_mean_HetFAD,lagTime_mean_KOFAD],0.5);
 hold on
-er = errorbar(1:6,[lagTime_mean_WT,lagTime_mean_Het,lagTime_mean_KO,lagTime_mean_WTFAD,lagTime_mean_HetFAD,lagTime_mean_KOFAD],zeros(1,6),[lagTime_std_WT,lagTime_std_Het,lagTime_std_KO,lagTime_std_WTFAD,lagTime_std_HetFAD,lagTime_std_KOFAD]);
+er = errorbar(1:6,[lagTime_std_WT,lagTime_std_Het,lagTime_std_KO,lagTime_std_WTFAD,lagTime_std_HetFAD,lagTime_std_KOFAD],zeros(1,6),[lagTime_std_WT,lagTime_std_Het,lagTime_std_KO,lagTime_std_WTFAD,lagTime_std_HetFAD,lagTime_std_KOFAD]);
 er.Color = [0 0 0];
 er.LineStyle = 'none';
 hold off
 xticklabels({'Trem WT','Trem Het','Trem KO','TremWT FAD', 'TremHet FAD', 'TremKO FAD'})
 ylabel('Lag Time(s)')
 title('Colonna Project')
+
 
 [h_WT_Het,p_WT_Het] = ttest2(lagTimeTrial_HbTCalcium_mice_mean_WT,lagTimeTrial_HbTCalcium_mice_mean_Het,0.05, 'both', 'unequal');
 [h_WT_KO,p_WT_KO] = ttest2(lagTimeTrial_HbTCalcium_mice_mean_WT,lagTimeTrial_HbTCalcium_mice_mean_KO,0.05, 'both', 'unequal');

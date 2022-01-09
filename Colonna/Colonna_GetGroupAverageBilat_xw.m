@@ -1,5 +1,5 @@
-excelFile='V:\CTREM\CTREM.xlsx';
-excelRows=[2:11,17:22,27:63];  % Rows from Excell Database
+excelFile='Y:\CTREM\CTREM_new.xlsx';
+excelRows=[2:11,17:22,27:66];  % Rows from Excell Database
 % % % for ii = [2:11,17:22,27:63]
 % % %     exampleBilateralFCAnalysis(excelFileName,ii,[0.009 0.08])
 % % %     exampleBilateralFCAnalysis(excelFileName,ii,[0.4 4])
@@ -60,18 +60,21 @@ d=0;
 e=0;
 f=0;
 
+
 for n=excelRows;
     
     [~, ~, raw]=xlsread(excelFile,1, ['A',num2str(n),':K',num2str(n)]);
     Date=num2str(raw{1});
     Mouse=raw{2};
     Group=raw{8};
-    directory=['V:\CTREM\Mouse level averages\'];
+    directory=['Y:\CTREM\Mouse level averages\'];
     cd(directory)
     
     disp(['Loading ', Mouse, ' n= ' , num2str(n)])
     file=['CTREM-bilateralFC-rows',num2str(n),'~',num2str(n),'-0p009-0p08.mat'];
-    
+    if ~exist(file,'file')
+        file=['CTREM_new-bilateralFC-rows',num2str(n),'~',num2str(n),'-0p009-0p08.mat'];
+    end
     load(file);
     
    for ii = 1:4
@@ -123,12 +126,14 @@ for n=excelRows;
     Date=num2str(raw{1});
     Mouse=raw{2};
     Group=raw{8};
-    directory=['V:\CTREM\Mouse level averages\'];
+    directory=['Y:\CTREM\Mouse level averages\'];
     cd(directory)
     
     disp(['Loading ', Mouse, ' n= ' , num2str(n)])
     file=['CTREM-bilateralFC-rows',num2str(n),'~',num2str(n),'-0p4-4.mat'];
-    
+    if ~exist(file,'file')
+        file=['CTREM_new-bilateralFC-rows',num2str(n),'~',num2str(n),'-0p4-4.mat'];
+    end
     load(file);
     
     for ii = 1:4

@@ -20,26 +20,35 @@ Hb_filter = mouse.freq.filterData(double(xform_datahb),0.02,2,25);
 FAD_filter = mouse.freq.filterData(double(squeeze(xform_FADCorr)),0.02,2,25);
 Calcium_filter = mouse.freq.filterData(double(squeeze(xform_jrgeco1aCorr)),0.02,2,25);
 HbT_filter = Hb_filter(:,:,1,:) + Hb_filter(:,:,2,:);
-Calcium = normRow(transpose(squeeze(mean(mean(Calcium_filter(71:75,17:21,:)*100,1),2))));
-FAD = normRow(transpose(squeeze(mean(mean(FAD_filter(71:75,17:21,:)*100,1),2))));
-HbT = normRow(transpose(squeeze(mean(mean(HbT_filter(71:75,17:21,:)*10^6,1),2))));
+% Calcium = normRow(transpose(squeeze(mean(mean(Calcium_filter(71:75,17:21,:)*100,1),2))));
+% FAD = normRow(transpose(squeeze(mean(mean(FAD_filter(71:75,17:21,:)*100,1),2))));
+% HbT = normRow(transpose(squeeze(mean(mean(HbT_filter(71:75,17:21,:)*10^6,1),2))));
+Calcium = transpose(squeeze(mean(mean(Calcium_filter(71:75,17:21,:)*100,1),2)));
+FAD = transpose(squeeze(mean(mean(FAD_filter(71:75,17:21,:)*100,1),2)));
+HbT = transpose(squeeze(mean(mean(HbT_filter(71:75,17:21,:)*10^6,1),2)));
 figure
-time = (1:1+60*25)/25
-h(1) = plot(time,Calcium(3769:3769+60*25),'m-')
+time = (1:1+60*25)/25;
+h(1) = plot(time,Calcium(3769+251:3769+251+60*25),'m-');
 hold on
-h(2) = plot(time,FAD(3769:3769+60*25),'g-')
+h(2) = plot(time,FAD(3769+251:3769+251+60*25)*4,'g-');
 hold on
+ylabel('Fluorescence(\DeltaF/F%)')
 %ylim([-2.5 2.5])
-h(3) = plot(time,HbT(3769:3769+60*25),'k-')
+yyaxis right
+h(3) = plot(time,HbT(3769+251:3769+251+60*25),'k-');
+ylabel('Hb(\Delta\muM)') 
 xlabel('time(s)')
 set(findall(gca, 'Type', 'Line'),'LineWidth',2);
 set(gca,'FontSize',20,'FontWeight','Bold')
-xlim([0,60])
-ylim([-0.025 0.045])
+xlim([0,30])
+ylim([-5 10])
+% ylim([-0.025 0.045])
 ROI = zeros(128,128);
 ROI(71:75,17:21) =1;
+yyaxis left
+ylim([-5 10])
 patch([13.64,13.64+90/25,13.64+90/25,13.64],[-5 -5 10 10],[0.5 0.5 0.5],'EdgeColor','none','FaceAlpha',0.5)
-legend(h,{'Corrected jRGECO1a','Corrected FAD','HbT'},'location','northwest','FontSize',14,'FontWeight','Bold')
+legend(h,{'Corrected jRGECO1a','Corrected FADx4','HbT'},'location','northwest','FontSize',14,'FontWeight','Bold')
 % 
 % 
 

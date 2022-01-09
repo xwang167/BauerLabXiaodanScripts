@@ -58,6 +58,19 @@ for excelRow = excelRows
         HbT_filter = Hb_filter(:,:,1,:) + Hb_filter(:,:,2,:);
         HbT_filter = squeeze(HbT_filter);
         t = (0:750)./25;
+        
+       Calcium_filter = reshape(Calcium_filter,128*128,[]);
+       HbT_filter = reshape(HbT_filter,128*128,[]);
+       Calcium_filter = normRow(Calcium_filter);
+       HbT_filter = normRow(HbT_filter);
+       Calcium_filter = reshape(Calcium_filter,128,128,[]);
+       HbT_filter = reshape(HbT_filter,128,128,[]);
+
+        
+        [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_CalciumHbT_Mask_noNorm(Calcium_filter,HbT_filter,t,mask);
+        
+        
+        
         [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_CalciumHbT_Mask_noNorm(Calcium_filter*100,HbT_filter*10^6,t,mask);
         save(fullfile(saveDir,processedName),'T','W','A','r','r2','hemoPred','-append')
         figure

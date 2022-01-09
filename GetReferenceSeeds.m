@@ -26,7 +26,7 @@ function [refseeds, I]=GetReferenceSeeds
 % ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 % POSSIBILITY OF SUCH DAMAGE.
 
-[Seeds, L]=Seeds_PaxinosSpace;  % Normal 16 seed map
+[Seeds, L]=Seeds_PaxinosSpace_new;  % Normal 16 seed map
 
 F=fieldnames(Seeds);
 numf=numel(F);
