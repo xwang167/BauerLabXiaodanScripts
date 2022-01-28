@@ -1,6 +1,6 @@
 import mouse.*
-excelFile='V:\CTREM\CTREM.xlsx';
-excelRows=[2:11,17:22,27:63];
+excelFile='V:\CTREM\CTREM_new.xlsx';
+excelRows=[2:11,17:22,27:66];
 
 a=0;
 b=0;

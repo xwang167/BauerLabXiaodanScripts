@@ -1,4 +1,5 @@
-load('L:\RGECO\190707\190707-R5M2286-anes-fc1_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
+%load('L:\RGECO\190707\190707-R5M2286-anes-fc1_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
+load('L:\RGECO\190627\190627-R5M2286-fc1_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
 load('D:\OIS_Process\noVasculatureMask.mat');
 WB = 255*ones(128,128,3);
 mask = leftMask+rightMask;
@@ -16,9 +17,9 @@ Hb_filter = double(xform_datahb);
 FAD_filter = double(squeeze(xform_FADCorr));
 Calcium_filter = double(squeeze(xform_jrgeco1aCorr));
 
-% Hb_filter = mouse.freq.filterData(double(xform_datahb),0.02,2,25);
-% FAD_filter = mouse.freq.filterData(double(squeeze(xform_FADCorr)),0.02,2,25);
-% Calcium_filter = mouse.freq.filterData(double(squeeze(xform_jrgeco1aCorr)),0.02,2,25);
+Hb_filter = mouse.freq.filterData(double(xform_datahb),0.02,2,25);
+FAD_filter = mouse.freq.filterData(double(squeeze(xform_FADCorr)),0.02,2,25);
+Calcium_filter = mouse.freq.filterData(double(squeeze(xform_jrgeco1aCorr)),0.02,2,25);
 HbT_filter = Hb_filter(:,:,1,:) + Hb_filter(:,:,2,:);
 Calcium = squeeze(mean(mean(Calcium_filter(71:75,17:21,:),1),2))*100;
 FAD = squeeze(mean(mean(FAD_filter(71:75,17:21,:),1),2))*100;

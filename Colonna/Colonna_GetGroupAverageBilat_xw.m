@@ -113,63 +113,63 @@ for n=excelRows;
 end
 
 
-a=0;
-b=0;
-c=0;
-d=0;
-e=0;
-f=0;
-
-for n=excelRows;
-    
-    [~, ~, raw]=xlsread(excelFile,1, ['A',num2str(n),':K',num2str(n)]);
-    Date=num2str(raw{1});
-    Mouse=raw{2};
-    Group=raw{8};
-    directory=['Y:\CTREM\Mouse level averages\'];
-    cd(directory)
-    
-    disp(['Loading ', Mouse, ' n= ' , num2str(n)])
-    file=['CTREM-bilateralFC-rows',num2str(n),'~',num2str(n),'-0p4-4.mat'];
-    if ~exist(file,'file')
-        file=['CTREM_new-bilateralFC-rows',num2str(n),'~',num2str(n),'-0p4-4.mat'];
-    end
-    load(file);
-    
-    for ii = 1:4
-    tempDeltafc(:,:,ii) = atanh(cell2mat(bilatFCMapCat(1,ii))).*mask;
-    end
-        
-    if strcmp(Group,'GP5.5(+)Trem2(WT)')
-        a=a+1;
-        TremWT_Delta_Bilat(:,:,:,a)=tempDeltafc;
-        
-    elseif strcmp(Group,'GP5.5(+)Trem2(het)')
-        b=b+1;
-        TremHet_Delta_Bilat(:,:,:,b)=tempDeltafc;
-        
-    elseif strcmp(Group,'GP5.5(+)Trem2(KO)')
-        c=c+1;
-        TremKO_Delta_Bilat(:,:,:,c)=tempDeltafc;
-        
-    elseif strcmp(Group,'GP5.5(+)Trem2(WT)5xFAD')
-        d=d+1;
-        TremWT5XFAD_Delta_Bilat(:,:,:,d)=tempDeltafc;
-        
-    elseif strcmp(Group,'GP5.5(+)Trem2(het)5xFAD')
-        e=e+1;
-        TremHet5XFAD_Delta_Bilat(:,:,:,e)=tempDeltafc;
-        
-    elseif strcmp(Group,'GP5.5(+)Trem2(KO)5xFAD')
-        f=f+1;
-        TremKO5XFAD_Delta_Bilat(:,:,:,f)=tempDeltafc;
-        
-    end
-    clear bilatFCMapCat
-    clear tempISAR tempISAfc tempDeltaR tempDeltafc
-    
-end
-
+% a=0;
+% b=0;
+% c=0;
+% d=0;
+% e=0;
+% f=0;
+% 
+% for n=excelRows;
+%     
+%     [~, ~, raw]=xlsread(excelFile,1, ['A',num2str(n),':K',num2str(n)]);
+%     Date=num2str(raw{1});
+%     Mouse=raw{2};
+%     Group=raw{8};
+%     directory=['Y:\CTREM\Mouse level averages\'];
+%     cd(directory)
+%     
+%     disp(['Loading ', Mouse, ' n= ' , num2str(n)])
+%     file=['CTREM-bilateralFC-rows',num2str(n),'~',num2str(n),'-0p4-4.mat'];
+%     if ~exist(file,'file')
+%         file=['CTREM_new-bilateralFC-rows',num2str(n),'~',num2str(n),'-0p4-4.mat'];
+%     end
+%     load(file);
+%     
+%     for ii = 1:4
+%     tempDeltafc(:,:,ii) = atanh(cell2mat(bilatFCMapCat(1,ii))).*mask;
+%     end
+%         
+%     if strcmp(Group,'GP5.5(+)Trem2(WT)')
+%         a=a+1;
+%         TremWT_Delta_Bilat(:,:,:,a)=tempDeltafc;
+%         
+%     elseif strcmp(Group,'GP5.5(+)Trem2(het)')
+%         b=b+1;
+%         TremHet_Delta_Bilat(:,:,:,b)=tempDeltafc;
+%         
+%     elseif strcmp(Group,'GP5.5(+)Trem2(KO)')
+%         c=c+1;
+%         TremKO_Delta_Bilat(:,:,:,c)=tempDeltafc;
+%         
+%     elseif strcmp(Group,'GP5.5(+)Trem2(WT)5xFAD')
+%         d=d+1;
+%         TremWT5XFAD_Delta_Bilat(:,:,:,d)=tempDeltafc;
+%         
+%     elseif strcmp(Group,'GP5.5(+)Trem2(het)5xFAD')
+%         e=e+1;
+%         TremHet5XFAD_Delta_Bilat(:,:,:,e)=tempDeltafc;
+%         
+%     elseif strcmp(Group,'GP5.5(+)Trem2(KO)5xFAD')
+%         f=f+1;
+%         TremKO5XFAD_Delta_Bilat(:,:,:,f)=tempDeltafc;
+%         
+%     end
+%     clear bilatFCMapCat
+%     clear tempISAR tempISAfc tempDeltaR tempDeltafc
+%     
+% end
+% 
 Names=whos;
 for n=1:size(Names,1)
     if numel(Names(n).size)==4

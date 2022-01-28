@@ -1,6 +1,5 @@
 database='Y:\CTREM\CTREM_new.xlsx';
-excelfiles=[2:27];  % Rows from Excell Database
-
+excelfiles=[2:11,17:22,27:66];   % Rows from Excell Database
 isbrainall=ones(128);
 
 for n=excelfiles;

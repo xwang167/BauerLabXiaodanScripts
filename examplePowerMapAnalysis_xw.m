@@ -105,11 +105,11 @@ for runInfo = runsInfo
         for jj = 1:length(runInfo.Contrasts)
             subplot(1,length(runInfo.Contrasts),jj)
             if jj <4
-                powerLim = [-12.5 -10.5];
+                powerLim = [0 8];
             else
-                powerLim = [-5.5 -3.5];
+                powerLim = [0 0.8];
             end
-            imagesc(log10(powerMap(:,:,2,jj)),powerLim)
+            imagesc(powerMap(:,:,2,jj),powerLim)
             cb = colorbar();
             axis(gca,'square');
             set(gca,'Visible','off');
@@ -118,9 +118,9 @@ for runInfo = runsInfo
             set(titleObj,'Visible','on');
             % different label for gcamp6
             if jj >3
-                ylabelObj = ylabel(cb,'log_1_0 ((\DeltaF/F%)^2)','FontSize',13);
+                ylabelObj = ylabel(cb,'(\DeltaF/F%)^2','FontSize',13);
             else
-                ylabelObj = ylabel(cb,'log_1_0 (\muM^2)','FontSize',13);
+                ylabelObj = ylabel(cb,'\muM^2','FontSize',13);
             end
             set(ylabelObj,'Visible','on');
         end
@@ -135,11 +135,11 @@ for runInfo = runsInfo
         for jj = 1:length(runInfo.Contrasts)
             subplot(1,length(runInfo.Contrasts),jj)
             if jj <4
-                powerLim = [-13.5 -11.5];
+                powerLim = [0 0.6];
             else
-                powerLim = [-7 -5];
+                powerLim = [0 0.05];
             end
-            imagesc(log10(powerMap(:,:,3,jj)),powerLim)
+            imagesc(powerMap(:,:,3,jj),powerLim)
             cb = colorbar();
             axis(gca,'square');
             set(gca,'Visible','off');
@@ -148,9 +148,9 @@ for runInfo = runsInfo
             set(titleObj,'Visible','on');
             % different label for gcamp6
             if jj >3
-                ylabelObj = ylabel(cb,'log10 ((\DeltaF/F)^2)','FontSize',13);
+                ylabelObj = ylabel(cb,'(\DeltaF/F%)^2','FontSize',13);
             else
-                ylabelObj = ylabel(cb,'log10 (M^2)','FontSize',13);
+                ylabelObj = ylabel(cb,'\muM^2','FontSize',13);
             end
             set(ylabelObj,'Visible','on');
         end

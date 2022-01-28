@@ -6,7 +6,7 @@ excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBa
 
 % 
 % % 
-excelRows = [195 202 204 230 234 240]%[181,183,185,228,232,236];%321:327;
+% excelRows = [195 202 204 230 234 240]%[181,183,185,228,232,236];%321:327;
 
 runs = 1:3;
 
@@ -108,6 +108,249 @@ load('D:\OIS_Process\noVasculaturemask.mat')
 
 excelRows =[181,183,185,228,232,236];%[195 202 204 230 234 240]; [195 202 204 181 183 185];
 miceCat = 'Awake RGECO';
+
+runs = 1:3;
+
+load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
+load('D:\OIS_Process\noVasculaturemask.mat')
+
+lagTimeTrial_HbTCalcium_mice_mean = zeros(128,128,length(excelRows));
+lagAmpTrial_HbTCalcium_mice_mean = zeros(128,128,length(excelRows));
+lagTimeTrial_FADCalcium_mice_mean = zeros(128,128,length(excelRows));
+lagAmpTrial_FADCalcium_mice_mean = zeros(128,128,length(excelRows));
+lagTimeTrial_HbTFAD_mice_mean = zeros(128,128,length(excelRows));
+lagAmpTrial_HbTFAD_mice_mean = zeros(128,128,length(excelRows));
+
+lagTimeTrial_HbTCalcium_mice_median = zeros(128,128,length(excelRows));
+lagAmpTrial_HbTCalcium_mice_median = zeros(128,128,length(excelRows));
+lagTimeTrial_FADCalcium_mice_median = zeros(128,128,length(excelRows));
+lagAmpTrial_FADCalcium_mice_median = zeros(128,128,length(excelRows));
+lagTimeTrial_HbTFAD_mice_median = zeros(128,128,length(excelRows));
+lagAmpTrial_HbTFAD_mice_median = zeros(128,128,length(excelRows));
+
+
+
+lagParaStrs = ["lagTime","lagAmp"];
+traceStrs = ["total","Calcium","FAD"];
+bandStrs = ["ISA","Delta"];
+avgWayStrs = ["mean","median"];
+lagSpeciesStrs = ["HbTCalcium","FADCalcium","HbTFAD"];
+
+tLim = [0 1.5];
+rLim = [-1 1];
+
+
+
+miceName = [];
+saveDir_cat = 'L:\RGECO\cat';
+mouseInd =1;
+for excelRow = excelRows
+    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+    recDate = excelRaw{1}; recDate = string(recDate);
+    mouseName = excelRaw{2}; mouseName = string(mouseName);
+    miceName = char(strcat(miceName, '-', mouseName));
+    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+    sessionInfo.darkFrameNum = excelRaw{15};
+    sessionInfo.mouseType = excelRaw{17};
+    systemType =excelRaw{5};
+    mask_newDir_new = saveDir;
+    sessionInfo.framerate = excelRaw{7};
+    systemInfo.numLEDs = 4;
+    mask_newName_new = strcat(recDate,'-',mouseName,'-Landmarksandmask_new','.mat');
+    fs = excelRaw{7};
+    %mask_newName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datahb','.mat');
+    %load(fullfile(mask_newDir,mask_newName), 'xform_isbrain')
+    %save(fullfile(mask_newDir_new,mask_newName_new),'xform_isbrain')
+    lagTimeTrial_HbTCalcium_mouse = zeros(128,128,length(runs));
+    lagAmpTrial_HbTCalcium_mouse = zeros(128,128,length(runs));
+    lagTimeTrial_FADCalcium_mouse = zeros(128,128,length(runs));
+    lagAmpTrial_FADCalcium_mouse = zeros(128,128,length(runs));
+    processedName_mouse = strcat(recDate,'-',mouseName,'-',sessionType,'_processed.mat');
+
+    for n = runs
+        visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
+        processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
+        disp('loading processed data')
+        
+        if strcmp(sessionType,'fc')
+            
+            
+            if strcmp(sessionInfo.mouseType,'jrgeco1a')
+                
+                
+                for ii = 1:2
+                    for jj = 1:3
+                        eval(strcat('load(fullfile(saveDir, processedName), ',char(39),lagParaStrs(ii),'Trial_',lagSpeciesStrs(jj),char(39),')'));
+                        eval(strcat(lagParaStrs(ii),'Trial_',lagSpeciesStrs(jj),'_mouse(:,:,n)','= ',lagParaStrs(ii),'Trial_',lagSpeciesStrs(jj),';'));
+                        
+                    end
+                end
+                
+                
+                               
+                
+                
+            end
+            close all
+        end
+    end
+    
+    
+    lagTimeTrial_HbTCalcium_mouse_mean = nanmean(lagTimeTrial_HbTCalcium_mouse,3);
+    lagAmpTrial_HbTCalcium_mouse_mean = nanmean(lagAmpTrial_HbTCalcium_mouse,3);
+    lagTimeTrial_FADCalcium_mouse_mean = nanmean(lagTimeTrial_FADCalcium_mouse,3);
+    lagAmpTrial_FADCalcium_mouse_mean = nanmean(lagAmpTrial_FADCalcium_mouse,3);
+    lagTimeTrial_HbTFAD_mouse_mean = nanmean(lagTimeTrial_HbTFAD_mouse,3);
+    lagAmpTrial_HbTFAD_mouse_mean = nanmean(lagAmpTrial_HbTFAD_mouse,3);
+    
+    lagTimeTrial_HbTCalcium_mouse_median = nanmedian(lagTimeTrial_HbTCalcium_mouse,3);
+    lagAmpTrial_HbTCalcium_mouse_median = nanmedian(lagAmpTrial_HbTCalcium_mouse,3);
+    lagTimeTrial_FADCalcium_mouse_median = nanmedian(lagTimeTrial_FADCalcium_mouse,3);
+    lagAmpTrial_FADCalcium_mouse_median = nanmedian(lagAmpTrial_FADCalcium_mouse,3);
+       lagTimeTrial_HbTFAD_mouse_median = nanmedian(lagTimeTrial_HbTFAD_mouse,3);
+    lagAmpTrial_HbTFAD_mouse_median = nanmedian(lagAmpTrial_HbTFAD_mouse,3);
+    
+    
+    
+    figure;
+    colormap jet;
+    subplot(2,3,1); imagesc(lagTimeTrial_HbTCalcium_mouse_mean,tLim); axis image off;h = colorbar;ylabel(h,'t(s)');title('Calcium HbT');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+    subplot(2,3,2); imagesc(lagTimeTrial_FADCalcium_mouse_mean,[0 0.3]);axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+    subplot(2,3,3); imagesc(lagTimeTrial_HbTFAD_mouse_mean,[0 1.5]); axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD HbT');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+
+    subplot(2,3,4); imagesc(lagAmpTrial_HbTCalcium_mouse_mean,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+    subplot(2,3,5); imagesc(lagAmpTrial_FADCalcium_mouse_mean,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+    subplot(2,3,6); imagesc(lagAmpTrial_HbTFAD_mouse_mean,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+    suptitle(strcat(recDate,'-',mouseName,'-',sessionType,'-mean'))
+    saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_Lag_mean.png')));
+    saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_Lag_mean.fig')));
+    
+    figure;
+    colormap jet;
+    subplot(2,3,1); imagesc(lagTimeTrial_HbTCalcium_mouse_median,tLim); axis image off;h = colorbar;ylabel(h,'t(s)');title('Calcium HbT');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+    subplot(2,3,2); imagesc(lagTimeTrial_FADCalcium_mouse_median,[0 0.3]);axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+      subplot(2,3,3); imagesc(lagTimeTrial_HbTFAD_mouse_median,[0 1.5]); axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD HbT');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+
+    subplot(2,3,4); imagesc(lagAmpTrial_HbTCalcium_mouse_median,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+    subplot(2,3,5); imagesc(lagAmpTrial_FADCalcium_mouse_median,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+    subplot(2,3,6); imagesc(lagAmpTrial_HbTFAD_mouse_median,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+        
+    suptitle(strcat(recDate,'-',mouseName,'-',sessionType,'-median'))
+    saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_Lag_median.png')));
+    saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_Lag_median.fig')));
+    
+    save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_processed.mat')),...
+        'lagTimeTrial_HbTCalcium_mouse_mean', 'lagAmpTrial_HbTCalcium_mouse_mean','lagTimeTrial_FADCalcium_mouse_mean', 'lagAmpTrial_FADCalcium_mouse_mean','lagTimeTrial_HbTFAD_mouse_mean', 'lagAmpTrial_HbTFAD_mouse_mean',...
+        'lagTimeTrial_HbTCalcium_mouse_median', 'lagAmpTrial_HbTCalcium_mouse_median','lagTimeTrial_FADCalcium_mouse_median', 'lagAmpTrial_FADCalcium_mouse_median','lagTimeTrial_HbTFAD_mouse_median', 'lagAmpTrial_HbTFAD_mouse_median',...
+        '-append');
+    
+
+    
+    lagTimeTrial_HbTCalcium_mice_mean(:,:,mouseInd) = lagTimeTrial_HbTCalcium_mouse_mean;
+    lagAmpTrial_HbTCalcium_mice_mean(:,:,mouseInd) = lagAmpTrial_HbTCalcium_mouse_mean;
+    lagTimeTrial_FADCalcium_mice_mean(:,:,mouseInd) = lagTimeTrial_FADCalcium_mouse_mean;
+    lagAmpTrial_FADCalcium_mice_mean(:,:,mouseInd) = lagAmpTrial_FADCalcium_mouse_mean;
+        lagTimeTrial_HbTFAD_mice_mean(:,:,mouseInd) = lagTimeTrial_HbTFAD_mouse_mean;
+    lagAmpTrial_HbTFAD_mice_mean(:,:,mouseInd) = lagAmpTrial_HbTFAD_mouse_mean;
+    
+    
+    lagTimeTrial_HbTCalcium_mice_median(:,:,mouseInd) = lagTimeTrial_HbTCalcium_mouse_median;
+    lagAmpTrial_HbTCalcium_mice_median(:,:,mouseInd) = lagAmpTrial_HbTCalcium_mouse_median;
+    lagTimeTrial_FADCalcium_mice_median(:,:,mouseInd) = lagTimeTrial_FADCalcium_mouse_median;
+    lagAmpTrial_FADCalcium_mice_median(:,:,mouseInd) = lagAmpTrial_FADCalcium_mouse_median;
+        lagTimeTrial_HbTFAD_mice_median(:,:,mouseInd) = lagTimeTrial_HbTFAD_mouse_median;
+    lagAmpTrial_HbTFAD_mice_median(:,:,mouseInd) = lagAmpTrial_HbTFAD_mouse_median;
+    
+    for ii = 1:2
+        for jj = 1:3
+            for kk = 1:2
+                %eval(strcat('load(fullfile(saveDir, processedName), ',char(39),lagParaStrs(ii),'Trial_',lagSpeciesStrs(jj),'_mouse_',avgWayStrs(kk),char(39),')'));
+                eval(strcat(lagParaStrs(ii),'Trial_',lagSpeciesStrs(jj),'_mice_',avgWayStrs(kk),'(:,:,mouseInd)','= ',lagParaStrs(ii),'Trial_',lagSpeciesStrs(jj),'_mouse_',avgWayStrs(kk),';'));
+            end
+            
+        end
+    end
+    
+    
+
+    
+    
+    
+    mouseInd = mouseInd+1;
+end
+
+processedName_mice = strcat(recDate,'-',miceName,'-',sessionType,'_processed.mat');
+
+lagTimeTrial_HbTCalcium_mice_mean = nanmean(lagTimeTrial_HbTCalcium_mice_mean,3);
+lagAmpTrial_HbTCalcium_mice_mean = nanmean(lagAmpTrial_HbTCalcium_mice_mean,3);
+lagTimeTrial_FADCalcium_mice_mean = nanmean(lagTimeTrial_FADCalcium_mice_mean,3);
+lagAmpTrial_FADCalcium_mice_mean= nanmean(lagAmpTrial_FADCalcium_mice_mean,3);
+lagTimeTrial_HbTFAD_mice_mean = nanmean(lagTimeTrial_HbTFAD_mice_mean,3);
+lagAmpTrial_HbTFAD_mice_mean = nanmean(lagAmpTrial_HbTFAD_mice_mean,3);
+
+lagTimeTrial_HbTCalcium_mice_median = nanmedian(lagTimeTrial_HbTCalcium_mice_median,3);
+lagAmpTrial_HbTCalcium_mice_median = nanmedian(lagAmpTrial_HbTCalcium_mice_median,3);
+lagTimeTrial_FADCalcium_mice_median = nanmedian(lagTimeTrial_FADCalcium_mice_median,3);
+lagAmpTrial_FADCalcium_mice_median= nanmedian(lagAmpTrial_FADCalcium_mice_median,3);
+lagTimeTrial_HbTFAD_mice_median = nanmedian(lagTimeTrial_HbTFAD_mice_median,3);
+lagAmpTrial_HbTFAD_mice_median = nanmedian(lagAmpTrial_HbTFAD_mice_median,3);
+
+
+figure;
+colormap jet;
+subplot(2,3,1); imagesc(lagTimeTrial_HbTCalcium_mice_mean,tLim); axis image off;h = colorbar;ylabel(h,'t(s)');title('Calcium HbT');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+subplot(2,3,2); imagesc(lagTimeTrial_FADCalcium_mice_mean,[0 0.3]);axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+subplot(2,3,3); imagesc(lagTimeTrial_HbTFAD_mice_mean,[0 1.5]); axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD HbT');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+
+subplot(2,3,4); imagesc(lagAmpTrial_HbTCalcium_mice_mean,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+subplot(2,3,5); imagesc(lagAmpTrial_FADCalcium_mice_mean,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+subplot(2,3,6); imagesc(lagAmpTrial_HbTFAD_mice_mean,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+
+suptitle(strcat(recDate,'-',miceCat,'-',sessionType,'-mean','0.02-2Hz'))
+saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_Lag_mean.png')));
+saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_Lag_mean.fig')));
+
+figure;
+colormap jet;
+subplot(2,3,1); imagesc(lagTimeTrial_HbTCalcium_mice_median,tLim); axis image off;h = colorbar;ylabel(h,'t(s)');title('Calcium HbT');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+subplot(2,3,2); imagesc(lagTimeTrial_FADCalcium_mice_median,[0 0.3]);axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD Calcium');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+subplot(2,3,3); imagesc(lagTimeTrial_HbTFAD_mice_median,[0 1.5]); axis image off;h = colorbar;ylabel(h,'t(s)');title('FAD HbT');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+
+subplot(2,3,4); imagesc(lagAmpTrial_HbTCalcium_mice_median,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+subplot(2,3,5); imagesc(lagAmpTrial_FADCalcium_mice_median,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+subplot(2,3,6); imagesc(lagAmpTrial_HbTFAD_mice_median,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask_new);set(gca,'FontSize',14,'FontWeight','Bold')
+suptitle(strcat(recDate,'-',miceCat,'-',sessionType,'-median',' 0.02-2Hz'))
+saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_Lag_median.png')));
+saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_Lag_median.fig')));
+
+
+save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_processed.mat')),...
+    'lagTimeTrial_HbTCalcium_mice_mean', 'lagAmpTrial_HbTCalcium_mice_mean','lagTimeTrial_FADCalcium_mice_mean', 'lagAmpTrial_FADCalcium_mice_mean','lagTimeTrial_HbTFAD_mice_mean', 'lagAmpTrial_HbTFAD_mice_mean',...
+    'lagTimeTrial_HbTCalcium_mice_median', 'lagAmpTrial_HbTCalcium_mice_median','lagTimeTrial_FADCalcium_mice_median', 'lagAmpTrial_FADCalcium_mice_median', 'lagTimeTrial_HbTFAD_mice_median', 'lagAmpTrial_HbTFAD_mice_median',...
+    '-append');
+
+
+
+lagTime_HbTCalcium = nanmean(lagTimeTrial_HbTCalcium_mice_median(logical(mask_new)));
+lagTime_HbTFAD = nanmean(lagTimeTrial_HbTFAD_mice_median(logical(mask_new)));
+lagTime_FADCalcium = nanmean(lagTimeTrial_FADCalcium_mice_median(logical(mask_new)));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+excelRows = [195 202 204 230 234 240];% [195 202 204 181 183 185];
+miceCat = 'Anes RGECO';
 
 runs = 1:3;
 

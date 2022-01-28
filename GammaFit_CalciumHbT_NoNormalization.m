@@ -7,7 +7,7 @@ excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBa
 % excelRows = [181,183,185,228,232,236,202,195,204,230,234,240]; % excelRows_awake = [181 183 185 228  232  236 ]; excelRows_anes = [ 202 195 204 230 234 240];
 % 
 % runs = 1:3;%
-excelRows = 181;
+excelRows = 183;
 runs = 3;
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
 load('D:\OIS_Process\noVasculatureMask.mat')
@@ -44,6 +44,7 @@ for excelRow = excelRows
     end
     mask = logical(mask_new.*xform_isbrain);
     for n = runs
+      tic
         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
         load(fullfile(saveDir,processedName),'xform_datahb','xform_jrgeco1aCorr')
@@ -59,20 +60,23 @@ for excelRow = excelRows
         HbT_filter = squeeze(HbT_filter);
         t = (0:750)./25;
         
-       Calcium_filter = reshape(Calcium_filter,128*128,[]);
-       HbT_filter = reshape(HbT_filter,128*128,[]);
-       Calcium_filter = normRow(Calcium_filter);
-       HbT_filter = normRow(HbT_filter);
-       Calcium_filter = reshape(Calcium_filter,128,128,[]);
-       HbT_filter = reshape(HbT_filter,128,128,[]);
+%        Calcium_filter = reshape(Calcium_filter,128*128,[]);
+%        HbT_filter = reshape(HbT_filter,128*128,[]);
+%        Calcium_filter = normRow(Calcium_filter);
+%        HbT_filter = normRow(HbT_filter);
+%        Calcium_filter = reshape(Calcium_filter,128,128,[]);
+%        HbT_filter = reshape(HbT_filter,128,128,[]);
 
-        
-        [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_CalciumHbT_Mask_noNorm(Calcium_filter,HbT_filter,t,mask);
-        
-        
-        
-        [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_CalciumHbT_Mask_noNorm(Calcium_filter*100,HbT_filter*10^6,t,mask);
-        save(fullfile(saveDir,processedName),'T','W','A','r','r2','hemoPred','-append')
+%        
+% tic
+%         [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_CalciumHbT_Mask(Calcium_filter,HbT_filter,t,mask);
+%         toc
+%         
+%         
+        tic 
+        [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_CalciumHbT_Mask(Calcium_filter*100,HbT_filter*10^6,t,mask);
+        toc
+%         save(fullfile(saveDir,processedName),'T','W','A','r','r2','hemoPred','-append')
         figure
         subplot(2,3,1)
         imagesc(T,[0,2])
@@ -95,7 +99,7 @@ for excelRow = excelRows
         set(gca,'FontSize',14,'FontWeight','Bold')
 
         subplot(2,3,3)
-        imagesc(A,[0 5])
+        imagesc(A,[0 0.07])
         colorbar
         axis image off
         colormap jet
@@ -123,9 +127,10 @@ for excelRow = excelRows
         hold on;
         imagesc(xform_WL,'AlphaData',1-mask);
         set(gca,'FontSize',14,'FontWeight','Bold')
-
-        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_GammaFit.png')));
-        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_GammaFit.fig')));
+        suptitle('Normalized')
+toc
+%         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_GammaFit.png')));
+%         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_GammaFit.fig')));
 
     end
 end

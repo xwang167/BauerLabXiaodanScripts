@@ -4,254 +4,254 @@
 clear all;close all;clc
 import mouse.*
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
-excelRows = 321:327; % excelRows_awake = [181 183 185 228  232  236 ]; excelRows_anes = [ 202 195 204 230 234 240];
-runs = 4:9;%
+% excelRows = 321:327; % excelRows_awake = [181 183 185 228  232  236 ]; excelRows_anes = [ 202 195 204 230 234 240];
+% runs = 4:9;%
 
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
 load('D:\OIS_Process\noVasculatureMask.mat')
-for excelRow = excelRows
-    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
-    recDate = excelRaw{1}; recDate = string(recDate);
-    mouseName = excelRaw{2}; mouseName = string(mouseName);
-    rawdataloc = excelRaw{3};
-    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-    if ~exist(saveDir)
-        mkdir(saveDir)
-    end
-    sessionInfo.mouseType = excelRaw{17};
-    sessionInfo.darkFrameNum = excelRaw{15};
-    systemType = excelRaw{5};
-    sessionInfo.framerate = excelRaw{7};
-    if strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto3')
-        maskDir = fullfile(rawdataloc,recDate);
-    else
-        maskDir = saveDir;
-    end
-
-    saveDir_new = strcat('L:\RGECO\Kenny\', recDate, '\');
-    maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datafluor','.mat');
-
-    if ~exist(fullfile(saveDir_new,maskName),'file')
-        maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-        load(fullfile(saveDir,maskName),'xform_isbrain')
-    else
-        load(fullfile(saveDir_new,maskName),'xform_isbrain')
-    end
-    mask = logical(mask_new.*xform_isbrain);
-    for n = runs
-        visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
-        processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
-        tic
-        load(fullfile(saveDir,processedName),'xform_datahb','xform_jrgeco1aCorr')
-
-        xform_datahb(isinf(xform_datahb)) = 0;
-        xform_datahb(isnan(xform_datahb)) = 0;
-        xform_jrgeco1aCorr(isinf(xform_jrgeco1aCorr)) = 0;
-        xform_jrgeco1aCorr(isnan(xform_jrgeco1aCorr)) = 0;
-
-        Hb_filter = mouse.freq.filterData(double(xform_datahb),0.02,2,25);
-        clear xform_datahb
-        %FAD_filter = mouse.freq.filterData(double(squeeze(xform_FADCorr)),0.02,2,25);
-        Calcium_filter = mouse.freq.filterData(double(squeeze(xform_jrgeco1aCorr)),0.02,2,25);
-        clear xform_jrgeco1aCorr
-        HbT_filter = Hb_filter(:,:,1,:) + Hb_filter(:,:,2,:);
-        clear Hb_filter
-        HbT_filter = squeeze(HbT_filter);
-        t = (0:750)./25;
-       %[T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_xw(Calcium_filter,HbT_filter*10^6,t);
-       %[T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_xw(Calcium_filter,HbT_filter,t);
-       Calcium_filter = reshape(Calcium_filter,128*128,[]);
-       HbT_filter = reshape(HbT_filter,128*128,[]);
-       Calcium_filter = normRow(Calcium_filter);
-       HbT_filter = normRow(HbT_filter);
-       Calcium_filter = reshape(Calcium_filter,128,128,[]);
-       HbT_filter = reshape(HbT_filter,128,128,[]);
-      % [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_testCalciumHbT_noMask(Calcium_filter,HbT_filter,t);
-        [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_testCalciumHbT_Mask(Calcium_filter,HbT_filter,t,mask);
-        save(fullfile(saveDir,processedName),'T','W','A','r','r2','hemoPred','-append')
-        figure
-        subplot(2,3,1)
-        imagesc(T,[0,2])
-        colorbar
-        axis image off
-        colormap jet
-        title('T(s)')
-        hold on;
-        imagesc(xform_WL,'AlphaData',1-mask);
-        set(gca,'FontSize',14,'FontWeight','Bold')
-
-        subplot(2,3,2)
-        imagesc(W,[0 3])
-        colorbar
-        axis image off
-        colormap jet
-        title('W(s)')
-        hold on;
-        imagesc(xform_WL,'AlphaData',1-mask);
-        set(gca,'FontSize',14,'FontWeight','Bold')
-
-        subplot(2,3,3)
-        imagesc(A,[0 0.07])
-        colorbar
-        axis image off
-        colormap jet
-        title('A')
-        hold on;
-        imagesc(xform_WL,'AlphaData',1-mask);
-        set(gca,'FontSize',14,'FontWeight','Bold')
-
-        subplot(2,3,4)
-        imagesc(r,[0 1])
-        colorbar
-        axis image off
-        colormap jet
-        title('r')
-        hold on;
-        imagesc(xform_WL,'AlphaData',1-mask);
-        set(gca,'FontSize',14,'FontWeight','Bold')
-
-        subplot(2,3,5)
-        imagesc(r2,[0 1])
-        colorbar
-        axis image off
-        colormap jet
-        title('R^2')
-        hold on;
-        imagesc(xform_WL,'AlphaData',1-mask);
-        set(gca,'FontSize',14,'FontWeight','Bold')
-
-        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_GammaFit.png')));
-        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_GammaFit.fig')));
-
-    end
-end
-
-for excelRow = excelRows
-    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
-    recDate = excelRaw{1}; recDate = string(recDate);
-    mouseName = excelRaw{2}; mouseName = string(mouseName);
-    rawdataloc = excelRaw{3};
-    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-    if ~exist(saveDir)
-        mkdir(saveDir)
-    end
-    sessionInfo.mouseType = excelRaw{17};
-    sessionInfo.darkFrameNum = excelRaw{15};
-    systemType = excelRaw{5};
-    sessionInfo.framerate = excelRaw{7};
-    
-    saveDir_new = strcat('L:\RGECO\Kenny\', recDate, '\');
-    maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datafluor','.mat');
-    
-    if ~exist(fullfile(saveDir_new,maskName),'file')
-        maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-        load(fullfile(saveDir,maskName),'xform_isbrain')
-    else
-        load(fullfile(saveDir_new,maskName),'xform_isbrain')
-    end
-    T_mouse = [];
-    W_mouse = [];
-    A_mouse = [];
-    r_mouse = [];
-    r2_mouse = [];
-    hemoPred_mouse = [];
-    for n = runs
-        visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
-        disp(visName)
-        processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
-        load(fullfile(saveDir,processedName),'T','W','A','r','r2','hemoPred')
-%         mask_nan = zeros(128,128);
-%         mask_nan(T<0.006) = 1;
-%         mask_nan(W<0.01) = 1;
-%         mask_nan(A<0.04) = 1;
-%         mask_nan(r<0.006) = 1;
-%         mask_nan = logical(mask_nan);
+% for excelRow = excelRows
+%     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+%     recDate = excelRaw{1}; recDate = string(recDate);
+%     mouseName = excelRaw{2}; mouseName = string(mouseName);
+%     rawdataloc = excelRaw{3};
+%     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+%     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+%     if ~exist(saveDir)
+%         mkdir(saveDir)
+%     end
+%     sessionInfo.mouseType = excelRaw{17};
+%     sessionInfo.darkFrameNum = excelRaw{15};
+%     systemType = excelRaw{5};
+%     sessionInfo.framerate = excelRaw{7};
+%     if strcmp(char(sessionInfo.mouseType),'jrgeco1a-opto3')
+%         maskDir = fullfile(rawdataloc,recDate);
+%     else
+%         maskDir = saveDir;
+%     end
+% 
+%     saveDir_new = strcat('L:\RGECO\Kenny\', recDate, '\');
+%     maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datafluor','.mat');
+% 
+%     if ~exist(fullfile(saveDir_new,maskName),'file')
+%         maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+%         load(fullfile(saveDir,maskName),'xform_isbrain')
+%     else
+%         load(fullfile(saveDir_new,maskName),'xform_isbrain')
+%     end
+%     mask = logical(mask_new.*xform_isbrain);
+%     for n = runs
+%         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
+%         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
+%         tic
+%         load(fullfile(saveDir,processedName),'xform_datahb','xform_jrgeco1aCorr')
+% 
+%         xform_datahb(isinf(xform_datahb)) = 0;
+%         xform_datahb(isnan(xform_datahb)) = 0;
+%         xform_jrgeco1aCorr(isinf(xform_jrgeco1aCorr)) = 0;
+%         xform_jrgeco1aCorr(isnan(xform_jrgeco1aCorr)) = 0;
+% 
+%         Hb_filter = mouse.freq.filterData(double(xform_datahb),0.02,2,25);
+%         clear xform_datahb
+%         %FAD_filter = mouse.freq.filterData(double(squeeze(xform_FADCorr)),0.02,2,25);
+%         Calcium_filter = mouse.freq.filterData(double(squeeze(xform_jrgeco1aCorr)),0.02,2,25);
+%         clear xform_jrgeco1aCorr
+%         HbT_filter = Hb_filter(:,:,1,:) + Hb_filter(:,:,2,:);
+%         clear Hb_filter
+%         HbT_filter = squeeze(HbT_filter);
+%         t = (0:750)./25;
+%        %[T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_xw(Calcium_filter,HbT_filter*10^6,t);
+%        %[T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_xw(Calcium_filter,HbT_filter,t);
+%        Calcium_filter = reshape(Calcium_filter,128*128,[]);
+%        HbT_filter = reshape(HbT_filter,128*128,[]);
+%        Calcium_filter = normRow(Calcium_filter);
+%        HbT_filter = normRow(HbT_filter);
+%        Calcium_filter = reshape(Calcium_filter,128,128,[]);
+%        HbT_filter = reshape(HbT_filter,128,128,[]);
+%       % [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_testCalciumHbT_noMask(Calcium_filter,HbT_filter,t);
+%         [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_CalciumHbT_Mask(Calcium_filter,HbT_filter,t,mask);
+%         save(fullfile(saveDir,processedName),'T','W','A','r','r2','hemoPred','-append')
 %         figure
-%         imagesc(mask_nan)
+%         subplot(2,3,1)
+%         imagesc(T,[0,2])
+%         colorbar
 %         axis image off
-%         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_NaNMask.png')));
-%         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_NaNMask.fig')));
-%         T(mask_nan) = NaN;
-%         W(mask_nan) = NaN;
-%         A(mask_nan) = NaN;
-%         r(mask_nan) = NaN;
-%         r2(mask_nan) = NaN;
-%         hemoPred(mask_nan,:) = NaN;
-        
-        T_mouse = cat(3,T_mouse,T);
-        W_mouse = cat(3,W_mouse,W);
-        A_mouse = cat(3,A_mouse,A);
-        r_mouse = cat(3,r_mouse,r);
-        r2_mouse = cat(3,r2_mouse,r2);
-        hemoPred_mouse = cat(4,hemoPred_mouse,hemoPred);
-    end
-    T_mouse = nanmean(T_mouse,3);
-    W_mouse = nanmean(W_mouse,3);
-    A_mouse = nanmean(A_mouse,3);
-    r_mouse = nanmean(r_mouse,3);
-    r2_mouse = nanmean(r2_mouse,3);
-    hemoPred_mouse = nanmean(hemoPred_mouse,4);
-    processedName_mouse = strcat(recDate,'-',mouseName,'-',sessionType,'_processed','.mat');
-    save(fullfile(saveDir,processedName_mouse),'T_mouse','W_mouse','A_mouse','r_mouse','r2_mouse','hemoPred_mouse','-append')
-    
-    figure
-    subplot(2,3,1)
-    imagesc(T_mouse,[0,2])
-    colorbar
-    axis image off
-    colormap jet
-    title('T(s)')
-    hold on;
-    imagesc(xform_WL,'AlphaData',1-mask);
-    set(gca,'FontSize',14,'FontWeight','Bold')
-    
-    subplot(2,3,2)
-    imagesc(W_mouse,[0 3])
-    colorbar
-    axis image off
-    colormap jet
-    title('W(s)')
-    hold on;
-    imagesc(xform_WL,'AlphaData',1-mask);
-    set(gca,'FontSize',14,'FontWeight','Bold')
-    
-    subplot(2,3,3)
-    imagesc(A_mouse,[0 0.07])
-    colorbar
-    axis image off
-    colormap jet
-    title('A')
-    hold on;
-    imagesc(xform_WL,'AlphaData',1-mask);
-    set(gca,'FontSize',14,'FontWeight','Bold')
-    
-    subplot(2,3,4)
-    imagesc(r_mouse,[0 1])
-    colorbar
-    axis image off
-    colormap jet
-    title('r')
-    hold on;
-    imagesc(xform_WL,'AlphaData',1-mask);
-    set(gca,'FontSize',14,'FontWeight','Bold')
-    
-    subplot(2,3,5)
-    imagesc(r2_mouse,[0 1])
-    colorbar
-    axis image off
-    colormap jet
-    title('R^2')
-    hold on;
-    imagesc(xform_WL,'AlphaData',1-mask);
-    set(gca,'FontSize',14,'FontWeight','Bold')
-    
-    saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_CalciumHbT_GammaFit.png')));
-    saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_CalciumHbT_GammaFit.fig')));
-    close all
-    
-end
+%         colormap jet
+%         title('T(s)')
+%         hold on;
+%         imagesc(xform_WL,'AlphaData',1-mask);
+%         set(gca,'FontSize',14,'FontWeight','Bold')
+% 
+%         subplot(2,3,2)
+%         imagesc(W,[0 3])
+%         colorbar
+%         axis image off
+%         colormap jet
+%         title('W(s)')
+%         hold on;
+%         imagesc(xform_WL,'AlphaData',1-mask);
+%         set(gca,'FontSize',14,'FontWeight','Bold')
+% 
+%         subplot(2,3,3)
+%         imagesc(A,[0 0.07])
+%         colorbar
+%         axis image off
+%         colormap jet
+%         title('A')
+%         hold on;
+%         imagesc(xform_WL,'AlphaData',1-mask);
+%         set(gca,'FontSize',14,'FontWeight','Bold')
+% 
+%         subplot(2,3,4)
+%         imagesc(r,[0 1])
+%         colorbar
+%         axis image off
+%         colormap jet
+%         title('r')
+%         hold on;
+%         imagesc(xform_WL,'AlphaData',1-mask);
+%         set(gca,'FontSize',14,'FontWeight','Bold')
+% 
+%         subplot(2,3,5)
+%         imagesc(r2,[0 1])
+%         colorbar
+%         axis image off
+%         colormap jet
+%         title('R^2')
+%         hold on;
+%         imagesc(xform_WL,'AlphaData',1-mask);
+%         set(gca,'FontSize',14,'FontWeight','Bold')
+% 
+%         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_GammaFit.png')));
+%         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_GammaFit.fig')));
+% 
+%     end
+% end
+% 
+% for excelRow = excelRows
+%     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+%     recDate = excelRaw{1}; recDate = string(recDate);
+%     mouseName = excelRaw{2}; mouseName = string(mouseName);
+%     rawdataloc = excelRaw{3};
+%     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+%     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+%     if ~exist(saveDir)
+%         mkdir(saveDir)
+%     end
+%     sessionInfo.mouseType = excelRaw{17};
+%     sessionInfo.darkFrameNum = excelRaw{15};
+%     systemType = excelRaw{5};
+%     sessionInfo.framerate = excelRaw{7};
+%     
+%     saveDir_new = strcat('L:\RGECO\Kenny\', recDate, '\');
+%     maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datafluor','.mat');
+%     
+%     if ~exist(fullfile(saveDir_new,maskName),'file')
+%         maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+%         load(fullfile(saveDir,maskName),'xform_isbrain')
+%     else
+%         load(fullfile(saveDir_new,maskName),'xform_isbrain')
+%     end
+%     T_mouse = [];
+%     W_mouse = [];
+%     A_mouse = [];
+%     r_mouse = [];
+%     r2_mouse = [];
+%     hemoPred_mouse = [];
+%     for n = runs
+%         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
+%         disp(visName)
+%         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
+%         load(fullfile(saveDir,processedName),'T','W','A','r','r2','hemoPred')
+% %         mask_nan = zeros(128,128);
+% %         mask_nan(T<0.006) = 1;
+% %         mask_nan(W<0.01) = 1;
+% %         mask_nan(A<0.04) = 1;
+% %         mask_nan(r<0.006) = 1;
+% %         mask_nan = logical(mask_nan);
+% %         figure
+% %         imagesc(mask_nan)
+% %         axis image off
+% %         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_NaNMask.png')));
+% %         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_NaNMask.fig')));
+% %         T(mask_nan) = NaN;
+% %         W(mask_nan) = NaN;
+% %         A(mask_nan) = NaN;
+% %         r(mask_nan) = NaN;
+% %         r2(mask_nan) = NaN;
+% %         hemoPred(mask_nan,:) = NaN;
+%         
+%         T_mouse = cat(3,T_mouse,T);
+%         W_mouse = cat(3,W_mouse,W);
+%         A_mouse = cat(3,A_mouse,A);
+%         r_mouse = cat(3,r_mouse,r);
+%         r2_mouse = cat(3,r2_mouse,r2);
+%         hemoPred_mouse = cat(4,hemoPred_mouse,hemoPred);
+%     end
+%     T_mouse = nanmean(T_mouse,3);
+%     W_mouse = nanmean(W_mouse,3);
+%     A_mouse = nanmean(A_mouse,3);
+%     r_mouse = nanmean(r_mouse,3);
+%     r2_mouse = nanmean(r2_mouse,3);
+%     hemoPred_mouse = nanmean(hemoPred_mouse,4);
+%     processedName_mouse = strcat(recDate,'-',mouseName,'-',sessionType,'_processed','.mat');
+%     save(fullfile(saveDir,processedName_mouse),'T_mouse','W_mouse','A_mouse','r_mouse','r2_mouse','hemoPred_mouse','-append')
+%     
+%     figure
+%     subplot(2,3,1)
+%     imagesc(T_mouse,[0,2])
+%     colorbar
+%     axis image off
+%     colormap jet
+%     title('T(s)')
+%     hold on;
+%     imagesc(xform_WL,'AlphaData',1-mask);
+%     set(gca,'FontSize',14,'FontWeight','Bold')
+%     
+%     subplot(2,3,2)
+%     imagesc(W_mouse,[0 3])
+%     colorbar
+%     axis image off
+%     colormap jet
+%     title('W(s)')
+%     hold on;
+%     imagesc(xform_WL,'AlphaData',1-mask);
+%     set(gca,'FontSize',14,'FontWeight','Bold')
+%     
+%     subplot(2,3,3)
+%     imagesc(A_mouse,[0 0.07])
+%     colorbar
+%     axis image off
+%     colormap jet
+%     title('A')
+%     hold on;
+%     imagesc(xform_WL,'AlphaData',1-mask);
+%     set(gca,'FontSize',14,'FontWeight','Bold')
+%     
+%     subplot(2,3,4)
+%     imagesc(r_mouse,[0 1])
+%     colorbar
+%     axis image off
+%     colormap jet
+%     title('r')
+%     hold on;
+%     imagesc(xform_WL,'AlphaData',1-mask);
+%     set(gca,'FontSize',14,'FontWeight','Bold')
+%     
+%     subplot(2,3,5)
+%     imagesc(r2_mouse,[0 1])
+%     colorbar
+%     axis image off
+%     colormap jet
+%     title('R^2')
+%     hold on;
+%     imagesc(xform_WL,'AlphaData',1-mask);
+%     set(gca,'FontSize',14,'FontWeight','Bold')
+%     
+%     saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_CalciumHbT_GammaFit.png')));
+%     saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_CalciumHbT_GammaFit.fig')));
+%     close all
+%     
+% end
 
 %Awake
 excelRows = [181,183,185,228,232,236];
