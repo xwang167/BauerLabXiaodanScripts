@@ -1,7 +1,7 @@
 close all;clear all;clc
 import mouse.*
 excelFile = "L:\RGECO\RGECO.xlsx";
-excelRows = 2:13;%:450;
+excelRows = 2:7;%:450;
 runs = 1:3;
 % for excelRow = excelRows
 %     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
@@ -82,7 +82,6 @@ runs = 1:3;
 %     end
 % end
 % 
-excelRows = 8:13;
 length_runs = length(runs);
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':R',num2str(excelRow)]);

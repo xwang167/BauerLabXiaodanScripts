@@ -12,130 +12,130 @@ nVx = 128;
 
 %
 % % % % % % %
-% % % %make mask and transform matrix
-% previousDate = [];
-% for excelRow = excelRows
-%     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
-%     recDate = excelRaw{1}; recDate = string(recDate);
-%     currentDate = recDate;
-%     mouseName = excelRaw{2}; mouseName = string(mouseName);
-%     rawdataloc = excelRaw{3};
-%     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-%     
-%     oriDir = "D:\"; oriDir = fullfile(oriDir,recDate);
-%     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-%     if ~exist(saveDir)
-%         mkdir(saveDir)
-%     end
-%     
-%     sessionInfo.mouseType = excelRaw{17};
-%     sessionInfo.darkFrameNum = excelRaw{15};
-%     sessionInfo.totalFrameNum = excelRaw{22};
-%     sessionInfo.framerate = excelRaw{7};
-%     sessionInfo.freqout = sessionInfo.framerate;
-%     systemType = excelRaw{5};
-%     
-%     
-%     wlName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-%     if exist(fullfile(saveDir,strcat(recDate,'-tform.mat')),'file')
-%         disp(strcat('transform file already exists for ', recDate,'-', mouseName))
-%         %     elseif strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')
-%         %         disp(strcat('WL and transform file already exists for ', recDate,'-', mouseName))
-%         %         load(fullfile(rawdataloc,recDate,wlName),'mytform','WL');
-%     else
-%         disp(strcat('get WL and transform for ', recDate,'-', mouseName))
-%         
-%         fileName_cam1 = strcat(recDate,'-',mouseName,'-',sessionType,'1-cam1.mat');
-%         fileName_cam1 = fullfile(rawdataloc,recDate,fileName_cam1);
-%         load(fileName_cam1)
-%         
-%         if sessionInfo.darkFrameNum>0
-%             if sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,sessionInfo.darkFrameNum/4-1),'all')>5 %%% check if drop frame
-%                 numCh = size(raw_unregistered,3);
-%                 raw_unregistered = reshape(raw_unregistered,128,128,[]);
-%                 raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
-%                 raw_unregistered = reshape(raw_unregistered,128,128,numCh,[]);
-%             end
-%         end
-%         
-%         
-%         firstFrame_cam1  = squeeze(raw_unregistered(:,:,2,sessionInfo.darkFrameNum/4+1));
-%         
-%         clear raw_unregistered
-%         fileName_cam2 = strcat(recDate,'-',mouseName,'-',sessionType,'1-cam2.mat');
-%         fileName_cam2 = fullfile(rawdataloc,recDate,fileName_cam2);
-%         load(fileName_cam2)
-%         
-%         if sessionInfo.darkFrameNum>0
-%             if sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4-1),'all')>5
-%                 numCh = size(raw_unregistered,3);
-%                 raw_unregistered = reshape(raw_unregistered,128,128,[]);
-%                 raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
-%                 raw_unregistered = reshape(raw_unregistered,128,128,numCh,[]);
-%             end
-%         end
-%         firstFrame_cam2  = squeeze(raw_unregistered(:,:,3,sessionInfo.darkFrameNum/4+1));
-%         
-%         clear raw_unregistered
-%         maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-%         
-%         % need to be modified to see if WL exist
-%         
-%         disp(strcat('get landmarks and mask for',recDate,'-', mouseName))
-%         if ~exist(fullfile(saveDir,strcat(recDate,'-tform.mat')),'file')
-%         if ~strcmp(previousDate,currentDate)
-%             load(strcat('\\10.23.92.192\RawData_EastOIS2\',recDate,'\',recDate,'-grid-WL-cam1.mat'))
-%             cam1 = raw_unregistered(:,:,1,21);
-%             clear raw_unregistered
-%             load(strcat('\\10.23.92.192\RawData_EastOIS2\',recDate,'\',recDate,'-grid-WL-cam2.mat'))
-%             cam2 = raw_unregistered(:,:,1,21);
-%             clear raw_unregistered
-%             [mytform,fixed_cam1,registered_cam2] = getTransformation(cam1,cam2);
-%             if ~exist(saveDir)
-%                 mkdir(saveDir)
-%             end
-%             save(fullfile(saveDir,strcat(recDate,'-tform.mat')),'mytform')
-%         end
-%         end
-%         load(fullfile(saveDir,strcat(recDate,'-tform.mat')),'mytform')
-%         previousDate = currentDate;
-%         fixed = firstFrame_cam1./max(max(firstFrame_cam1));
-%         unregistered = firstFrame_cam2./max(max(firstFrame_cam2));
-%         registered = imwarp(unregistered, mytform,'OutputView',imref2d(size(unregistered)));
-%         %Create White Light Image
-%         WL = zeros(128,128,3);
-%         WL(:,:,1) = registered;
-%         WL(:,:,2) = fixed;
-%         WL(:,:,3) = fixed;
-%         [isbrain,xform_isbrain,affineMarkers,seedcenter,WLcrop,xform_WLcrop,xform_WL] = getLandMarksandMask_xw(WL);
-%         isbrain_contour = bwperim(isbrain);
-%         save(fullfile(saveDir,maskName),'isbrain', 'WL','WLcrop', 'xform_WLcrop', 'xform_isbrain', 'isbrain', 'WL', 'xform_WL', 'affineMarkers', 'seedcenter')
-%         figure;
-%         imagesc(WL); %changed 3/1/1
-%         axis off
-%         axis image
-%         title(strcat(recDate,'-',mouseName));
-%         
-%         for f=1:size(seedcenter,1)
-%             hold on;
-%             plot(seedcenter(f,1),seedcenter(f,2),'ko','MarkerFaceColor','k')
-%         end
-%         hold on;
-%         plot(affineMarkers.tent(1,1),affineMarkers.tent(1,2),'ko','MarkerFaceColor','b')
-%         hold on;
-%         plot(affineMarkers.bregma(1,1),affineMarkers.bregma(1,2),'ko','MarkerFaceColor','b')
-%         hold on;
-%         plot(affineMarkers.OF(1,1),affineMarkers.OF(1,2),'ko','MarkerFaceColor','b')
-%         hold on;
-%         contour(isbrain_contour,'r')
-%         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'_WLandMarks.jpg')))
-%         close all
-%         clearvars -except excelFile nVx nVy excelRows runs isDetrend previousDate
-%     end
-% end
-% % %
-% % % % %get registered together, dark frame removed raw and QC_raw check
-% % %
+% % %make mask and transform matrix
+previousDate = [];
+for excelRow = excelRows
+    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+    recDate = excelRaw{1}; recDate = string(recDate);
+    currentDate = recDate;
+    mouseName = excelRaw{2}; mouseName = string(mouseName);
+    rawdataloc = excelRaw{3};
+    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+    
+    oriDir = "D:\"; oriDir = fullfile(oriDir,recDate);
+    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+    if ~exist(saveDir)
+        mkdir(saveDir)
+    end
+    
+    sessionInfo.mouseType = excelRaw{17};
+    sessionInfo.darkFrameNum = excelRaw{15};
+    sessionInfo.totalFrameNum = excelRaw{22};
+    sessionInfo.framerate = excelRaw{7};
+    sessionInfo.freqout = sessionInfo.framerate;
+    systemType = excelRaw{5};
+    
+    
+    wlName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+    if exist(fullfile(saveDir,strcat(recDate,'-tform.mat')),'file')
+        disp(strcat('transform file already exists for ', recDate,'-', mouseName))
+        %     elseif strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')
+        %         disp(strcat('WL and transform file already exists for ', recDate,'-', mouseName))
+        %         load(fullfile(rawdataloc,recDate,wlName),'mytform','WL');
+    else
+        disp(strcat('get WL and transform for ', recDate,'-', mouseName))
+        
+        fileName_cam1 = strcat(recDate,'-',mouseName,'-',sessionType,'1-cam1.mat');
+        fileName_cam1 = fullfile(rawdataloc,recDate,fileName_cam1);
+        load(fileName_cam1)
+        
+        if sessionInfo.darkFrameNum>0
+            if sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,sessionInfo.darkFrameNum/4-1),'all')>5 %%% check if drop frame
+                numCh = size(raw_unregistered,3);
+                raw_unregistered = reshape(raw_unregistered,128,128,[]);
+                raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
+                raw_unregistered = reshape(raw_unregistered,128,128,numCh,[]);
+            end
+        end
+        
+        
+        firstFrame_cam1  = squeeze(raw_unregistered(:,:,2,sessionInfo.darkFrameNum/4+1));
+        
+        clear raw_unregistered
+        fileName_cam2 = strcat(recDate,'-',mouseName,'-',sessionType,'1-cam2.mat');
+        fileName_cam2 = fullfile(rawdataloc,recDate,fileName_cam2);
+        load(fileName_cam2)
+        
+        if sessionInfo.darkFrameNum>0
+            if sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4),'all')/ sum(raw_unregistered(:,:,1,sessionInfo.darkFrameNum/4-1),'all')>5
+                numCh = size(raw_unregistered,3);
+                raw_unregistered = reshape(raw_unregistered,128,128,[]);
+                raw_unregistered(:,:,2:end) = raw_unregistered(:,:,1:end-1);
+                raw_unregistered = reshape(raw_unregistered,128,128,numCh,[]);
+            end
+        end
+        firstFrame_cam2  = squeeze(raw_unregistered(:,:,3,sessionInfo.darkFrameNum/4+1));
+        
+        clear raw_unregistered
+        maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+        
+        % need to be modified to see if WL exist
+        
+        disp(strcat('get landmarks and mask for',recDate,'-', mouseName))
+        if ~exist(fullfile(saveDir,strcat(recDate,'-tform.mat')),'file')
+        if ~strcmp(previousDate,currentDate)
+            load(strcat('\\10.23.92.192\RawData_EastOIS2\',recDate,'\',recDate,'-grid-WL-cam1.mat'))
+            cam1 = raw_unregistered(:,:,1,21);
+            clear raw_unregistered
+            load(strcat('\\10.23.92.192\RawData_EastOIS2\',recDate,'\',recDate,'-grid-WL-cam2.mat'))
+            cam2 = raw_unregistered(:,:,1,21);
+            clear raw_unregistered
+            [mytform,fixed_cam1,registered_cam2] = getTransformation(cam1,cam2);
+            if ~exist(saveDir)
+                mkdir(saveDir)
+            end
+            save(fullfile(saveDir,strcat(recDate,'-tform.mat')),'mytform')
+        end
+        end
+        load(fullfile(saveDir,strcat(recDate,'-tform.mat')),'mytform')
+        previousDate = currentDate;
+        fixed = firstFrame_cam1./max(max(firstFrame_cam1));
+        unregistered = firstFrame_cam2./max(max(firstFrame_cam2));
+        registered = imwarp(unregistered, mytform,'OutputView',imref2d(size(unregistered)));
+        %Create White Light Image
+        WL = zeros(128,128,3);
+        WL(:,:,1) = registered;
+        WL(:,:,2) = fixed;
+        WL(:,:,3) = fixed;
+        [isbrain,xform_isbrain,affineMarkers,seedcenter,WLcrop,xform_WLcrop,xform_WL] = getLandMarksandMask_xw(WL);
+        isbrain_contour = bwperim(isbrain);
+        save(fullfile(saveDir,maskName),'isbrain', 'WL','WLcrop', 'xform_WLcrop', 'xform_isbrain', 'isbrain', 'WL', 'xform_WL', 'affineMarkers', 'seedcenter')
+        figure;
+        imagesc(WL); %changed 3/1/1
+        axis off
+        axis image
+        title(strcat(recDate,'-',mouseName));
+        
+        for f=1:size(seedcenter,1)
+            hold on;
+            plot(seedcenter(f,1),seedcenter(f,2),'ko','MarkerFaceColor','k')
+        end
+        hold on;
+        plot(affineMarkers.tent(1,1),affineMarkers.tent(1,2),'ko','MarkerFaceColor','b')
+        hold on;
+        plot(affineMarkers.bregma(1,1),affineMarkers.bregma(1,2),'ko','MarkerFaceColor','b')
+        hold on;
+        plot(affineMarkers.OF(1,1),affineMarkers.OF(1,2),'ko','MarkerFaceColor','b')
+        hold on;
+        contour(isbrain_contour,'r')
+        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'_WLandMarks.jpg')))
+        close all
+        clearvars -except excelFile nVx nVy excelRows runs isDetrend previousDate
+    end
+end
+% %
+% % % %get registered together, dark frame removed raw and QC_raw check
+% %
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
     recDate = excelRaw{1}; recDate = string(recDate);

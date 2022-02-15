@@ -140,3 +140,43 @@ legend('mean','standard deviation','SNR')
 title(strcat(recDate,'-jrgeco1a-SNR-averaged across block'))
 savefig(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mouseName,'-',sessionType,'-mean-std-ratio-blocks','.fig')))
 saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mouseName,'-',sessionType,'-mean-std-ratio-blocks','.png')))
+
+
+
+
+
+
+
+load('X:\XW\Paper\RGECO\211210\211210-R21M1-stim2_processed.mat','xform_jrgeco1aCorr')
+xform_jrgeco1aCorr = reshape(xform_jrgeco1aCorr,128,128,750,[]);
+baseline= mean(xform_jrgeco1aCorr(:,:,1:125),3);
+baseline = repmat(baseline,1,1,750,10);
+xform_jrgeco1aCorr = xform_jrgeco1aCorr-baseline;
+peakMap = mean(xform_jrgeco1aCorr,4);
+peakMap_ROI = mean(peakMap(:,:,126:250),3);
+figure
+imagesc(peakMap_ROI)
+[x1,y1] = ginput(1);
+[x2,y2] = ginput(1);
+[X,Y] = meshgrid(1:128,1:128);
+radius = sqrt((x1-x2)^2+(y1-y2)^2);
+ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
+max_ROI = prctile(peakMap_ROI(ROI),99);
+temp = double(peakMap_ROI).*double(ROI);
+ROI = temp>max_ROI*0.75;
+hold on
+contour(ROI)
+iROI = reshape(ROI,1,[]);
+
+xform_jrgeco1aCorr = reshape(xform_jrgeco1aCorr,128,128,750,[]);
+baseline= mean(xform_jrgeco1aCorr(:,:,1:125,:),3);
+baseline = repmat(baseline,1,1,750,1);
+xform_jrgeco1aCorr = xform_jrgeco1aCorr-baseline;
+
+xform_jrgeco1aCorr = reshape(xform_jrgeco1aCorr,128*128,750,10);
+jrgeco1aCorr_ROI = squeeze(mean(xform_jrgeco1aCorr(iROI,:,:),1));
+timeTrace = reshape(jrgeco1aCorr_ROI,1,[]);
+figure('Renderer', 'painters', 'Position', [100 100 1420 370])
+plot((1:3750)/25,timeTrace(1:3750)*100,'m')
+xlabel('Time(s)')
+ylabel('\DeltaF/F%')

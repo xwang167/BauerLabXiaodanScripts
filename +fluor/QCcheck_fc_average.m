@@ -4,8 +4,11 @@ import mouse.*
 nVx = 128;
 nVy = 128;
 %
-excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
-excelRows = [3,5,7,8,10,11];%:450;
+% excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
+% excelRows = [3,5,7,8,10,11];%:450
+excelRows = [181 183 185 228 232 236];
+excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
+
 runs = 1:3;
 length_runs = length(runs);
 

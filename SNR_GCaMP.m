@@ -108,3 +108,76 @@ saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mouseName,'-',sessionType,'-m
 SNR_mouse1 = mean(mean_gcamp_cat(1:30)./std_gcamp_cat(1:30));
 SNR_mouse2 = mean(mean_gcamp_cat(31:60)./std_gcamp_cat(31:60));
 SNR_mouse3 = mean(mean_gcamp_cat(31:60)./std_gcamp_cat(61:90));
+
+
+
+
+load('X:\XW\Paper\GCaMP\211210\211210-G2M1-stim2_processed.mat','xform_gcampCorr')
+xform_gcampCorr = reshape(xform_gcampCorr,128,128,750,[]);
+baseline= mean(xform_gcampCorr(:,:,1:125),3);
+baseline = repmat(baseline,1,1,750,10);
+xform_gcampCorr = xform_gcampCorr-baseline;
+peakMap = mean(xform_gcampCorr,4);
+peakMap_ROI = mean(peakMap(:,:,126:128),3);
+figure
+imagesc(peakMap_ROI)
+[x1,y1] = ginput(1);
+[x2,y2] = ginput(1);
+[X,Y] = meshgrid(1:128,1:128);
+radius = sqrt((x1-x2)^2+(y1-y2)^2);
+ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
+max_ROI = prctile(peakMap_ROI(ROI),99);
+temp = double(peakMap_ROI).*double(ROI);
+ROI = temp>max_ROI*0.75;
+hold on
+contour(ROI)
+iROI = reshape(ROI,1,[]);
+
+xform_gcampCorr = reshape(xform_gcampCorr,128,128,750,[]);
+baseline= mean(xform_gcampCorr(:,:,1:125,:),3);
+baseline = repmat(baseline,1,1,750,1);
+xform_gcampCorr = xform_gcampCorr-baseline;
+
+xform_gcampCorr = reshape(xform_gcampCorr,128*128,750,10);
+gcampCorr_ROI = squeeze(mean(xform_gcampCorr(iROI,:,:),1));
+timeTrace = reshape(gcampCorr_ROI,1,[]);
+hold on
+plot((1:3750)/25,timeTrace(1:3750)*100,'g')
+
+
+
+
+
+
+load('X:\XW\Paper\GCaMP\211210\211210-G2M1-stim2_processed.mat','xform_gcampCorr')
+xform_gcampCorr = reshape(xform_gcampCorr,128,128,750,[]);
+baseline= mean(xform_gcampCorr(:,:,1:125),3);
+baseline = repmat(baseline,1,1,750,10);
+xform_gcampCorr = xform_gcampCorr-baseline;
+peakMap = mean(xform_gcampCorr,4);
+peakMap_ROI = mean(peakMap(:,:,126:128),3);
+figure
+imagesc(peakMap_ROI)
+[x1,y1] = ginput(1);
+[x2,y2] = ginput(1);
+[X,Y] = meshgrid(1:128,1:128);
+radius = sqrt((x1-x2)^2+(y1-y2)^2);
+ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
+max_ROI = prctile(peakMap_ROI(ROI),99);
+temp = double(peakMap_ROI).*double(ROI);
+ROI = temp>max_ROI*0.75;
+hold on
+contour(ROI)
+iROI = reshape(ROI,1,[]);
+
+xform_gcampCorr = reshape(xform_gcampCorr,128,128,750,[]);
+baseline= mean(xform_gcampCorr(:,:,1:125,:),3);
+baseline = repmat(baseline,1,1,750,1);
+xform_gcampCorr = xform_gcampCorr-baseline;
+
+xform_gcampCorr = reshape(xform_gcampCorr,128*128,750,10);
+gcampCorr_ROI = squeeze(mean(xform_gcampCorr(iROI,:,:),1));
+timeTrace = reshape(gcampCorr_ROI,1,[]);
+hold on
+plot((1:3750)/25,timeTrace(1:3750)*100,'g')
+
