@@ -14,15 +14,18 @@ excelFile="X:\XW\CodeModification\CodeMeeting.xlsx";
 excelRows=[4];
 istransform = 0;
 
-fRange_ISA = [0.01 0.08];
-fRange_delta = [0.5 4];
 runsInfo = parseRuns_xw(excelFile,excelRows);
-load('Z:\220205\220205-paper-LandmarksandMask.mat')
 
 %% first chunk
 load('Z:\220205\220205-paper-stim1-cam1_1.mat')
+indx1 = 60+5*20*3+4;
+idxs1 = indx1:1801:totalFrames;
 
-
+laserFrames_1 = raw_unregistered(:,:,idxs1);
+for kk = 1:40
+imagesc(laserFrames_1(:,:,kk),[0 500000])
+pause
+end
 
 
 load('Z:\220208\220208-N13M309-stim1-cam1_1.mat')
@@ -61,13 +64,15 @@ end
 
 
 
+
+
 load('Z:\220208\220208-N13M309-stim1-cam1_2.mat')
 totalFrames = size(raw_unregistered,3);
 n2 = (totalFrames)/1801;
 indx1 = 5*20*3+4;
 idxs1 = indx1:1801:totalFrames;
 
-laserFrames_1 = raw_unregistered(:,:,idxs1);
+laserFrames_2 = raw_unregistered(:,:,idxs1);
 
 
 ii = 80;
@@ -80,7 +85,7 @@ end
 kk = 1;
 for jj = 41:ii-1
     if GoodSeedsidx(m(jj))           
-        imagesc(laserFrames_1(:,:,kk),[0 100000])
+        imagesc(laserFrames_2(:,:,kk),[0 100000])
         axis image off
         hold on
         scatter(GalvoSeedCenterCCDSpace(m(jj),2),GalvoSeedCenterCCDSpace(m(jj),1),'w','LineWidth',1.5)
@@ -91,6 +96,10 @@ for jj = 41:ii-1
 end
 
 
+for kk = 1:40
+     imagesc(laserFrames_2(:,:,kk),[0 100000])
+     pause
+end
 
 
 sessionInfo = sysInfo_xw(runInfo.system);
@@ -111,7 +120,7 @@ load('Z:\220205\220205-paper-stim1-cam1_2.mat')
 
 totalFrames = size(raw_unregistered,3);
 n2 = totalFrame/1801;
-laserFrames_2 = nan(128,128,n2);
+
 indx2 = 5*20*3+4;
 idxs2 = indx2:1801:totalFrames;
 
@@ -133,3 +142,7 @@ for jj = 1:n2
         pause
     end
 end
+
+
+
+A = squeeze(raw_unregistered(93,68,:));
