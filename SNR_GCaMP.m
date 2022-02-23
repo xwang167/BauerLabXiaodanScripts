@@ -179,5 +179,5 @@ xform_gcampCorr = reshape(xform_gcampCorr,128*128,750,10);
 gcampCorr_ROI = squeeze(mean(xform_gcampCorr(iROI,:,:),1));
 timeTrace = reshape(gcampCorr_ROI,1,[]);
 hold on
-plot((1:3750)/25,timeTrace(1:3750)*100,'g')
+plot((1:7500)/25,timeTrace*100,'g')
 

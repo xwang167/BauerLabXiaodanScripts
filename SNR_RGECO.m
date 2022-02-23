@@ -177,6 +177,6 @@ xform_jrgeco1aCorr = reshape(xform_jrgeco1aCorr,128*128,750,10);
 jrgeco1aCorr_ROI = squeeze(mean(xform_jrgeco1aCorr(iROI,:,:),1));
 timeTrace = reshape(jrgeco1aCorr_ROI,1,[]);
 figure('Renderer', 'painters', 'Position', [100 100 1420 370])
-plot((1:3750)/25,timeTrace(1:3750)*100,'m')
+plot((1:7500)/25,timeTrace*100,'m')
 xlabel('Time(s)')
 ylabel('\DeltaF/F%')

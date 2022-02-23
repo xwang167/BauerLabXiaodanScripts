@@ -79,3 +79,14 @@ plot(t_CalciumFAD,normr(y_CalciumFAD),'g--')
 xlabel('Time(s)')
 ylabel('n.a.')
 title('NMC')
+
+
+
+%%frequency content
+t= 1:0.01:10;
+h = y_CalciumHbT_awake; % impulse response
+fs = 20;
+Nfft = 128;
+[H,F] = freqz(h,1,Nfft,fs);
+semilogx(F,mag2db(abs(H))); grid on;
+xlabel('Frequency (Hz)'); ylabel('Magnitude (dB)');
