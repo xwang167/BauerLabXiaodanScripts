@@ -156,7 +156,7 @@ save('X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-ECMatrix.mat',...
 
 figure
 colormap jet
-imagesc(ECMatrix_calcium_mice_sorted_LR,[-0.6 0.6]);
+imagesc(ECMatrix_calcium_mice_LR_sorted,[-0.6 0.6]);
 title('N13M309-N13M548-N13M549-ECMatrix-Calcium-LR')
 h = colorbar;
 ylabel(h, 'z(r)','fontsize',10,'FontWeight','bold')

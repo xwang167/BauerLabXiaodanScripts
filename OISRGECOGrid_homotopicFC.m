@@ -10,7 +10,7 @@ for excelRows = 2:4
     runsInfo = parseRuns_xw(excelFile,excelRows);
     runInfo = runsInfo(1);
     load(strcat(runInfo.saveFilePrefix(1:end-6),'-evokeTimeTrace-Calcium.mat'),...
-        'gridEvokeTimeTrace_jRGECO1a_valid','gridEvokeTimeTrace_jRGECO1a_valid_R')
+        'gridEvokeTimeTrace_jRGECO1a_valid_L','gridEvokeTimeTrace_jRGECO1a_valid_R')
     HomoFC_valid= nan(128,128);
     for ii = 1:79
         x1 = seedLocation_mice_valid(2,ii);
@@ -18,7 +18,7 @@ for excelRows = 2:4
         [X,Y] = meshgrid(1:128,1:128);
         radius = 3;
         ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
-        HomoFC_valid(ROI) = corr(gridEvokeTimeTrace_jRGECO1a_valid(:,ii),...           
+        HomoFC_valid(ROI) = corr(gridEvokeTimeTrace_jRGECO1a_valid_L(:,ii),...           
             gridEvokeTimeTrace_jRGECO1a_valid_R(:,ii));
     end
     save(strcat(runInfo.saveFilePrefix(1:end-6),'-homoFC-Calcium.mat'),...
@@ -43,6 +43,7 @@ for excelRows = 2:4
 end
 
 HomoFC_valid_mice = mean(HomoFC_valid_mice,3);
+save('X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-HomoFC-Calcium','HomoFC_valid_mice')
 figure
 colormap jet
 imagesc(HomoFC_valid_mice,[-1 1])

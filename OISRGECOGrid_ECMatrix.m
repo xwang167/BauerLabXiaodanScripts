@@ -55,7 +55,7 @@ saveas(gcf,'X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-ECMatrix-Calcium.
 close all
 ECMatrix_calcium_mice_sorted = ECMatrix_calcium_mice(I,I);
 save('X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-ECMatrix.mat',...
-    'ECMatrix_calcium_mice','ECMatrix_calcium_mice_sorted')
+    'ECMatrix_calcium_mice')
 
 
 

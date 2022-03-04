@@ -14,8 +14,8 @@ jj = 1;
 for ii = 1:160
     if ~isnan(seedLocation_mice(1,ii))
         seedLocation_mice_valid(:,jj) = round(seedLocation_mice(:,ii));
-        atlasIndx(ii) = AtlasSeedsFilled(seedLocation_mice_valid(2,jj),...
-            seedLocation_mice_valid(1,jj));
+        atlasIndx(ii) = AtlasSeedsFilled(seedLocation_mice_valid(1,jj),...
+            seedLocation_mice_valid(2,jj));
         atlasIndx_valid(jj) = atlasIndx(ii);
         jj = jj+1;
     end
