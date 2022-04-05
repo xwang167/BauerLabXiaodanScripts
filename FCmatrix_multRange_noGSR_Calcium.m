@@ -12,63 +12,63 @@ load('L:\RGECO\cat\191030--R5M2286-anes-R5M2285-anes-R5M2288-anes-R6M2460-anes-R
 xform_isbrain_mice_anes = xform_isbrain_mice;
 xform_isbrain_mice = xform_isbrain_mice_awake.*xform_isbrain_mice_anes;
 %
-% for excelRow = excelRows
-%     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
-%     recDate = excelRaw{1}; recDate = string(recDate);
-%     mouseName = excelRaw{2}; mouseName = string(mouseName);
-%     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-%     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-%     sessionInfo.darkFrameNum = excelRaw{15};
-%     sessionInfo.mouseType = excelRaw{17};
-%     systemType =excelRaw{5};
-%     sessionInfo.framerate = excelRaw{7};
-%     systemInfo.numLEDs = 4;
-%     fs = excelRaw{7};
-%     
+for excelRow = excelRows
+    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+    recDate = excelRaw{1}; recDate = string(recDate);
+    mouseName = excelRaw{2}; mouseName = string(mouseName);
+    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+    sessionInfo.darkFrameNum = excelRaw{15};
+    sessionInfo.mouseType = excelRaw{17};
+    systemType =excelRaw{5};
+    sessionInfo.framerate = excelRaw{7};
+    systemInfo.numLEDs = 4;
+    fs = excelRaw{7};
     
-%     for n = runs
-%         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
-%         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
-%         disp('loading processed data')
-%         load(fullfile(saveDir,processedName),'xform_jrgeco1aCorr');
-%         xform_jrgeco1aCorr(isinf(xform_jrgeco1aCorr)) = 0;
-%         xform_jrgeco1aCorr(isnan(xform_jrgeco1aCorr)) = 0;
-%         FCMatrix_Calcium_ISA_old = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),0.009,0.08,fs,xform_isbrain_mice);
-%         FCMatrix_Calcium_Delta_old = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),0.4,4,fs,xform_isbrain_mice);
-%         FCMatrix_Calcium_0p02 = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),0.02,0.08,fs,xform_isbrain_mice);
-%         FCMatrix_Calcium_0p04 = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),0.04,0.16,fs,xform_isbrain_mice);
-%         FCMatrix_Calcium_0p08 = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),0.08,0.32,fs,xform_isbrain_mice);
-%         FCMatrix_Calcium_0p16 = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),0.16,0.64,fs,xform_isbrain_mice);
-%         FCMatrix_Calcium_0p32 = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),0.32,1.28,fs,xform_isbrain_mice);
-%         FCMatrix_Calcium_0p64 = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),0.64,2.56,fs,xform_isbrain_mice);
-%         FCMatrix_Calcium_1p28 = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),1.28,5.12,fs,xform_isbrain_mice);
-%         clear xform_jrgeco1aCorr
-%         processedName_fcMatrix = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_fcMatrix_noGSR','.mat');
-%         if exist(fullfile(saveDir,processedName_fcMatrix))
-%             save(fullfile(saveDir,processedName_fcMatrix),...
-%                 'FCMatrix_Calcium_ISA_old','FCMatrix_Calcium_Delta_old',...
-%                 'FCMatrix_Calcium_0p02','FCMatrix_Calcium_0p04',...
-%                 'FCMatrix_Calcium_0p08','FCMatrix_Calcium_0p16',...
-%                 'FCMatrix_Calcium_0p32','FCMatrix_Calcium_0p64',...
-%                 'FCMatrix_Calcium_1p28','-append')
-%         else
-%             save(fullfile(saveDir,processedName_fcMatrix),...
-%                 'FCMatrix_Calcium_ISA_old','FCMatrix_Calcium_Delta_old',...
-%                 'FCMatrix_Calcium_0p02','FCMatrix_Calcium_0p04',...
-%                 'FCMatrix_Calcium_0p08','FCMatrix_Calcium_0p16',...
-%                 'FCMatrix_Calcium_0p32','FCMatrix_Calcium_0p64',...
-%                 'FCMatrix_Calcium_1p28','-v7.3')
-%         end
-%         
-%         clear FCMatrix_Calcium_ISA_old FCMatrix_Calcium_Delta_old...
-%             FCMatrix_Calcium_0p02 FCMatrix_Calcium_0p04...
-%             FCMatrix_Calcium_0p08 FCMatrix_Calcium_0p16...
-%             FCMatrix_Calcium_0p32 FCMatrix_Calcium_0p64...
-%             FCMatrix_Calcium_1p28
-%         
-%         
-%     end
-% end
+    
+    for n = runs
+        visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
+        processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
+        disp('loading processed data')
+        load(fullfile(saveDir,processedName),'xform_jrgeco1aCorr');
+        xform_jrgeco1aCorr(isinf(xform_jrgeco1aCorr)) = 0;
+        xform_jrgeco1aCorr(isnan(xform_jrgeco1aCorr)) = 0;
+        FCMatrix_Calcium_ISA_old = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),0.009,0.08,fs,xform_isbrain_mice);
+        FCMatrix_Calcium_Delta_old = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),0.4,4,fs,xform_isbrain_mice);
+        FCMatrix_Calcium_0p02 = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),0.02,0.08,fs,xform_isbrain_mice);
+        FCMatrix_Calcium_0p04 = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),0.04,0.16,fs,xform_isbrain_mice);
+        FCMatrix_Calcium_0p08 = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),0.08,0.32,fs,xform_isbrain_mice);
+        FCMatrix_Calcium_0p16 = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),0.16,0.64,fs,xform_isbrain_mice);
+        FCMatrix_Calcium_0p32 = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),0.32,1.28,fs,xform_isbrain_mice);
+        FCMatrix_Calcium_0p64 = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),0.64,2.56,fs,xform_isbrain_mice);
+        FCMatrix_Calcium_1p28 = calcFCMatrix_noGSR(squeeze(xform_jrgeco1aCorr),1.28,5.12,fs,xform_isbrain_mice);
+        clear xform_jrgeco1aCorr
+        processedName_fcMatrix = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_fcMatrix_noGSR','.mat');
+        if exist(fullfile(saveDir,processedName_fcMatrix))
+            save(fullfile(saveDir,processedName_fcMatrix),...
+                'FCMatrix_Calcium_ISA_old','FCMatrix_Calcium_Delta_old',...
+                'FCMatrix_Calcium_0p02','FCMatrix_Calcium_0p04',...
+                'FCMatrix_Calcium_0p08','FCMatrix_Calcium_0p16',...
+                'FCMatrix_Calcium_0p32','FCMatrix_Calcium_0p64',...
+                'FCMatrix_Calcium_1p28','-append')
+        else
+            save(fullfile(saveDir,processedName_fcMatrix),...
+                'FCMatrix_Calcium_ISA_old','FCMatrix_Calcium_Delta_old',...
+                'FCMatrix_Calcium_0p02','FCMatrix_Calcium_0p04',...
+                'FCMatrix_Calcium_0p08','FCMatrix_Calcium_0p16',...
+                'FCMatrix_Calcium_0p32','FCMatrix_Calcium_0p64',...
+                'FCMatrix_Calcium_1p28','-v7.3')
+        end
+        
+        clear FCMatrix_Calcium_ISA_old FCMatrix_Calcium_Delta_old...
+            FCMatrix_Calcium_0p02 FCMatrix_Calcium_0p04...
+            FCMatrix_Calcium_0p08 FCMatrix_Calcium_0p16...
+            FCMatrix_Calcium_0p32 FCMatrix_Calcium_0p64...
+            FCMatrix_Calcium_1p28
+        
+        
+    end
+end
 
 
 

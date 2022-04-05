@@ -43,9 +43,9 @@ for excelRow = excelRows
         FCMatrix_FAD_0p32 = calcFCMatrix(squeeze(xform_FADCorr),0.32,1.28,fs,xform_isbrain_mice);
         FCMatrix_FAD_0p64 = calcFCMatrix(squeeze(xform_FADCorr),0.64,2.56,fs,xform_isbrain_mice);
         FCMatrix_FAD_1p28 = calcFCMatrix(squeeze(xform_FADCorr),1.28,5.12,fs,xform_isbrain_mice);
-        clear xform_jrgeco1aCorr
+        clear xform_FADCorr
         processedName_fcMatrix = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_fcMatrix','.mat');
-        if exist(fullfile(saveDir,processedName_fcMatrix))
+        if exist(fullfile(saveDir,processedName_fcMatrix),'file')
             save(fullfile(saveDir,processedName_fcMatrix),...
                 'FCMatrix_FAD_ISA_old','FCMatrix_FAD_Delta_old',...
                 'FCMatrix_FAD_0p02','FCMatrix_FAD_0p04',...

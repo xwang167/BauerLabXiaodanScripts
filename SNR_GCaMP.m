@@ -1,6 +1,6 @@
 clear all;clc
 import mouse.*
-excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
+excelFile = "X:\Paper\PaperExperiment.xlsx";
 excelRows = 29:31;%:450;
 runs = 1:3;
 mean_gcamp_cat = [];
@@ -8,7 +8,7 @@ std_gcamp_cat = [];
 
 mean_gcamp_blocks_cat = [];
 std_gcamp_blocks_cat = [];
-saveDir_cat = 'X:\XW\Paper\hemoGCaMP\cat';
+saveDir_cat = 'X:\Paper\GCaMP\cat';
 miceName = [];
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
@@ -89,11 +89,11 @@ for excelRow = excelRows
 end
 figure
 yyaxis left
-plot(mean_gcamp_cat,'r-')
+plot(mean_gcamp_cat*100,'r-')
 hold on
-plot(std_gcamp_cat,'g-')
-ylim([-0.01 0.09])
-ylabel('\muF/F')
+plot(std_gcamp_cat*100,'g-')
+ylim([0 20])
+ylabel('\DeltaF/F%')
 hold on
 yyaxis right
 ylabel('SNR')

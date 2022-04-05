@@ -1,12 +1,12 @@
 clear all;clc
 import mouse.*
-excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
+excelFile = "X:\Paper\PaperExperiment.xlsx";
 excelRows = [26 27 34];%:450;
 runs = 1:3;
 peak_rgeco_cat = [];
 std_rgeco_cat = [];
 
-saveDir_cat = 'X:\XW\Paper\RGECO\cat';
+saveDir_cat = 'X:\Paper\RGECO\cat';
 miceName = [];
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
@@ -74,6 +74,8 @@ for excelRow = excelRows
         xlabel('Time(s)')
         ylabel('\muF/F')
         title(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-TimeTrace'))
+
+        save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-TimeTrace.mat')),'timeTrace')
         savefig(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-TimeTrace','.fig')))
         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-TimeTrace','.png')))
         for ii = 1:10

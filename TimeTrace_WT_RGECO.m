@@ -34,7 +34,7 @@ load('X:\XW\FilteredSpectra\FilteredEmission\WT\cat\210830--W30M3-W30M1-W30M2-W3
 % plot((1:750)/250,jrgeco1aCorr_timetrace,'m-')
 
 figure
-load('X:\XW\Paper\WT\RGECO Emission\cat\210830--W30M1-W30M2-W30M3-W31M1-W31M2-stim_processed_mice.mat', 'xform_jrgeco1a_mice_NoGSR','ROI')
+load('X:\Paper\WT\RGECO Emission\cat\210830--W30M1-W30M2-W30M3-W31M1-W31M2-stim_processed_mice.mat', 'xform_jrgeco1a_mice_NoGSR','ROI')
 iROI = reshape(ROI,1,[]);
 xform_jrgeco1a_mice_NoGSR_WT = reshape(xform_jrgeco1a_mice_NoGSR,128*128,[]);
 jrgeco1a_timetrace_WT= mean(xform_jrgeco1a_mice_NoGSR_WT(iROI,:),1);
@@ -44,7 +44,7 @@ hold on
 plot((1:750)/25,jrgeco1a_timetrace_WT,'k-')
 
 
-load('X:\XW\Paper\WT\RGECO Emission\cat\210830--W30M1-W30M2-W30M3-W31M1-W31M2-stim_processed_mice','xform_red_mice_NoGSR')
+load('X:\Paper\WT\RGECO Emission\cat\210830--W30M1-W30M2-W30M3-W31M1-W31M2-stim_processed_mice','xform_red_mice_NoGSR')
 xform_red_mice_NoGSR_WT = reshape(xform_red_mice_NoGSR,128*128,[]);
 red_timetrace = mean(xform_red_mice_NoGSR_WT(iROI,:),1);
 red_timetrace = red_timetrace-mean(red_timetrace(1:125));
@@ -95,3 +95,18 @@ a15 = jrgeco1a_timetrace_WT(246)/jrgeco1a_timetrace(246);
 
 RGECO = mean([jrgeco1a_timetrace(130) jrgeco1a_timetrace(137) jrgeco1a_timetrace(146) jrgeco1a_timetrace(154) jrgeco1a_timetrace(163) jrgeco1a_timetrace(171) jrgeco1a_timetrace(180) jrgeco1a_timetrace(188) jrgeco1a_timetrace(196) jrgeco1a_timetrace(205) jrgeco1a_timetrace(213) jrgeco1a_timetrace(221) jrgeco1a_timetrace(230) jrgeco1a_timetrace(238) jrgeco1a_timetrace(246)]);
 WT = mean([jrgeco1a_timetrace_WT(130) jrgeco1a_timetrace_WT(137) jrgeco1a_timetrace_WT(146) jrgeco1a_timetrace_WT(154) jrgeco1a_timetrace_WT(163) jrgeco1a_timetrace_WT(171) jrgeco1a_timetrace_WT(180) jrgeco1a_timetrace_WT(188) jrgeco1a_timetrace_WT(196) jrgeco1a_timetrace_WT(205) jrgeco1a_timetrace_WT(213) jrgeco1a_timetrace_WT(221) jrgeco1a_timetrace_WT(230) jrgeco1a_timetrace_WT(238) jrgeco1a_timetrace_WT(246)]);
+
+
+
+
+
+
+load('L:\RGECO\cat\191030--R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-stim_processed_mice.mat', 'xform_FADCorr_mice_NoGSR','ROI_GSR')
+iROI = reshape(ROI_GSR,1,[]);
+xform_FADCorr_mice_NoGSR_rgeco = reshape(xform_FADCorr_mice_NoGSR,128*128,[]);
+FADCorr_timetrace = mean(xform_FADCorr_mice_NoGSR_rgeco(iROI,:),1);
+FADCorr_timetrace = FADCorr_timetrace-mean(FADCorr_timetrace(1:125));
+mean_evoke_FADCorr= mean(FADCorr_timetrace(126:250));
+hold on
+plot((1:750)/25,jrgeco1a_timetrace,'m-')
+
