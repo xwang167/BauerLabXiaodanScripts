@@ -868,7 +868,8 @@ colorbar
 save('X:\GammaFit\190627-R5M2285-fc1-VaryTWA','tempT','tempW','tempA','tempr',...
     'tempr2','tempObj')
 
-
+load('X:\GammaFit\190627-R5M2285-fc1-VaryTWA','tempT','tempW','tempA','tempr',...
+    'tempr2','tempObj')
 
 
 
