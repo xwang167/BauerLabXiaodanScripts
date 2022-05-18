@@ -5,7 +5,7 @@ close all;clearvars;clc
 % runs = 1:6;
 
 excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
-excelRows = [19,23];%[13 15 12];
+excelRows = [29:31];%[13 15 12];
 runs = 1:3;
 stimStartTime = 5;
 
@@ -33,17 +33,17 @@ for excelRow = excelRows
     info.freqout=1;
     goodRuns = str2num(excelRaw{18});
     
-%     maskDir = saveDir;
-%     % maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-%     maskDir = fullfile(rawdataloc,recDate);
-%     maskName = strcat(recDate,'-N8M861-opto3-LandmarksAndMask','.mat');
-%     
-%     %maskName = strcat(recDate,'-',mouseName(1:11),mouseName((end-4):end),'-LandmarksAndMask','.mat');
-%     load(fullfile(maskDir,maskName),'xform_isbrain','isbrain');
+    %     maskDir = saveDir;
+    %     % maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+    %     maskDir = fullfile(rawdataloc,recDate);
+    %     maskName = strcat(recDate,'-N8M861-opto3-LandmarksAndMask','.mat');
+    %
+    %     %maskName = strcat(recDate,'-',mouseName(1:11),mouseName((end-4):end),'-LandmarksAndMask','.mat');
+    %     load(fullfile(maskDir,maskName),'xform_isbrain','isbrain');
     
     sessionInfo.framerate = excelRaw{7};
     processedName_mouse = strcat(recDate,'-',mouseName,'-',sessionType,'_processed_mouse','.mat');
-        maskDir = strcat('L:\RGECO\Kenny\', recDate, '\');
+    maskDir = strcat('L:\RGECO\Kenny\', recDate, '\');
     if exist(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-dataFluor.mat')),'file')
         load(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-dataFluor.mat')),'xform_isbrain');
         load(fullfile(maskDir,strcat(recDate,'-',mouseName,'-','LandmarksAndMask.mat')),'affineMarkers')
@@ -66,11 +66,11 @@ for excelRow = excelRows
     
     %xform_Laser_mouse_NoGSR = [];
     %     %
-        xform_FAD_mouse_GSR = [];
-        xform_FAD_mouse_NoGSR = [];
-        %
-        xform_FADCorr_mouse_GSR = [];
-        xform_FADCorr_mouse_NoGSR = [];
+    xform_FAD_mouse_GSR = [];
+    xform_FAD_mouse_NoGSR = [];
+    %
+    xform_FADCorr_mouse_GSR = [];
+    xform_FADCorr_mouse_NoGSR = [];
     %     %
     %
     %  xform_gcamp_mouse_GSR = [];
@@ -79,18 +79,17 @@ for excelRow = excelRows
     % xform_gcampCorr_mouse_GSR = [];
     %     xform_gcampCorr_mouse_NoGSR = [];
     %
-      xform_green_mouse_GSR = [];
-        xform_green_mouse_NoGSR = [];
+    xform_green_mouse_GSR = [];
+    xform_green_mouse_NoGSR = [];
     
     %if ~exist(fullfile(saveDir,processedName_mouse),'file')
-    for n = runs
-        
+    for n = runs        
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
         if exist(fullfile(saveDir, processedName),'file')
             sessionInfo.stimblocksize = excelRaw{11};
             disp('loading processed data')
-                            %goodBlocks_GSR = 1:10;
-                %goodBlocks_NoGSR = 1:10;
+            %goodBlocks_GSR = 1:10;
+            %goodBlocks_NoGSR = 1:10;
             load(fullfile(saveDir, processedName),'xform_datahb','goodBlocks_NoGSR')
             numBlocks = size(xform_datahb,4)/sessionInfo.stimblocksize;
             
@@ -103,25 +102,25 @@ for excelRow = excelRows
             
             xform_datahb_NoGSR = xform_datahb_NoGSR - xform_datahb_baseline;
             
-           
+            
             xform_datahb_mouse_NoGSR = cat(5,xform_datahb_mouse_NoGSR,xform_datahb_NoGSR(:,:,:,:,goodBlocks_NoGSR));
             
             
             
-                        load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_datahb_GSR','goodBlocks_GSR')
+            load(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'xform_datahb_GSR','goodBlocks_GSR')
             
-                        xform_datahb_GSR = reshape(xform_datahb_GSR,128,128,2,[],numBlocks);
+            xform_datahb_GSR = reshape(xform_datahb_GSR,128,128,2,[],numBlocks);
             
             
-                                    xform_datahb_GSR = reshape(xform_datahb_GSR,128,128,2,[],numBlocks);
-                        xform_datahb_GSR_baseline = mean(xform_datahb_GSR(:,:,:,1:sessionInfo.stimbaseline,:),4);
-                        xform_datahb_GSR_baseline = repmat(xform_datahb_GSR_baseline,1,1,1,size(xform_datahb_GSR,4),1);
+            xform_datahb_GSR = reshape(xform_datahb_GSR,128,128,2,[],numBlocks);
+            xform_datahb_GSR_baseline = mean(xform_datahb_GSR(:,:,:,1:sessionInfo.stimbaseline,:),4);
+            xform_datahb_GSR_baseline = repmat(xform_datahb_GSR_baseline,1,1,1,size(xform_datahb_GSR,4),1);
             
-                        xform_datahb_GSR = xform_datahb_GSR - xform_datahb_GSR_baseline;
-                       
-                            xform_datahb_mouse_GSR = cat(5,xform_datahb_mouse_GSR,xform_datahb_GSR(:,:,:,:,goodBlocks_GSR));
-                            clear xform_datahb_GSR
-                      
+            xform_datahb_GSR = xform_datahb_GSR - xform_datahb_GSR_baseline;
+            
+            xform_datahb_mouse_GSR = cat(5,xform_datahb_mouse_GSR,xform_datahb_GSR(:,:,:,:,goodBlocks_GSR));
+            clear xform_datahb_GSR
+            
             
             
             if strcmp(char(sessionInfo.mouseType),'PV')
@@ -134,7 +133,7 @@ for excelRow = excelRows
                 
                 
             end
-
+            
             %
             %
             if strcmp(char(sessionInfo.mouseType),'gcamp6f')
@@ -379,7 +378,7 @@ for excelRow = excelRows
         
         
         clear xform_datahb_mouse_NoGSR xform_jrgeco1a_mouse_NoGSR xform_jrgeco1aCorr_mouse_NoGSR xform_red_mouse_NoGSR  xform_FAD_mouse_NoGSR xform_FADCorr_mouse_NoGSR xform_green_mouse_NoGSR
- 
+        
         %
         xform_jrgeco1a_mouse_GSR = mean(xform_jrgeco1a_mouse_GSR,4);
         xform_jrgeco1aCorr_mouse_GSR = mean(xform_jrgeco1aCorr_mouse_GSR,4);
@@ -473,8 +472,8 @@ for excelRow = excelRows
         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'ROI.fig')))
         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'ROI.png')))
     end
-close all
-  
+    close all
+    
     
 end
 

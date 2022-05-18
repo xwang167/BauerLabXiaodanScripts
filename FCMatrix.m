@@ -25,15 +25,6 @@ for excelRow = excelRows
     systemInfo.numLEDs = 4;
     fs = excelRaw{7};
 
-    saveDir_new = strcat('L:\RGECO\Kenny\', recDate, '\');
-    maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datafluor','.mat');
-
-    if ~exist(fullfile(saveDir_new,maskName),'file')
-        maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-        load(fullfile(saveDir,maskName),'xform_isbrain')
-    else
-        load(fullfile(saveDir_new,maskName),'xform_isbrain');
-    end
     for n = runs
         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');

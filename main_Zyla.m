@@ -905,7 +905,7 @@ for excelRow = excelRows
                     ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
                     max_ROI = prctile(peakMap_ROI(ROI),99);
                     temp = double(peakMap_ROI).*double(ROI);
-                    ROI = temp>max_ROI*0.5;
+                    ROI = temp>max_ROI*0.75;
                     hold on
                     ROI_contour = bwperim(ROI);
                     [~,c] = contour( ROI_contour,'r');

@@ -65,7 +65,7 @@ HbT_filter = reshape(HbT_filter,128,128,[]);
 time_epoch=15;
 t = linspace(0,time_epoch,time_epoch*sessionInfo.framerate *(5/sessionInfo.framerate));%% force it to be 5 hz
 
-%% iter 300
+%% iter 300,cross corrlation as T initial guess
 hrfParam2 = nan(128,128,3);
 T2 = nan(128,128);
 W2 = nan(128,128);
@@ -75,7 +75,7 @@ r2 = nan(128,128);
 r22 = nan(128,128);
 mask = reshape(mask,128,128);
 
-options=optimset('Display','iter','MaxFunEvals',12000,'MaxIter',300,'Tolx',1e-8,'TolF',1e-8);
+options=optimset('Display','iter','MaxFunEvals',1200,'MaxIter',300,'Tolx',1e-8,'TolF',1e-8);
 
 for xInd = 1:size(HbT_filter,2)
     for yInd = 1:size(HbT_filter,1)
@@ -90,7 +90,7 @@ for xInd = 1:size(HbT_filter,2)
             %             options.TolFun = worstErr*0.01;
             %fcn = @(param)he.fcn(param);
             fcn = @(param)he.fcn(param);
-            [~,pixHrfParam,obj_val,~,~] = evalc('fminsearchbnd(fcn,[1,1.5,0.25],[0.01,0.3,0.05],[2,3,1],options)');
+            [~,pixHrfParam,obj_val,~,~] = evalc('fminsearchbnd(fcn,[lagTimeTrial_HbTCalcium(yInd,xInd),1.8,0.12],[0.5,0.3,0.05],[2,3,1],options)');
             
             
             %             tMin = 0.0625; tMax = 4; tNum = 64;
