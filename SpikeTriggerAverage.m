@@ -1,11 +1,14 @@
 import mouse.*
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
 excelRows = [181 183 185 228 232 236];% 202 195 204 230 234 240];
-runs = 1;%
+runs = 1:3;%
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
 load('D:\OIS_Process\noVasculatureMask.mat')
 
+HbO_spikes = [];
+HbR_spikes = [];
 HbT_spikes = [];
+FAD_spikes = [];
 calcium_spikes = [];
 
 for excelRow = excelRows
@@ -42,102 +45,82 @@ for excelRow = excelRows
         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
         tic
-        load(fullfile(saveDir,processedName),'xform_datahb','xform_jrgeco1a')
-        xform_jrgeco1a = squeeze(xform_jrgeco1a);
+        load(fullfile(saveDir,processedName),'xform_datahb','xform_jrgeco1a','xform_FAD')
         xform_datahb(isinf(xform_datahb)) = 0;
         xform_datahb(isnan(xform_datahb)) = 0;
         xform_jrgeco1a(isinf(xform_jrgeco1a)) = 0;
         xform_jrgeco1a(isnan(xform_jrgeco1a)) = 0;
+        xform_FAD(isinf(xform_FAD)) = 0;
+        xform_FAD(isnan(xform_FAD)) = 0;
         
-        calcium = squeeze(xform_jrgeco1a);  
-        %clear xform_jrgeco1a
+        calcium = squeeze(xform_jrgeco1a);
+        FAD = squeeze(xform_FAD);
+        clear xform_jrgeco1a xform_FAD
         HbT = squeeze(xform_datahb(:,:,1,:) + xform_datahb(:,:,2,:));
-        %clear xform_datahb
-       
+        HbR = squeeze(xform_datahb(:,:,2,:));
+        HbO = squeeze(xform_datahb(:,:,1,:));
+        clear xform_datahb
+        
         mask = logical(mask_new.*xform_isbrain);
         for ii = 1:128
             for jj = 1:128
                 range_peaks = [];
                 if mask(ii,jj)
-                    pixHemo = squeeze(HbT(ii,jj,1:1000))'*10^6;
-                    pixNeural = squeeze(calcium(ii,jj,1:1000))'*100;
+                    pixHbT = squeeze(HbT(ii,jj,:))'*10^6;
+                    pixHbO = squeeze(HbO(ii,jj,:))'*10^6;
+                    pixHbR = squeeze(HbR(ii,jj,:))'*10^6;
+                    pixNeural = squeeze(calcium(ii,jj,:))'*100;
+                    pixFAD = squeeze(FAD(ii,jj,:))'*100;
                     [~,locs] = findpeaks(pixNeural,'MinPeakProminence',6);
-                                       
                     %with peaks
                     if ~isempty(locs)
                         for ll = 1:length(locs)
-                            if locs(ll)+30>length(pixHemo)
-                                locs(ll) = [];
+                            if locs(ll)+250>length(pixHemo)
+                                continue
                             else
-                                endInd = locs(ll)+30;
+                                endInd = locs(ll)+250;
                             end
                             
-                            if locs(ll)-30<1
-                                 locs(ll) = [];
+                            if locs(ll)-74<1
+                                continue
                             else
-                                startInd = locs(ll)-30;
+                                startInd = locs(ll)-74;
                             end
-                            peak_HbT = pixHemo(startInd:endInd);
+                            peak_HbT = pixHbT(startInd:endInd);
+                            peak_HbO = pixHbO(startInd:endInd);
+                            peak_HbR = pixHbR(startInd:endInd);
+                            peak_FAD = pixFAD(startInd:endInd);
                             peak_calcium = pixNeural(startInd:endInd);
-                            baseline_HbT = mean(peak_HbT(1:10));
-                            baseline_calcium = mean(peak_calcium(1:10));
+                            
+                            baseline_HbT = mean(peak_HbT(1:50));
+                            baseline_HbO = mean(peak_HbO(1:50));
+                            baseline_HbR = mean(peak_HbR(1:50));
+                            baseline_FAD = mean(peak_FAD(1:50));
+                            baseline_calcium = mean(peak_calcium(1:50));
+                            
                             peak_HbT =  peak_HbT - baseline_HbT;
+                            peak_HbO =  peak_HbO - baseline_HbO;
+                            peak_HbR =  peak_HbR - baseline_HbR;
+                            peak_FAD =  peak_FAD - baseline_FAD;
                             peak_calcium =  peak_calcium - baseline_calcium;
-                            HbT_spike = peakHbT;
-                            calcium_spike = peak_calcium;
+                            
+                            HbT_spikes = cat(1,HbT_spikes,peak_HbT);
+                            HbO_spikes = cat(1,HbO_spikes,peak_HbO);
+                            HbR_spikes = cat(1,HbR_spikes,peak_HbR);
+                            FAD_spikes = cat(1,FAD_spikes,peak_FAD);
+                            calcium_spikes = cat(1,calcium_spikes,peak_calcium);
                         end
-                        
-                        trace_peak_calcium = pixNeural(range_peaks);
-                        trace_peak_HbT = pixHemo(range_peaks);
-                        
-                        
-                        he = HemodynamicsError(t,trace_peak_calcium,trace_peak_HbT);
-                        fcn = @(param)he.fcn(param);
-                        [~,pixHrfParam,obj_val,~,~] = evalc('fminsearchbnd(fcn,[0.62,1.8,0.12],[0.2,0.3,0.05],[2,3,1],options)');
-                        pixelHrf = hrfGamma(t,pixHrfParam(1),pixHrfParam(2),pixHrfParam(3));
-                        
-                        pixHemoPred = conv(trace_peak_calcium,pixelHrf);
-                        pixHemoPred = pixHemoPred(1:numel(trace_peak_calcium));
-                        r = corr(pixHemoPred',trace_peak_HbT');%real(atanh(corr(pixHemoPred',pixHemo')));
-                        [lagTimeTrial_HbTCalcium, lagAmpTrial_HbTCalcium,covResult_HbTCalcium] = mouse.conn.dotLag(...
-                            reshape(trace_peak_HbT,1,1,[]),reshape(trace_peak_calcium,1,1,[]),edgeLen,validRange,corrThr, true,true);
-                        lagTimeTrial_HbTCalcium = lagTimeTrial_HbTCalcium./fs;
-                        bad_peaks_T = [bad_peaks_T,pixHrfParam(1)];
-                        bad_peaks_r = [bad_peaks_r,r];
-                        bad_peaks_lag = [bad_peaks_lag,lagTimeTrial_HbTCalcium];
-                        bad_peaks_lagCorr = [bad_peaks_lagCorr,lagAmpTrial_HbTCalcium];
-                        
-                        
-                        trace_nopeak_calcium = pixNeural;
-                        trace_nopeak_HbT = pixHemo;
-                        
-                        trace_nopeak_calcium(range_peaks) = [];
-                        trace_nopeak_HbT(range_peaks) = [];
-                        he = HemodynamicsError(t,trace_nopeak_calcium,trace_nopeak_HbT);
-                        fcn = @(param)he.fcn(param);
-                        [~,pixHrfParam,obj_val,~,~] = evalc('fminsearchbnd(fcn,[0.62,1.8,0.12],[0.2,0.3,0.05],[2,3,1],options)');
-                        pixelHrf = hrfGamma(t,pixHrfParam(1),pixHrfParam(2),pixHrfParam(3));
-                        
-                        pixHemoPred = conv(trace_nopeak_calcium,pixelHrf);
-                        pixHemoPred = pixHemoPred(1:numel(trace_nopeak_calcium));
-                        r = corr(pixHemoPred',trace_nopeak_calcium');%real(atanh(corr(pixHemoPred',pixHemo')));
-                        [lagTimeTrial_HbTCalcium, lagAmpTrial_HbTCalcium,covResult_HbTCalcium] = mouse.conn.dotLag(...
-                            reshape(trace_nopeak_HbT,1,1,[]),reshape(trace_nopeak_calcium,1,1,[]),edgeLen,validRange,corrThr, true,true);
-                        lagTimeTrial_HbTCalcium = lagTimeTrial_HbTCalcium./fs;
-                        bad_nopeaks_T = [bad_nopeaks_T,pixHrfParam(1)];
-                        bad_nopeaks_r = [bad_nopeaks_r,r];
-                        bad_nopeaks_lag = [bad_nopeaks_lag,lagTimeTrial_HbTCalcium];
-                        bad_nopeaks_lagCorr = [bad_nopeaks_lagCorr,lagAmpTrial_HbTCalcium];
-                        % no peaks
-                        
                     end
+                    
+                    % no peaks
+                    
                 end
-                
-                
             end
+            
+            
         end
     end
-    
 end
+
 
 
