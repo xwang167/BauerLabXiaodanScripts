@@ -1,4 +1,4 @@
-function [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_CalciumHbT_Mask_nan(neural,hemo,t,mask)
+function [T,W,A,r,r2,hemoPred] = interSpeciesGammaFit_CalciumHbT_Mask_jpc(neural,hemo,t,mask,lag)
 %UNTITLED2 Summary of this function goes here
 %   neural = 3D
 %   hemo = 3D
@@ -21,20 +21,18 @@ r2 = nan(128);
 
 for xInd = 1:size(neural,2)
     for yInd = 1:size(neural,1)
-        %if mask(yInd,xInd)
+        if mask(yInd,xInd)
             pixHemo = squeeze(hemo(yInd,xInd,:))';
             pixNeural = squeeze(neural(yInd,xInd,:))';
             %t = (0:25)./25;
             %t = (0:750)./25;
             he = HemodynamicsError(t,pixNeural,pixHemo);
-            worstErr = sum(pixHemo.^2);
-            options.TolFun = worstErr*0.01;
-            fcn = @(param)he.fcn(param);
+            fcn = @(param)he.fcn_zscore(param);
             %             [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[1,3,0.0001],[0,0.5,0],[4,10,inf],options)');
             %             [~,pixHrfParam] = evalc('fminsearch(fcn,[2,3,0.0001],options)');
             %[~,pixHrfParam] = evalc('fminsearchbnd(fcn,[2,3,1],[0,0,0],[4,6,inf],options)');
             %[x,pixHrfParam,objective_val,exitflag,outputs] = evalc('fminsearchbnd(fcn,[1,1.5,0.25],[0.01,0.3,0.05],[2,3,1],options)');
-             [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[0.62,1.8,0.12],[0.2,0.3,0.05],[2,3,1],options)');%before 220319
+            [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[lag(yInd,xInd),1.8,0.12],[0.2,0.3,0.05],[2,3,1],options)');%before 220319
             %             [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[2,3,0.0001],[0,0,0],[inf,inf,inf],options)');
             %             [~,pixHrfParam] = evalc('fminsearchbnd(fcn,[2,3,0.0001],[0,-inf,-inf],[4,-inf,inf],options)');
             
@@ -61,7 +59,7 @@ for xInd = 1:size(neural,2)
                 r2(yInd,xInd) = 1-sumsqr(pixHemo-pixHemoPred)/sumsqr(pixHemo-mean(pixHemo));
                 end
             %1 - var(pixHemoPred - pixHemo)/var(pixHemo);
-        %end
+        end
     end
 end
 

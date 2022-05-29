@@ -5,7 +5,7 @@ close all;clear all;clc
 % runs = 1:6;
 
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
-excelRows = [237];
+excelRows = [229];
 
 runs = 1:3;
 stimStartTime = 5;
@@ -71,8 +71,8 @@ for excelRow = excelRows
     xform_FADCorr_mouse_GSR = [];
     xform_FADCorr_mouse_NoGSR = [];
     %
-    xform_green_mouse_GSR = [];
-    xform_green_mouse_NoGSR = [];
+    xform_red_mouse_GSR = [];
+    xform_red_mouse_NoGSR = [];
     
     %if ~exist(fullfile(saveDir,processedName_mouse),'file')
     for n = runs
@@ -136,13 +136,20 @@ for excelRow = excelRows
             clear xform_green
             
             xform_datahb_GSR = reshape(xform_datahb_GSR,128,128,2,[],numBlocks);            
-            xform_jrgeco1a_GSR = reshape(xform_jrgeco1a_GSR,128,128,[],numBlocks);            
+            clear xform_datahb_GSR
+            xform_jrgeco1a_GSR = reshape(xform_jrgeco1a_GSR,128,128,[],numBlocks);
+            clear xform_jrgeco1a_GSR
             xform_jrgeco1aCorr_GSR = reshape(xform_jrgeco1aCorr_GSR,128,128,[],numBlocks);
-            %xform_red_GSR = reshape(xform_red_GSR,128,128,[],numBlocks);                       
+            clear xform_jrgeco1aCorr_GSR
+            xform_red_GSR = reshape(xform_red_GSR,128,128,[],numBlocks);
+            clear xform_red_GSR
+            
             xform_FAD_GSR = reshape(xform_FAD_GSR,128,128,[],numBlocks);
+            clear xform_FAD_GSR
             xform_FADCorr_GSR = reshape(xform_FADCorr_GSR,128,128,[],numBlocks);
-            %xform_green_GSR = reshape(xform_green_GSR,128,128,[],numBlocks);
-
+            clear xform_FADCorr_GSR
+            xform_green_GSR = reshape(xform_green_GSR,128,128,[],numBlocks);
+            clear xform_green_GSR
             
             
             %concatenate
@@ -152,15 +159,15 @@ for excelRow = excelRows
             clear xform_FAD_NoGSR
             xform_FADCorr_mouse_NoGSR = cat(4,xform_FADCorr_mouse_NoGSR,xform_FADCorr_NoGSR);
             clear xform_FADCorr_NoGSR
-           % xform_green_mouse_NoGSR = cat(4,xform_green_mouse_NoGSR,xform_green_NoGSR);
-            %clear xform_green_NoGSR
+            xform_green_mouse_NoGSR = cat(4,xform_green_mouse_NoGSR,xform_green_NoGSR);
+            clear xform_green_NoGSR
             
             xform_jrgeco1a_mouse_NoGSR = cat(4,xform_jrgeco1a_mouse_NoGSR,xform_jrgeco1a_NoGSR);
             clear xform_jrgeco1a_NoGSR
             xform_jrgeco1aCorr_mouse_NoGSR = cat(4,xform_jrgeco1aCorr_mouse_NoGSR,xform_jrgeco1aCorr_NoGSR);
             clear xform_jrgeco1aCorr_NoGSR
-            %xform_red_mouse_NoGSR = cat(4,xform_red_mouse_NoGSR,xform_red_NoGSR);
-            %clear xform_red_NoGSR
+            xform_red_mouse_NoGSR = cat(4,xform_red_mouse_NoGSR,xform_red_NoGSR);
+            clear xform_red_NoGSR
                                               
             xform_datahb_mouse_GSR = cat(5,xform_datahb_mouse_GSR,xform_datahb_GSR);
             
@@ -168,15 +175,15 @@ for excelRow = excelRows
             clear xform_FAD_GSR
             xform_FADCorr_mouse_GSR = cat(4,xform_FADCorr_mouse_GSR,xform_FADCorr_GSR);
             clear xform_FADCorr_GSR
-           % xform_green_mouse_GSR = cat(4,xform_green_mouse_GSR,xform_green_GSR);
-           % clear xform_green_GSR
+            xform_green_mouse_GSR = cat(4,xform_green_mouse_GSR,xform_green_GSR);
+            clear xform_green_GSR
             
             xform_jrgeco1a_mouse_GSR = cat(4,xform_jrgeco1a_mouse_GSR,xform_jrgeco1a_GSR);
             clear xform_jrgeco1a_GSR
             xform_jrgeco1aCorr_mouse_GSR = cat(4,xform_jrgeco1aCorr_mouse_GSR,xform_jrgeco1aCorr_GSR);
             clear xform_jrgeco1aCorr_GSR
-            %xform_red_mouse_GSR = cat(4,xform_red_mouse_GSR,xform_red_GSR);
-            %clear xform_red_GSR
+            xform_red_mouse_GSR = cat(4,xform_red_mouse_GSR,xform_red_GSR);
+            clear xform_red_GSR
             
         end
     end

@@ -1,3 +1,32 @@
+Skip to content
+Search or jump to…
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@xwang167 
+xwang167
+/
+BauerLabXiaodanScripts
+Public
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security
+Insights
+Settings
+BauerLabXiaodanScripts/interSpeciesGammaFit_CalciumFAD.m
+@xwang167
+xwang167 update
+Latest commit 499002f on Nov 15, 2021
+ History
+ 1 contributor
+56 lines (46 sloc)  1.92 KB
+   
 function [T,W,A,r,r2,FADPred] = interSpeciesGammaFit_CalciumFAD(neural,FAD,t)
 %UNTITLED2 Summary of this function goes here
 %   neural = 3D
@@ -54,3 +83,16 @@ W = mrfParam(:,:,2);
 A = mrfParam(:,:,3);
 
 end
+© 2022 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+Loading complete

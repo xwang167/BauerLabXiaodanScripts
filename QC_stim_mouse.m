@@ -149,6 +149,8 @@ for excelRow = excelRows
                 xform_green_NoGSR = reshape(xform_green,128,128,[],numBlocks);
                 clear xform_green
                 
+                
+                
                 xform_gcamp_mouse_NoGSR = cat(4,xform_gcamp_mouse_NoGSR,xform_gcamp_NoGSR(:,:,:,goodBlocks_NoGSR));
                 xform_gcampCorr_mouse_NoGSR = cat(4,xform_gcampCorr_mouse_NoGSR,xform_gcampCorr_NoGSR(:,:,:,goodBlocks_NoGSR));
                 xform_green_mouse_NoGSR = cat(4,xform_green_mouse_NoGSR,xform_green_NoGSR(:,:,:,goodBlocks_NoGSR));
