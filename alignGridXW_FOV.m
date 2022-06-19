@@ -1,8 +1,7 @@
 %clear; close all; clc;
-load("X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-HomoFC-Calcium.mat");
-load("X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-SeedLocation.mat");
+load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-HomoFC-Calcium.mat'));
+load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-SeedLocation.mat'));
 load('D:\OIS_Process\Paxinos\AtlasandIsbrain.mat')
-%%
 
 
 %% get seedmap v2
@@ -110,7 +109,7 @@ hold on
 brainMapADOG = brainMapOG;
 brainMapADOG(isnan(brainMapADOG)) = 0;
 brainMapADOG(brainMapADOG>0) = 1;
-imagesc(brainMapOG, "AlphaData", brainMapADOG);
+imagesc(brainMapOG, "AlphaData", brainMapADOG,[-1.4 1.4]);
 axis square image off
 h = colorbar;
 ylabel(h, 'z(r)','fontsize',10,'FontWeight','bold')

@@ -1,10 +1,10 @@
 clear all;close all;
 %% Get Run and System Info
-excelFile="X:\XW\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
-load('Z:\220210\220210-m.mat')
+load('W:\220210\220210-m.mat')
+excelFile="X:\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
 [refseeds, ~]=GetReferenceGridSeeds;
 %% Average movies across runs for each mouse
-for excelRows = 2:4
+for excelRows = 5:11
     
     runsInfo = parseRuns_xw(excelFile,excelRows);
     [row,start_ind_mouse,numruns_per_mouse]=unique({runsInfo.excelRow_char}); %Note that unique only takes characters! This makes it so that we only do landmark for one of the runs!
@@ -13,21 +13,23 @@ for excelRows = 2:4
     totalSubFileNum = length(runInfo.rawFile)/2;
     load(runInfo.saveMaskFile,'xform_isbrain')
     for ii = 1:totalSubFileNum
-        load(strcat(runInfo.saveFilePrefix,'_',num2str(ii),'.mat'),'laserFrames_cam1')
-        numBlocks = size(laserFrames_cam1,3);
-        AvgMovie_jRGECO1a = zeros(128,128,runInfo.samplingRate*runInfo.blockLen*numBlocks,3);
-        for runInd = 1:3
-            runInfo = runsInfo(runInd);
-            load(strcat(runInfo.saveFilePrefix,'_',num2str(ii),'-dataFluor.mat'),'xform_datafluorCorr')
-            AvgMovie_jRGECO1a(:,:,:,runInd) = gsr(xform_datafluorCorr,xform_isbrain);
+        if ~exist(strcat(runInfo.saveFilePrefix(1:end-6),'_',num2str(ii),'-avgCalciumMovie.mat'),'file')
+            load(strcat(runInfo.saveFilePrefix,'_',num2str(ii),'.mat'),'laserFrames_cam1')
+            numBlocks = size(laserFrames_cam1,3);
+            AvgMovie_jRGECO1a = [];
+            for runInd = 1:length(runsInfo)
+                runInfo = runsInfo(runInd);
+                load(strcat(runInfo.saveFilePrefix,'_',num2str(ii),'-dataFluor.mat'),'xform_datafluorCorr')
+                AvgMovie_jRGECO1a = cat(4,AvgMovie_jRGECO1a,gsr(xform_datafluorCorr,xform_isbrain));
+            end
+            AvgMovie_jRGECO1a = mean(AvgMovie_jRGECO1a,4);
+            save(strcat(runInfo.saveFilePrefix(1:end-6),'_',num2str(ii),'-avgCalciumMovie.mat'),'AvgMovie_jRGECO1a','-v7.3')
         end
-        AvgMovie_jRGECO1a = mean(AvgMovie_jRGECO1a,4);
-        save(strcat(runInfo.saveFilePrefix(1:end-6),'_',num2str(ii),'-avgCalciumMovie.mat'),'AvgMovie_jRGECO1a','-v7.3')
     end
 end
 
 %% Peak maps for each mouse, each site, averaged across runs
-for excelRows = 2:4    
+for excelRows = 5:11
     runsInfo = parseRuns_xw(excelFile,excelRows);
     runInfo = runsInfo(1);
     totalSubFileNum = length(runInfo.rawFile)/2;
@@ -42,28 +44,28 @@ for excelRows = 2:4
         kk = 1;
         load(strcat(runInfo.saveFilePrefix,'_',num2str(ii),'.mat'),'laserFrames_cam1')
         xform_laserFrames_cam1 = affineTransform(laserFrames_cam1,I);
-        while kk < numBlock+1         
-            if GoodSeedsidx(m(jj)) == 1  
-                gridPeakMaps_jrgeco1aCorr(:,:,m(jj)) = AvgPeakMap(:,:,kk);                
+        while kk < numBlock+1
+            if GoodSeedsidx(m(jj)) == 1
+                gridPeakMaps_jrgeco1aCorr(:,:,m(jj)) = AvgPeakMap(:,:,kk);
                 figure('units','normalized','outerposition',[0 0 1 1])
-                colormap jet                            
+                colormap jet
                 subplot(1,2,1)
                 imagesc(gridPeakMaps_jrgeco1aCorr(:,:,m(jj))*100,[-1.5 1.5]);
                 axis image off
-                colorbar                            
-                hold on               
+                colorbar
+                hold on
                 scatter(refseeds(m(jj),1),refseeds(m(jj),2),'w','LineWidth',2)
                 title('jRGECO1a')
                 
                 subplot(1,2,2)
                 imagesc(xform_laserFrames_cam1(:,:,kk));
                 axis image off
-                colorbar                            
-                hold on               
+                colorbar
+                hold on
                 scatter(refseeds(m(jj),1),refseeds(m(jj),2),'w','LineWidth',2)
                 title('xform Laser')
-                suptitle(strcat(runInfo.recDate,'-',runInfo.mouseName,'-',...
-                     num2str(ii),'-',num2str(kk),'-GSR-AvgPeakMaps-Calcium'))
+                sgtitle(strcat(runInfo.recDate,'-',runInfo.mouseName,'-',...
+                    num2str(ii),'-',num2str(kk),'-GSR-AvgPeakMaps-Calcium'))
                 saveas(gcf,strcat(runInfo.saveFilePrefix(1:end-6),'_',num2str(ii),'-',num2str(kk),'-GSR-AvgPeakMaps-Calcium.fig'))
                 saveas(gcf,strcat(runInfo.saveFilePrefix(1:end-6),'_',num2str(ii),'-',num2str(kk),'-GSR-AvgPeakMaps-Calcium.png'))
                 close all
@@ -76,7 +78,7 @@ for excelRows = 2:4
 end
 
 %% collect all the peak maps for one mouse
-for excelRows = 2:4    
+for excelRows = 5:11
     runsInfo = parseRuns_xw(excelFile,excelRows);
     runInfo = runsInfo(1);
     totalSubFileNum = length(runInfo.rawFile)/2;
@@ -90,7 +92,7 @@ for excelRows = 2:4
 end
 
 %% store laser maps in the right order
-for excelRows = 2:4    
+for excelRows = 5:11
     runsInfo = parseRuns_xw(excelFile,excelRows);
     runInfo = runsInfo(1);
     totalSubFileNum = length(runInfo.rawFile)/2;
@@ -102,9 +104,9 @@ for excelRows = 2:4
         load(strcat(runInfo.saveFilePrefix,'_',num2str(ii),'.mat'),'laserFrames_cam1')
         xform_laserFrames_cam1 = affineTransform(laserFrames_cam1,I);
         numBlock = size(xform_laserFrames_cam1,3);
-        while kk < numBlock+1         
-            if GoodSeedsidx(m(jj)) == 1  
-                gridLaser(:,:,m(jj)) = laserFrames_cam1(:,:,kk);
+        while kk < numBlock+1
+            if GoodSeedsidx(m(jj)) == 1
+                gridLaser(:,:,m(jj)) = xform_laserFrames_cam1(:,:,kk);
                 kk = kk+1;
             end
             jj = jj+1;
@@ -114,7 +116,7 @@ for excelRows = 2:4
 end
 
 %% collect all the laser for one mouse
-for excelRows = 2:4    
+for excelRows = 5:11
     runsInfo = parseRuns_xw(excelFile,excelRows);
     runInfo = runsInfo(1);
     totalSubFileNum = length(runInfo.rawFile)/2;
@@ -142,13 +144,13 @@ end
 %     hold on
 %     contour(xform_isbrain,'k')
 % end
-% 
-% 
+%
+%
 % axis image off
-% for jj = 1:160    
+% for jj = 1:160
 %     if GoodSeedsidx_shared(m(jj)) == 1
 %         hold on
-%         scatter(refseeds(m(jj),1),refseeds(m(jj),2),'w','LineWidth',2)        
+%         scatter(refseeds(m(jj),1),refseeds(m(jj),2),'w','LineWidth',2)
 %     end
 % end
 % title('Shared Laser Sites')

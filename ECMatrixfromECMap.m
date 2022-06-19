@@ -1,4 +1,4 @@
-% load('X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-gridEFC.mat')
+% load('X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-gridEC.mat')
 % load('X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-SeedLocation.mat')
 % load('X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-GoodSeedsNew.mat')
 % load('X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-Atlas.mat','atlasIndx_valid_sorted','I')
@@ -11,9 +11,9 @@
 %     xform_isbrain_mice = xform_isbrain_mice.*xform_isbrain;
 % end
 % xform_isbrain_mice = xform_isbrain_mice & fliplr(xform_isbrain_mice);
-% gridEFC_jRGECO1a_mice_valid = gridEFC_jRGECO1a_mice;
-% gridEFC_jRGECO1a_mice_valid(:,:,logical(1-GoodSeedsidx_new_mice))=[];
-% gridEFC_jRGECO1a_mice_valid_sorted = gridEFC_jRGECO1a_mice_valid(:,:,I);
+% gridEC_jRGECO1a_mice_valid = gridEC_jRGECO1a_mice;
+% gridEC_jRGECO1a_mice_valid(:,:,logical(1-GoodSeedsidx_new_mice))=[];
+% gridEC_jRGECO1a_mice_valid_sorted = gridEC_jRGECO1a_mice_valid(:,:,I);
 % 
 % 
 % seedLocation_mice_valid = seedLocation_mice;
@@ -29,7 +29,7 @@
 %     radius = 3;
 %     ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
 %     subplot(5,8,jj)
-%     imagesc(gridEFC_jRGECO1a_mice_valid_sorted(:,:,ii),[-2 2])
+%     imagesc(gridEC_jRGECO1a_mice_valid_sorted(:,:,ii),[-2 2])
 %     hold on
 %     contour(ROI,'w')
 %     hold on;
@@ -64,8 +64,8 @@
 % saveas(gcf,'X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-EC-Calcium-sorted-2.fig')
 % save('X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-SeedLocation.mat',...
 %     'seedLocation_mice_valid','seedLocation_mice_valid_sorted','-append')
-% save('X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-gridEFC.mat',...
-%     'gridEFC_jRGECO1a_mice_valid','gridEFC_jRGECO1a_mice_valid_sorted','-append')
+% save('X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-gridEC.mat',...
+%     'gridEC_jRGECO1a_mice_valid','gridEC_jRGECO1a_mice_valid_sorted','-append')
 seedLocation_mice_valid_sorted_R = nan(2,79);
 seedLocation_mice_valid_sorted_R(1,:) = seedLocation_mice_valid_sorted(1,:);
 seedLocation_mice_valid_sorted_R(2,:) = 129-seedLocation_mice_valid_sorted(2,:);
@@ -77,7 +77,7 @@ ECMatrix_mice_valid_sorted_L = nan(79,79);
 ECMatrix_mice_valid_sorted_R = nan(79,79);
 
 for ii = 1:79
-    map = gridEFC_jRGECO1a_mice_valid_sorted(:,:,ii);
+    map = gridEC_jRGECO1a_mice_valid_sorted(:,:,ii);
     for jj = 1:79        
         x1 = seedLocation_mice_valid_sorted(2,jj);
         y1 = seedLocation_mice_valid_sorted(1,jj);
@@ -91,7 +91,7 @@ end
 
 
 for ii = 1:79
-    map = gridEFC_jRGECO1a_mice_valid_sorted(:,:,ii);
+    map = gridEC_jRGECO1a_mice_valid_sorted(:,:,ii);
     for jj = 1:79        
         x1 = seedLocation_mice_valid_sorted_R(2,jj);
         y1 = seedLocation_mice_valid_sorted_R(1,jj);

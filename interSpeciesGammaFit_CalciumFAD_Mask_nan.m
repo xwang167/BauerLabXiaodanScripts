@@ -12,7 +12,7 @@ function [T,W,A,r,r2,FADPred] = interSpeciesGammaFit_CalciumFAD_Mask_nan(neural,
 
 options = optimset('Display','iter');
 % options.MaxIter = 100;
-
+options=optimset('Display','iter','MaxFunEvals',1200,'MaxIter',300,'Tolx',1e-8,'TolF',1e-8);%before 220319
 mrfParam = nan(128,128,3);
 FADPred = nan(128,128,size(neural,3));
 r = nan(128);

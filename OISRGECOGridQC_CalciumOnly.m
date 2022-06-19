@@ -1,13 +1,13 @@
 clear all;close all;
 %% Get Run and System Info
-excelFile="X:\XW\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
-excelRows = [3:4];
+excelFile="X:\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
+excelRows = 5:11;
 
 runsInfo = parseRuns_xw(excelFile,excelRows);
 [row,start_ind_mouse,numruns_per_mouse]=unique({runsInfo.excelRow_char}); %Note that unique only takes characters! This makes it so that we only do landmark for one of the runs!
 
 runNum = numel(runsInfo);
-load('Z:\220210\220210-m.mat')
+load('W:\220210\220210-m.mat')
 [refseeds, I]=GetReferenceGridSeeds;
 for runInd = 1:runNum
     clearvars -except runsInfo runNum runInd fRange_ISA fRange_delta refseeds m
@@ -49,7 +49,7 @@ for runInd = 1:runNum
                 hold on               
                 scatter(refseeds(m(jj),1),refseeds(m(jj),2),'w','LineWidth',2)
                 title('xform Laser')
-                suptitle(strcat(runInfo.recDate,'-',runInfo.mouseName,'-',...
+                sgtitle(strcat(runInfo.recDate,'-',runInfo.mouseName,'-',...
                   runInfo.session,num2str(runInfo.run),'-',num2str(ii),'-',num2str(kk),'-GSR-PeakMaps-Calcium'))
                 saveas(gcf,strcat(runInfo.saveFilePrefix,'_',num2str(ii),'-',num2str(kk),'-GSR-PeakMaps-Calcium.fig'))
                 saveas(gcf,strcat(runInfo.saveFilePrefix,'_',num2str(ii),'-',num2str(kk),'-GSR-PeakMaps-Calcium.png'))
