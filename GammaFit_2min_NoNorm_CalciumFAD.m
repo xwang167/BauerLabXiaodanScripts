@@ -4,17 +4,12 @@
 clear all;close all;clc
 import mouse.*
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
-excelRows = [181 183 185 228 232 236 202 195 204 230 234 240];
-runs = 1:3;%
+excelRows = [181 183 185 228 232 236 202 195 204 230 234 240];%
+runs =1:3;%
 
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
 load('D:\OIS_Process\noVasculatureMask.mat')
-T_CalciumFAD_2min_NoNorm = nan(128,128,5);
-W_CalciumFAD_2min_NoNorm = nan(128,128,5);
-A_CalciumFAD_2min_NoNorm = nan(128,128,5);
-r_CalciumFAD_2min_NoNorm = nan(128,128,5);
-r2_CalciumFAD_2min_NoNorm = nan(128,128,5);
-hemoPred_CalciumFAD_2min_NoNorm = nan(128,128,3000,5);
+
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
     recDate = excelRaw{1}; recDate = string(recDate);
@@ -50,7 +45,7 @@ for excelRow = excelRows
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
         tic
         load(fullfile(saveDir,processedName),'xform_FADCorr','xform_jrgeco1aCorr')
-      
+        
         xform_FADCorr(isinf(xform_FADCorr)) = 0;
         xform_FADCorr(isnan(xform_FADCorr)) = 0;
         xform_jrgeco1aCorr(isinf(xform_jrgeco1aCorr)) = 0;
@@ -61,6 +56,12 @@ for excelRow = excelRows
         Calcium_filter = filterData(double(squeeze(xform_jrgeco1aCorr)),0.02,2,25);
         clear xform_jrgeco1aCorr
         t = (0:75)./25;
+        T_CalciumFAD_2min_NoNorm = nan(128,128,5);
+        W_CalciumFAD_2min_NoNorm = nan(128,128,5);
+        A_CalciumFAD_2min_NoNorm = nan(128,128,5);
+        r_CalciumFAD_2min_NoNorm = nan(128,128,5);
+        r2_CalciumFAD_2min_NoNorm = nan(128,128,5);
+        hemoPred_CalciumFAD_2min_NoNorm = nan(128,128,3000,5);
         for ii = 1:4
             tic
             [T_CalciumFAD_2min_NoNorm(:,:,ii),W_CalciumFAD_2min_NoNorm(:,:,ii),A_CalciumFAD_2min_NoNorm(:,:,ii),...
@@ -70,76 +71,77 @@ for excelRow = excelRows
             toc
         end
         
-              [T_CalciumFAD_2min_NoNorm(:,:,5),W_CalciumFAD_2min_NoNorm(:,:,5),A_CalciumFAD_2min_NoNorm(:,:,5),...
+        [T_CalciumFAD_2min_NoNorm(:,:,5),W_CalciumFAD_2min_NoNorm(:,:,5),A_CalciumFAD_2min_NoNorm(:,:,5),...
             r_CalciumFAD_2min_NoNorm(:,:,5),r2_CalciumFAD_2min_NoNorm(:,:,5),hemoPred_CalciumFAD_2min_NoNorm(:,:,1:2999,5)] ...
-            = interSpeciesGammaFit_CalciumFAD_Mask(Calcium_filter(:,:,4*120*25+1:end),FAD_filter(:,:,4*120*25+1:end),t,mask);%14999 not dividible by 3000
- 
-         T_CalciumFAD_2min_NoNorm_median = nanmedian(T_CalciumFAD_2min_NoNorm,3);
+            = interSpeciesGammaFit_CalciumFAD_Mask_NoNorm(Calcium_filter(:,:,4*120*25+1:end),FAD_filter(:,:,4*120*25+1:end),t,mask);%14999 not dividible by 3000
+        
+        T_CalciumFAD_2min_NoNorm_median = nanmedian(T_CalciumFAD_2min_NoNorm,3);
         W_CalciumFAD_2min_NoNorm_median = nanmedian(W_CalciumFAD_2min_NoNorm,3);
         A_CalciumFAD_2min_NoNorm_median = nanmedian(A_CalciumFAD_2min_NoNorm,3);
         r_CalciumFAD_2min_NoNorm_median = nanmedian(r_CalciumFAD_2min_NoNorm,3);
         r2_CalciumFAD_2min_NoNorm_median = nanmedian(r2_CalciumFAD_2min_NoNorm,3);
-         if exist(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_2min_NoNorm','.mat')),'file')
-         save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_2min_NoNorm','.mat')),...
-             'T_CalciumFAD_2min_NoNorm','W_CalciumFAD_2min_NoNorm','A_CalciumFAD_2min_NoNorm','r_CalciumFAD_2min_NoNorm','r2_CalciumFAD_2min_NoNorm','hemoPred_CalciumFAD_2min_NoNorm',...
-             'T_CalciumFAD_2min_NoNorm_median','W_CalciumFAD_2min_NoNorm_median','A_CalciumFAD_2min_NoNorm_median','r_CalciumFAD_2min_NoNorm_median','r2_CalciumFAD_2min_NoNorm_median','-append')
-         else
-             save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_2min_NoNorm','.mat')),...
-             'T_CalciumFAD_2min_NoNorm','W_CalciumFAD_2min_NoNorm','A_CalciumFAD_2min_NoNorm','r_CalciumFAD_2min_NoNorm','r2_CalciumFAD_2min_NoNorm','hemoPred_CalciumFAD_2min_NoNorm',...
-             'T_CalciumFAD_2min_NoNorm_median','W_CalciumFAD_2min_NoNorm_median','A_CalciumFAD_2min_NoNorm_median','r_CalciumFAD_2min_NoNorm_median','r2_CalciumFAD_2min_NoNorm_median','-v7.3')
-         end
-            figure
-            subplot(2,3,4)
-            imagesc(r_CalciumFAD_2min_NoNorm_median,'AlphaData',mask)
-            cb=colorbar;
-            caxis([-1 1])
-            axis image off
-            colormap jet
-            title('r')
-            set(gca,'FontSize',14,'FontWeight','Bold')
-            
-            subplot(2,3,5)
-            imagesc(r2_CalciumFAD_2min_NoNorm_median,'AlphaData',mask)
-            cb=colorbar;
-            caxis([0 1])
-            axis image off
-            colormap jet
-            title('R^2')
-            set(gca,'FontSize',14,'FontWeight','Bold')
-            
-            subplot(2,3,1)
-            imagesc(T_CalciumFAD_2min_NoNorm_median,'AlphaData',mask)
-            cb=colorbar;
-            caxis([0 0.3])
-            axis image off
-            cmocean('ice')
-            title('T(s)')
-            set(gca,'FontSize',14,'FontWeight','Bold')
-            
-            subplot(2,3,2)
-            imagesc(W_CalciumFAD_2min_NoNorm_median,'AlphaData',mask)
-            cb=colorbar;
-            caxis([0 0.2])
-            axis image off
-            cmocean('ice')
-            title('W(s)')
-            set(gca,'FontSize',14,'FontWeight','Bold')
-            
-            subplot(2,3,3)
-            imagesc(A_CalciumFAD_2min_NoNorm_median,'AlphaData',mask)
-             cb=colorbar;
-            caxis([0 0.5])
-            axis image off
-            cmocean('ice')
-            title('A')
-            set(gca,'FontSize',14,'FontWeight','Bold')           
-            suptitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-CalciumFAD-GammaFit-2min-NoNorm'))
-           
-            saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit_2min_NoNorm.png')));
-            saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit_2min_NoNorm.fig')));
-close all
+        if exist(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_2min_NoNorm','.mat')),'file')
+            save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_2min_NoNorm','.mat')),...
+                'T_CalciumFAD_2min_NoNorm','W_CalciumFAD_2min_NoNorm','A_CalciumFAD_2min_NoNorm','r_CalciumFAD_2min_NoNorm','r2_CalciumFAD_2min_NoNorm','hemoPred_CalciumFAD_2min_NoNorm',...
+                'T_CalciumFAD_2min_NoNorm_median','W_CalciumFAD_2min_NoNorm_median','A_CalciumFAD_2min_NoNorm_median','r_CalciumFAD_2min_NoNorm_median','r2_CalciumFAD_2min_NoNorm_median','-append')
+        else
+            save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_2min_NoNorm','.mat')),...
+                'T_CalciumFAD_2min_NoNorm','W_CalciumFAD_2min_NoNorm','A_CalciumFAD_2min_NoNorm','r_CalciumFAD_2min_NoNorm','r2_CalciumFAD_2min_NoNorm','hemoPred_CalciumFAD_2min_NoNorm',...
+                'T_CalciumFAD_2min_NoNorm_median','W_CalciumFAD_2min_NoNorm_median','A_CalciumFAD_2min_NoNorm_median','r_CalciumFAD_2min_NoNorm_median','r2_CalciumFAD_2min_NoNorm_median','-v7.3')
+        end
+        
+        figure
+        subplot(2,3,4)
+        imagesc(r_CalciumFAD_2min_NoNorm_median,'AlphaData',mask)
+        cb=colorbar;
+        caxis([-1 1])
+        axis image off
+        colormap jet
+        title('r')
+        set(gca,'FontSize',14,'FontWeight','Bold')
+        
+        subplot(2,3,5)
+        imagesc(r2_CalciumFAD_2min_NoNorm_median,'AlphaData',mask)
+        cb=colorbar;
+        caxis([0 1])
+        axis image off
+        colormap jet
+        title('R^2')
+        set(gca,'FontSize',14,'FontWeight','Bold')
+        
+        subplot(2,3,1)
+        imagesc(T_CalciumFAD_2min_NoNorm_median,'AlphaData',mask)
+        cb=colorbar;
+        caxis([0 0.2])
+        axis image off
+        cmocean('ice')
+        title('T(s)')
+        set(gca,'FontSize',14,'FontWeight','Bold')
+        
+        subplot(2,3,2)
+        imagesc(W_CalciumFAD_2min_NoNorm_median,'AlphaData',mask)
+        cb=colorbar;
+        caxis([0 0.05])
+        axis image off
+        cmocean('ice')
+        title('W(s)')
+        set(gca,'FontSize',14,'FontWeight','Bold')
+        
+        subplot(2,3,3)
+        imagesc(A_CalciumFAD_2min_NoNorm_median,'AlphaData',mask)
+        cb=colorbar;
+        caxis([0 0.5])
+        axis image off
+        cmocean('ice')
+        title('A')
+        set(gca,'FontSize',14,'FontWeight','Bold')
+        sgtitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-CalciumFAD-GammaFit-2min-NoNorm'))
+        
+        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit_2min_NoNorm.png')));
+        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit_2min_NoNorm.fig')));
+        close all
     end
-   
+    
 end
 %% average across runs
 

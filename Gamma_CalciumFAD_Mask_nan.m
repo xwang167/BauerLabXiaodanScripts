@@ -1,10 +1,10 @@
-%
-clear all;close all;clc
+% %
+% clear all;close all;clc
 import mouse.*
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
-excelRows = [202 195 204 230 234 240]; %excelRows_anes = [ 202 195 204 230 234 240];[181 183 185 228 232 236 
+excelRows = [181]; %excelRows_anes = [ 202 195 204 230 234 240];[181 183 185 228 232 236 
 
-runs = 1:3;%
+runs = 1;%
 
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
 load('D:\OIS_Process\noVasculatureMask.mat')
@@ -53,7 +53,9 @@ for excelRow = excelRows
         Calcium_filter = filterData(double(squeeze(xform_jrgeco1aCorr)),0.02,2,25);
         clear xform_jrgeco1aCorr
         t = (0:75)./25;
-        [T_CalciumFAD,W_CalciumFAD,A_CalciumFAD,r_CalciumFAD,r2_CalciumFAD,FADPred_CalciumFAD] = interSpeciesGammaFit_CalciumFAD_Mask_nan(Calcium_filter,FAD_filter,t,mask);
+        [T_CalciumFAD,W_CalciumFAD,A_CalciumFAD,r_CalciumFAD,r2_CalciumFAD,FADPred_CalciumFAD] = interSpeciesGammaFit_CalciumFAD_Mask_nan(Calcium_filter*100,FAD_filter*100,t,mask);
+        % [T_CalciumFAD,W_CalciumFAD,A_CalciumFAD,r_CalciumFAD,r2_CalciumFAD,FADPred_CalciumFAD] = interSpeciesGammaFit_CalciumFAD_Mask_nan(Calcium_filter*100,FAD_filter*100,t,mask);
+        %
         saveName =  strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_nan.mat');
         save(fullfile(saveDir,saveName),'T_CalciumFAD','W_CalciumFAD','A_CalciumFAD','r_CalciumFAD','r2_CalciumFAD','FADPred_CalciumFAD','-append')
         

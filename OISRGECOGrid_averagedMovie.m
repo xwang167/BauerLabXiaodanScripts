@@ -1,10 +1,12 @@
 clear all;close all;
+% need ProcOISRGECOGrid to process the raw data.
+
 %% Get Run and System Info
 load('W:\220210\220210-m.mat')
 excelFile="X:\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
 [refseeds, ~]=GetReferenceGridSeeds;
 %% Average movies across runs for each mouse
-for excelRows = 5:11
+for excelRows = 2
     
     runsInfo = parseRuns_xw(excelFile,excelRows);
     [row,start_ind_mouse,numruns_per_mouse]=unique({runsInfo.excelRow_char}); %Note that unique only takes characters! This makes it so that we only do landmark for one of the runs!
@@ -13,7 +15,7 @@ for excelRows = 5:11
     totalSubFileNum = length(runInfo.rawFile)/2;
     load(runInfo.saveMaskFile,'xform_isbrain')
     for ii = 1:totalSubFileNum
-        if ~exist(strcat(runInfo.saveFilePrefix(1:end-6),'_',num2str(ii),'-avgCalciumMovie.mat'),'file')
+        %if ~exist(strcat(runInfo.saveFilePrefix(1:end-6),'_',num2str(ii),'-avgCalciumMovie.mat'),'file')
             load(strcat(runInfo.saveFilePrefix,'_',num2str(ii),'.mat'),'laserFrames_cam1')
             numBlocks = size(laserFrames_cam1,3);
             AvgMovie_jRGECO1a = [];
@@ -24,7 +26,7 @@ for excelRows = 5:11
             end
             AvgMovie_jRGECO1a = mean(AvgMovie_jRGECO1a,4);
             save(strcat(runInfo.saveFilePrefix(1:end-6),'_',num2str(ii),'-avgCalciumMovie.mat'),'AvgMovie_jRGECO1a','-v7.3')
-        end
+        %end
     end
 end
 

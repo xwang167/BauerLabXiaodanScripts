@@ -4,8 +4,8 @@ close all;clearvars;clc
 % excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
 % runs = 1:6;
 
-excelFile = "X:\XW\Paper\PaperExperiment.xlsx";
-excelRows = [29:31];%[13 15 12];
+excelFile = 'X:\jonah_gamma\Stim\XiaodanData.xlsx';
+excelRows = 9;
 runs = 1:3;
 stimStartTime = 5;
 
@@ -31,7 +31,7 @@ for excelRow = excelRows
     sessionInfo.stimduration = excelRaw{13};
     sessionInfo.stimFrequency = excelRaw{16};
     info.freqout=1;
-    goodRuns = str2num(excelRaw{18});
+    %goodRuns = str2num(excelRaw{18});
     
     %     maskDir = saveDir;
     %     % maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');

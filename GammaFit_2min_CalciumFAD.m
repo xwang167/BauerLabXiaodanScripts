@@ -60,11 +60,15 @@ for excelRow = excelRows
         clear xform_FADCorr
         Calcium_filter = mouse.freq.filterData(double(squeeze(xform_jrgeco1aCorr)),0.02,2,25);
         clear xform_jrgeco1aCorr
-
+      
         t = (0:750)./25;
         
         Calcium_filter = reshape(Calcium_filter,128*128,[]);
         FAD_filter = reshape(FAD_filter,128*128,[]);
+        
+        Calcium_filter=resample(Calcium_filter',5,sessionInfo.framerate)';
+        
+        
         %Norm
         Calcium_filter = normRow(Calcium_filter);
         FAD_filter = normRow(FAD_filter);

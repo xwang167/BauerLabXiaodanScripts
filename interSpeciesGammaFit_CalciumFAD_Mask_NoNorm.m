@@ -17,6 +17,7 @@ mrfParam = nan(128,128,3);
 FADPred = nan(128,128,size(neural,3));
 r = nan(128);
 r2 = nan(128);
+obj_v
 
 for xInd = 1:size(neural,2)
     for yInd = 1:size(neural,1)
@@ -29,7 +30,8 @@ for xInd = 1:size(neural,2)
             worstErr = sum(pixFAD.^2);
             options.TolFun = worstErr*0.01;
             fcn = @(param)he.fcn(param);
-              [~,pixmrfParam] = evalc('fminsearchbnd(fcn,[0.1,0.02,0.06],[0.002,0.001,0.01],[0.6,1.2,0.25],options)');
+                 [~,pixmrfParam] = evalc('fminsearchbnd(fcn,[0.1,0.02,0.06],[0.002,0.001,0.005],[0.6,1.2,0.25],options)');
+           %[~,pixmrfParam] = evalc('fminsearchbnd(fcn,[0.1,0.02,0.06],[0.002,0.001,0.005],[0.6,1.2,0.25],options)');
            %[~,pixHrfParam] = evalc('fminsearchbnd(fcn,[0.2,0.4,1],[0.01,0.01,0],[0.6,1.2,100000],options)');
             % saved before 11/01/21 [~,pixmrfParam] = evalc('fminsearchbnd(fcn,[0.2,0.4,1],[0.001,0.001,0],[0.6,1.2,inf],options)');
             %[~,pixmrfParam] = evalc('fminsearchbnd(fcn,[0.07,0.04,0.8],[0.0007,0.0004,0.008],[0.7,0.4,8],options)');
