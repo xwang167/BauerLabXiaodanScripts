@@ -1,11 +1,10 @@
-function  [fh,peakMaps] = generateBlockMap_Dynamics_avg(data,data_gsr,runInfo,peakRange,isbrain,ROIMask)
+function  [fh,peakMaps] = generateBlockMap_Dynamics_avg(data,data_gsr,runInfo,peakRange,isbrain)
 % pres of each block during stim period
 OGsize=size(data_gsr);
-Mask_ind=find(ROIMask.*isbrain);
-parampath=what('bauerparams');
+%parampath=what('bauerparams');
 load(which('noVasculatureMask.mat'))
 mask_new = logical(mask_new);
-numRows = length(runInfo.Contrasts);
+%numRows = length(runInfo.Contrasts);
 fh = figure('units','normalized','outerposition',[0 0 1 1]);
 colormap jet
 peakMaps = nan(128,128,length(runInfo.Contrasts));
@@ -35,10 +34,18 @@ for ii = 1:length(runInfo.Contrasts)
 
 end
 
-
+figure(2)
+ROIMask=findStimROIMask(peakMaps(:,:,end),size(peakMaps,1),size(peakMaps,2));
+ROIMask=imgaussfilt(double(ROIMask),4); %smooth with 4 pixel kernel
+ROIMask=ROIMask>.5*max(max(ROIMask));
+imagesc(ROIMask)
+pause(0.5)
+                
+Mask_ind=find(ROIMask.*isbrain);
 data_dynam=data;
 data_dynam=reshape(data_dynam,OGsize(1)*OGsize(2),[],numel(runInfo.Contrasts));
 data_dynam=data_dynam(Mask_ind,:,:);
+figure(1)
 subplot(2,3,length(runInfo.Contrasts)+1)
 for jj=1:numel(runInfo.Contrasts)
     if sum(contains({'HbO','HbR','HbT'},runInfo.Contrasts{jj}))>0
