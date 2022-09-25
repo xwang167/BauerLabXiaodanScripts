@@ -5,7 +5,7 @@ clear all;close all;
 load('W:\220210\220210-m.mat')
 excelFile="X:\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
 [refseeds, ~]=GetReferenceGridSeeds;
-excelRows = 3:11;
+excelRows = 2:11;
 %% Average movies across runs for each mouse without gsr for calcium
 for excelRow = excelRows
     runsInfo = parseRuns_xw(excelFile,excelRow);

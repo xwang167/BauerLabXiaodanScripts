@@ -13,7 +13,7 @@ for excelRow = excelRows
     ii = 1+ii;
 end
 incidentVector = sum(GoodSeedsidx_mice,1);
-save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'_incident.mat'),'incidentVector')
+save
 figure
 [refseeds, ~]=GetReferenceGridSeeds;
 imagesc(xform_WL(:,1:64,:));

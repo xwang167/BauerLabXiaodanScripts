@@ -1,5 +1,8 @@
 load('220702-N26M761-WhiskerOnly-stim1-dataFluor.mat', 'xform_datafluorCorr')
 load('220702-N26M761-WhiskerOnly-stim1-dataHb.mat', 'xform_datahb','runInfo')
+load('220702-N26M761-WhiskerOnly-LandmarksAndMask.mat', 'xform_isbrain')
+xform_isbrain = logical(xform_isbrain);
+
 calcium = reshape(xform_datafluorCorr*100,128,128,600,10);
 HbO = reshape(xform_datahb(:,:,1,:)*10^6,128,128,600,10);
 HbR = reshape(xform_datahb(:,:,2,:)*10^6,128,128,600,10);
@@ -40,24 +43,26 @@ for ii = 1:10
     peakMaps_HbO(:,:,ii) = mean(HbO(:,:,100:200,ii),3);
     peakMaps_HbR(:,:,ii) = mean(HbR(:,:,100:200,ii),3);
 end
-for jj = 1:3
-    for kk = 1:10
-        subplot(3,11,kk)
-        imagesc(peakMaps_HbO(:,:,kk),[-10 10])
-        colorbar
-        axis image off
-        subplot(3,11,kk+11);
-        imagesc(peakMaps_HbR(:,:,kk),[-4 4])
-        colorbar
-        axis image off
-        subplot(3,11,kk+22);
-        imagesc(peakMaps_calcium(:,:,kk),[-6 6])
-        colorbar
-        axis image off
-    end
-end
-
-colormap jet
+% figure
+% for jj = 1:3
+%     for kk = 1:10
+%         subplot(3,11,kk)
+%         imagesc(peakMaps_HbO(:,:,kk),[-10 10])
+%         colorbar
+%         axis image off
+%         subplot(3,11,kk+11);
+%         imagesc(peakMaps_HbR(:,:,kk),[-5 5])
+%         colorbar
+%         axis image off
+%         subplot(3,11,kk+22);
+%         imagesc(peakMaps_calcium(:,:,kk),[-6 6])
+%         colorbar
+%         axis image off
+%     end
+% end
+% 
+% colormap jet
+% sgtitle('No Filter')
 
 
 calcium = reshape(calcium,128,128,[]);
@@ -81,50 +86,101 @@ for ii = 1:10
     peakMaps_HbO_filter(:,:,ii) = mean(HbO_filter(:,:,100:200,ii),3);
     peakMaps_HbR_filter(:,:,ii) = mean(HbR_filter(:,:,100:200,ii),3);
 end
+% figure
+% for jj = 1:3
+%     for kk = 1:10
+%         subplot(3,11,kk)
+%         imagesc(peakMaps_HbO_filter(:,:,kk),[-10 10])
+%         colorbar
+%         axis image off
+%         subplot(3,11,kk+11);
+%         imagesc(peakMaps_HbR_filter(:,:,kk),[-5 5])
+%         colorbar
+%         axis image off
+%         subplot(3,11,kk+22);
+%         imagesc(peakMaps_calcium_filter(:,:,kk),[-6 6])
+%         colorbar
+%         axis image off
+%     end
+% end
+% 
+% colormap jet
+
+
+
+    peakMaps_calcium_diff = (peakMaps_calcium_filter-peakMaps_calcium)./abs(peakMaps_calcium_filter)*100;
+    peakMaps_HbO_diff = (peakMaps_HbO_filter-peakMaps_HbO)./abs(peakMaps_HbO_filter)*100;
+    peakMaps_HbR_diff = (peakMaps_HbR_filter-peakMaps_HbR)./abs(peakMaps_HbR_filter)*100;
 figure
 for jj = 1:3
     for kk = 1:10
-        subplot(3,11,kk)
+        subplot(9,10,kk)
+        imagesc(peakMaps_HbO(:,:,kk),[-10 10])
+        colorbar
+        axis image off
+        subplot(9,10,kk+10);
+        imagesc(peakMaps_HbR(:,:,kk),[-6 6])
+        colorbar
+        axis image off
+        subplot(9,10,kk+20);
+        imagesc(peakMaps_calcium(:,:,kk),[-6 6])
+        colorbar
+        axis image off
+        
+        
+        subplot(9,10,kk+30)
         imagesc(peakMaps_HbO_filter(:,:,kk),[-10 10])
         colorbar
         axis image off
-        subplot(3,11,kk+11);
-        imagesc(peakMaps_HbR_filter(:,:,kk),[-4 4])
+        subplot(9,10,kk+40);
+        imagesc(peakMaps_HbR_filter(:,:,kk),[-6 6])
         colorbar
         axis image off
-        subplot(3,11,kk+22);
+        subplot(9,10,kk+50);
         imagesc(peakMaps_calcium_filter(:,:,kk),[-6 6])
         colorbar
         axis image off
-    end
-end
 
-colormap jet
-
-
-
-    peakMaps_calcium_diff = peakMaps_calcium_filter-peakMaps_calcium;
-    peakMaps_HbO_diff = peakMaps_HbO_filter-peakMaps_HbO;
-    peakMaps_HbR_diff = peakMaps_HbR_filter-peakMaps_HbR;
-figure
-for jj = 1:3
-    for kk = 1:10
-        subplot(3,11,kk)
-        imagesc(peakMaps_calcium_diff(:,:,kk),[-0.2 0.2])
+        subplot(9,10,kk+60)
+        imagesc(peakMaps_HbO_diff(:,:,kk),[-25 25])
+       diff = peakMaps_HbO_diff(:,:,kk);
+       diff_median = median(diff(xform_isbrain),'all');
+       title([num2str(diff_median),'%'])
         colorbar
         axis image off
-        subplot(3,11,kk+11);
-        imagesc(peakMaps_calcium_diff(:,:,kk),[-0.2 0.2])
+        subplot(9,10,kk+70);
+        imagesc(peakMaps_HbR_diff(:,:,kk),[-25 25])
+        diff = peakMaps_HbR_diff(:,:,kk);
+       diff_median = median(diff(xform_isbrain),'all');
+       title([num2str(diff_median),'%'])
         colorbar
         axis image off
-        subplot(3,11,kk+22);
-        imagesc(peakMaps_calcium_diff(:,:,kk),[-0.2 0.2])
+        subplot(9,10,kk+80);
+        imagesc(peakMaps_calcium_diff(:,:,kk),[-25 25])
+        diff = peakMaps_calcium_diff(:,:,kk);
+       diff_median = median(diff(xform_isbrain),'all');
+       title([num2str(diff_median),'%'])
         colorbar
         axis image off
     end
 end
-
 colormap jet
+
+HbR = reshape(HbR,128,128,600,10);
+HbR_filter = reshape(HbR_filter,128,128,600,10);
+for ii = 100:200
+    subplot(121)    
+    imagesc(HbR(:,:,ii,10),[-6 6])
+    axis image off
+    title(['No filter: t = ',num2str(ii/20),'s'])
+    subplot(122)
+    
+    imagesc(HbR_filter(:,:,ii,10),[-6 6]);
+    axis image off
+    title(['Filter: t = ',num2str(ii/20),'s'])
+    pause(0.1)
+end
+
 %% dynamic
 calcium = reshape(calcium,128*128,[]);
 HbO = reshape(HbO,128*128,[]);
@@ -159,6 +215,7 @@ title('filter-no filter')
 
 [Pxx_calcium,hz] = pwelch(calcium_ROI,[],[],[],20);
 [Pxx_calcium_filter,hz] = pwelch(calcium_filter_ROI,[],[],[],20);
+[Pxx_calcium_diff,hz] = pwelch(calcium_filter_ROI-calcium_ROI,[],[],[],20);
 
 figure
 loglog(hz,Pxx_calcium)
@@ -173,6 +230,11 @@ figure
 loglog(hz,Pxx_calcium_filter./Pxx_calcium)
 xlabel('Frequency(Hz)')
 title('filter/nofilter')
+
+figure
+loglog(hz,Pxx_calcium_diff)
+xlabel('Frequency(Hz)')
+title('Filter-NoFilter')
 
 
 figure
