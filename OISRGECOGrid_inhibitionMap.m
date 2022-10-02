@@ -177,8 +177,8 @@ load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'_incident.mat'),'inciden
 isIncidentHigh = incidentVector>5;
 load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice')
 load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-inhibitionMap.mat'),'inhibitionMap_Calcium_NoGSR_mice')
-% mycolormap = brewermap(256,'RdBu');
-CoolerColors= brewermap(256,'RdBu');
+mycolormap = brewermap(256,'-RdBu');
+%CoolerColors= brewermap(256,'-Spectral');
 
 close all
 for kk = 1:160

@@ -6,10 +6,14 @@ xform_isbrain = logical(xform_isbrain);
 calcium = reshape(xform_datafluorCorr*100,128,128,600,10);
 HbO = reshape(xform_datahb(:,:,1,:)*10^6,128,128,600,10);
 HbR = reshape(xform_datahb(:,:,2,:)*10^6,128,128,600,10);
+HbT = HbO + HbR;
 
 %% peak map
 calcium_avg = mean(calcium,4);
 peakMap_avg = mean(calcium_avg(:,:,100:200),3);
+load('D:\OIS_Process\atlas.mat')
+ROI_barrel = AtlasSeeds == 9;
+
 
 figure
 imagesc(peakMap_avg)
@@ -108,9 +112,9 @@ end
 
 
 
-    peakMaps_calcium_diff = (peakMaps_calcium_filter-peakMaps_calcium)./abs(peakMaps_calcium_filter)*100;
-    peakMaps_HbO_diff = (peakMaps_HbO_filter-peakMaps_HbO)./abs(peakMaps_HbO_filter)*100;
-    peakMaps_HbR_diff = (peakMaps_HbR_filter-peakMaps_HbR)./abs(peakMaps_HbR_filter)*100;
+    peakMaps_calcium_diff = (peakMaps_calcium_filter-peakMaps_calcium)./peakMaps_calcium_filter*100;
+    peakMaps_HbO_diff = (peakMaps_HbO_filter-peakMaps_HbO)./peakMaps_HbO_filter*100;
+    peakMaps_HbR_diff = (peakMaps_HbR_filter-peakMaps_HbR)./peakMaps_HbR_filter*100;
 figure
 for jj = 1:3
     for kk = 1:10
