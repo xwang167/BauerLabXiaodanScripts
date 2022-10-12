@@ -73,7 +73,8 @@ calcium = reshape(calcium,128,128,[]);
 HbO = reshape(xform_datahb(:,:,1,:)*10^6,128,128,[]);
 HbR = reshape(xform_datahb(:,:,2,:)*10^6,128,128,[]);
 
-calcium_filter = filterData(calcium,0.01,5,runInfo.samplingRate); 
+calcium_filter = filterData(calcium,0.01,5,runInfo.samplingRate);
+
 HbO_filter = filterData(HbO,0.01,5,runInfo.samplingRate); 
 HbR_filter = filterData(HbR,0.01,5,runInfo.samplingRate);
 
@@ -305,3 +306,16 @@ loglog(hz,Pxx_HbR_filter./Pxx_HbR)
 xlabel('Frequency(Hz)')
 title('filter/nofilter')
 
+calcium_filter_downsample = resample(reshape(calcium_filter,128,128,[]),10 ,20,'Dimension',3);
+calcium_filter_downsample = reshape(calcium_filter_downsample,128,128,[],10);
+save('X:\CodeModification\calcium_filter_downsample.mat','calcium_filter_downsample','-v7.3')
+save('X:\CodeModification\calcium.mat','calcium','-v7.3')
+
+clear all
+tic
+load('X:\CodeModification\calcium_filter_downsample.mat','calcium_filter_downsample')
+toc
+clear all
+tic
+load('X:\CodeModification\calcium.mat','calcium')
+toc

@@ -40,7 +40,7 @@ for excelRow = 2:11
     save(strcat(runInfo.saveFilePrefix(1:end-6),'-InhibitionMap.mat'),'inhibitionMap')
 end
 
-%% Generate figure of inhibition map with laser laoction on
+%% Generate figure of inhibition map with laser loction on
 for excelRow = 2:11
     runsInfo = parseRuns_xw(excelFile,excelRow);
     runInfo = runsInfo(1);
