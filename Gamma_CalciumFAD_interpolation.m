@@ -8,12 +8,12 @@
 % xlim([0 0.5])
 % end
 %interpolate
-
 clear all;close all;clc
 import mouse.*
+sessionInfo.framerate_new = 250;
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
-excelRows = 195;
-runs = 1;%
+excelRows = [181 183 185 228 232 236 202 195 204 230 234 240];
+runs = 1:3;%
 
 
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
@@ -64,8 +64,6 @@ for excelRow = excelRows
         clear FAD_smooth
         Calcium_filter = filterData(double(calcium_smooth),0.02,2,sessionInfo.framerate);
         clear calcium_smooth
-             
-        sessionInfo.framerate_new = 250;
         time_epoch=0.1;
         t=0:1/sessionInfo.framerate_new:time_epoch-1/sessionInfo.framerate_new;
         
@@ -101,7 +99,6 @@ for excelRow = excelRows
                     r_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),r2_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),~,obj_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj)] ...
                     = GammaFit_CalciumFAD(calcium_interp,FAD_interp,t,mask);%hemoPred_CalciumFAD_1min_smooth_Rolling_interp(:,:,:,jj)
                 toc
-                pause
             else
                 tic
                 numFrames = length(ii:size(Calcium_filter,3))/sessionInfo.framerate*sessionInfo.framerate_new;
