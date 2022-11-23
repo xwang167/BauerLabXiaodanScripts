@@ -174,6 +174,6 @@ ylim([-4,4])
 xlabel('Time(s)')
 ylabel('\Delta\muM')
 legend('Actual HbT','Predicted HbT')
-title(strcat('r = ',num2str(r_pixel(72,23))))
+title(strcat('r = ',num2str(r_region_barrel)))
 
 sgtitle('HRF for Barrel Region, 0.01-5Hz, Awake R5M2285 for Second Block for Run 1')
