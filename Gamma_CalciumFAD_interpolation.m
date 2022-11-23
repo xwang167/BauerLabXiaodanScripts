@@ -64,7 +64,7 @@ for excelRow = excelRows
         clear FAD_smooth
         Calcium_filter = filterData(double(calcium_smooth),0.02,2,sessionInfo.framerate);
         clear calcium_smooth
-        time_epoch=0.1;
+        time_epoch= 3;
         t=0:1/sessionInfo.framerate_new:time_epoch-1/sessionInfo.framerate_new;
         
         T_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,19);
