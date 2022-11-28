@@ -257,9 +257,9 @@ imagesc(xform_WL,'AlphaData',1-mask);
 set(gca,'FontSize',14,'FontWeight','Bold')
 
 subplot(2,3,3)
-imagesc(A_CalciumHbT_1min_smooth_Rolling_median_mice,[0 0.07])
+imagesc(A_CalciumHbT_1min_smooth_Rolling_median_mice,[0 0.3])
 cb = colorbar;
-set(cb,'YTick',[0 0.035 0.07]);
+set(cb,'YTick',[0 0.15 0.3]);
 axis image off
 cmocean('ice')
 title('A')
@@ -272,11 +272,17 @@ saveas(gcf,fullfile('L:\RGECO\cat',strcat('191030-R5M2285-R5M2286-R5M2288-R6M246
 saveas(gcf,fullfile('L:\RGECO\cat',strcat('191030-R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-fc','_CalciumHbT_GammaFit_1min_smooth_Rolling.fig')));
 
 
+time_epoch=30;
+t=linspace(0,time_epoch,time_epoch*sessionInfo.framerate);%% force it to be 5 hz
+mask_new = logical(mask_new);
+T_awake = median(T_CalciumHbT_1min_smooth_Rolling_median_mice(mask_new));
+W_awake = median(W_CalciumHbT_1min_smooth_Rolling_median_mice(mask_new));
+A_awake = median(A_CalciumHbT_1min_smooth_Rolling_median_mice(mask_new));
 
-% mask_new = logical(mask_new);
-% T = median(T_CalciumHbT_1min_smooth_Rolling_median_mice(mask_new))
-% W = median(W_CalciumHbT_1min_smooth_Rolling_median_mice(mask_new))
-% A = median(A_CalciumHbT_1min_smooth_Rolling_median_mice(mask_new))
+alpha_awake = (T_awake/W_awake)^2*8*log(2);
+beta_awake = W_awake^2/(T_awake*8*log(2));
+y_awake = A_awake*(t/T_awake).^alpha_awake.*exp((t-T_awake)/(-beta_awake));
+
 % r = median(r_CalciumHbT_1min_smooth_Rolling_median_mice(mask_new))
 % r2 = median(r2_CalciumHbT_1min_smooth_Rolling_median_mice(mask_new))
 %
@@ -395,9 +401,9 @@ imagesc(xform_WL,'AlphaData',1-mask);
 set(gca,'FontSize',14,'FontWeight','Bold')
 
 subplot(2,3,3)
-imagesc(A_CalciumHbT_1min_smooth_Rolling_median_mice,[0 0.07])
+imagesc(A_CalciumHbT_1min_smooth_Rolling_median_mice,[0 0.3])
 cb = colorbar;
-set(cb,'YTick',[0 0.035 0.07]);
+set(cb,'YTick',[0 0.15 0.3]);
 axis image off
 cmocean('ice')
 title('A')
@@ -412,6 +418,22 @@ saveas(gcf,fullfile('L:\RGECO\cat',strcat('191030--R5M2286-anes-R5M2285-anes-R5M
 
 %  cbh = colorbar ; %Create Colorbar
 %  cbh.Ticks = [0 1 2 3] ; %Create 8 ticks from zero to 1
-%  cbh.TickLabels = num2cell(0:3) ;  
+%  cbh.TickLabels = num2cell(0:3) ;
+mask_new = logical(mask_new);
+T_anes = median(T_CalciumHbT_1min_smooth_Rolling_median_mice(mask_new));
+W_anes = median(W_CalciumHbT_1min_smooth_Rolling_median_mice(mask_new));
+A_anes = median(A_CalciumHbT_1min_smooth_Rolling_median_mice(mask_new));
 
+alpha_anes = (T_anes/W_anes)^2*8*log(2);
+beta_anes = W_anes^2/(T_anes*8*log(2));
+y_anes = A_anes*(t/T_anes).^alpha_anes.*exp((t-T_anes)/(-beta_anes));
 
+figure
+plot(t,y_awake,'k-')
+hold on
+plot(t,y_anes,'k--')
+xlim([0 10])
+xlabel('Time(s)')
+ylabel('Amplitude a.u.')
+legend('Awake','Anesthetized')
+title('Gamma Variate Fitting Function between Calcium and HbT')

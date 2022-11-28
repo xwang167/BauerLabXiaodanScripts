@@ -29,17 +29,21 @@ for xInd = 1:size(neural,2)
             %[~,pixmrfParam] = evalc('fminsearchbnd(fcn,[0.1,0.035,1],[0.06,0.02,0.01],[0.6,1,1],options)');
             %[~,pixmrfParam,obj_val(yInd,xInd)] = evalc('fminsearchbnd(fcn,[0.16,0.03,0.17],[0.0001,0.005,0.001],[0.2,0.1,0.1],options)');%xw 220731 change A upper bound to 2
             %[~,pixmrfParam,obj_val(yInd,xInd)] = evalc('fminunc(fcn,[0.003,0.003,0.05],options)');
-            [~,pixmrfParam,obj_val(yInd,xInd)] = evalc('fminsearchbnd(fcn,[0.02,0.003,0.05],[0.006,0.0005,0.02],[0.06,0.005,0.4],options)');
-            pixelMrf = hrfGamma(t,pixmrfParam(1),pixmrfParam(2),pixmrfParam(3));
+            [~,pixmrfParam,obj] = evalc('fminsearchbnd(fcn,[0.1,0.2,0.0002],[0.001,0.001,0.00002],[1,1,0.01],options)');
             
-            pixFADPred = conv(pixNeural,pixelMrf);
-            pixFADPred = pixFADPred(1:numel(pixNeural));
             
-            mrfParam(yInd,xInd,:) = pixmrfParam;
-            FADPred(yInd,xInd,:) = pixFADPred;
-            
-            r(yInd,xInd) = corr(pixFADPred',pixFAD');%real(atanh(corr(pixHemoPred',pixHemo')));
-            r2(yInd,xInd) = 1-sumsqr(pixFAD-pixFADPred)/sumsqr(pixFAD-mean(pixFAD));
+            if pixmrfParam(1)>0.0011 && pixmrfParam(2)>0.0011
+                pixelMrf = hrfGamma(t,pixmrfParam(1),pixmrfParam(2),pixmrfParam(3));
+                pixFADPred = conv(pixNeural,pixelMrf);
+                pixFADPred = pixFADPred(1:numel(pixNeural));
+                
+                mrfParam(yInd,xInd,:) = pixmrfParam;
+                FADPred(yInd,xInd,:) = pixFADPred;
+                
+                r(yInd,xInd) = corr(pixFADPred',pixFAD');%real(atanh(corr(pixHemoPred',pixHemo')));
+                r2(yInd,xInd) = 1-sumsqr(pixFAD-pixFADPred)/sumsqr(pixFAD-mean(pixFAD));
+                obj_val(yInd,xInd) = obj;
+            end
             %1 - var(pixHemoPred - pixHemo)/var(pixHemo);
         end
     end

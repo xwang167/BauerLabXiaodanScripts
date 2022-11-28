@@ -10,7 +10,9 @@
 %interpolate
 clear all;close all;clc
 import mouse.*
-sessionInfo.framerate_new = 250;
+sessionInfo.framerate_new = 100;
+time_epoch= 3;
+t=0:1/sessionInfo.framerate_new:time_epoch-1/sessionInfo.framerate_new;
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
 excelRows = [181 183 185 228 232 236 202 195 204 230 234 240];
 runs = 1:3;%
@@ -64,8 +66,6 @@ for excelRow = excelRows
         clear FAD_smooth
         Calcium_filter = filterData(double(calcium_smooth),0.02,2,sessionInfo.framerate);
         clear calcium_smooth
-        time_epoch= 3;
-        t=0:1/sessionInfo.framerate_new:time_epoch-1/sessionInfo.framerate_new;
         
         T_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,19);
         W_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,19);
@@ -79,20 +79,20 @@ for excelRow = excelRows
         for ii = 1:30*sessionInfo.framerate:(600-60)*sessionInfo.framerate+1
             
             if jj < 19
-                 tic
+                tic
                 calcium_interp = zeros(128,128,60*sessionInfo.framerate_new);
                 FAD_interp = zeros(128,128,60*sessionInfo.framerate_new);
                 for kk = 1:128
                     for ll = 1:128
                         if mask(kk,ll)
                             temp_calcium = squeeze(Calcium_filter(kk,ll,ii:ii+60*sessionInfo.framerate-1)*100);
-                            temp_FAD = squeeze(FAD_filter(kk,ll,ii:ii+60*sessionInfo.framerate-1)*100);                       
+                            temp_FAD = squeeze(FAD_filter(kk,ll,ii:ii+60*sessionInfo.framerate-1)*100);
                             calcium_interp(kk,ll,:) = interp1(1:60*sessionInfo.framerate,temp_calcium,linspace(1,60*sessionInfo.framerate,60*sessionInfo.framerate_new));
                             FAD_interp(kk,ll,:) = interp1(1:60*sessionInfo.framerate,temp_FAD,linspace(1,60*sessionInfo.framerate,60*sessionInfo.framerate_new));
                         end
                     end
                 end
-                 toc
+                toc
                 
                 tic
                 [T_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),W_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),A_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),...
@@ -108,7 +108,7 @@ for excelRow = excelRows
                     for ll = 1:128
                         if mask(kk,ll)
                             temp_calcium = squeeze(Calcium_filter(kk,ll,ii:end)*100);
-                            temp_FAD = squeeze(FAD_filter(kk,ll,ii:end)*100);  
+                            temp_FAD = squeeze(FAD_filter(kk,ll,ii:end)*100);
                             calcium_interp(kk,ll,:) = interp1(1:length(temp_calcium),temp_calcium,linspace(1,length(temp_calcium),numFrames));
                             FAD_interp(kk,ll,:) = interp1(1:length(temp_FAD),temp_FAD,linspace(1,length(temp_calcium),numFrames));
                         end
