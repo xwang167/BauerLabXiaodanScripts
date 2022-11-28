@@ -1,6 +1,6 @@
 %%Example load
 clear all
-path='L:\RGECO\';
+path='E:\RGECO\';
 tmp=readtable([path, 'RGECO_stim.xlsx']);
 runsInfo.samplingRate=25;
 OGFS=25;
@@ -8,15 +8,16 @@ FS=10;
 %run level
 for row=1:size(tmp,1)
     for stim=1:3
-        save_name=[path,'Deconvolution_stim\',num2str(tmp{row,1}),'\', num2str(tmp{row,1}) ,'-',tmp{row,2}{:},'-stim' ,num2str(stim) , '-NVC.mat'];
+        save_name=[path, num2str(tmp{row,1}) ,'-',tmp{row,2}{:},'-stim' ,num2str(stim) , '-NVC.mat'];
 
-        mouse_name= [path, num2str(tmp{row,1}),'\',num2str(tmp{row,1}) ,'-',tmp{row,2}{:},'-stim', num2str(stim),'_processed.mat'];
+
+        mouse_name= [path, num2str(tmp{row,1}) ,'-',tmp{row,2}{:},'-stim', num2str(stim),'_processed.mat'];
         disp(mouse_name(1:end-4))
         load(mouse_name,'xform_jrgeco1aCorr','xform_datahb')
         try
-            load([path, num2str(tmp{row,1}),'\', num2str(tmp{row,1}) ,'-',tmp{row,2}{:},'-stim1-dataFluor.mat'],'xform_isbrain')
+            load([path, num2str(tmp{row,1}) ,'-',tmp{row,2}{:},'-stim1-dataFluor.mat'])
         catch
-            load([path, num2str(tmp{row,1}),'\',num2str(tmp{row,1}) ,'-',tmp{row,2}{:},'-LandmarksandMask.mat'],'xform_isbrain')
+            load([path, num2str(tmp{row,1}) ,'-',tmp{row,2}{:},'-LandmarksandMask.mat'])
         end
 
 
@@ -37,7 +38,8 @@ for row=1:size(tmp,1)
         data_full(:,:,3)=  reshape(resample(filterData(total,  0.01,FS/2,OGFS),FS,OGFS,'dimension',3),128*128,[])*10^6;
         data_full(:,:,4)=  reshape(resample(filterData(calcium,0.01,FS/2,OGFS),FS,OGFS,'dimension',3),128*128,[])*100;
         data_full=data_full(isbrain,:,:);
-        data_full=reshape(data_full,[],300,10,4); %reshape into blocks pix*time*block*species
+        data_full=data_full-mean(data_full,2); %mean shift
+        data_full=reshape(data_full,[],300,10,4); %reshape into blocks
 
         clear oxy doxy total calcium xform_isbrian
 
@@ -45,8 +47,8 @@ for row=1:size(tmp,1)
         %initializing
         Contrast={'HbO','HbR','HbT','Calcium'};
         kernel_size=30;
-        pixHrfParam_BRAIN=nan(numel(isbrain),size(data_full,3),3,3); % pix*blocks*species*(T W A)
-        h_brain=nan(numel(isbrain),size(data_full,3),3,size(data_full,2)); % pix*blocks*species*time
+        pixHrfParam_BRAIN=nan(numel(isbrain),size(data_full,3),3,3);
+        h_brain=nan(numel(isbrain),size(data_full,3),3,size(data_full,2));
         lam=1E-1;
         t=linspace(0,kernel_size,kernel_size*FS );
 
@@ -54,11 +56,11 @@ for row=1:size(tmp,1)
             parfor pix=1:length(isbrain)
                 for species=1:3
 
-                    pixBlockTimeseries=(squeeze((data_full(pix,:,block,:)))'); %get rid of the first second
+                    pixBlockTimeseries=dataNormalizer_JPC(squeeze((data_full(pix,:,block,:)))'); %get rid of the first second
                     
-                    pixBlockTimeseries=(pixBlockTimeseries'.*tukeywin(size(data_full,2),.5))';
+                    pixBlockTimeseries=(pixBlockTimeseries'.*tukeywin(size(data_full,2),.1))';
 
-                    pixBlockTimeseries=pixBlockTimeseries-pixBlockTimeseries(:,1);
+                    pixBlockTimeseries=pixBlockTimeseries-mean(pixBlockTimeseries(:,1:FS),2);
                     %gamma-fit
 
                     [~, pixHrfParam_BRAIN(pix,block,species,:),~,~,~] =...
@@ -74,10 +76,8 @@ for row=1:size(tmp,1)
             end
         end
 
-        if ~exist([path,'Deconvolution_stim\',num2str(tmp{row,1})],'dir')
-            mkdir([path,'Deconvolution_stim\',num2str(tmp{row,1})])
-        end
-        save(save_name,'pixHrfParam_BRAIN','h_brain')
+
+        save(save_name,'pixHrfParam_BRAIN','h_brain','h_deriv_brain','h_mp_brain')
 
     end
 end
