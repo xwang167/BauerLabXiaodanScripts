@@ -93,10 +93,12 @@ for excelRow = excelRows
                     end
                 end
                 toc
-                
+                   calcium_interp = reshape(calcium_interp,128*128,[]);
+                   FAD_interp = reshape(FAD_interp,128*128,[]);
                    calcium_interp = normRow(calcium_interp);
-                   calcium_interp = normRow(calcium_interp);
-       
+                   FAD_interp = normRow(FAD_interp);
+                   calcium_interp = reshape(calcium_interp,128,128,[]);
+                   FAD_interp = reshape(FAD_interp,128,128,[]);      
                 tic
                 [T_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),W_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),A_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),...
                     r_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),r2_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),~,obj_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj)] ...

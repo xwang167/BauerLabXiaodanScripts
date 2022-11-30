@@ -29,10 +29,11 @@ for xInd = 1:size(neural,2)
             %[~,pixmrfParam] = evalc('fminsearchbnd(fcn,[0.1,0.035,1],[0.06,0.02,0.01],[0.6,1,1],options)');
             %[~,pixmrfParam,obj_val(yInd,xInd)] = evalc('fminsearchbnd(fcn,[0.16,0.03,0.17],[0.0001,0.005,0.001],[0.2,0.1,0.1],options)');%xw 220731 change A upper bound to 2
             %[~,pixmrfParam,obj_val(yInd,xInd)] = evalc('fminunc(fcn,[0.003,0.003,0.05],options)');
-            [~,pixmrfParam,obj] = evalc('fminsearchbnd(fcn,[0.1,0.2,0.0002],[0.001,0.001,0.00002],[1,1,0.01],options)');
+            %[~,pixmrfParam,obj] = evalc('fminsearchbnd(fcn,[0.1,0.2,0.002],[0.001,0.001,0.00002],[2,3,0.1],options)');
+            [~,pixmrfParam,obj] = evalc('fminsearchbnd(fcn,[0.1,0.02,0.1],[0.001,0.0002,0.001],[0.6,1.2,10],options)');
             
             
-            if pixmrfParam(1)>0.0011 && pixmrfParam(2)>0.0011
+            if pixmrfParam(1)>0.0011 && pixmrfParam(2)>0.0002 && pixmrfParam(3)<0.99
                 pixelMrf = hrfGamma(t,pixmrfParam(1),pixmrfParam(2),pixmrfParam(3));
                 pixFADPred = conv(pixNeural,pixelMrf);
                 pixFADPred = pixFADPred(1:numel(pixNeural));
