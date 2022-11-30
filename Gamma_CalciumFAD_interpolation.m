@@ -10,8 +10,8 @@
 %interpolate
 clear all;close all;clc
 import mouse.*
-sessionInfo.framerate_new = 100;
-time_epoch= 3;
+sessionInfo.framerate_new = 1000;
+time_epoch= 60;
 t=0:1/sessionInfo.framerate_new:time_epoch-1/sessionInfo.framerate_new;
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
 excelRows = 181;%[181 183 185 228 232 236];% 202 195 204 230 234 240];
@@ -45,7 +45,8 @@ for excelRow = excelRows
         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
         load(fullfile(saveDir,processedName),'xform_FADCorr','xform_jrgeco1aCorr')
-        
+        xform_FADCorr(:,:,end+1) = xform_FADCorr(:,:,end);
+        xform_jrgeco1aCorr(:,:,end+1) = xform_jrgeco1aCorr(:,:,end);
         FAD = xform_FADCorr;
         clear xform_FADCorr
         calcium = squeeze(xform_jrgeco1aCorr);
@@ -62,67 +63,43 @@ for excelRow = excelRows
         clear FAD
         calcium_smooth = smoothImage(calcium,gBox,gSigma);
         clear calcium
-        FAD_filter =  filterData(double(FAD_smooth),0.02,2,sessionInfo.framerate);
-        clear FAD_smooth
-        Calcium_filter = filterData(double(calcium_smooth),0.02,2,sessionInfo.framerate);
-        clear calcium_smooth
         
-        T_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,19);
-        W_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,19);
-        A_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,19);
-        r_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,19);
-        r2_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,19);
+        tic
+        calcium_interp = zeros(128,128,length(calcium_smooth)/sessionInfo.framerate*sessionInfo.framerate_new);
+        FAD_interp = zeros(128,128,length(FAD_smooth)/sessionInfo.framerate*sessionInfo.framerate_new);
+        for kk = 1:128
+            for ll = 1:128
+                if mask(kk,ll)
+                    temp_calcium = squeeze(calcium_smooth(kk,ll,:)*100);
+                    temp_FAD = squeeze(FAD_smooth(kk,ll,:)*100);
+                    calcium_interp(kk,ll,:) = interp1(1:length(calcium_smooth),temp_calcium,linspace(1,length(calcium_smooth),length(calcium_smooth)/sessinInfo.framerate*sessionInfo.framerate_new));
+                    FAD_interp(kk,ll,:) = interp1(1:length(FAD_smooth),temp_FAD,linspace(1,length(FAD_smooth),length(FAD_smooth)/sessionInfo.framerate*sessionInfo.framerate_new));
+                end
+            end
+        end
+        toc
+        
+        clear calcium_smooth FAD_smooth
+        FAD_filter =  filterData(double(FAD_interp),0.02,2,sessionInfo.framerate_new);
+        clear FAD_interp
+        Calcium_filter = filterData(double(calcium_interp),0.02,2,sessionInfo.framerate_new);
+        clear calcium_interp
+        
+        T_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,20);
+        W_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,20);
+        A_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,20);
+        r_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,20);
+        r2_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,20);
         %hemoPred_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,60*sessionInfo.framerate_new,19);
-        obj_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,19);
+        obj_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,20);
         jj = 1;
         %%
-        for ii = 1:30*sessionInfo.framerate:(600-60)*sessionInfo.framerate+1
-            
-            if jj < 19
-                tic
-                calcium_interp = zeros(128,128,60*sessionInfo.framerate_new);
-                FAD_interp = zeros(128,128,60*sessionInfo.framerate_new);
-                for kk = 1:128
-                    for ll = 1:128
-                        if mask(kk,ll)
-                            temp_calcium = squeeze(Calcium_filter(kk,ll,ii:ii+60*sessionInfo.framerate-1)*100);
-                            temp_FAD = squeeze(FAD_filter(kk,ll,ii:ii+60*sessionInfo.framerate-1)*100);
-                            calcium_interp(kk,ll,:) = interp1(1:60*sessionInfo.framerate,temp_calcium,linspace(1,60*sessionInfo.framerate,60*sessionInfo.framerate_new));
-                            FAD_interp(kk,ll,:) = interp1(1:60*sessionInfo.framerate,temp_FAD,linspace(1,60*sessionInfo.framerate,60*sessionInfo.framerate_new));
-                        end
-                    end
-                end
-                toc                
-       
-                tic
-                [T_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),W_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),A_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),...
-                    r_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),r2_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),~,obj_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj)] ...
-                    = GammaFit_CalciumFAD(calcium_interp,FAD_interp,t,mask);%hemoPred_CalciumFAD_1min_smooth_Rolling_interp(:,:,:,jj)
-                toc
-            else
-                tic
-                numFrames = length(ii:size(Calcium_filter,3))/sessionInfo.framerate*sessionInfo.framerate_new;
-                calcium_interp = zeros(128,128,numFrames);
-                FAD_interp = zeros(128,128,numFrames);
-                for kk = 1:128
-                    for ll = 1:128
-                        if mask(kk,ll)
-                            temp_calcium = squeeze(Calcium_filter(kk,ll,ii:end)*100);
-                            temp_FAD = squeeze(FAD_filter(kk,ll,ii:end)*100);
-                            calcium_interp(kk,ll,:) = interp1(1:length(temp_calcium),temp_calcium,linspace(1,length(temp_calcium),numFrames));
-                            FAD_interp(kk,ll,:) = interp1(1:length(temp_FAD),temp_FAD,linspace(1,length(temp_calcium),numFrames));
-                        end
-                    end
-                end
-                %clear Calcium_filter FAD_filter
-                toc
-                tic
-                [T_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),W_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),A_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),...
-                    r_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),r2_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),~,obj_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj)] ...
-                    = GammaFit_CalciumFAD(calcium_interp*100,FAD_interp*100,t,mask);
-                toc
-            end
-            
+        for ii = 1:30*sessionInfo.framerate_new:(600-60)*sessionInfo.framerate_new+1
+            tic
+            [T_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),W_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),A_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),...
+                r_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),r2_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),~,obj_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj)] ...
+                = GammaFit_CalciumFAD(calcium_filter(:,:,ii:ii+time_epoch*sessionInfo.framerate_new-1),FAD_filter(:,:,ii:ii+time_epoch*sessionInfo.framerate_new-1),t,mask);%hemoPred_CalciumFAD_1min_smooth_Rolling_interp(:,:,:,jj)
+            toc
             jj = jj+1;
         end
         %%
@@ -175,7 +152,7 @@ for excelRow = excelRows
         subplot(2,3,1)
         imagesc(T_CalciumFAD_1min_smooth_Rolling_interp_median,'AlphaData',mask)
         cb=colorbar;
-        caxis([0 0.05])
+        caxis([0 0.5])
         axis image off
         cmocean('ice')
         title('T(s)')
@@ -184,7 +161,7 @@ for excelRow = excelRows
         subplot(2,3,2)
         imagesc(W_CalciumFAD_1min_smooth_Rolling_interp_median,'AlphaData',mask)
         cb=colorbar;
-        caxis([0 0.006])
+        caxis([0 0.4])
         axis image off
         cmocean('ice')
         title('W(s)')
@@ -193,7 +170,7 @@ for excelRow = excelRows
         subplot(2,3,3)
         imagesc(A_CalciumFAD_1min_smooth_Rolling_interp_median,'AlphaData',mask)
         cb=colorbar;
-        caxis([0 0.15]) %%anes caxis([0 0.07])
+        caxis([0 0.5]) %%anes caxis([0 0.07])
         axis image off
         cmocean('ice')
         title('A')
