@@ -14,7 +14,7 @@ sessionInfo.framerate_new = 100;
 time_epoch= 3;
 t=0:1/sessionInfo.framerate_new:time_epoch-1/sessionInfo.framerate_new;
 excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
-excelRows = 195;%[181 183 185 228 232 236];% 202 195 204 230 234 240];
+excelRows = 181;%[181 183 185 228 232 236];% 202 195 204 230 234 240];
 runs = 1:3;%
 
 
@@ -92,10 +92,7 @@ for excelRow = excelRows
                         end
                     end
                 end
-                toc
-                
-                   calcium_interp = normRow(calcium_interp);
-                   calcium_interp = normRow(calcium_interp);
+                toc                
        
                 tic
                 [T_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),W_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),A_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),...
