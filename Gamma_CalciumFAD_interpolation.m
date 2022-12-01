@@ -10,17 +10,16 @@
 %interpolate
 clear all;close all;clc
 import mouse.*
-sessionInfo.framerate_new = 1000;
+sessionInfo.framerate_new = 400;
 time_epoch= 60;
 t=0:1/sessionInfo.framerate_new:time_epoch-1/sessionInfo.framerate_new;
-excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
+excelFile = "X:\RGECO\DataBase_Xiaodan.xlsx";
 excelRows = 181;%[181 183 185 228 232 236];% 202 195 204 230 234 240];
 runs = 1:3;%
 
+load('C:\Users\Xiaodan Wang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL.mat','xform_WL')
+load('C:\Users\Xiaodan Wang\Documents\GitHub\BauerLabXiaodanScripts\noVasculatureMask.mat')
 
-load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
-load('D:\OIS_Process\noVasculatureMask.mat')
-mask = mask_new;
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
     recDate = excelRaw{1}; recDate = string(recDate);
@@ -31,20 +30,12 @@ for excelRow = excelRows
         mkdir(saveDir)
     end
     sessionInfo.framerate = excelRaw{7};
-    saveDir_new = strcat('L:\RGECO\Kenny\', recDate, '\');
-    maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datafluor','.mat');
     
-    if ~exist(fullfile(saveDir_new,maskName),'file')
-        maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-        load(fullfile(saveDir,maskName),'xform_isbrain')
-    else
-        load(fullfile(saveDir_new,maskName),'xform_isbrain')
-    end
-    mask = logical(mask_new.*xform_isbrain);
     for n = runs
         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
-        load(fullfile(saveDir,processedName),'xform_FADCorr','xform_jrgeco1aCorr')
+        load(fullfile(saveDir,processedName),'xform_FADCorr','xform_jrgeco1aCorr','xform_isbrain')
+        mask = logical(mask_new.*xform_isbrain);
         xform_FADCorr(:,:,end+1) = xform_FADCorr(:,:,end);
         xform_jrgeco1aCorr(:,:,end+1) = xform_jrgeco1aCorr(:,:,end);
         FAD = xform_FADCorr;
@@ -72,7 +63,7 @@ for excelRow = excelRows
                 if mask(kk,ll)
                     temp_calcium = squeeze(calcium_smooth(kk,ll,:)*100);
                     temp_FAD = squeeze(FAD_smooth(kk,ll,:)*100);
-                    calcium_interp(kk,ll,:) = interp1(1:length(calcium_smooth),temp_calcium,linspace(1,length(calcium_smooth),length(calcium_smooth)/sessinInfo.framerate*sessionInfo.framerate_new));
+                    calcium_interp(kk,ll,:) = interp1(1:length(calcium_smooth),temp_calcium,linspace(1,length(calcium_smooth),length(calcium_smooth)/sessionInfo.framerate*sessionInfo.framerate_new));
                     FAD_interp(kk,ll,:) = interp1(1:length(FAD_smooth),temp_FAD,linspace(1,length(FAD_smooth),length(FAD_smooth)/sessionInfo.framerate*sessionInfo.framerate_new));
                 end
             end
