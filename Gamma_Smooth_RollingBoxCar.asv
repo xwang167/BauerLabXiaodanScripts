@@ -92,13 +92,13 @@ for excelRow = excelRows
         hemoPre_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5_median = nanmedian(hemoPred_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5,4);
         obj_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5_median = nanmedian(obj_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5,3);
         
-        if exist(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_1min_smooth_Rolling_60epoch_0p01_5','.mat')),'file')
-            save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_1min_smooth_Rolling_60epoch_0p01_5','.mat')),...
+        if exist(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_1min_smooth_Rolling_60epoch','.mat')),'file')
+            save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_1min_smooth_Rolling_60epoch','.mat')),...
                 'T_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5','W_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5','A_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5','r_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5','r2_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5','hemoPred_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5',...
                 'T_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5_median','W_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5_median','A_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5_median','r_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5_median','r2_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5_median',...
                 'hemoPre_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5_median','obj_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5_median','-append')
         else
-            save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_1min_smooth_Rolling_60epoch_0p01_5','.mat')),...
+            save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_1min_smooth_Rolling_60epoch','.mat')),...
                 'T_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5','W_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5','A_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5','r_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5','r2_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5','hemoPred_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5',...
                 'T_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5_median','W_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5_median','A_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5_median','r_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5_median','r2_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5_median',...
                 'hemoPre_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5_median','obj_CalciumHbT_1min_smooth_Rolling_60epoch_0p01_5_median','-v7.3')
@@ -156,10 +156,10 @@ for excelRow = excelRows
         cmocean('ice')
         title('A')
         set(gca,'FontSize',14,'FontWeight','Bold')
-        sgtitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-CalciumHbT-GammaFit-1min-smooth-Rolling-60epoch-0p05-5'))
+        sgtitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-CalciumHbT-GammaFit-1min-smooth-Rolling-60epoch-'))
         
-        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_GammaFit_1min_smooth_Rolling_60epoch_0p01_5.png')));
-        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_GammaFit_1min_smooth_Rolling_60epoch_0p01_5.fig')));
+        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_GammaFit_1min_smooth_Rolling_60epoch.png')));
+        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_GammaFit_1min_smooth_Rolling_60epoch.fig')));
     end
 end
 
