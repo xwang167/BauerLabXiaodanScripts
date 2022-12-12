@@ -197,7 +197,7 @@ legend('25%-75%')
 xlim([-3 7])
 xlabel('Time(s)')
 grid on
-title(strcat('For awake:  ',num2str(qualifiedNum_anes),'/',num2str(totalNum_anes),' has r>0.6, Median: T=',num2str(locs_anes,'%4.2f'),'s, W=',num2str(w_anes,'%4.2f'),'s, A=',num2str(pks_anes,'%4.2f')))
+title(strcat('For anesthetized:  ',num2str(qualifiedNum_anes),'/',num2str(totalNum_anes),' has r>0.6, Median: T=',num2str(locs_anes,'%4.2f'),'s, W=',num2str(w_anes,'%4.2f'),'s, A=',num2str(pks_anes,'%4.2f')))
 
 subplot(2,2,3)
 plot_distribution_prctile(t,HRF_GSR_Barrel_0p6_awake,'Color',[1 0 0])

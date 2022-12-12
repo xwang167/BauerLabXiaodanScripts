@@ -164,8 +164,13 @@ for excelRow = [181 183 185 228 232 236]
     end
     for n = 1:3
         load(fullfile(saveDir,'Barrel_HRF', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_HRF','.mat')),'r_NoGSR_Barrel_HRF','HRF_NoGSR_Barrel')
+        if length(r_NoGSR_Barrel_HRF) == 9
         totalNum_NoGSR = totalNum_NoGSR + length(r_NoGSR_Barrel_HRF);
         HRF_NoGSR_Barrel_0p6 = cat(1,HRF_NoGSR_Barrel_0p6,HRF_NoGSR_Barrel(r_NoGSR_Barrel_HRF>0.6,:));
+        else
+            disp(['Not 9 ',mouseName])
+            pause
+        end
     end
 end
 qualifiedNum_NoGSR = size(HRF_NoGSR_Barrel_0p6,1);
