@@ -5,7 +5,7 @@ AtlasSeedsFilled(:,65:end)=AtlasSeedsFilled(:,65:end)+20;
 AtlasSeedsFilled(AtlasSeedsFilled==20) = 0;
 imagesc(AtlasSeedsFilled)
 load('W:\220210\220210-m.mat')
-excelRows = 5:11;
+excelRows = 2:11;
 
 %load the laser frame (first frame of the laser stim)
 for excelRow = excelRows

@@ -7,7 +7,7 @@ load("X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-SeedLocation.mat");
 
 %% get seedmap v2
 close all;
-load("D:\OIS_Process\Paxinos\AtlasandIsbrain.mat",'xform_WL')
+load("C:\Users\Xiaodan Wang\Documents\GitHub\BauerLabXiaodanScripts\AtlasandIsbrain.mat")
 seedLocation_mice(isnan(seedLocation_mice)) = 0;
 seedLocation_mice_valid_sorted(isnan(seedLocation_mice_valid_sorted)) = 0;
 seedmapLocsOG = round(seedLocation_mice);

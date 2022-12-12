@@ -13,14 +13,13 @@ import mouse.*
 sessionInfo.framerate_new = 1000;
 time_epoch= 60;
 t=0:1/sessionInfo.framerate_new:time_epoch-1/sessionInfo.framerate_new;
-excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
+excelFile = "A:\XW\RGECO\DataBase_Xiaodan_2.xlsx";
 excelRows = 181;%[181 183 185 228 232 236];% 202 195 204 230 234 240];
 runs = 1:3;%
 
+load('C:\Users\threadripper\Documents\GitHub\BauerLabXiaodanScripts\GoodWL.mat','xform_WL')
+load('C:\Users\threadripper\Documents\GitHub\BauerLabXiaodanScripts\noVasculatureMask.mat')
 
-load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
-load('D:\OIS_Process\noVasculatureMask.mat')
-mask = mask_new;
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
     recDate = excelRaw{1}; recDate = string(recDate);
@@ -31,20 +30,12 @@ for excelRow = excelRows
         mkdir(saveDir)
     end
     sessionInfo.framerate = excelRaw{7};
-    saveDir_new = strcat('L:\RGECO\Kenny\', recDate, '\');
-    maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datafluor','.mat');
     
-    if ~exist(fullfile(saveDir_new,maskName),'file')
-        maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-        load(fullfile(saveDir,maskName),'xform_isbrain')
-    else
-        load(fullfile(saveDir_new,maskName),'xform_isbrain')
-    end
-    mask = logical(mask_new.*xform_isbrain);
     for n = runs
         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
-        load(fullfile(saveDir,processedName),'xform_FADCorr','xform_jrgeco1aCorr')
+        load(fullfile(saveDir,processedName),'xform_FADCorr','xform_jrgeco1aCorr','xform_isbrain')
+        mask = logical(mask_new.*xform_isbrain);
         xform_FADCorr(:,:,end+1) = xform_FADCorr(:,:,end);
         xform_jrgeco1aCorr(:,:,end+1) = xform_jrgeco1aCorr(:,:,end);
         FAD = xform_FADCorr;
@@ -54,8 +45,7 @@ for excelRow = excelRows
         mask_matrix = repmat(mask,1,1,size(calcium,3));
         calcium = calcium.*mask_matrix;
         FAD = FAD.*mask_matrix;
-        calcium(calcium == 0) = nan;
-        FAD(FAD==0) = nan;
+
         %Smooth
         gBox = 20;
         gSigma = 10;
@@ -63,7 +53,8 @@ for excelRow = excelRows
         clear FAD
         calcium_smooth = smoothImage(calcium,gBox,gSigma);
         clear calcium
-        
+        FAD_smooth =  filterData(double(FAD_smooth),0.02,2,sessionInfo.framerate);
+        calcium_smooth = filterData(double(calcium_smooth),0.02,2,sessionInfo.framerate);
         tic
         calcium_interp = zeros(128,128,length(calcium_smooth)/sessionInfo.framerate*sessionInfo.framerate_new);
         FAD_interp = zeros(128,128,length(FAD_smooth)/sessionInfo.framerate*sessionInfo.framerate_new);
@@ -72,32 +63,30 @@ for excelRow = excelRows
                 if mask(kk,ll)
                     temp_calcium = squeeze(calcium_smooth(kk,ll,:)*100);
                     temp_FAD = squeeze(FAD_smooth(kk,ll,:)*100);
-                    calcium_interp(kk,ll,:) = interp1(1:length(calcium_smooth),temp_calcium,linspace(1,length(calcium_smooth),length(calcium_smooth)/sessinInfo.framerate*sessionInfo.framerate_new));
-                    FAD_interp(kk,ll,:) = interp1(1:length(FAD_smooth),temp_FAD,linspace(1,length(FAD_smooth),length(FAD_smooth)/sessionInfo.framerate*sessionInfo.framerate_new));
+                    calcium_interp(kk,ll,:) = interp1(1:length(calcium_smooth),temp_calcium,linspace(1,length(calcium_smooth),length(calcium_smooth)/sessionInfo.framerate*sessionInfo.framerate_new),'spline');
+                    FAD_interp(kk,ll,:) = interp1(1:length(FAD_smooth),temp_FAD,linspace(1,length(FAD_smooth),length(FAD_smooth)/sessionInfo.framerate*sessionInfo.framerate_new),'spline');
                 end
             end
         end
-        toc
-        
+        toc        
         clear calcium_smooth FAD_smooth
         FAD_filter =  filterData(double(FAD_interp),0.02,2,sessionInfo.framerate_new);
         clear FAD_interp
-        Calcium_filter = filterData(double(calcium_interp),0.02,2,sessionInfo.framerate_new);
+        calcium_filter = filterData(double(calcium_interp),0.02,2,sessionInfo.framerate_new);
         clear calcium_interp
-        
         T_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,20);
         W_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,20);
         A_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,20);
         r_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,20);
         r2_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,20);
-        %hemoPred_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,60*sessionInfo.framerate_new,19);
+        FADPred_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,60*sessionInfo.framerate_new,20);
         obj_CalciumFAD_1min_smooth_Rolling_interp = nan(128,128,20);
         jj = 1;
         %%
         for ii = 1:30*sessionInfo.framerate_new:(600-60)*sessionInfo.framerate_new+1
             tic
             [T_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),W_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),A_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),...
-                r_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),r2_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),~,obj_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj)] ...
+                r_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),r2_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj),FADPred_CalciumFAD_1min_smooth_Rolling_interp(:,:,:,jj),obj_CalciumFAD_1min_smooth_Rolling_interp(:,:,jj)] ...
                 = GammaFit_CalciumFAD(calcium_filter(:,:,ii:ii+time_epoch*sessionInfo.framerate_new-1),FAD_filter(:,:,ii:ii+time_epoch*sessionInfo.framerate_new-1),t,mask);%hemoPred_CalciumFAD_1min_smooth_Rolling_interp(:,:,:,jj)
             toc
             jj = jj+1;
@@ -115,12 +104,12 @@ for excelRow = excelRows
             save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_1min_smooth_Rolling_interp_CalciumFAD','.mat')),...
                 'T_CalciumFAD_1min_smooth_Rolling_interp','W_CalciumFAD_1min_smooth_Rolling_interp','A_CalciumFAD_1min_smooth_Rolling_interp','r_CalciumFAD_1min_smooth_Rolling_interp','r2_CalciumFAD_1min_smooth_Rolling_interp','obj_CalciumFAD_1min_smooth_Rolling_interp',...
                 'T_CalciumFAD_1min_smooth_Rolling_interp_median','W_CalciumFAD_1min_smooth_Rolling_interp_median','A_CalciumFAD_1min_smooth_Rolling_interp_median','r_CalciumFAD_1min_smooth_Rolling_interp_median','r2_CalciumFAD_1min_smooth_Rolling_interp_median',...
-                'obj_CalciumFAD_1min_smooth_Rolling_interp_median','-append')
+                'obj_CalciumFAD_1min_smooth_Rolling_interp_median','FADPred_CalciumFAD_1min_smooth_Rolling_interp','-append')
         else
             save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_1min_smooth_Rolling_interp_CalciumFAD','.mat')),...
                 'T_CalciumFAD_1min_smooth_Rolling_interp','W_CalciumFAD_1min_smooth_Rolling_interp','A_CalciumFAD_1min_smooth_Rolling_interp','r_CalciumFAD_1min_smooth_Rolling_interp','r2_CalciumFAD_1min_smooth_Rolling_interp','obj_CalciumFAD_1min_smooth_Rolling_interp',...
                 'T_CalciumFAD_1min_smooth_Rolling_interp_median','W_CalciumFAD_1min_smooth_Rolling_interp_median','A_CalciumFAD_1min_smooth_Rolling_interp_median','r_CalciumFAD_1min_smooth_Rolling_interp_median','r2_CalciumFAD_1min_smooth_Rolling_interp_median',...
-                'obj_CalciumFAD_1min_smooth_Rolling_interp_median','-v7.3')
+                'obj_CalciumFAD_1min_smooth_Rolling_interp_median','FADPred_CalciumFAD_1min_smooth_Rolling_interp','-v7.3')
         end
         figure('units','normalized','outerposition',[0 0 1 1])
         subplot(2,3,4)
@@ -152,7 +141,7 @@ for excelRow = excelRows
         subplot(2,3,1)
         imagesc(T_CalciumFAD_1min_smooth_Rolling_interp_median,'AlphaData',mask)
         cb=colorbar;
-        caxis([0 0.5])
+        caxis([0 0.01])
         axis image off
         cmocean('ice')
         title('T(s)')
@@ -161,7 +150,7 @@ for excelRow = excelRows
         subplot(2,3,2)
         imagesc(W_CalciumFAD_1min_smooth_Rolling_interp_median,'AlphaData',mask)
         cb=colorbar;
-        caxis([0 0.4])
+        caxis([0 0.01])
         axis image off
         cmocean('ice')
         title('W(s)')
@@ -170,15 +159,15 @@ for excelRow = excelRows
         subplot(2,3,3)
         imagesc(A_CalciumFAD_1min_smooth_Rolling_interp_median,'AlphaData',mask)
         cb=colorbar;
-        caxis([0 0.5]) %%anes caxis([0 0.07])
+        caxis([0 2]) %%anes caxis([0 0.07])
         axis image off
         cmocean('ice')
         title('A')
         set(gca,'FontSize',14,'FontWeight','Bold')
         sgtitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-CalciumFAD-GammaFit-1min-smooth-Rolling-interp'))
         
-        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit_1min_smooth_Rolling_Interp.png')));
-        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit_1min_smooth_Rolling_Interp.fig')));
+        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit_1min_smooth_Rolling_interp.png')));
+        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit_1min_smooth_Rolling_interp.fig')));
     end
 end
 
