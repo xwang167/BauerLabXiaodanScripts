@@ -1,5 +1,13 @@
 clear all;close all;clc
 excelFile="X:\XW\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
+excelRows = 2:11;
+miceName = [];
+excelFile="X:\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
+for excelRow = excelRows
+     runsInfo = parseRuns_xw(excelFile,excelRow);
+     runInfo = runsInfo(1);
+  miceName = strcat(miceName,'-',runInfo.mouseName);
+end
 load('X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-SeedLocation.mat',...
     'seedLocation_mice_valid')
 load('D:\OIS_Process\Paxinos\AtlasandIsbrain.mat','xform_WL')
