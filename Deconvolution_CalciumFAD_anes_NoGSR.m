@@ -132,8 +132,9 @@ for excelRow = [202 195 204 230 234 240]
             saveName =  fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-segment#',num2str(ii),'-Barrel-NoGSR-mrf'));
             saveas(gcf,strcat(saveName,'.fig'))
             saveas(gcf,strcat(saveName,'.png'))
+            close all
         end
-        close all
+        
         save(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'r_Barrel_mrf','mrf_Barrel')
     end
 end
@@ -150,9 +151,6 @@ for excelRow = [202 195 204 230 234 240]
     miceName = strcat(miceName,'-',mouseName);
     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-    if ~exist(strcat(saveDir,'\Barrel_mrf'),'dir')
-        mkdir(strcat(saveDir,'\Barrel_mrf'))
-    end
     for n = 1:3
         load(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'r_Barrel_mrf','mrf_Barrel')
         totalNum = totalNum + length(r_Barrel_mrf);
@@ -163,7 +161,7 @@ qualifiedNum = size(mrf_Barrel_0p6,1);
 mrf_Barrel_0p6_median = median(mrf_Barrel_0p6);
 save(strcat('L:\RGECO\cat\Barrel_mrf\',recDate,miceName,'-Barrel_mrf.mat'),'mrf_Barrel_0p6','qualifiedNum','totalNum');
 
-[pks,locs,w,p] = findpeaks(mrf_Barrel_0p6_median,t,'MinPeakProminence',2e-9);
+[pks,locs,w,p] = findpeaks(mrf_Barrel_0p6_median,t,'MinPeakProminence',1e-11);
 
 figure
 plot_distribution_prctile(t,mrf_Barrel_0p6)
@@ -173,21 +171,56 @@ xlabel('Time(s)')
 grid on
 title(strcat(num2str(qualifiedNum),'/',num2str(totalNum),' has r>0.6, Median: T=',num2str(locs),'s, W=',num2str(w),'s, A=',num2str(pks)))
 
+% Averaged across all 
+totalNum = 0;
+mrf_Barrel_mice = [];
+r_Barrel_mrf_mice = [];
+miceName = [];
+for excelRow = [202 195 204 230 234 240]
+    
+    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+    recDate = excelRaw{1}; recDate = string(recDate);
+    mouseName = excelRaw{2}; mouseName = string(mouseName);
+    miceName = strcat(miceName,'-',mouseName);
+    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
 
-%%
-load('191030-R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-Barrel_mrf.mat')
+    for n = 1:3
+        load(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'mrf_Barrel','r_Barrel_mrf')
+        totalNum = totalNum + length(mrf_Barrel);
+        mrf_Barrel_mice = cat(1,mrf_Barrel_mice,mrf_Barrel);
+        r_Barrel_mrf_mice = [r_Barrel_mrf_mice,r_Barrel_mrf];
+    end
+end
+mrf_Barrel_mice_median = median(mrf_Barrel_mice);
+r_Barrel_mice_median = median(r_Barrel_mrf_mice);
+save(strcat('L:\RGECO\cat\Barrel_mrf\',recDate,miceName,'-Barrel_mrf.mat'),'mrf_Barrel_mice','r_Barrel_mice','-append');
+
+[pks,locs,w,p] = findpeaks(mrf_Barrel_mice_median,t,'MinPeakProminence',1e-11);
+figure
+plot_distribution_prctile(t,mrf_Barrel_mice)
+legend('25%-75%')
+xlim([-3 10])
+xlabel('Time(s)')
+grid on
+title(strcat('Median: T=',num2str(locs),'s, W=',num2str(w),'s, A=',num2str(pks),', r =',num2str(r_Barrel_mice_median)))
+
+
+
+%% Compare results between awake and anesthetized for r>0.6
+load('L:\RGECO\cat\Barrel_mrf\191030-R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-Barrel_mrf.mat')
 mrf_Barrel_0p6_awake =mrf_Barrel_0p6;
 qualifiedNum_awake = qualifiedNum;
 totalNum_awake = totalNum;
 mrf_Barrel_0p6_median_awake = median(mrf_Barrel_0p6_awake);
 [pks_awake,locs_awake,w_awake,p_awake] = findpeaks(mrf_Barrel_0p6_median_awake,t,'MinPeakProminence',2e-9);
 
-load('191030-R5M2285-anes-R5M2286-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-Barrel_mrf.mat')
+load('L:\RGECO\cat\Barrel_mrf\191030-R5M2285-anes-R5M2286-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-Barrel_mrf.mat')
 mrf_Barrel_0p6_anes =mrf_Barrel_0p6;
 qualifiedNum_anes = qualifiedNum;
 totalNum_anes = totalNum;
 mrf_Barrel_0p6_median_anes = median(mrf_Barrel_0p6_anes);
-[pks_anes,locs_anes,w_anes,p_anes] = findpeaks(mrf_Barrel_0p6_median_anes,t,'MinPeakProminence',2e-9);
+[pks_anes,locs_anes,w_anes,p_anes] = findpeaks(mrf_Barrel_0p6_median_anes,t,'MinPeakProminence',1e-11);
 
 figure('units','normalized','outerposition',[0 0 1 1])
 subplot(2,2,1)
@@ -214,4 +247,4 @@ xlim([-3 7])
 xlabel('Time(s)')
 grid on
 title('mrf, Awake vs. Anesthetized')
-sgtitle('mrf for Left Barrel Cortex without GSR')
+sgtitle('MRF for Left Barrel Cortex without GSR')

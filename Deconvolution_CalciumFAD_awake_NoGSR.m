@@ -176,6 +176,7 @@ title(strcat(num2str(qualifiedNum),'/',num2str(totalNum),' has r>0.6, Median: T=
 % Averaged across all 
 totalNum = 0;
 mrf_Barrel_mice = [];
+r_Barrel_mrf_mice = [];
 miceName = [];
 for excelRow = [181 183 185 228 232 236]
     
@@ -187,13 +188,15 @@ for excelRow = [181 183 185 228 232 236]
     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
 
     for n = 1:3
-        load(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'mrf_Barrel')
+        load(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'mrf_Barrel','r_Barrel_mrf')
         totalNum = totalNum + length(mrf_Barrel);
         mrf_Barrel_mice = cat(1,mrf_Barrel_mice,mrf_Barrel);
+        r_Barrel_mrf_mice = [r_Barrel_mrf_mice,r_Barrel_mrf];
     end
 end
 mrf_Barrel_mice_median = median(mrf_Barrel_mice);
-save(strcat('L:\RGECO\cat\Barrel_mrf\',recDate,miceName,'-Barrel_mrf.mat'),'mrf_Barrel_mice','-append');
+r_Barrel_mice_median = median(r_Barrel_mrf_mice);
+save(strcat('L:\RGECO\cat\Barrel_mrf\',recDate,miceName,'-Barrel_mrf.mat'),'mrf_Barrel_mice','r_Barrel_mice','-append');
 
 [pks,locs,w,p] = findpeaks(mrf_Barrel_mice_median,t,'MinPeakProminence',2e-9);
 figure
@@ -202,6 +205,6 @@ legend('25%-75%')
 xlim([-3 10])
 xlabel('Time(s)')
 grid on
-title(strcat('Median: T=',num2str(locs),'s, W=',num2str(w),'s, A=',num2str(pks)))
+title(strcat('Median: T=',num2str(locs),'s, W=',num2str(w),'s, A=',num2str(pks),', r =',num2str(r_Barrel_mice_median)))
 
 
