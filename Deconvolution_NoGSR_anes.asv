@@ -247,4 +247,46 @@ title('HRF, Awake vs. Anesthetized')
 sgtitle('HRF for Left Barrel Cortex without GSR with 0.02-2Hz Filter')
 
 %% Compare Awake v.s. Anesthetized for all r 
+load("D:\XiaodanPaperData\cat\Barrel_HRF\191030-R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-Barrel_HRF.mat")
+HRF_Barrel_mice_awake =HRF_Barrel_mice;
+qualifiedNum_awake = qualifiedNum;
+totalNum_awake = totalNum;
+HRF_Barrel_mice_median_awake = median(HRF_Barrel_mice_awake);
+r_Barrel_HRF_mice_median_awake = median(r_Barrel_HRF_mice);
+[pks_awake,locs_awake,w_awake,p_awake] = findpeaks(HRF_Barrel_mice_median_awake,t,'MinPeakProminence',0.01);
 
+load("D:\XiaodanPaperData\cat\Barrel_HRF\191030-R5M2285-anes-R5M2286-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-Barrel_HRF.mat")
+HRF_Barrel_mice_anes =HRF_Barrel_mice;
+qualifiedNum_anes = qualifiedNum;
+totalNum_anes = totalNum;
+HRF_Barrel_mice_median_anes = median(HRF_Barrel_mice_anes);
+r_Barrel_HRF_mice_median_anes = median(r_Barrel_HRF_mice);
+
+[pks_anes,locs_anes,w_anes,p_anes] = findpeaks(HRF_Barrel_mice_median_anes,t,'MinPeakProminence',0.005);
+
+figure('units','normalized','outerposition',[0 0 1 1])
+subplot(2,2,1)
+plot_distribution_prctile(t,HRF_Barrel_mice_awake,'Color',[1 0 0])
+legend('25%-75%')
+xlim([-3 7])
+xlabel('Time(s)')
+grid on
+title(strcat('For awake: Median: T=',num2str(locs_awake,'%4.2f'),'s, W=',num2str(w_awake,'%4.2f'),'s, A=',num2str(pks_awake,'%4.2f'),', r=',num2str(r_Barrel_HRF_mice_median_awake,'%4.2f')))
+
+subplot(2,2,2)
+plot_distribution_prctile(t,HRF_Barrel_mice_anes,'Color',[0 0 1])
+legend('25%-75%')
+xlim([-3 7])
+xlabel('Time(s)')
+grid on
+title(strcat('For anesthetized: Median: T=',num2str(locs_anes,'%4.2f'),'s, W=',num2str(w_anes,'%4.2f'),'s, A=',num2str(pks_anes,'%4.2f'),', r=',num2str(r_Barrel_HRF_mice_median_anes,'%4.2f')))
+
+subplot(2,2,3)
+plot_distribution_prctile(t,HRF_Barrel_mice_awake,'Color',[1 0 0])
+hold on
+plot_distribution_prctile(t,HRF_Barrel_mice_anes,'Color',[0 0 1])
+xlim([-3 7])
+xlabel('Time(s)')
+grid on
+title('HRF, Awake vs. Anesthetized')
+sgtitle('HRF for Left Barrel Cortex without GSR with 0.02-2Hz Filter')

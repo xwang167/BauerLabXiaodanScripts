@@ -127,16 +127,16 @@ for excelRow = [181 183 185 228 232 236]%
             ylim([-hbMax hbMax])
 
 
-            HbT_barrel_filter = lowpass(HbT_barrel,lowPass,freq);
-            r_region_barrel_filter = corr(HbT_barrel_filter,HbT_barrel_pred(3*freq+1:end));
-            subplot(2,2,4)
-            plot((1:300)/10,HbT_barrel_filter,'r')
-            hold on
-            plot((1:300)/10,HbT_barrel_pred(3*freq+1:3*freq+length(HbT_barrel_filter)),'Color',[0 0.5 0])
-            xlabel('Time(s)')
-            ylabel('\Delta\muM')
-            legend(strcat(num2str(lowPass),'Hz Low Passed Actual HbT'),'Predicted HbT')
-            title(strcat('r = ',num2str(r_region_barrel_filter)))
+%             HbT_barrel_filter = lowpass(HbT_barrel,lowPass,freq);
+%             r_region_barrel_filter = corr(HbT_barrel_filter,HbT_barrel_pred(3*freq+1:end));
+%             subplot(2,2,4)
+%             plot((1:300)/10,HbT_barrel_filter,'r')
+%             hold on
+%             plot((1:300)/10,HbT_barrel_pred(3*freq+1:3*freq+length(HbT_barrel_filter)),'Color',[0 0.5 0])
+%             xlabel('Time(s)')
+%             ylabel('\Delta\muM')
+%             legend(strcat(num2str(lowPass),'Hz Low Passed Actual HbT'),'Predicted HbT')
+%             title(strcat('r = ',num2str(r_region_barrel_filter)))
 
             sgtitle(strcat('HRF for Barrel Region, ',num2str(freqLow),'-2Hz, no GSR, lambda = ',num2str(lambda),', ',mouseName,' Run #',num2str(n),', Segment #',num2str(ii)))
             saveName =  fullfile(saveDir,'Barrel_HRF', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-segment#',num2str(ii),'-Barrel-NoGSR-HRF'));

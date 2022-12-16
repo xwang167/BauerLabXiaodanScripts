@@ -1,5 +1,5 @@
 clear ;close all;clc
-excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
+excelFile = "X:\RGECO\DataBase_Xiaodan_3.xlsx";
 startInd = 2;
 freqLow = 0.02;
 freqHigh = 2;
@@ -16,7 +16,7 @@ load('AtlasandIsbrain.mat','AtlasSeeds')
 mask_barrel = AtlasSeeds==9;
 
 
-for excelRow = [181 183 185 228 232 236]
+for excelRow = [232]%181 183 185 228 232 236
     
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
     recDate = excelRaw{1}; recDate = string(recDate);
@@ -26,7 +26,9 @@ for excelRow = [181 183 185 228 232 236]
     if ~exist(strcat(saveDir,'\Barrel_mrf'),'dir')
         mkdir(strcat(saveDir,'\Barrel_mrf'))
     end
-    for n = 1:3
+    for n = 3
+        tic 
+        disp(strcat(mouseName,', run#',num2str(n)))
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
         %load contrasts
         load(fullfile(saveDir,processedName),'xform_FADCorr','xform_jrgeco1aCorr','xform_isbrain')
@@ -55,9 +57,10 @@ for excelRow = [181 183 185 228 232 236]
         Calcium = resample(Calcium,freq,samplingRate,'Dimension',3); %resample to 250 Hz
         
         % filter again
+        tic
         FAD =  filterData(FAD,freqLow,freqHigh,freq);
         Calcium = filterData(Calcium,freqLow,freqHigh,freq);
-        
+        toc
         % Reshape into 30 seconds
         FAD=reshape(FAD,128,128,t_kernel*freq,[]);
         Calcium=reshape(Calcium,128,128,t_kernel*freq,[]);
@@ -84,8 +87,8 @@ for excelRow = [181 183 185 228 232 236]
             %X = X(151:450,:);
             X = X(1:length(Calcium_barrel),1:length(Calcium_barrel));% make it square?
             [~,S,~]=svd(X);
-            lambda = 0.01;
-            h_region_barrel = (X'*S*X+(S(1,1).^3)*lambda*eye(length(Calcium_barrel))) \ (X'*S*[zeros(3*freq,1); FAD_barrel(1:end-3*freq)]);% why add 3s of zeros? Do we need to shift it?
+            lambda = 0.0005;
+            h_region_barrel = (X'*S*X+(S(1,1).^1)*lambda*eye(length(Calcium_barrel))) \ (X'*S*[zeros(3*freq,1); FAD_barrel(1:end-3*freq)]);% why add 3s of zeros? Do we need to shift it?
             mrf_Barrel_0p02_2(jj,:) = h_region_barrel;
             
             % Predicted FAD
@@ -113,29 +116,40 @@ for excelRow = [181 183 185 228 232 236]
             plot(t,h_region_barrel)
             xlim([-3 10])
             %ylim([-mrfMax mrfMax])
-            ylabel('\Delta\muM/\DeltaF/F%')
+        
             xlabel('Time(s)')
             title('mrf for Barrel Cortex')
-
+            
+            test = abs(FAD_barrel);
+            maxVal = max(test);
             subplot(2,2,3)
             yyaxis left
             plot((1:t_kernel*freq)/freq,FAD_barrel,'g')
+            ylim([-maxVal maxVal])
             hold on
+            test = abs(FAD_barrel_pred);
+            maxVal = max(test);
             yyaxis right
             plot((1:t_kernel*freq)/freq,FAD_barrel_pred(3*freq+1:3*freq+length(FAD_barrel)),'k')
+            ylim([-maxVal maxVal])
             xlabel('Time(s)')
             ylabel('\DeltaF/F%')
             legend('Actual FAD','Predicted FAD')
             title(strcat('r = ',num2str(r_region_barrel)))
             
-            sgtitle(strcat('mrf for Barrel Region, ',num2str(freqLow),'-',freqHigh,', ',' lambda = ',num2str(lambda),', ',mouseName,' Run #',num2str(n),', Segment #',num2str(ii)))
+            sgtitle(strcat('mrf for Barrel Region, ',num2str(freqLow),'-',num2str(freqHigh),', ',' lambda = ',num2str(lambda),', ',mouseName,' Run #',num2str(n),', Segment #',num2str(ii)))
             saveName =  fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-segment#',num2str(ii),'-Barrel-NoGSR-mrf'));
             saveas(gcf,strcat(saveName,'.fig'))
             saveas(gcf,strcat(saveName,'.png'))
             close all
         end
-        
-        save(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'r_Barrel_mrf_0p02_2','mrf_Barrel_0p02_2','-append')
+        clear FAD Calcium
+        if exist(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'file')
+            save(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'r_Barrel_mrf_0p02_2','mrf_Barrel_0p02_2','-append')
+        else
+            save(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'r_Barrel_mrf_0p02_2','mrf_Barrel_0p02_2')
+        end
+        toc 
     end
 end
 
@@ -188,7 +202,7 @@ for excelRow = [181 183 185 228 232 236]
     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
 
     for n = 1:3
-        load(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'mrf_Barrel_0p02_2')
+        load(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'mrf_Barrel_0p02_2','r_Barrel_mrf_0p02_2')
         totalNum = totalNum + length(mrf_Barrel_0p02_2);
         mrf_Barrel_0p02_2_mice = cat(1,mrf_Barrel_0p02_2_mice,mrf_Barrel_0p02_2);
         r_Barrel_mrf_0p02_2_mice = [r_Barrel_mrf_0p02_2_mice,r_Barrel_mrf_0p02_2];

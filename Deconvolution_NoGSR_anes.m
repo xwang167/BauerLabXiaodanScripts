@@ -80,7 +80,7 @@ for excelRow = [202 195 204 230 234 240]
             X = X(1:length(Calcium_barrel),1:length(Calcium_barrel));% make it square?
             [~,S,~]=svd(X);
             lambda = 0.01;
-            h_region_barrel = (X'*S*X+(S(1,1).^3)*lambda*eye(length(Calcium_barrel))) \ (X'*S*[zeros(3*freq,1); HbT_barrel(1:end-3*freq)]);% why add 3s of zeros? Do we need to shift it?
+            h_region_barrel = (X'*S*X+(S(1,1).^2)*lambda*eye(length(Calcium_barrel))) \ (X'*S*[zeros(3*freq,1); HbT_barrel(1:end-3*freq)]);% why add 3s of zeros? Do we need to shift it?
             HRF_Barrel(jj,:) = h_region_barrel;
             
             % Predicted HbT
