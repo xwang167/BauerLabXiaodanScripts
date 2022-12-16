@@ -10,8 +10,8 @@ runs = 1:3;%
 freq = 250;
 load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
 load('D:\OIS_Process\noVasculatureMask.mat')
-lagTimeTrial_FADCalcium_2min = nan(128,128,5);
-lagAmpTrial_FADCalcium_2min = nan(128,128,5);
+lagTimeTrial_FADHbT_2min = nan(128,128,5);
+lagAmpTrial_FADHbT_2min = nan(128,128,5);
 edgeLen =1;
 tZone = 4;
 corrThr = 0;
@@ -51,67 +51,67 @@ for excelRow = excelRows
         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
         tic
-        load(fullfile(saveDir,processedName),'xform_FADCorr','xform_jrgeco1aCorr')
+        load(fullfile(saveDir,processedName),'xform_datahb','xform_jrgeco1aCorr')
         % Convert to DeltaF/F%
-        Calcium = double(squeeze(xform_jrgeco1aCorr))*100;
-        clear xform_jrgeco1aCorr
-        FAD     = double(xform_FADCorr)              *100;
+        HbT = double(squeeze(xform_datahb(:,:,1,:)+xform_datahb(:,:,2,:)))*10^6;
+        clear xform_datahb
+        FAD = double(xform_FADCorr)                                       *100;
         clear xform_FADCorr
         
         % Pad to full 10mins
-        Calcium(:,:,end+1) = Calcium(:,:,end);
-        FAD(:,:,end+1)     = FAD    (:,:,end);
+        HbT(:,:,end+1) = HbT(:,:,end);
+        FAD(:,:,end+1) = FAD(:,:,end);
         
         % Filter
-        Calcium_filter = filterData(Calcium,0.02,2,sessionInfo.framerate);
-        clear Calcium
-        FAD_filter     = filterData(FAD    ,0.02,2,sessionInfo.framerate);
+        HbT_filter = filterData(HbT,0.02,2,sessionInfo.framerate);
+        clear HbT
+        FAD_filter = filterData(FAD,0.02,2,sessionInfo.framerate);
         clear FAD
 
 %         % Resample to 250Hx
-%         Calcium_filter = resample(Calcium_filter,freq,sessionInfo.framerate);
+%         HbT_filter = resample(HbT_filter,freq,sessionInfo.framerate);
 %         FAD_filter     = resample(FAD_filter,    freq,sessionInfo.framerate);
 %         
 %         % Filter again
-%         Calcium_filter = filterData(Calcium_filter,0.02,2,freq);
+%         HbT_filter = filterData(HbT_filter,0.02,2,freq);
 %         FAD_filter =     filterData(FAD_filter    ,0.02,2,freq);
 
-        Calcium_filter = reshape(Calcium_filter,128*128,[]);
-        FAD_filter     = reshape(FAD_filter,    128*128,[]);
+        HbT_filter = reshape(HbT_filter,128*128,[]);
+        FAD_filter = reshape(FAD_filter,128*128,[]);
         % Norm
-        Calcium_filter = normRow(Calcium_filter);
-        FAD_filter     = normRow(FAD_filter);
+        HbT_filter = normRow(HbT_filter);
+        FAD_filter = normRow(FAD_filter);
         
         % Resahpe
-        Calcium_filter = reshape(Calcium_filter,128,128,120*sessionInfo.framerate,[]);
-        FAD_filter     = reshape(FAD_filter,    128,128,120*sessionInfo.framerate,[]);
+        HbT_filter = reshape(HbT_filter,128,128,120*sessionInfo.framerate,[]);
+        FAD_filter = reshape(FAD_filter,128,128,120*sessionInfo.framerate,[]);
         
         for ii = 1:5
-            [lagTimeTrial_FADCalcium_2min(:,:,ii), lagAmpTrial_FADCalcium_2min(:,:,ii),~] = mouse.conn.dotLag(...
-                FAD_filter(:,:,(ii-1)*120*freq+1:ii*120*freq),Calcium_filter(:,:,(ii-1)*120*freq+1:ii*120*freq),...
+            [lagTimeTrial_FADHbT_2min(:,:,ii), lagAmpTrial_FADHbT_2min(:,:,ii),~] = mouse.conn.dotLag(...
+                FAD_filter(:,:,:,ii),HbT_filter(:,:,:,ii),...
                 edgeLen,validRange,corrThr, true,true);
         end
         
-        lagTimeTrial_FADCalcium_2min = lagTimeTrial_FADCalcium_2min./ sessionInfo.framerate;
+        lagTimeTrial_FADHbT_2min = lagTimeTrial_FADHbT_2min./ sessionInfo.framerate;
         
-        lagTimeTrial_FADCalcium_2min_median = nanmedian(lagTimeTrial_FADCalcium_2min,3);
-        lagAmpTrial_FADCalcium_2min_median = nanmedian(lagAmpTrial_FADCalcium_2min,3);
+        lagTimeTrial_FADHbT_2min_median = nanmedian(lagTimeTrial_FADHbT_2min,3);
+        lagAmpTrial_FADHbT_2min_median = nanmedian(lagAmpTrial_FADHbT_2min,3);
         
         
         
         if exist(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_2min','.mat')),'file')
             save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_2min','.mat')),...
-                'lagTimeTrial_FADCalcium_2min_median','lagAmpTrial_FADCalcium_2min_median',...
-                'lagTimeTrial_FADCalcium_2min','lagAmpTrial_FADCalcium_2min','-append')
+                'lagTimeTrial_FADHbT_2min_median','lagAmpTrial_FADHbT_2min_median',...
+                'lagTimeTrial_FADHbT_2min','lagAmpTrial_FADHbT_2min','-append')
         else
             save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_2min','.mat')),...
-                'lagTimeTrial_FADCalcium_2min_median','lagAmpTrial_FADCalcium_2min_median',...
-                'lagTimeTrial_FADCalcium_2min','lagAmpTrial_FADCalcium_2min','-v7.3')
+                'lagTimeTrial_FADHbT_2min_median','lagAmpTrial_FADHbT_2min_median',...
+                'lagTimeTrial_FADHbT_2min','lagAmpTrial_FADHbT_2min','-v7.3')
         end
         
         figure
         subplot(2,1,2)
-        imagesc(lagAmpTrial_FADCalcium_2min_median,'AlphaData',mask)
+        imagesc(lagAmpTrial_FADHbT_2min_median,'AlphaData',mask)
         cb=colorbar;
         caxis([-1 1])
         axis image off
@@ -119,20 +119,20 @@ for excelRow = excelRows
         title('r')
         set(gca,'FontSize',14,'FontWeight','Bold')
         subplot(2,1,1)
-        imagesc(lagTimeTrial_FADCalcium_2min_median,'AlphaData',mask)
+        imagesc(lagTimeTrial_FADHbT_2min_median,'AlphaData',mask)
         cb=colorbar;
         caxis([0 0.3])
         axis image off
         cmocean('ice')
         title('T(s)')
         set(gca,'FontSize',14,'FontWeight','Bold')
-        sgtitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-CalciumFAD-CrossCorrelation-2min'))
-        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_CrossCorrelation_2min.png')));
-        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_CrossCorrelation_2min.fig')));
+        sgtitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-HbTFAD-CrossCorrelation-2min'))
+        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_HbTFAD_CrossCorrelation_2min.png')));
+        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_HbTFAD_CrossCorrelation_2min.fig')));
         %         for jj = 1:10
         %             figure
         %             subplot(2,1,1)
-        %             imagesc(lagTimeTrial_FADCalcium_2min(:,:,jj),[0,2])
+        %             imagesc(lagTimeTrial_FADHbT_2min(:,:,jj),[0,2])
         %             colorbar
         %             axis image off
         %             colormap jet
@@ -143,7 +143,7 @@ for excelRow = excelRows
         %
         %
         %             subplot(2,1,2)
-        %             imagesc(lagAmpTrial_FADCalcium_2min(:,:,jj),[0 1])
+        %             imagesc(lagAmpTrial_FADHbT_2min(:,:,jj),[0 1])
         %             colorbar
         %             axis image off
         %             colormap jet
