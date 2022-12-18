@@ -9,13 +9,12 @@ mrfMax = 0.05;
 nVx = 128;
 nVy = 128;
 samplingRate =25;
-freq = 250;
 t_kernel = 30;
-t = (-3*freq:(t_kernel-3)*freq-1)/freq;
+t = (-3*samplingRate:(t_kernel-3)*samplingRate-1)/samplingRate;
 load('AtlasandIsbrain.mat','AtlasSeeds')
 mask_barrel = AtlasSeeds==9;
 
-for excelRow = [228 232 236 202 195 204 230 234 240]%181 183 185 
+for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]% 
     
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
     recDate = excelRaw{1}; recDate = string(recDate);
@@ -47,22 +46,15 @@ for excelRow = [228 232 236 202 195 204 230 234 240]%181 183 185
         Calcium = squeeze(xform_jrgeco1aCorr)*100; % convert to DeltaF/F%
         clear xform_jrgeco1aCorr
         Calcium(:,:,end+1) = Calcium(:,:,end);
-        % Filter 0.01-5Hz, resample to 250 Hz
+
+        % Filter 0.02-5Hz, resample to 250 Hz
         FAD =  filterData(FAD,freqLow,freqHigh,samplingRate);
         Calcium = filterData(Calcium,freqLow,freqHigh,samplingRate);
         
-        %resample
-        FAD = resample(FAD,freq,samplingRate,'Dimension',3); %resample to 250 Hz
-        Calcium = resample(Calcium,freq,samplingRate,'Dimension',3); %resample to 250 Hz
-        
-        % filter again
-        tic
-        FAD =  filterData(FAD,freqLow,freqHigh,freq);
-        Calcium = filterData(Calcium,freqLow,freqHigh,freq);
         toc
         % Reshape into 30 seconds
-        FAD=reshape(FAD,128,128,t_kernel*freq,[]);
-        Calcium=reshape(Calcium,128,128,t_kernel*freq,[]);
+        FAD=reshape(FAD,128,128,t_kernel*samplingRate,[]);
+        Calcium=reshape(Calcium,128,128,t_kernel*samplingRate,[]);
         
         r_Barrel_mrf_0p02_2 = zeros(1,21-startInd);
         mrf_Barrel_0p02_2 = zeros(21-startInd,length(Calcium));
@@ -86,26 +78,26 @@ for excelRow = [228 232 236 202 195 204 230 234 240]%181 183 185
             %X = X(151:450,:);
             X = X(1:length(Calcium_barrel),1:length(Calcium_barrel));% make it square?
             [~,S,~]=svd(X);
-            lambda = 5e-11;
-            h_region_barrel = (X'*S*X+(S(1,1).^3)*lambda*eye(length(Calcium_barrel))) \ (X'*S*[zeros(3*freq,1); FAD_barrel(1:end-3*freq)]);% why add 3s of zeros? Do we need to shift it?
+            lambda = 5e-7;
+            h_region_barrel = (X'*S*X+(S(1,1).^3)*lambda*eye(length(Calcium_barrel))) \ (X'*S*[zeros(3*samplingRate,1); FAD_barrel(1:end-3*samplingRate)]);% why add 3s of zeros? Do we need to shift it?
             disp(num2str((S(1,1).^3)*lambda))
             mrf_Barrel_0p02_2(jj,:) = h_region_barrel;
             
             % Predicted FAD
             FAD_barrel_pred = conv(Calcium_barrel,h_region_barrel);
-            FAD_barrel_pred = FAD_barrel_pred(1:(length(FAD_barrel)+3*freq));
-            r_region_barrel = corr(FAD_barrel,FAD_barrel_pred(3*freq+1:end));
+            FAD_barrel_pred = FAD_barrel_pred(1:(length(FAD_barrel)+3*samplingRate));
+            r_region_barrel = corr(FAD_barrel,FAD_barrel_pred(3*samplingRate+1:end));
             r_Barrel_mrf_0p02_2(jj) = r_region_barrel;
             
             jj = jj+1;
             figure('units','normalized','outerposition',[0 0 1 1])
             subplot(2,2,1)
-            plot((1:t_kernel*freq)/freq,FAD_barrel,'g')
+            plot((1:t_kernel*samplingRate)/samplingRate,FAD_barrel,'g')
             ylabel('\DeltaF/F%')
             ylim([-FADMax FADMax])
             hold on
             yyaxis right
-            plot((1:t_kernel*freq)/freq,Calcium_barrel,'m')
+            plot((1:t_kernel*samplingRate)/samplingRate,Calcium_barrel,'m')
             legend('FAD','jRGECO1a')
             ylim([-calMax calMax])
             ylabel('\DeltaF/F%')
@@ -123,13 +115,13 @@ for excelRow = [228 232 236 202 195 204 230 234 240]%181 183 185
             maxVal = max(test);
             subplot(2,2,3)
             yyaxis left
-            plot((1:t_kernel*freq)/freq,FAD_barrel,'g')
+            plot((1:t_kernel*samplingRate)/samplingRate,FAD_barrel,'g')
             ylim([-maxVal maxVal])
             hold on
             test = abs(FAD_barrel_pred);
             maxVal = max(test);
             yyaxis right
-            plot((1:t_kernel*freq)/freq,FAD_barrel_pred(3*freq+1:3*freq+length(FAD_barrel)),'k')
+            plot((1:t_kernel*samplingRate)/samplingRate,FAD_barrel_pred(3*samplingRate+1:3*samplingRate+length(FAD_barrel)),'k')
             ylim([-maxVal maxVal])
             xlabel('Time(s)')
             ylabel('\DeltaF/F%')
@@ -141,7 +133,6 @@ for excelRow = [228 232 236 202 195 204 230 234 240]%181 183 185
             saveas(gcf,strcat(saveName,'.png'))
             close all
         end
-        
           clear FAD Calcium
         if exist(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'file')
             save(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'r_Barrel_mrf_0p02_2','mrf_Barrel_0p02_2','-append')
@@ -152,7 +143,9 @@ for excelRow = [228 232 236 202 195 204 230 234 240]%181 183 185
     end
 end
 
-%% Averaged over r>0.6 only
+
+
+%% Awake Averaged over r>0.6 only
 totalNum = 0;
 mrf_Barrel_0p02_2_0p6 = [];
 miceName = [];
@@ -175,20 +168,19 @@ for excelRow = [181 183 185 228 232 236]
 end
 qualifiedNum = size(mrf_Barrel_0p02_2_0p6,1);
 mrf_Barrel_0p02_2_0p6_median = median(mrf_Barrel_0p02_2_0p6);
-save(strcat('L:\RGECO\cat\Barrel_mrf\',recDate,miceName,'-Barrel_mrf.mat'),'mrf_Barrel_0p02_2_0p6','qualifiedNum','totalNum');
+save(strcat("D:\XiaodanPaperData\cat\Barrel_mrf",recDate,miceName,'-Barrel_mrf.mat'),'mrf_Barrel_0p02_2_0p6','qualifiedNum','totalNum');
 
-[pks,locs,w,p] = findpeaks(mrf_Barrel_0p02_2_0p6_median,t,'MinPeakProminence',2e-9);
+[pks,locs,w,p] = findpeaks(mrf_Barrel_0p02_2_0p6_median,t,'MinPeakProminence',0.01);
 figure
 plot_distribution_prctile(t,mrf_Barrel_0p02_2_0p6)
 legend('25%-75%')
 xlim([-3 10])
 xlabel('Time(s)')
 grid on
-title(strcat(num2str(qualifiedNum),'/',num2str(totalNum),' has r>0.6, Median: T=',num2str(locs),'s, W=',num2str(w),'s, A=',num2str(pks)))
+title(strcat('Awake MRF, ',num2str(qualifiedNum),'/',num2str(totalNum),' has r>0.6, Median: T=',num2str(locs),'s, W=',num2str(w),'s, A=',num2str(pks)))
 
-% Averaged across all 
+% Awake Averaged across all 
 totalNum = 0;
-mrf_Barrel_mice = [];
 mrf_Barrel_0p02_2_mice = [];
 r_Barrel_mrf_0p02_2_mice= [];
 miceName = [];
@@ -210,21 +202,20 @@ for excelRow = [181 183 185 228 232 236]
 end
 mrf_Barrel_0p02_2_mice_median = median(mrf_Barrel_0p02_2_mice);
 r_Barrel_mrf_0p02_2_mice_median = median(r_Barrel_mrf_0p02_2_mice);
-save(strcat('L:\RGECO\cat\Barrel_mrf\',recDate,miceName,'-Barrel_mrf.mat'),'mrf_Barrel_0p02_2_mice','-append');
+save(strcat("D:\XiaodanPaperData\cat\Barrel_mrf\",recDate,miceName,'-Barrel_mrf.mat'),'mrf_Barrel_0p02_2_mice','r_Barrel_mrf_0p02_2_mice','-append');
 
-[pks,locs,w,p] = findpeaks(mrf_Barrel_0p02_2_mice_median,t,'MinPeakProminence',2e-9);
+[pks,locs,w,p] = findpeaks(mrf_Barrel_0p02_2_mice_median,t,'MinPeakProminence',0.01);
 figure
-plot_distribution_prctile(t,mrf_Barrel_mice)
 plot_distribution_prctile(t,mrf_Barrel_0p02_2_mice)
 legend('25%-75%')
 xlim([-3 10])
 xlabel('Time(s)')
 grid on
-title(strcat('Median: T=',num2str(locs),'s, W=',num2str(w),'s, A=',num2str(pks)', 'r=',num2str(r_Barrel_mrf_0p02_2_mice_median,'%4.2f')))
+title(strcat('Awake MRF, ','Median: T=',num2str(locs),'s, W=',num2str(w),'s, A=',num2str(pks),', r=',num2str(r_Barrel_mrf_0p02_2_mice_median,'%4.2f')))
 
-%%
+%% Anes Averaged over r>0.6 only
 totalNum = 0;
-mrf_Barrel_0p6 = [];
+mrf_Barrel_0p02_2_0p6 = [];
 miceName = [];
 for excelRow = [202 195 204 230 234 240]
     
@@ -234,30 +225,32 @@ for excelRow = [202 195 204 230 234 240]
     miceName = strcat(miceName,'-',mouseName);
     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+    if ~exist(strcat(saveDir,'\Barrel_mrf'),'dir')
+        mkdir(strcat(saveDir,'\Barrel_mrf'))
+    end
     for n = 1:3
-        load(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'r_Barrel_mrf','mrf_Barrel')
-        totalNum = totalNum + length(r_Barrel_mrf);
-        mrf_Barrel_0p6 = cat(1,mrf_Barrel_0p6,mrf_Barrel(r_Barrel_mrf>0.6,:));
+        load(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'r_Barrel_mrf_0p02_2','mrf_Barrel_0p02_2')
+        totalNum = totalNum + length(r_Barrel_mrf_0p02_2);
+        mrf_Barrel_0p02_2_0p6 = cat(1,mrf_Barrel_0p02_2_0p6,mrf_Barrel_0p02_2(r_Barrel_mrf_0p02_2>0.6,:));
     end
 end
-qualifiedNum = size(mrf_Barrel_0p6,1);
-mrf_Barrel_0p6_median = median(mrf_Barrel_0p6);
-save(strcat('L:\RGECO\cat\Barrel_mrf\',recDate,miceName,'-Barrel_mrf.mat'),'mrf_Barrel_0p6','qualifiedNum','totalNum');
+qualifiedNum = size(mrf_Barrel_0p02_2_0p6,1);
+mrf_Barrel_0p02_2_0p6_median = median(mrf_Barrel_0p02_2_0p6);
+save(strcat("D:\XiaodanPaperData\cat\Barrel_mrf\",recDate,miceName,'-Barrel_mrf.mat'),'mrf_Barrel_0p02_2_0p6','qualifiedNum','totalNum');
 
-[pks,locs,w,p] = findpeaks(mrf_Barrel_0p6_median,t,'MinPeakProminence',1e-11);
-
+[pks,locs,w,p] = findpeaks(mrf_Barrel_0p02_2_0p6_median,t,'MinPeakProminence',0.008);
 figure
-plot_distribution_prctile(t,mrf_Barrel_0p6)
+plot_distribution_prctile(t,mrf_Barrel_0p02_2_0p6)
 legend('25%-75%')
 xlim([-3 10])
 xlabel('Time(s)')
 grid on
-title(strcat(num2str(qualifiedNum),'/',num2str(totalNum),' has r>0.6, Median: T=',num2str(locs),'s, W=',num2str(w),'s, A=',num2str(pks)))
+title(strcat('Anesthetized MRF, ',num2str(qualifiedNum),'/',num2str(totalNum),' has r>0.6, Median: T=',num2str(locs),'s, W=',num2str(w),'s, A=',num2str(pks)))
 
-% Averaged across all 
+% Anes Averaged across all 
 totalNum = 0;
-mrf_Barrel_mice = [];
-r_Barrel_mrf_mice = [];
+mrf_Barrel_0p02_2_mice = [];
+r_Barrel_mrf_0p02_2_mice= [];
 miceName = [];
 for excelRow = [202 195 204 230 234 240]
     
@@ -268,66 +261,69 @@ for excelRow = [202 195 204 230 234 240]
     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
 
-    for n = 1:3
-        load(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'mrf_Barrel','r_Barrel_mrf')
-        totalNum = totalNum + length(mrf_Barrel);
-        mrf_Barrel_mice = cat(1,mrf_Barrel_mice,mrf_Barrel);
-        r_Barrel_mrf_mice = [r_Barrel_mrf_mice,r_Barrel_mrf];
+    for n = 1:3;
+        load(fullfile(saveDir,'Barrel_mrf', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Barrel_mrf','.mat')),'mrf_Barrel_0p02_2','r_Barrel_mrf_0p02_2')
+        totalNum = totalNum + length(r_Barrel_mrf_0p02_2);
+        mrf_Barrel_0p02_2_mice = cat(1,mrf_Barrel_0p02_2_mice,mrf_Barrel_0p02_2);
+        r_Barrel_mrf_0p02_2_mice = [r_Barrel_mrf_0p02_2_mice,r_Barrel_mrf_0p02_2];
     end
 end
-mrf_Barrel_mice_median = median(mrf_Barrel_mice);
-r_Barrel_mice_median = median(r_Barrel_mrf_mice);
-save(strcat('L:\RGECO\cat\Barrel_mrf\',recDate,miceName,'-Barrel_mrf.mat'),'mrf_Barrel_mice','r_Barrel_mice','-append');
+mrf_Barrel_0p02_2_mice_median = median(mrf_Barrel_0p02_2_mice);
+r_Barrel_mrf_0p02_2_mice_median = median(r_Barrel_mrf_0p02_2_mice);
+save(strcat("D:\XiaodanPaperData\cat\Barrel_mrf\",recDate,miceName,'-Barrel_mrf.mat'),'mrf_Barrel_0p02_2_mice','r_Barrel_mrf_0p02_2_mice','-append');
 
-[pks,locs,w,p] = findpeaks(mrf_Barrel_mice_median,t,'MinPeakProminence',1e-11);
+[pks,locs,w,p] = findpeaks(mrf_Barrel_0p02_2_mice_median,t,'MinPeakProminence',0.008);
 figure
-plot_distribution_prctile(t,mrf_Barrel_mice)
+plot_distribution_prctile(t,mrf_Barrel_0p02_2_mice)
 legend('25%-75%')
 xlim([-3 10])
 xlabel('Time(s)')
 grid on
-title(strcat('Median: T=',num2str(locs),'s, W=',num2str(w),'s, A=',num2str(pks),', r =',num2str(r_Barrel_mice_median)))
+title(strcat('Anesthetized MRF, ','Median: T=',num2str(locs),'s, W=',num2str(w),'s, A=',num2str(pks),', r=',num2str(r_Barrel_mrf_0p02_2_mice_median,'%4.2f')))
 
 
-
-%% Compare results between awake and anesthetized for r>0.6
-load('L:\RGECO\cat\Barrel_mrf\191030-R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-Barrel_mrf.mat')
-mrf_Barrel_0p6_awake =mrf_Barrel_0p6;
+%% Compare results between awake and anesthetized
+load('D:\XiaodanPaperData\cat\Barrel_mrf\191030-R5M2285-R5M2286-R5M2288-R6M2460-awake-R6M1-awake-R6M2497-awake-Barrel_mrf.mat')
+mrf_Barrel_awake = mrf_Barrel_0p02_2_mice;
+r_Barrel_mrf_awake = median(r_Barrel_mrf_0p02_2_mice);
 qualifiedNum_awake = qualifiedNum;
 totalNum_awake = totalNum;
-mrf_Barrel_0p6_median_awake = median(mrf_Barrel_0p6_awake);
-[pks_awake,locs_awake,w_awake,p_awake] = findpeaks(mrf_Barrel_0p6_median_awake,t,'MinPeakProminence',2e-9);
+mrf_Barrel_median_awake = median(mrf_Barrel_awake);
+[pks_awake,locs_awake,w_awake,p_awake] = findpeaks(mrf_Barrel_median_awake,t,'MinPeakProminence',0.008);
 
-load('L:\RGECO\cat\Barrel_mrf\191030-R5M2285-anes-R5M2286-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-Barrel_mrf.mat')
-mrf_Barrel_0p6_anes =mrf_Barrel_0p6;
+load('D:\XiaodanPaperData\cat\Barrel_mrf\191030-R5M2285-anes-R5M2286-anes-R5M2288-anes-R6M2460-anes-R6M1-anes-R6M2497-anes-Barrel_mrf.mat')
+mrf_Barrel_anes = mrf_Barrel_0p02_2_mice;
+r_Barrel_mrf_anes = median(r_Barrel_mrf_0p02_2_mice);
 qualifiedNum_anes = qualifiedNum;
 totalNum_anes = totalNum;
-mrf_Barrel_0p6_median_anes = median(mrf_Barrel_0p6_anes);
-[pks_anes,locs_anes,w_anes,p_anes] = findpeaks(mrf_Barrel_0p6_median_anes,t,'MinPeakProminence',1e-11);
+mrf_Barrel_median_anes = median(mrf_Barrel_anes);
+[pks_anes,locs_anes,w_anes,p_anes] = findpeaks(mrf_Barrel_median_anes,t,'MinPeakProminence',0.008);
 
 figure('units','normalized','outerposition',[0 0 1 1])
 subplot(2,2,1)
-plot_distribution_prctile(t,mrf_Barrel_0p6_awake,'Color',[1 0 0])
+plot_distribution_prctile(t,mrf_Barrel_awake,'Color',[1 0 0])
 legend('25%-75%')
 xlim([-3 7])
 xlabel('Time(s)')
 grid on
-title(strcat('For awake:  ',num2str(qualifiedNum_awake),'/',num2str(totalNum_awake),' has r>0.6, Median: T=',num2str(locs_awake,'%4.2f'),'s, W=',num2str(w_awake,'%4.2f'),'s, A=',num2str(pks_awake,'%4.2f')))
+title(strcat('For awake, Median: T=',num2str(locs_awake,'%4.2f'),'s, W=',...
+    num2str(w_awake,'%4.2f'),'s, A=',num2str(pks_awake,'%4.4f'),', r=',num2str(r_Barrel_mrf_awake,'%4.2f')))
 
 subplot(2,2,2)
-plot_distribution_prctile(t,mrf_Barrel_0p6_anes,'Color',[0 0 1])
+plot_distribution_prctile(t,mrf_Barrel_anes,'Color',[0 0 1])
 legend('25%-75%')
 xlim([-3 7])
 xlabel('Time(s)')
 grid on
-title(strcat('For anesthetized:  ',num2str(qualifiedNum_anes),'/',num2str(totalNum_anes),' has r>0.6, Median: T=',num2str(locs_anes,'%4.2f'),'s, W=',num2str(w_anes,'%4.2f'),'s, A=',num2str(pks_anes,'%4.2f')))
+title(strcat('For anesthetized, Median: T=',num2str(locs_anes,'%4.2f'),'s, W=',...
+    num2str(w_anes,'%4.2f'),'s, A=',num2str(pks_anes,'%4.4f'),', r=',num2str(r_Barrel_mrf_anes,'%4.2f')))
 
 subplot(2,2,3)
-plot_distribution_prctile(t,mrf_Barrel_0p6_awake,'Color',[1 0 0])
+plot_distribution_prctile(t,mrf_Barrel_awake,'Color',[1 0 0])
 hold on
-plot_distribution_prctile(t,mrf_Barrel_0p6_anes,'Color',[0 0 1])
+plot_distribution_prctile(t,mrf_Barrel_anes,'Color',[0 0 1])
 xlim([-3 7])
 xlabel('Time(s)')
 grid on
-title('mrf, Awake vs. Anesthetized')
+title('MRF, Awake vs. Anesthetized')
 sgtitle('MRF for Left Barrel Cortex without GSR')

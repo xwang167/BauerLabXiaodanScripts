@@ -271,7 +271,7 @@ legend('25%-75%')
 xlim([-3 7])
 xlabel('Time(s)')
 grid on
-title(strcat('For awake: Median: T=',num2str(locs_awake,'%4.2f'),'s, W=',num2str(w_awake,'%4.2f'),'s, A=',num2str(pks_awake,'%4.2f'),', r=',num2str(r_Barrel_HRF_mice_median_awake,'%4.2f')))
+title(strcat('For awake: Median: T=',num2str(locs_awake,'%4.1f'),'s, W=',num2str(w_awake,'%4.2f'),'s, A=',num2str(pks_awake,'%4.4f'),', r=',num2str(r_Barrel_HRF_mice_median_awake,'%4.2f')))
 
 subplot(2,2,2)
 plot_distribution_prctile(t,HRF_Barrel_mice_anes,'Color',[0 0 1])
@@ -279,7 +279,7 @@ legend('25%-75%')
 xlim([-3 7])
 xlabel('Time(s)')
 grid on
-title(strcat('For anesthetized: Median: T=',num2str(locs_anes,'%4.2f'),'s, W=',num2str(w_anes,'%4.2f'),'s, A=',num2str(pks_anes,'%4.2f'),', r=',num2str(r_Barrel_HRF_mice_median_anes,'%4.2f')))
+title(strcat('For anesthetized: Median: T=',num2str(locs_anes,'%4.1f'),'s, W=',num2str(w_anes,'%4.2f'),'s, A=',num2str(pks_anes,'%4.4f'),', r=',num2str(r_Barrel_HRF_mice_median_anes,'%4.2f')))
 
 subplot(2,2,3)
 plot_distribution_prctile(t,HRF_Barrel_mice_awake,'Color',[1 0 0])
@@ -290,3 +290,8 @@ xlabel('Time(s)')
 grid on
 title('HRF, Awake vs. Anesthetized')
 sgtitle('HRF for Left Barrel Cortex without GSR with 0.02-2Hz Filter')
+
+
+
+
+
