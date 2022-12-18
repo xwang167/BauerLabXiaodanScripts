@@ -21,7 +21,7 @@ mask_barrel = AtlasSeeds==9;
 % hrfMax = 0.02;
 
 
-for excelRow = [181 183 185 228 232 236]%
+for excelRow = [181]% 183 185 228 232 236
 
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
     recDate = excelRaw{1}; recDate = string(recDate);
@@ -177,7 +177,7 @@ if ~exist('D:\XiaodanPaperData\cat\Barrel_HRF\','dir')
 end
 save(strcat('D:\XiaodanPaperData\cat\Barrel_HRF\',recDate,miceName,'-Barrel_HRF.mat'),'HRF_Barrel_0p6','qualifiedNum','totalNum');
 
-[pks,locs,w,p] = findpeaks(HRF_Barrel_0p6_median,t,'MinPeakProminence',0.02);
+[pks,locs,w,p] = findpeaks(HRF_Barrel_0p6_median,t,'MinPeakProminence',0.01);
 
 figure
 plot_distribution_prctile(t,HRF_Barrel_0p6)
