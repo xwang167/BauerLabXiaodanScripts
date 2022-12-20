@@ -1,23 +1,23 @@
 
 excelFile="X:\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
-%% convert laser from to coordinate of laser
-for excelRow = 2:11
-    runsInfo = parseRuns_xw(excelFile,excelRow);
-    runInfo = runsInfo(1);
-    seedLocation_mouse = nan(2,160);
-    load(strcat(runInfo.saveFilePrefix(1:end-6),'-xform_laser_grid.mat'),'gridLaser_mouse')
-    for ii = 1:160
-        temp = gridLaser_mouse(:,:,ii);
-        [max_Val,I] = max(temp(:));
-        if max_Val>10000
-            [row,col] = ind2sub([128 128],I);
-            seedLocation_mouse(1,ii) = row;
-            seedLocation_mouse(2,ii) = col;
-        end
-    end
-    save(strcat(runInfo.saveFilePrefix(1:end-6),'-seedLocation.mat'),'seedLocation_mouse')
-end
-
+% %% convert laser from to coordinate of laser
+% for excelRow = 2:11
+%     runsInfo = parseRuns_xw(excelFile,excelRow);
+%     runInfo = runsInfo(1);
+%     seedLocation_mouse = nan(2,160);
+%     load(strcat(runInfo.saveFilePrefix(1:end-6),'-xform_laser_grid.mat'),'gridLaser_mouse')
+%     for ii = 1:160
+%         temp = gridLaser_mouse(:,:,ii);
+%         [max_Val,I] = max(temp(:));
+%         if max_Val>10000
+%             [row,col] = ind2sub([128 128],I);
+%             seedLocation_mouse(1,ii) = row;
+%             seedLocation_mouse(2,ii) = col;
+%         end
+%     end
+%     save(strcat(runInfo.saveFilePrefix(1:end-6),'-seedLocation.mat'),'seedLocation_mouse')
+% end
+% 
 
 % All for Calcium
 %% Create inhibition map for calcium
@@ -32,7 +32,7 @@ for excelRow = 2:11
         % inhibition map
         for ii = 1:128
             for jj = 1:128
-                inhibitionMap(ii,jj,kk) = (median(AvgMovie_jRGECO1a_NoGSR_ordered(ii,jj,101:200,kk))-median(AvgMovie_jRGECO1a_NoGSR_ordered(ii,jj,1:100,kk)))*100;
+                inhibitionMap(ii,jj,kk) = (mean(AvgMovie_jRGECO1a_NoGSR_ordered(ii,jj,120:200,kk))-mean(AvgMovie_jRGECO1a_NoGSR_ordered(ii,jj,1:100,kk)))*100;
             end
         end
     end
