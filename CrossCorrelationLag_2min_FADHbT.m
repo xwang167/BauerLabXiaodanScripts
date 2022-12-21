@@ -4,6 +4,7 @@
 %load('L:\RGECO\190707\190707-R5M2286-anes-fc1_processed.mat', 'xform_FADCorr','xform_jrgeco1aCorr','xform_FADCorr');
 clear all;close all;clc
 import mouse.*
+excelFile = 'L:\WT\WT.xlsx';
 excelRows = [2,3,4,5,7,8,11,12,14,15];%[181 183 185 228 232 236 202 195 204 230 234 240];
 runs = 1:3;%
 excelFile = "L:\WT\WT.xlsx";
@@ -380,6 +381,233 @@ else
         'lagTimeTrial_FADHbT_2min_median_mice', 'lagAmpTrial_FADHbT_2min_median_mice',...
         '-v7.3');
 end
+
+
+%% WT Awake mice
+excelFile = "L:\WT\WT.xlsx";
+excelRows =[2,4,7,11,14];%[195 202 204 230 234 240]; [195 202 204 181 183 185];
+miceCat = 'Awake WT';
+
+runs = 1:3;
+
+load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
+load('D:\OIS_Process\noVasculaturemask.mat')
+
+
+lagTimeTrial_FADHbT_2min_median_mice = zeros(128,128,length(excelRows));
+lagAmpTrial_FADHbT_2min_median_mice = zeros(128,128,length(excelRows));
+
+tLim = [0 2];
+rLim = [-1 1];
+
+miceName = [];
+saveDir_cat = 'L:\WT\cat';
+mouseInd =1;
+xform_isbrain_mice = 1;
+for excelRow = excelRows
+    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+    recDate = excelRaw{1}; recDate = string(recDate);
+    mouseName = excelRaw{2}; mouseName = string(mouseName);
+    miceName = char(strcat(miceName, '-', mouseName));
+    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+    sessionInfo.darkFrameNum = excelRaw{15};
+    sessionInfo.mouseType = excelRaw{17};
+    systemType =excelRaw{5};
+    mask_newDir_new = saveDir;
+    sessionInfo.framerate = excelRaw{7};
+    systemInfo.numLEDs = 4;
+    fs = excelRaw{7};
+    saveDir_new = strcat('L:\RGECO\Kenny\', recDate, '\');
+    maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datafluor','.mat');
+    
+    if ~exist(fullfile(saveDir_new,maskName),'file')
+        maskName = strcat(recDate,'-',mouseName,'-LandmarksAndmask','.mat');
+        load(fullfile(saveDir,maskName),'xform_isbrain')
+    else
+        load(fullfile(saveDir_new,maskName),'xform_isbrain')
+    end
+    
+    xform_isbrain_mice = xform_isbrain_mice.*xform_isbrain;
+    
+    lagTimeTrial_FADHbT_2min_median_mouse = zeros(128,128,length(runs));
+    lagAmpTrial_FADHbT_2min_median_mouse = zeros(128,128,length(runs));
+    processedName_mouse = strcat(recDate,'-',mouseName,'-',sessionType,'_2min.mat');
+    mask = xform_isbrain.*mask_new;
+    for n = runs
+        processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_2min','.mat');
+        disp('loading processed data')
+        load(fullfile(saveDir, processedName),'lagTimeTrial_FADHbT_2min_median','lagAmpTrial_FADHbT_2min_median')
+        lagTimeTrial_FADHbT_2min_median_mouse(:,:,n) = lagTimeTrial_FADHbT_2min_median;
+        lagAmpTrial_FADHbT_2min_median_mouse(:,:,n) = lagAmpTrial_FADHbT_2min_median;
+    end
+    
+    
+    
+    lagTimeTrial_FADHbT_2min_median_mouse = nanmedian(lagTimeTrial_FADHbT_2min_median_mouse,3);
+    lagAmpTrial_FADHbT_2min_median_mouse = nanmedian(lagAmpTrial_FADHbT_2min_median_mouse,3);
+    
+    figure;
+    colormap jet;
+    subplot(2,1,2); imagesc(lagAmpTrial_FADHbT_2min_median_mouse,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
+    
+    subplot(2,1,1); imagesc(lagTimeTrial_FADHbT_2min_median_mouse,[0 2]);axis image off;h = colorbar;ylabel(h,'t(s)');title('HbT FAD');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold');cmocean('ice')
+    sgtitle(strcat(recDate,'-',mouseName,'-',sessionType,'-2min'))
+    saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_FADHbT_Lag_2min.png')));
+    saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_FADHbT_Lag_2min.fig')));
+    
+    if exist(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_2min.mat')))
+        save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_2min.mat')),...
+            'lagTimeTrial_FADHbT_2min_median_mouse', 'lagAmpTrial_FADHbT_2min_median_mouse',...
+            '-append');
+    else
+        save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_2min.mat')),...
+            'lagTimeTrial_FADHbT_2min_median_mouse', 'lagAmpTrial_FADHbT_2min_median_mouse',...
+            '-v7.3');
+    end
+    lagTimeTrial_FADHbT_2min_median_mice(:,:,mouseInd) = lagTimeTrial_FADHbT_2min_median_mouse;
+    lagAmpTrial_FADHbT_2min_median_mice(:,:,mouseInd) = lagAmpTrial_FADHbT_2min_median_mouse;
+    mouseInd = mouseInd+1;
+end
+
+processedName_mice = strcat(recDate,'-',miceName,'-',sessionType,'_2min.mat');
+
+lagTimeTrial_FADHbT_2min_median_mice = nanmedian(lagTimeTrial_FADHbT_2min_median_mice,3);
+lagAmpTrial_FADHbT_2min_median_mice= nanmedian(lagAmpTrial_FADHbT_2min_median_mice,3);
+mask = xform_isbrain_mice.*mask_new;
+
+figure;
+
+subplot(2,1,2); imagesc(lagAmpTrial_FADHbT_2min_median_mice,rLim);colormap jet;axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
+subplot(2,1,1); imagesc(lagTimeTrial_FADHbT_2min_median_mice,[0 2]);cmocean('ice');axis image off;h = colorbar;ylabel(h,'t(s)');title('HbT FAD');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold');cmocean('ice')
+
+sgtitle('WT Awake Cross Correlation 2min')
+saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_FADHbT_Lag_2min.png')));
+saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_FADHbT_Lag_2min.fig')));
+
+if exist(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_2min.mat')),'file')
+    save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_2min.mat')),...
+        'lagTimeTrial_FADHbT_2min_median_mice', 'lagAmpTrial_FADHbT_2min_median_mice',...
+        '-append');
+else
+    save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_2min.mat')),...
+        'lagTimeTrial_FADHbT_2min_median_mice', 'lagAmpTrial_FADHbT_2min_median_mice',...
+        '-v7.3');
+end
+
+
+%% WT Anes mice
+excelFile = "L:\WT\WT.xlsx";
+excelRows = [3,5,8,12,15]; %[195 202 204 181 183 185];
+miceCat = 'Anes WT';
+
+runs = 1:3;
+
+load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
+load('D:\OIS_Process\noVasculaturemask.mat')
+
+lagTimeTrial_FADHbT_2min_median_mice = zeros(128,128,length(excelRows));
+lagAmpTrial_FADHbT_2min_median_mice = zeros(128,128,length(excelRows));
+
+tLim = [0 2];
+rLim = [-1 1];
+
+miceName = [];
+saveDir_cat = 'L:\WT\cat';
+mouseInd =1;
+xform_isbrain_mice = 1;
+for excelRow = excelRows
+    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+    recDate = excelRaw{1}; recDate = string(recDate);
+    mouseName = excelRaw{2}; mouseName = string(mouseName);
+    miceName = char(strcat(miceName, '-', mouseName));
+    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+    sessionInfo.darkFrameNum = excelRaw{15};
+    sessionInfo.mouseType = excelRaw{17};
+    systemType =excelRaw{5};
+    mask_newDir_new = saveDir;
+    sessionInfo.framerate = excelRaw{7};
+    systemInfo.numLEDs = 4;
+    fs = excelRaw{7};
+    saveDir_new = strcat('L:\RGECO\Kenny\', recDate, '\');
+    maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-datafluor','.mat');
+    
+    if ~exist(fullfile(saveDir_new,maskName),'file')
+        maskName = strcat(recDate,'-',mouseName,'-LandmarksAndmask','.mat');
+        load(fullfile(saveDir,maskName),'xform_isbrain')
+    else
+        load(fullfile(saveDir_new,maskName),'xform_isbrain')
+    end
+    
+    xform_isbrain_mice = xform_isbrain_mice.*xform_isbrain;
+    lagTimeTrial_FADHbT_2min_median_mouse = zeros(128,128,length(runs));
+    lagAmpTrial_FADHbT_2min_median_mouse = zeros(128,128,length(runs));
+    processedName_mouse = strcat(recDate,'-',mouseName,'-',sessionType,'_2min.mat');
+    mask = xform_isbrain.*mask_new;
+    for n = runs
+        processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_2min','.mat');
+        disp('loading processed data')
+        load(fullfile(saveDir, processedName),'lagTimeTrial_FADHbT_2min_median','lagAmpTrial_FADHbT_2min_median')
+        
+        lagTimeTrial_FADHbT_2min_median_mouse(:,:,n) = lagTimeTrial_FADHbT_2min_median;
+        lagAmpTrial_FADHbT_2min_median_mouse(:,:,n) = lagAmpTrial_FADHbT_2min_median;
+    end
+    
+    
+    lagTimeTrial_FADHbT_2min_median_mouse = nanmedian(lagTimeTrial_FADHbT_2min_median_mouse,3);
+    lagAmpTrial_FADHbT_2min_median_mouse = nanmedian(lagAmpTrial_FADHbT_2min_median_mouse,3);
+    
+    figure;
+    colormap jet;
+    subplot(2,1,2); imagesc(lagAmpTrial_FADHbT_2min_median_mouse,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
+    subplot(2,1,1); imagesc(lagTimeTrial_FADHbT_2min_median_mouse,[0 2]);axis image off;h = colorbar;ylabel(h,'t(s)');title('HbT FAD');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold');cmocean('ice')
+    
+    sgtitle(strcat(recDate,'-',mouseName,'-',sessionType,'-2min'))
+    saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_FADHbT_Lag_2min.png')));
+    saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_FADHbT_Lag_2min.fig')));
+    
+    if exist(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_2min.mat')))
+        save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_2min.mat')),...
+            'lagTimeTrial_FADHbT_2min_median_mouse', 'lagAmpTrial_FADHbT_2min_median_mouse',...
+            '-append');
+    else
+        save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,'_2min.mat')),...
+            'lagTimeTrial_FADHbT_2min_median_mouse', 'lagAmpTrial_FADHbT_2min_median_mouse',...
+            '-v7.3');
+    end
+    lagTimeTrial_FADHbT_2min_median_mice(:,:,mouseInd) = lagTimeTrial_FADHbT_2min_median_mouse;
+    lagAmpTrial_FADHbT_2min_median_mice(:,:,mouseInd) = lagAmpTrial_FADHbT_2min_median_mouse;
+    mouseInd = mouseInd+1;
+end
+
+processedName_mice = strcat(recDate,'-',miceName,'-',sessionType,'_2min.mat');
+
+lagTimeTrial_FADHbT_2min_median_mice = nanmedian(lagTimeTrial_FADHbT_2min_median_mice,3);
+lagAmpTrial_FADHbT_2min_median_mice= nanmedian(lagAmpTrial_FADHbT_2min_median_mice,3);
+mask = xform_isbrain_mice.*mask_new;
+
+figure;
+colormap jet;
+subplot(2,1,2); imagesc(lagAmpTrial_FADHbT_2min_median_mice,rLim);axis image off;h = colorbar;ylabel(h,'r');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold')
+subplot(2,1,1); imagesc(lagTimeTrial_FADHbT_2min_median_mice,[0 2]);axis image off;h = colorbar;ylabel(h,'t(s)');title('HbT FAD');hold on;imagesc(xform_WL,'AlphaData',1-mask);set(gca,'FontSize',14,'FontWeight','Bold');cmocean('ice')
+
+
+sgtitle('WT Anes Cross Correlation 2min')
+saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_FADHbT_Lag_2min.png')));
+saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_FADHbT_Lag_2min.fig')));
+
+if exist(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_2min.mat')),'file')
+    save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_2min.mat')),...
+        'lagTimeTrial_FADHbT_2min_median_mice', 'lagAmpTrial_FADHbT_2min_median_mice',...
+        '-append');
+else
+    save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_2min.mat')),...
+        'lagTimeTrial_FADHbT_2min_median_mice', 'lagAmpTrial_FADHbT_2min_median_mice',...
+        '-v7.3');
+end
+
+
 
 
 
