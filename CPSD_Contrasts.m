@@ -59,14 +59,14 @@ for excelRow = [181,183,185,228,232,236, 202,195,204,230,234,240];
             [Pxy_CalciumFAD(:,ii),hz] = cpsd(Calcium_barrel,FAD_barrel,[],[],[],samplingRate);
             Pxy_CalciumHbT(:,ii)     = cpsd(Calcium_barrel,HbT_barrel,[],[],[],samplingRate);
             Pxy_FADHbT    (:,ii)     = cpsd(FAD_barrel,    HbT_barrel,[],[],[],samplingRate);
-            
+
             Pxy_CalciumFAD_magnitude(:,ii) = abs(Pxy_CalciumFAD(:,ii));
-            Pxy_FADHbT_magnitude    (:,ii) = abs(Pxy_FADHbT(:,ii));
+            Pxy_FADHbT_magnitude    (:,ii) = abs(Pxy_FADHbT     (:,ii));
             Pxy_CalciumHbT_magnitude(:,ii) = abs(Pxy_CalciumHbT(:,ii));
 
-            Pxy_CalciumFAD_angle(:,ii) = atan2(imag(Pxy_CalciumFAD(:,ii)),real(Pxy_CalciumFAD(:,ii)));
-            Pxy_FADHbT_angle    (:,ii) = atan2(imag(Pxy_FADHbT    (:,ii)),real(Pxy_FADHbT    (:,ii)));
-            Pxy_CalciumHbT_angle(:,ii) = atan2(imag(Pxy_CalciumHbT(:,ii)),real(Pxy_CalciumHbT(:,ii)));
+            Pxy_CalciumFAD_angle(:,ii) = unwrap(angle(Pxy_CalciumFAD(:,ii)),[],2);
+            Pxy_FADHbT_angle    (:,ii) = unwrap(angle(Pxy_FADHbT    (:,ii)),[],2);
+            Pxy_CalciumHbT_angle(:,ii) = unwrap(angle(Pxy_CalciumHbT(:,ii)),[],2);
 
         end
         % Visualization of magnitude and phase
@@ -229,16 +229,16 @@ for excelRow = excelRows
         for ii = 1:5
             % mice PSD
             Pxx_HbT_mouse    (:,ind) = Pxx_HbT    (:,ii);
-            Pxx_FAD_mouse    (:,ind) = Pxx_FAD    (:,ii); 
+            Pxx_FAD_mouse    (:,ind) = Pxx_FAD    (:,ii);
             Pxx_Calcium_mouse(:,ind) = Pxx_Calcium(:,ii);
             % mice CPSD
             Pxy_CalciumFAD_mouse_magnitude(:,ind) = abs(Pxy_CalciumFAD(:,ii));
             Pxy_FADHbT_mouse_magnitude    (:,ind) = abs(Pxy_FADHbT    (:,ii));
             Pxy_CalciumHbT_mouse_magnitude(:,ind) = abs(Pxy_CalciumHbT(:,ii));
 
-            Pxy_CalciumFAD_mouse_angle(:,ind) = angle(Pxy_CalciumFAD(:,ii));
-            Pxy_FADHbT_mouse_angle    (:,ind) = angle(Pxy_FADHbT    (:,ii));
-            Pxy_CalciumHbT_mouse_angle(:,ind) = angle(Pxy_CalciumHbT(:,ii));
+            Pxy_CalciumFAD_mouse_angle(:,ind) = unwrap(angle(Pxy_CalciumFAD(:,ii)),[],1);
+            Pxy_FADHbT_mouse_angle    (:,ind) = unwrap(angle(Pxy_FADHbT    (:,ii)),[],1);
+            Pxy_CalciumHbT_mouse_angle(:,ind) = unwrap(angle(Pxy_CalciumHbT(:,ii)),[],1);
             ind = ind+1;
         end
     end
@@ -246,7 +246,7 @@ for excelRow = excelRows
     Pxx_Calcium_mice = cat(2,Pxx_Calcium_mice,Pxx_Calcium_mouse);
     Pxx_HbT_mice     = cat(2,Pxx_HbT_mice,    Pxx_HbT_mouse);
     Pxx_FAD_mice     = cat(2,Pxx_FAD_mice,    Pxx_FAD_mouse);
-    
+
     Pxy_CalciumFAD_mice_magnitude = cat(2,Pxy_CalciumFAD_mice_magnitude,Pxy_CalciumFAD_mouse_magnitude);
     Pxy_CalciumHbT_mice_magnitude = cat(2,Pxy_CalciumHbT_mice_magnitude,Pxy_CalciumHbT_mouse_magnitude);
     Pxy_FADHbT_mice_magnitude     = cat(2,Pxy_FADHbT_mice_magnitude,Pxy_FADHbT_mouse_magnitude);
@@ -265,7 +265,7 @@ for excelRow = excelRows
     ylabel('(\DeltaF/F)^2/Hz')
     xlim([hz(1),samplingRate/2])
     grid on
-    
+
     subplot(3,3,2)
     plot_distribution_prctile(hz,Pxx_FAD_mouse','Color',[0 0.5 0])
     set(gca, 'XScale', 'log')
@@ -324,6 +324,7 @@ for excelRow = excelRows
     ylabel('Phase')
     xlim([hz(1),samplingRate/2])
     grid on
+    ylim([-10 15])
 
     subplot(3,3,8)
     plot_distribution_prctile(hz,Pxy_CalciumHbT_mouse_angle','Color',[0 0 1])
@@ -333,6 +334,7 @@ for excelRow = excelRows
     ylabel('Phase')
     xlim([hz(1),samplingRate/2])
     grid on
+    ylim([-10 15])
 
     subplot(3,3,9)
     plot_distribution_prctile(hz,Pxy_FADHbT_mouse_angle','Color',[0 0 1])
@@ -341,11 +343,14 @@ for excelRow = excelRows
     xlabel('Frequency(Hz)')
     ylabel('Phase')
     xlim([hz(1),samplingRate/2])
+    grid on
+    ylim([-10 15])
+
     sgtitle(strcat(mouseName,', Welch Cross Power Spectral Density Estimate'))
     saveName_mouse =  fullfile(saveDir,'Barrel_CPSD', strcat(recDate,'-',mouseName,'-Barrel-CPSD'));
     saveas(gcf,strcat(saveName_mouse,'.fig'))
     saveas(gcf,strcat(saveName_mouse,'.png'))
-    close all    
+    close all
 end
 
 
@@ -419,6 +424,7 @@ xlabel('Frequency(Hz)')
 ylabel('Phase')
 xlim([hz(1),samplingRate/2])
 grid on
+ylim([-10 15])
 
 subplot(3,3,8)
 plot_distribution_prctile(hz,Pxy_CalciumHbT_mice_angle','Color',[0 0 1])
@@ -428,6 +434,7 @@ xlabel('Frequency(Hz)')
 ylabel('Phase')
 xlim([hz(1),samplingRate/2])
 grid on
+ylim([-10 15])
 
 subplot(3,3,9)
 plot_distribution_prctile(hz,Pxy_FADHbT_mice_angle','Color',[0 0 1])
@@ -437,6 +444,7 @@ xlabel('Frequency(Hz)')
 ylabel('Phase')
 xlim([hz(1),samplingRate/2])
 grid on
+ylim([-10 15])
 
 sgtitle(strcat(miceName,', Welch Cross Power Spectral Density Estimate'))
 saveName_mice =  fullfile(saveDir_cat,'Barrel_CPSD', strcat(recDate,'-',miceName,'-Barrel-CPSD'));
@@ -477,7 +485,7 @@ for excelRow = excelRows
         for window = 1:5
             % mouse PSD
             Pxx_HbT_mouse    (:,ind) = Pxx_HbT    (:,window);
-            Pxx_FAD_mouse    (:,ind) = Pxx_FAD    (:,window); 
+            Pxx_FAD_mouse    (:,ind) = Pxx_FAD    (:,window);
             Pxx_Calcium_mouse(:,ind) = Pxx_Calcium(:,window);
             % mouse CPSD
             Pxy_CalciumFAD_mouse(:,ind) = Pxy_CalciumFAD(:,window);
@@ -491,7 +499,7 @@ for excelRow = excelRows
     Pxx_Calcium_mice = cat(2,Pxx_Calcium_mice,Pxx_Calcium_mouse);
     Pxx_HbT_mice     = cat(2,Pxx_HbT_mice,    Pxx_HbT_mouse);
     Pxx_FAD_mice     = cat(2,Pxx_FAD_mice,    Pxx_FAD_mouse);
-    
+
     Pxy_CalciumFAD_mice = cat(2,Pxy_CalciumFAD_mice,Pxy_CalciumFAD_mouse);
     Pxy_CalciumHbT_mice = cat(2,Pxy_CalciumHbT_mice,Pxy_CalciumHbT_mouse);
     Pxy_FADHbT_mice     = cat(2,Pxy_FADHbT_mice,Pxy_FADHbT_mouse);
@@ -500,9 +508,9 @@ for excelRow = excelRows
     Pxy_CalciumHbT_mouse_magnitude = abs(median(Pxy_CalciumHbT_mouse,2));
     Pxy_FADHbT_mouse_magnitude     = abs(median(Pxy_FADHbT_mouse,    2));
 
-    Pxy_CalciumFAD_mouse_angle = angle(median(Pxy_CalciumFAD_mouse,2));
-    Pxy_CalciumHbT_mouse_angle = angle(median(Pxy_CalciumHbT_mouse,2));
-    Pxy_FADHbT_mouse_angle     = angle(median(Pxy_FADHbT_mouse,    2));
+    Pxy_CalciumFAD_mouse_angle = unwrap(angle(median(Pxy_CalciumFAD_mouse,2)),[],1);
+    Pxy_CalciumHbT_mouse_angle = unwrap(angle(median(Pxy_CalciumHbT_mouse,2)),[],1);
+    Pxy_FADHbT_mouse_angle     = unwrap(angle(median(Pxy_FADHbT_mouse,    2)),[],1);
 
     figure('units','normalized','outerposition',[0 0 1 1])
     subplot(3,3,1)
@@ -514,7 +522,7 @@ for excelRow = excelRows
     ylabel('(\DeltaF/F)^2/Hz')
     xlim([hz(1),samplingRate/2])
     grid on
-    
+
     subplot(3,3,2)
     plot_distribution_prctile(hz,Pxx_FAD_mouse','Color',[0 0.5 0])
     set(gca, 'XScale', 'log')
@@ -566,6 +574,7 @@ for excelRow = excelRows
     ylabel('Phase')
     xlim([hz(1),samplingRate/2])
     grid on
+    ylim([-10 15])
 
     subplot(3,3,8)
     semilogx(hz,Pxy_CalciumHbT_mouse_angle','Color',[0 0 1])
@@ -574,6 +583,7 @@ for excelRow = excelRows
     ylabel('Phase')
     xlim([hz(1),samplingRate/2])
     grid on
+    ylim([-10 15])
 
     subplot(3,3,9)
     semilogx(hz,Pxy_FADHbT_mouse_angle','Color',[0 0 1])
@@ -581,20 +591,23 @@ for excelRow = excelRows
     xlabel('Frequency(Hz)')
     ylabel('Phase')
     xlim([hz(1),samplingRate/2])
+    ylim([-10 15])
+    grid on
+
     sgtitle(strcat(mouseName,', Welch Cross Power Spectral Density Estimate'))
     saveName_mouse =  fullfile(saveDir,'Barrel_CPSD', strcat(recDate,'-',mouseName,'-Barrel-CPSD'));
     saveas(gcf,strcat(saveName_mouse,'-median.fig'))
     saveas(gcf,strcat(saveName_mouse,'-median.png'))
-    close all    
+    close all
 end
 
 Pxy_CalciumFAD_mice_magnitude = abs(median(Pxy_CalciumFAD_mice,2));
 Pxy_CalciumHbT_mice_magnitude = abs(median(Pxy_CalciumHbT_mice,2));
 Pxy_FADHbT_mice_magnitude     = abs(median(Pxy_FADHbT_mice,    2));
 
-Pxy_CalciumFAD_mice_angle = angle(median(Pxy_CalciumFAD_mice,2));
-Pxy_CalciumHbT_mice_angle = angle(median(Pxy_CalciumHbT_mice,2));
-Pxy_FADHbT_mice_angle     = angle(median(Pxy_FADHbT_mice,    2));
+Pxy_CalciumFAD_mice_angle = unwrap(angle(median(Pxy_CalciumFAD_mice,2)),[],1);
+Pxy_CalciumHbT_mice_angle = unwrap(angle(median(Pxy_CalciumHbT_mice,2)),[],1);
+Pxy_FADHbT_mice_angle     = unwrap(angle(median(Pxy_FADHbT_mice,    2)),[],1);
 
 figure('units','normalized','outerposition',[0 0 1 1])
 subplot(3,3,1)
@@ -657,6 +670,7 @@ title('Calcium and FAD CPSD Angle Median')
 xlabel('Frequency(Hz)')
 ylabel('Phase')
 xlim([hz(1),samplingRate/2])
+ylim([-10 15])
 grid on
 
 subplot(3,3,8)
@@ -665,6 +679,7 @@ title('Calcium and HbT CPSD Angle Median')
 xlabel('Frequency(Hz)')
 ylabel('Phase')
 xlim([hz(1),samplingRate/2])
+ylim([-10 15])
 grid on
 
 subplot(3,3,9)
@@ -673,6 +688,7 @@ title('FAD and HbT CPSD Angle Median')
 xlabel('Frequency(Hz)')
 ylabel('Phase')
 xlim([hz(1),samplingRate/2])
+ylim([-10 15])
 grid on
 
 sgtitle(strcat(miceName,', Welch Cross Power Spectral Density Estimate'))

@@ -31,9 +31,9 @@ for excelRow = [181,183,185,228,232,236, 202,195,204,230,234,240];
         Pxy_FADHbT_magnitude    (:,window) = abs(Pxy_FADHbT    (:,window));
         Pxy_CalciumHbT_magnitude(:,window) = abs(Pxy_CalciumHbT(:,window));
 
-        Pxy_CalciumFAD_angle(:,window) = unwrap(angle(Pxy_CalciumFAD(:,window)));
-        Pxy_FADHbT_angle    (:,window) = unwrap(angle(Pxy_FADHbT    (:,window)));
-        Pxy_CalciumHbT_angle(:,window) = unwrap(angle(Pxy_CalciumHbT(:,window)));
+        Pxy_CalciumFAD_angle(:,window) = unwrap(angle(Pxy_CalciumFAD(:,window)),[],2);
+        Pxy_FADHbT_angle    (:,window) = unwrap(angle(Pxy_FADHbT    (:,window)),[],2);
+        Pxy_CalciumHbT_angle(:,window) = unwrap(angle(Pxy_CalciumHbT(:,window)),[],2);
         end
 
         % Visualization of magnitude and phase
