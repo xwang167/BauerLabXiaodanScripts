@@ -53,10 +53,6 @@ for excelRow = [202 195 204 230 234 240]
         HbT=reshape(HbT,128,128,30*freq,[]);
         Calcium=reshape(Calcium,128,128,30*freq,[]);
         
-        % GSR
-        HbT = gsr(HbT,xform_isbrain);
-        Calcium = gsr(Calcium,xform_isbrain);
-        
         r_Barrel_HRF = zeros(1,21-startInd);
         HRF_Barrel = zeros(21-startInd,length(Calcium));
         jj = 1;
