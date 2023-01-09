@@ -679,28 +679,26 @@ for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R
 end
 % pixel number in each region
 for condition = {'awake','anes'}
-   for h = {'HRF','MRF'} 
-       for var = {'T','W','A','r'}
-           % initialization
-           eval(strcat(h{1},'_',condition{1},'=[];'))
-           for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}
-               for ii = 1:eval(strcat('pixNum_',region{1}))
-               eval(strcat(h{1},'_',condition{1},'= cat(1,',h{1},'_',condition{1},',',...
-                   h{1},'_',region{1},'_mice_',condition{1},'_median);'))
-               end
-           end
-           eval(strcat(h{1},'_',condition{1},'_median = median(',h{1},'_',condition{1},');'))
-           saveName = "D:\XiaodanPaperData\cat\deconvolution_regions.mat";
-           if exist(saveName,'file')
-               eval(strcat('save(',char(39),saveName,char(39),',',...
-                   char(39),h{1},'_',condition{1},'_median',char(39),',',...
-                   char(39),h{1},'_',condition{1},char(39),',',...
-                   char(39),'-append',char(39),')'))
-           else
-               eval(strcat('save(',char(39),saveName,char(39),',',...
-                   char(39),h{1},'_',condition{1},'_median',char(39),',',...
-                   char(39),h{1},'_',condition{1},char(39),')'))
-           end
-       end
-   end
+    for h = {'HRF','MRF'}
+        % initialization
+        disp(strcat(condition,h))
+        eval(strcat(h{1},'_',condition{1},'=[];'))
+        for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}
+            disp(region)
+            eval(strcat('temp = repmat(',h{1},'_',region{1},'_mice_',condition{1},'_median,','pixNum_',region{1},',1);'))
+            eval(strcat(h{1},'_',condition{1},'= cat(1,',h{1},'_',condition{1},',temp);'))
+        end
+        eval(strcat(h{1},'_',condition{1},'_median = median(',h{1},'_',condition{1},');'))
+        saveName = "D:\XiaodanPaperData\cat\deconvolution_regions.mat";
+        if exist(saveName,'file')
+            eval(strcat('save(',char(39),saveName,char(39),',',...
+                char(39),h{1},'_',condition{1},'_median',char(39),',',...
+                char(39),h{1},'_',condition{1},char(39),',',...
+                char(39),'-append',char(39),')'))
+        else
+            eval(strcat('save(',char(39),saveName,char(39),',',...
+                char(39),h{1},'_',condition{1},'_median',char(39),',',...
+                char(39),h{1},'_',condition{1},char(39),')'))
+        end
+    end
 end
