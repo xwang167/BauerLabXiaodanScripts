@@ -2,7 +2,7 @@ clear ;close all;clc
 excelFile = "X:\RGECO\DataBase_Xiaodan_3.xlsx";
 freq_new     = 250;
 t_kernel = 30;
-t = (-3*freq_new:(t_kernel-3)*freq_new-1)/freq_new ;
+t = (0:t_kernel*freq_new-1)/freq_new ;
 load("C:\Users\Xiaodan Wang\Documents\GitHub\BauerLabXiaodanScripts\noVasculatureMask.mat",'mask_new')
 load('AtlasandIsbrain.mat','AtlasSeedsFilled')
 AtlasSeedsFilled(AtlasSeedsFilled==0) = nan;
@@ -60,6 +60,7 @@ for condition = {'awake','anes'}
              eval(strcat('T_',  h{1},'_',region{1},'_mice_',condition{1},'=[];'))
              eval(strcat('W_',  h{1},'_',region{1},'_mice_',condition{1},'=[];'))
              eval(strcat('A_',  h{1},'_',region{1},'_mice_',condition{1},'=[];'))
+             eval(strcat('r_',  h{1},'_',region{1},'_mice_',condition{1},'=[];'))
              eval(strcat('r2_', h{1},'_',region{1},'_mice_',condition{1},'=[];'))
              eval(strcat('obj_',h{1},'_',region{1},'_mice_',condition{1},'=[];'))
 
@@ -83,7 +84,7 @@ for condition = {'awake','anes'}
                 for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}
                     for var = {'T','W','A','r','r2','obj'}
                         % Load
-                        eval(strcat('load(fullfile(saveDir,','Gamma_',h{1},'_Regions',',', recDate,'-',mouseName,'-',sessionType,num2str(n),'Gamma_',h{1},'_Regions.mat',...
+                        eval(strcat('load(fullfile(saveDir,',char(39),'Gamma_',h{1},'_Regions',char(39),',',char(39), recDate,'-',mouseName,'-',sessionType,num2str(n),'_Gamma_',h{1},'_Regions.mat',char(39),'),',...
                             char(39),var{1},'_',h{1},'_',region{1},char(39),')'))
                         % concatenate
                         eval(strcat(var{1},'_',h{1},'_',region{1},'_mice_',condition{1},'= cat(2,',...
@@ -107,58 +108,67 @@ for condition = {'awake','anes'}
     end
 end
 
+% Maps with regional values
+for condition = {'awake','anes'}
+    for h = {'NVC','NMC'}        
+       for var = {'T','W','A','r','r2','obj'}
+           eval(strcat(var{1},'_',h{1},'_',condition{1},'_map =  zeros(1,128*128);'))
+           for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}                
+                eval(strcat(var{1},'_',h{1},'_',condition{1},'_map(mask_',region{1},'(:))=',var{1},'_',h{1},'_',region{1},'_mice_',condition{1},'_median;'))
+           end
+           eval(strcat(var{1},'_',h{1},'_',condition{1},'_map = reshape(',var{1},'_',h{1},'_',condition{1},'_map,128,128);'))
+        end
+    end
+end
+
 %% Calculate Gamma for the whole brain
+
 % total number of pixels in all interested regions
-pixTotal = 0;
 for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}
-    eval('pixNum_',region{1},'sum(mask_',region,',',char(39),'all',char(39),');');
-    eval(strcat('pixTotal = pixTotal+pixNum_',region{1},';'))
+    eval(strcat('pixNum_',region{1},' = sum(mask_',region{1},',',char(39),'all',char(39),');'));
 end
 % pixel number in each region
 for condition = {'awake','anes'}
    for h = {'NVC','NMC'} 
-       for var = {'T','W','A'}
+       for var = {'T','W','A','r'}
            % initialization
-           eval(strcat(var{1},'_',h{1}),condition{1},'=0;')
+           eval(strcat(var{1},'_',h{1},'_',condition{1},'=[];'))
            for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}
-               eval(strcat(var{1},'_',h{1}),condition{1},
+               for ii = 1:eval(strcat('pixNum_',region{1}))
+               eval(strcat(var{1},'_',h{1},'_',condition{1},'= cat(2,',var{1},'_',h{1},'_',condition{1},',',...
+                   var{1},'_',h{1},'_',region{1},'_mice_',condition{1},'_median);'))
+               end
+           end
+           eval(strcat(var{1},'_',h{1},'_',condition{1},'_median = median(',var{1},'_',h{1},'_',condition{1},');'))
+           saveName = "D:\XiaodanPaperData\cat\Gamma_regions.mat";
+           if exist(saveName,'file')
+               eval(strcat('save(',char(39),saveName,char(39),',',...
+                   char(39),var{1},'_',h{1},'_',condition{1},'_median',char(39),',',...
+                   char(39),var{1},'_',h{1},'_',condition{1},char(39),',',...
+                   char(39),'-append',char(39),')'))
+           else
+               eval(strcat('save(',char(39),saveName,char(39),',',...
+                   char(39),var{1},'_',h{1},'_',condition{1},'_median',char(39),',',...
+                   char(39),var{1},'_',h{1},'_',condition{1},char(39),')'))
            end
        end
    end
 end
 
+
+
+%% Gamma variate function
 for condition = {'awake','anes'}
-   for h = {'HRF','MRF'} 
-       temp = strcat(h,'_',condition,'= [];');
-       eval(temp{1})
-       for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}
-           temp = strcat('pixNum = sum(mask_',region,',',char(39),'all',char(39),');');
-           eval(temp{1})
-           for ii = 1: pixNum
-               temp = strcat(h,'_',condition,'= cat(1,',h,'_',condition,',',h,'_',region,'_mice_',condition,'_median);');
-               eval(temp{1})
-           end
-       end
-%        temp = strcat(h,'_',condition,'= median(',h,'_',condition,');');
-%        eval(temp{1})
-   end
+    for h = {'NVC','NMC'}
+        eval(strcat('alpha_',h{1},'_',condition{1},' = (T_',h{1},'_',condition{1},'_median/W_',h{1},'_',condition{1},...
+            '_median)^2*8*log(2);'));
+        eval(strcat('beta_',h{1},'_',condition{1},' = W_',h{1},'_',condition{1},'_median^2/(T_',h{1},'_',condition{1},...
+            '_median*8*log(2));'))
+        eval(strcat('y_',h{1},'_',condition{1},' = A_',h{1},'_',condition{1},'_median*(t/T_',h{1},'_',condition{1},...
+            '_median).^alpha_',h{1},'_',condition{1},'.*exp((t-T_',h{1},'_',condition{1},'_median)/(-beta_',h{1},'_',condition{1},'));'))
+        eval(strcat('y_',h{1},'_',condition{1},'(isnan(','y_',h{1},'_',condition{1},')) = 0;'))
+    end
 end
-HRF_awake_median = median(HRF_awake);
-HRF_anes_median  = median(HRF_anes);
-
-MRF_awake_median = median(MRF_awake);
-MRF_anes_median  = median(MRF_anes);
-save("D:\XiaodanPaperData\cat\deconvolution.mat",'HRF_awake','HRF_anes','MRF_awake','MRF_anes',...
-    'HRF_awake_median','HRF_anes_median','MRF_awake_median','MRF_anes_median')
-
-[A_HRF_awake,T_HRF_awake,W_HRF_awake] = findpeaks(HRF_awake_median,t,'MinPeakProminence',0.06);
-[A_HRF_anes, T_HRF_anes, W_HRF_anes]  = findpeaks(HRF_anes_median ,t,'MinPeakProminence',0.015);
-[A_MRF_awake,T_MRF_awake,W_MRF_awake] = findpeaks(MRF_awake_median,t,'MinPeakProminence',0.015);
-[A_MRF_anes, T_MRF_anes, W_MRF_anes]  = findpeaks(MRF_anes_median ,t,'MinPeakProminence',0.01);
-
-  eval(strcat('[A_HRF_',region{1},'_mice_anes,T_HRF_',region{1},'_mice_anes,W_HRF_',region{1},'_mice_anes] = ',...
-        'findpeaks(HRF_',region{1},'_mice_anes_median,t,',char(39),'MinPeakProminence',char(39),',',num2str(0.01),');'))
-
 
 %% Visualization
 load("C:\Users\Xiaodan Wang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL.mat")
@@ -167,40 +177,40 @@ for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R
     temp = strcat('mask = mask + mask_',region,';');
     eval(temp{1})
 end
+
+
 for condition = {'awake','anes'}
-    for h = {'HRF','MRF'}
+    for h = {'NVC','NMC'}
         figure('units','normalized','outerposition',[0 0 1 1])
         subplot(2,3,4)
-        temp = strcat('imagesc(r_',h{1},'_mice_',condition{1},',',char(39),'AlphaData',char(39),',mask)');
+        temp = strcat('imagesc(r_',h{1},'_',condition{1},'_map,',char(39),'AlphaData',char(39),',mask)');
         eval(temp)
         hold on;
         imagesc(xform_WL,'AlphaData',1-mask);
         cb=colorbar;
-        caxis([-1 1])
+        clim([-1 1])
         axis image off
         colormap jet
         title('r')
         set(gca,'FontSize',14,'FontWeight','Bold')
 
         subplot(2,3,5)
-        temp = strcat('plot_distribution_prctile(t,',h,'_',condition,',',char(39),'Color',char(39),',[0 0 0])');
-        eval(temp{1})
+        eval(strcat('plot(t,y_',h{1},'_',condition{1},',',char(39),'Color',char(39),',[0 0 0])'))   
         title(h)
         xlabel('Time(s)')
         xlim([-3 10])
         set(gca,'FontSize',14,'FontWeight','Bold')
 
         subplot(2,3,1)
-        temp = strcat('imagesc(T_',h{1},'_mice_',condition{1},',',char(39),'AlphaData',char(39),',mask)');
-        eval(temp)
+        eval(strcat('imagesc(T_',h{1},'_',condition{1},'_map,',char(39),'AlphaData',char(39),',mask)'));
         hold on;
         imagesc(xform_WL,'AlphaData',1-mask);
         cb=colorbar;
         
-        if strcmp(h,'HRF')
-            caxis([0 2])
+        if strcmp(h,'NVC')
+            clim([0 2])
         else
-            caxis([0 0.1])
+            clim([0 0.1])
         end
         axis image off
         cmocean('ice')
@@ -208,15 +218,15 @@ for condition = {'awake','anes'}
         set(gca,'FontSize',14,'FontWeight','Bold')
 
         subplot(2,3,2)
-        temp = strcat('imagesc(W_',h{1},'_mice_',condition{1},',',char(39),'AlphaData',char(39),',mask)');
+        temp = strcat('imagesc(W_',h{1},'_',condition{1},'_map,',char(39),'AlphaData',char(39),',mask)');
         eval(temp)
         hold on;
         imagesc(xform_WL,'AlphaData',1-mask);
         cb=colorbar;
-        if strcmp(h,'HRF')
-            caxis([0 3])
+        if strcmp(h,'NVC')
+            clim([0 3])
         else
-            caxis([0 0.6])
+            clim([0 0.6])
         end
         axis image off
         cmocean('ice')
@@ -224,16 +234,14 @@ for condition = {'awake','anes'}
         set(gca,'FontSize',14,'FontWeight','Bold')
 
         subplot(2,3,3)
-        temp = strcat('imagesc(A_',h{1},'_mice_',condition{1},',',char(39),'AlphaData',char(39),',mask)');
+        temp = strcat('imagesc(A_',h{1},'_',condition{1},'_map,',char(39),'AlphaData',char(39),',mask)');
         eval(temp) 
         hold on;
         imagesc(xform_WL,'AlphaData',1-mask);
         cb=colorbar;
-        if strcmp(h,'HRF')
-            caxis([0 0.1])
-        else
-            caxis([0 0.05])
-        end
+      
+        clim([0 0.01])
+
         axis image off
         cmocean('ice')
         title('A')
@@ -241,7 +249,7 @@ for condition = {'awake','anes'}
         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit_1min_smooth_Rolling_interp.png')));
         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit_1min_smooth_Rolling_interp.fig')));
 
-        sgtitle(strcat(h,' for RGECO mice under',{' '},condition,' condition'))
+        sgtitle(strcat('Gamma',{' '},h,' for RGECO mice under',{' '},condition,' condition'))
 
     end
 end
