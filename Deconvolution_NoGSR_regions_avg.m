@@ -1,4 +1,4 @@
-clear ;close all;clc
+%clear ;close all;clc
 excelFile = "X:\RGECO\DataBase_Xiaodan_3.xlsx";
 freq_new     = 250;
 t_kernel = 30;
@@ -656,11 +656,9 @@ end
 % Calculate T,W,A,r for median MRF for each region
 for condition = {'awake','anes'}
     for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}
-        temp = strcat('MRF_',region{1},'_mice_',condition{1},'_median = median(MRF_',region{1},'_mice_',condition{1},');');
-        eval(temp{1})
-        temp = strcat('[A_MRF_',region,'_mice_',condition{1},',T_MRF_',region,'_mice_',condition{1},',W_MRF_',region{1},'_mice_',condition{1},'] = ',...
-            'findpeaks(MRF_',region{1},'_mice_',condition{1},'_median,t,',char(39),'MinPeakProminence',char(39),',',num2str(0.013),');');
-        eval(temp{1})
+        eval(strcat('MRF_',region{1},'_mice_',condition{1},'_median = median(MRF_',region{1},'_mice_',condition{1},');'));        
+        eval(strcat('[A_MRF_',region{1},'_mice_',condition{1},',T_MRF_',region{1},'_mice_',condition{1},',W_MRF_',region{1},'_mice_',condition{1},'] = ',...
+            'findpeaks(MRF_',region{1},'_mice_',condition{1},'_median,t,',char(39),'MinPeakProminence',char(39),',',num2str(0.013),');'));
     end
 end
 
@@ -674,6 +672,35 @@ for condition = {'awake','anes'}
     end
 end
 
+%% HRF and MRF for the whole brain
+% total number of pixels in all interested regions
+for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}
+    eval(strcat('pixNum_',region{1},' = sum(mask_',region{1},',',char(39),'all',char(39),');'));
+end
+% pixel number in each region
 for condition = {'awake','anes'}
-   
+   for h = {'HRF','MRF'} 
+       for var = {'T','W','A','r'}
+           % initialization
+           eval(strcat(h{1},'_',condition{1},'=[];'))
+           for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}
+               for ii = 1:eval(strcat('pixNum_',region{1}))
+               eval(strcat(h{1},'_',condition{1},'= cat(1,',h{1},'_',condition{1},',',...
+                   h{1},'_',region{1},'_mice_',condition{1},'_median);'))
+               end
+           end
+           eval(strcat(h{1},'_',condition{1},'_median = median(',h{1},'_',condition{1},');'))
+           saveName = "D:\XiaodanPaperData\cat\deconvolution_regions.mat";
+           if exist(saveName,'file')
+               eval(strcat('save(',char(39),saveName,char(39),',',...
+                   char(39),h{1},'_',condition{1},'_median',char(39),',',...
+                   char(39),h{1},'_',condition{1},char(39),',',...
+                   char(39),'-append',char(39),')'))
+           else
+               eval(strcat('save(',char(39),saveName,char(39),',',...
+                   char(39),h{1},'_',condition{1},'_median',char(39),',',...
+                   char(39),h{1},'_',condition{1},char(39),')'))
+           end
+       end
+   end
 end
