@@ -45,6 +45,7 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
         mkdir(strcat(saveDir,'\Barrel_HRF'))
     end
     for n = 1:3
+        tic
         disp(strcat(mouseName,', run#',num2str(n)))
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
         load(fullfile(saveDir,processedName),'xform_datahb','xform_FADCorr','xform_jrgeco1aCorr','xform_isbrain')
@@ -252,6 +253,7 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
             'MRF_M2_R','MRF_M1_R','MRF_SS_R','MRF_P_R','MRF_V1_R','MRF_V2_R',...
             'r_MRF_M2_L','r_MRF_M1_L','r_MRF_SS_L','r_MRF_P_L','r_MRF_V1_L','r_MRF_V2_L',...
             'r_MRF_M2_R','r_MRF_M1_R','r_MRF_SS_R','r_MRF_P_R','r_MRF_V1_R','r_MRF_V2_R')
+    toc
     end
 end
 
