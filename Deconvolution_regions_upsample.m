@@ -5,10 +5,12 @@ freqLow = 0.02;
 calMax = 8;
 hbMax  = 1.5;
 FADMax = 1;
-hrfMax = 0.2;
-mrfMax = 0.08;
+hrfMax = 0.02;
+mrfMax = 0.002;
 samplingRate =25;
 freq_new     = 250;
+lambda_HRF = 5e-7;
+lambda_MRF = 5e-7;
 t_kernel = 30;
 t = (-3*freq_new :(t_kernel-3)*freq_new-1)/freq_new        ;
 load("C:\Users\Xiaodan Wang\Documents\GitHub\BauerLabXiaodanScripts\noVasculatureMask.mat",'mask_new')
@@ -85,7 +87,7 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
         for h = {'HRF','MRF'}
             for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}
                 eval(strcat('r_',h{1},'_',region{1},'=zeros(1,21-startInd);'))
-                eval(strcat(h{1},'_',region,'zeros(21-startInd,freq_new*t_kernel);'))
+                eval(strcat(h{1},'_',region{1},'=zeros(21-startInd,freq_new*t_kernel);'))
             end
         end
         jj = 1;
@@ -101,12 +103,13 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
             FAD_resample     = resample(FAD_temp    ,freq_new,samplingRate,'Dimension',2);
             Calcium_resample = resample(Calcium_temp,freq_new,samplingRate,'Dimension',2);
             %% Calculate HRF and MRF
-            lambda_HRF = 0.01;
-            lambda_MRF = 5e-7;            
+
             for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}
-                eval(strcat('HbT_region     = mean(HbT_temp    (mask','_',region{1},'(:),:));'))
-                eval(strcat('FAD_region     = mean(FAD_temp    (mask','_',region{1},'(:),:));'))
-                eval(strcat('Calcium_region = mean(Calcium_temp(mask','_',region{1},'(:),:));'))
+
+                % Mean signal inside of the regional mask
+                eval(strcat('HbT_region     = mean(HbT_resample    (mask','_',region{1},'(:),:));'))
+                eval(strcat('FAD_region     = mean(FAD_resample    (mask','_',region{1},'(:),:));'))
+                eval(strcat('Calcium_region = mean(Calcium_resample(mask','_',region{1},'(:),:));'))
 
                 % starting point to be zero
                 HbT_region     = tukeywin(length(HbT_region)    ,.3).*squeeze(HbT_region'    );
@@ -117,175 +120,139 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
                 % make it square
                 X = X(1:length(Calcium_region),1:length(Calcium_region));
                 [~,S,~]=svd(X);
-                h = (X'*S*X+(S(1,1).^2)*lambda*eye(length(Calcium))) \ (X'*S*[zeros(3*freq,1); HbT(1:end-3*freq)]);% why add 3s of zeros? Do we need to shift it?
+                
+                % Least square deconvolution
+                eval(strcat('HRF_',region{1},'(jj,:)= (X',char(39),'*S*X+(S(1,1).^2)*lambda_HRF','*eye(length(Calcium_region))) \ (X',char(39),'*S*[zeros(3*freq_new,1); HbT_region(1:end-3*freq_new)]);'));% add 3s of zeros
+                eval(strcat('MRF_',region{1},'(jj,:)= (X',char(39),'*S*X+(S(1,1).^2)*lambda_MRF','*eye(length(Calcium_region))) \ (X',char(39),'*S*[zeros(3*freq_new,1); FAD_region(1:end-3*freq_new)]);'));% add 3s of zeros
+                
                 % Predicted HbT
-                HbT_pred = conv(Calcium,h);
-                HbT_pred = HbT_pred(1:(length(HbT)+3*freq));
-                r = corr(HbT,HbT_pred(3*freq+1:end));
+                eval(strcat('HbT_pred = conv(Calcium_region,HRF_',region{1},'(jj,:));'))
+                HbT_pred = HbT_pred(1:(length(HbT_region)+3*freq_new))';
+                eval(strcat('r_HRF_',region{1},'(jj)= corr(HbT_region,HbT_pred(3*freq_new+1:end));'));
+                % Visualization for HRF
+                figure('units','normalized','outerposition',[0 0 1 1])
+                subplot(2,2,1)
+                eval(strcat('imagesc(mask_',region{1},')'))
+                axis image off
+                title(region)
+                grid on
 
+                subplot(2,2,2)
+                plot((1:t_kernel*freq_new)/freq_new,HbT_region,'k')
+                ylabel('\Delta\muM')
+                ylim([-hbMax hbMax])
+                hold on
+                yyaxis right
+                plot((1:t_kernel*freq_new)/freq_new,Calcium_region,'m')
+                legend('HbT','jRGECO1a')
+                ylim([-calMax calMax])
+                ylabel('\DeltaF/F%')
+                xlabel('Time(s)')
+                title(strcat('Time Course for',{' '},region{1}))
+                grid on
 
+                subplot(2,2,3)
+                eval(strcat('plot(t,HRF_',region{1},'(jj,:))'))
+                xlim([-3 10])
+                ylim([-hrfMax hrfMax])
+                ylabel('\Delta\muM/\DeltaF/F%')
+                xlabel('Time(s)')
+                title(strcat('HRF for',{' '},region{1}))
+                grid on
+
+                subplot(2,2,4)
+                plot((1:t_kernel*freq_new)/freq_new,HbT_region,'k')
+                hold on
+                plot((1:t_kernel*freq_new)/freq_new,HbT_pred(3*freq_new+1:3*freq_new+length(HbT_region)),'Color',[0 0.5 0])
+                xlabel('Time(s)')
+                ylabel('\Delta\muM')
+                legend('Actual HbT','Predicted HbT')
+                eval(strcat('title(strcat(',char(39),'r = ',char(39),',num2str(r_HRF_',region{1},'(jj))))'))
+                ylim([-hbMax hbMax])
+                grid on
+
+                sgtitle(strcat('HRF for Region',{' '},region{1},',',{' '},num2str(freqLow),'-2Hz, no GSR, lambda = ',num2str(lambda_HRF),', ',mouseName,' Run #',num2str(n),', Segment #',num2str(ii)))
+                if ~exist(fullfile(saveDir,'HRF_Regions_Upsample'))
+                    mkdir(fullfile(saveDir,'HRF_Regions_Upsample'))
+                end
+                saveName =  fullfile(saveDir,'HRF_Regions_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-segment#',num2str(ii),'-',region{1},'-NoGSR-HRF'));
+                saveas(gcf,strcat(saveName,'.fig'))
+                saveas(gcf,strcat(saveName,'.png'))
+
+                % Predicted FAD
+                eval(strcat('FAD_pred = conv(Calcium_region,MRF_',region{1},'(jj,:));'))
+                FAD_pred = FAD_pred(1:(length(FAD_region)+3*freq_new))';
+                eval(strcat('r_MRF_',region{1},'(jj)= corr(FAD_region,FAD_pred(3*freq_new+1:end));'));
+
+                % Visualize MRF
+                figure('units','normalized','outerposition',[0 0 1 1])
+                subplot(2,2,1)
+                eval(strcat('imagesc(mask_',region{1},')'))
+                axis image off
+                title(region)
+                grid on
+
+                subplot(2,2,2)
+                plot((1:t_kernel*freq_new)/freq_new,FAD_region,'g')
+                ylabel('\DeltaF/F%')
+                ylim([-FADMax FADMax])
+                hold on
+                yyaxis right
+                plot((1:t_kernel*freq_new)/freq_new,Calcium_region,'m')
+                legend('FAD','jRGECO1a')
+                ylim([-calMax calMax])
+                ylabel('\DeltaF/F%')
+                xlabel('Time(s)')
+                title(strcat('Time Course for',{' '},region{1}))
+                grid on
+
+                subplot(2,2,3)
+                eval(strcat('plot(t,MRF_',region{1},'(jj,:))'))
+                xlim([-3 10])
+                ylim([-mrfMax mrfMax])
+                ylabel('\DeltaF/F%/\DeltaF/F%')
+                xlabel('Time(s)')
+                title(strcat('MRF for',{' '},region{1}))
+                grid on
+
+                subplot(2,2,4)
+                plot((1:t_kernel*freq_new)/freq_new,FAD_region,'g')
+                hold on
+                plot((1:t_kernel*freq_new)/freq_new,FAD_pred(3*freq_new+1:3*freq_new+length(FAD_region)),'k')
+                xlabel('Time(s)')
+                ylabel('\DeltaF/F%')
+                legend('Actual FAD','Predicted FAD')
+                eval(strcat('title(strcat(',char(39),'r = ',char(39),',num2str(r_MRF_',region{1},'(jj))))'))
+                ylim([-FADMax FADMax])
+                grid on
+
+                sgtitle(strcat('MRF for Region',{' '},region{1},',',{' '},num2str(freqLow),'-2Hz, no GSR, lambda = ',num2str(lambda_MRF),', ',mouseName,' Run #',num2str(n),', Segment #',num2str(ii)))
+                if ~exist(fullfile(saveDir,'MRF_Regions_Upsample'))
+                    mkdir(fullfile(saveDir,'MRF_Regions_Upsample'))
+                end
+                saveName =  fullfile(saveDir,'MRF_Regions_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-segment#',num2str(ii),'-',region{1},'-NoGSR-MRF'));
+                saveas(gcf,strcat(saveName,'.fig'))
+                saveas(gcf,strcat(saveName,'.png'))
+                close all
             end
             jj = jj+1;
         end
         clear HbT FAD Calcium
+
         % save HRF
-        save(fullfile(saveDir,'HRF_Regions', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'HRF_Regions','.mat')),...
+        save(fullfile(saveDir,'HRF_Regions_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'HRF_Regions_Upsample','.mat')),...
             'HRF_M2_L','HRF_M1_L','HRF_SS_L','HRF_P_L','HRF_V1_L','HRF_V2_L',...
             'HRF_M2_R','HRF_M1_R','HRF_SS_R','HRF_P_R','HRF_V1_R','HRF_V2_R',...
             'r_HRF_M2_L','r_HRF_M1_L','r_HRF_SS_L','r_HRF_P_L','r_HRF_V1_L','r_HRF_V2_L',...
             'r_HRF_M2_R','r_HRF_M1_R','r_HRF_SS_R','r_HRF_P_R','r_HRF_V1_R','r_HRF_V2_R')
 
         % save MRF
-        save(fullfile(saveDir,'MRF_Regions', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'MRF_Regions','.mat')),...
+        save(fullfile(saveDir,'MRF_Regions_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'MRF_Regions_Upsample','.mat')),...
             'MRF_M2_L','MRF_M1_L','MRF_SS_L','MRF_P_L','MRF_V1_L','MRF_V2_L',...
             'MRF_M2_R','MRF_M1_R','MRF_SS_R','MRF_P_R','MRF_V1_R','MRF_V2_R',...
             'r_MRF_M2_L','r_MRF_M1_L','r_MRF_SS_L','r_MRF_P_L','r_MRF_V1_L','r_MRF_V2_L',...
             'r_MRF_M2_R','r_MRF_M1_R','r_MRF_SS_R','r_MRF_P_R','r_MRF_V1_R','r_MRF_V2_R')
     end
 end
-
-
-function [h,r] = calcVisHRF(HbT_temp,Calcium_temp,mask,freq,freq_new,freqLow,regionName,hbMax,calMax,hrfMax,t,t_kernel,mouseName,n,ii,saveDir,recDate,sessionType)
-% Average the signal for each region
-HbT     = mean(HbT_temp    (mask(:),:));
-Calcium = mean(Calcium_temp(mask(:),:));
-
-% starting point to be zero
-HbT     = tukeywin(length(HbT)    ,.3).*squeeze(HbT'    );
-Calcium = tukeywin(length(Calcium),.3).*squeeze(Calcium');
-
-% HRF
-X = convmtx(Calcium,length(Calcium));
-
-%X = X(151:450,:);
-
-% make it square
-X = X(1:length(Calcium),1:length(Calcium));
-[~,S,~]=svd(X);
-lambda = 0.01;
-h = (X'*S*X+(S(1,1).^2)*lambda*eye(length(Calcium))) \ (X'*S*[zeros(3*freq,1); HbT(1:end-3*freq)]);% why add 3s of zeros? Do we need to shift it?
-% Predicted HbT
-HbT_pred = conv(Calcium,h);
-HbT_pred = HbT_pred(1:(length(HbT)+3*freq));
-r = corr(HbT,HbT_pred(3*freq+1:end));
-figure('units','normalized','outerposition',[0 0 1 1])
-subplot(2,2,1)
-imagesc(mask)
-axis image off
-title(regionName)
-
-subplot(2,2,2)
-plot((1:t_kernel*freq)/freq,HbT    ,'k')
-ylabel('\Delta\muM')
-ylim([-hbMax hbMax])
-hold on
-yyaxis right
-plot((1:t_kernel*freq)/freq,Calcium,'m')
-legend('HbT','jRGECO1a')
-ylim([-calMax calMax])
-ylabel('\DeltaF/F%')
-xlabel('Time(s)')
-title(strcat('Time Course for',{' '},regionName))
-
-subplot(2,2,3)
-plot(t,h)
-xlim([-3 10])
-ylim([-hrfMax hrfMax])
-ylabel('\Delta\muM/\DeltaF/F%')
-xlabel('Time(s)')
-title(strcat('HRF for',{' '},regionName))
-
-subplot(2,2,4)
-plot((1:t_kernel*freq)/freq,HbT,'k')
-hold on
-plot((1:t_kernel*freq)/freq,HbT_pred(3*freq+1:3*freq+length(HbT)),'Color',[0 0.5 0])
-xlabel('Time(s)')
-ylabel('\Delta\muM')
-legend('Actual HbT','Predicted HbT')
-title(strcat('r = ',num2str(r)))
-ylim([-hbMax hbMax])
-
-sgtitle(strcat('HRF for Region',{' '},regionName,',',{' '},num2str(freqLow),'-2Hz, no GSR, lambda = ',num2str(lambda),', ',mouseName,' Run #',num2str(n),', Segment #',num2str(ii)))
-if ~exist(fullfile(saveDir,'HRF_Regions'))
-    mkdir(fullfile(saveDir,'HRF_Regions'))
-end
-saveName =  fullfile(saveDir,'HRF_Regions', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-segment#',num2str(ii),'-',regionName,'-NoGSR-HRF'));
-saveas(gcf,strcat(saveName,'.fig'))
-saveas(gcf,strcat(saveName,'.png'))
-close all
-h = resample(h,freq_new,freq);
-end
-
-function  [h,r] = calcVisMRF(FAD_temp,Calcium_temp,mask,samplingRate,freq_new,freqLow,regionName,FADMax,calMax,mrfMax,t,t_kernel,mouseName,n,ii,saveDir,recDate,sessionType)
-% Average the signal for each region
-FAD     = mean(FAD_temp    (mask(:),:));
-Calcium = mean(Calcium_temp(mask(:),:));
-
-% starting point to be zero
-FAD     = tukeywin(length(FAD)    ,.3).*squeeze(FAD'    );
-Calcium = tukeywin(length(Calcium),.3).*squeeze(Calcium');
-
-% HRF
-X = convmtx(Calcium,length(Calcium));
-
-%X = X(151:450,:);
-
-% make it square
-X = X(1:length(Calcium),1:length(Calcium));
-[~,S,~]=svd(X);
-lambda = 5e-7;
-h = (X'*S*X+(S(1,1).^2)*lambda*eye(length(Calcium))) \ (X'*S*[zeros(3*samplingRate,1); FAD(1:end-3*samplingRate)]);% why add 3s of zeros? Do we need to shift it?
-% Predicted HbT
-FAD_pred = conv(Calcium,h);
-FAD_pred = FAD_pred(1:(length(FAD)+3*samplingRate));
-r = corr(FAD,FAD_pred(3*samplingRate+1:end));
-figure('units','normalized','outerposition',[0 0 1 1])
-subplot(2,2,1)
-imagesc(mask)
-axis image off
-title(regionName)
-
-subplot(2,2,2)
-plot((1:t_kernel*samplingRate)/samplingRate,FAD    ,'Color',[0 0.5 0])
-ylabel('FAD(\DeltaF/F%)')
-ylim([-FADMax FADMax])
-hold on
-yyaxis right
-plot((1:t_kernel*samplingRate)/samplingRate,Calcium,'m')
-legend('HbT','jRGECO1a')
-ylim([-calMax calMax])
-ylabel('Calcium(\DeltaF/F%)')
-xlabel('Time(s)')
-title(strcat('Time Course for',{' '},regionName))
-
-subplot(2,2,3)
-plot(t,h)
-xlim([-3 10])
-ylim([-mrfMax mrfMax])
-xlabel('Time(s)')
-title(strcat('MRF for',{' '},regionName))
-
-subplot(2,2,4)
-plot((1:t_kernel*samplingRate)/samplingRate,FAD,'Color',[0 0.5 0])
-hold on
-plot((1:t_kernel*samplingRate)/samplingRate,FAD_pred(3*samplingRate+1:3*samplingRate+length(FAD)),'k')
-xlabel('Time(s)')
-ylabel('\DeltaF/F%')
-legend('Actual FAD','Predicted FAD')
-title(strcat('r = ',num2str(r)))
-ylim([-FADMax FADMax])
-
-sgtitle(strcat('MRF for Region',{' '},regionName,',',{' '},num2str(freqLow),'-2Hz, no GSR, lambda = ',num2str(lambda),', ',mouseName,' Run #',num2str(n),', Segment #',num2str(ii)))
-if ~exist(fullfile(saveDir,'MRF_Regions'))
-    mkdir(fullfile(saveDir,'MRF_Regions'))
-end
-saveName =  fullfile(saveDir,'MRF_Regions', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-segment#',num2str(ii),'-',regionName,'-NoGSR-MRF'));
-saveas(gcf,strcat(saveName,'.fig'))
-saveas(gcf,strcat(saveName,'.png'))
-close all
-h = resample(h,freq_new,samplingRate);
-
-end
-
 
 
