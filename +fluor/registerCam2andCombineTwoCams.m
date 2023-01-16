@@ -4,9 +4,9 @@ registered_cam2 = zeros(size(rawdata_cam2));
 
 
 channels_cam2 = size(rawdata_cam2,3);
-for ii = 1: length(channels_cam2)
+for ii = 1: channels_cam2
     for jj = 1:size(rawdata_cam2,4)
-        registered_cam2(:,:,channels_cam2(ii),jj) = imwarp(rawdata_cam2(:,:,channels_cam2(ii),jj), mytform,'OutputView',imref2d(size(rawdata_cam2)));
+        registered_cam2(:,:,ii,jj) = imwarp(rawdata_cam2(:,:,ii,jj), mytform,'OutputView',imref2d(size(rawdata_cam2)));
     end 
 end
 

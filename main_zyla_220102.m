@@ -3,7 +3,7 @@
 close all;clear all;clc
 import mouse.*
 excelFile = "D:\WT_Paper1\WT_Paper1.xlsx";
-excelRows = [2:5];%:450;
+excelRows = 19:25;%:450;
 runs = 1:3;
 isDetrend = 1;
 nVy = 128;
@@ -80,7 +80,7 @@ for excelRow = excelRows
         [WL,transformMat] = fluor.getTransformationandWL_Zyla(firtFrame_cam1, firtFrame_cam2,nVy,nVx,transformMat);
         save(fullfile(saveDir,wlName),'transformMat','WL');
         close all
-            
+        
         disp(strcat('get landmarks and mask for',recDate,'-', mouseName))
         [isbrain,xform_isbrain,affineMarkers,seedcenter,WLcrop,xform_WLcrop,xform_WL] = getLandMarksandMask_xw(WL);
         isbrain_contour = bwperim(isbrain);
@@ -105,7 +105,7 @@ for excelRow = excelRows
         contour(isbrain_contour,'r')
         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'_WLandMarks.jpg')))
         close all
-        clearvars -except excelFile nVx nVy excelRows runs isDetrend
+        clearvars -except excelFile nVx nVy excelRows runs isDetrend numCh
     end
     
 end
@@ -181,29 +181,29 @@ for excelRow = excelRows
                 disp(['raw2 is shorter than raw 1, raw1 is ', num2str(length_1)] )
             end
             
-             if strcmp(sessionInfo.mouseType,'PV')
-             elseif sessionInfo.darkFrameNum ==0
-                 raw_nondark =rawdata;
-                 darkName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Dark.mat');
-                 darkName =  fullfile(rawdataloc,recDate,darkName);
-                 load(darkName)
-                 darkFrame = squeeze(mean(rawdata(:,:,:,2:end),4));
-                 clear rawdata
-                 raw_baselineMinus = raw_nondark - repmat(darkFrame,1,1,1,size(raw_nondark,4));
-                 clear raw_baselineMinus
-                 rawdata = raw_baselineMinus;
-             else
-                 darkFrameInd = 2:sessionInfo.darkFrameNum/size(rawdata,3);
-                 darkFrame = squeeze(mean(rawdata(:,:,:,darkFrameInd),4));
-                 raw_baselineMinus = rawdata - repmat(darkFrame,1,1,1,size(rawdata,4));
-                 clear rawdata
-                 raw_baselineMinus(:,:,:,1:sessionInfo.darkFrameNum/size(raw_baselineMinus,3))=[];
-                 rawdata = raw_baselineMinus;
-                 clear raw_baselineMinus
-                 
-             end
-
-
+            if strcmp(sessionInfo.mouseType,'PV')
+            elseif sessionInfo.darkFrameNum ==0
+                raw_nondark =rawdata;
+                darkName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_Dark.mat');
+                darkName =  fullfile(rawdataloc,recDate,darkName);
+                load(darkName)
+                darkFrame = squeeze(mean(rawdata(:,:,:,2:end),4));
+                clear rawdata
+                raw_baselineMinus = raw_nondark - repmat(darkFrame,1,1,1,size(raw_nondark,4));
+                clear raw_baselineMinus
+                rawdata = raw_baselineMinus;
+            else
+                darkFrameInd = 2:sessionInfo.darkFrameNum/size(rawdata,3);
+                darkFrame = squeeze(mean(rawdata(:,:,:,darkFrameInd),4));
+                raw_baselineMinus = rawdata - repmat(darkFrame,1,1,1,size(rawdata,4));
+                clear rawdata
+                raw_baselineMinus(:,:,:,1:sessionInfo.darkFrameNum/size(raw_baselineMinus,3))=[];
+                rawdata = raw_baselineMinus;
+                clear raw_baselineMinus
+                
+            end
+            
+            
             disp(strcat('QC raw for ',rawName))
             visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
             [mdata] = QCcheck_raw(rawdata,isbrain,systemType,sessionInfo.framerate,saveDir,visName,sessionInfo.mouseType);
@@ -327,17 +327,16 @@ for excelRow = excelRows
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
         %         if ~exist(fullfile(saveDir,processedName),'file')
         if exist(fullfile(saveDir,rawName),'file')
-            
             isDatahbGot = false;
-            %             if exist(fullfile(saveDir,processedName),'file')
-            %                 C = who('-file',fullfile(saveDir,processedName));
-            %
-            %                 for  k=1:length(C)
-            %                     if strcmp(C(k),'xform_datahb')
-            %                         isDatahbGot = true;
-            %                     end
-            %                 end
-            %             end
+            if exist(fullfile(saveDir,processedName),'file')
+                C = who('-file',fullfile(saveDir,processedName));
+                
+                for  k=1:length(C)
+                    if strcmp(C(k),'xform_datahb')
+                        isDatahbGot = true;
+                    end
+                end
+            end
             
             if ~isDatahbGot
                 disp(mouseName)
@@ -380,7 +379,7 @@ for excelRow = excelRows
                     [op, E] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(2:3)));
                 else
                     
-                                [op, E] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.hbSpecies)));
+                    [op, E] = getHbOpticalProperties_xw(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.hbSpecies)));
                 end
                 %                     %         %
                 %                     %         [op, E] = getHbOpticalProperties_hillman(muspFcn,fullfile(pkgDir.path,'ledSpectra',systemInfo.LEDFiles(sessionInfo.hbSpecies)));
@@ -389,9 +388,9 @@ for excelRow = excelRows
                 BaselineFunction  = @(x) mean(x,numel(size(x)));
                 
                 if strcmp(sessionType,'stim')
-                    sessionInfo.stimblocksize = excelRaw{11};
-                    sessionInfo.stimbaseline=excelRaw{12};
-                    sessionInfo.stimduration = excelRaw{13};
+                    sessionInfo.stimblocksize = excelRaw{8}*sessionInfo.framerate;
+                    sessionInfo.stimbaseline=excelRaw{9};
+                    sessionInfo.stimduration = excelRaw{10};
                     numBlock = size(xform_raw,4)/sessionInfo.stimblocksize;
                     numBlock = floor(numBlock);
                     xform_raw = xform_raw(:,:,:,1:numBlock*sessionInfo.stimblocksize);
@@ -557,21 +556,14 @@ for excelRow = excelRows
     mouseName = excelRaw{2}; mouseName = string(mouseName);
     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-    sessionInfo.darkFrameNum = excelRaw{15};
-    sessionInfo.mouseType = excelRaw{17};
+    sessionInfo.mouseType = excelRaw{13};
     systemType =excelRaw{5};
     maskDir_new = saveDir;
     rawdataloc = excelRaw{3};
-    
-    
-    
     sessionInfo.framerate = excelRaw{7};
     systemInfo.numLEDs = 4;
-    maskName_new = strcat(recDate,'-N8M864-opto3-LandmarksAndMask','.mat');
-    maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-    % maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-dataFluor','.mat');
-    %     maskDir = strcat('L:\RGECO\Kenny\', recDate, '\');
     maskDir = saveDir;
+    maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
     load(fullfile(maskDir,maskName), 'xform_isbrain')
     %save(fullfile(maskDir_new,maskName_new),'xform_isbrain')
     %load(fullfile(rawdataloc,recDate,maskName_new), 'xform_isbrain')
@@ -763,10 +755,10 @@ for excelRow = excelRows
                 %             load('D:\OIS_Process\noVasculatureMask.mat')
                 %
                 %             xform_isbrain= xform_isbrain.*(double(leftMask)+double(rightMask));
-                sessionInfo.stimblocksize = excelRaw{11};
-                sessionInfo.stimbaseline=excelRaw{12};
-                sessionInfo.stimduration = excelRaw{13};
-                sessionInfo.stimFrequency = excelRaw{16};
+                sessionInfo.stimblocksize = excelRaw{8}*sessionInfo.framerate;
+                sessionInfo.stimbaseline=excelRaw{9};
+                sessionInfo.stimduration = excelRaw{10};
+                sessionInfo.stimFrequency = excelRaw{12};
                 stimStartTime = 5;
                 info.freqout=1;
                 disp('loading Non GRS data')
@@ -863,8 +855,13 @@ for excelRow = excelRows
                     [goodBlocks_NoGSR,ROI_NoGSR] = QC_stim(squeeze(xform_datahb(:,:,1,:)),squeeze(xform_datahb(:,:,2,:)),...
                         xform_FAD,xform_FADCorr,xform_green,[],[],[],...
                         xform_isbrain,numBlock,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,ROI);
-                elseif strcmp(sessionInfo.mouseType,'jrgeco1a')||strcmp(sessionInfo.mouseType,'WT')
+                elseif strcmp(sessionInfo.mouseType,'jrgeco1a')
                     [goodBlocks_NoGSR,ROI_NoGSR] = QC_stim(squeeze(xform_datahb(:,:,1,:))*10^6,squeeze(xform_datahb(:,:,2,:))*10^6,...
+                        xform_FAD*100,xform_FADCorr*100,xform_green*100,xform_jrgeco1a*100,xform_jrgeco1aCorr*100,xform_red*100,...
+                        xform_isbrain,numBlock,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,[]);
+                    
+                elseif strcmp(sessionInfo.mouseType,'WT')
+                    [goodBlocks_NoGSR,ROI_NoGSR] = QC_stim_WT(squeeze(xform_datahb(:,:,1,:))*10^6,squeeze(xform_datahb(:,:,2,:))*10^6,...
                         xform_FAD*100,xform_FADCorr*100,xform_green*100,xform_jrgeco1a*100,xform_jrgeco1aCorr*100,xform_red*100,...
                         xform_isbrain,numBlock,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_NoGSR,output_NoGSR,[]);
                 elseif strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')
@@ -912,9 +909,11 @@ for excelRow = excelRows
                     save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),...
                         'xform_datahb_GSR','xform_gcamp_GSR','xform_gcampCorr_GSR','xform_green_GSR','goodBlocks_NoGSR','goodBlocks_GSR','ROI_NoGSR','-append')
                     
-                elseif strcmp(sessionInfo.mouseType,'jrgeco1a')|| strcmp(sessionInfo.mouseType,'WT')
+                elseif strcmp(sessionInfo.mouseType,'jrgeco1a')
+                    xform_jrgeco1a(isnan(xform_jrgeco1a)) = 0;
                     xform_jrgeco1a_GSR = mouse.process.gsr(xform_jrgeco1a,xform_isbrain);
                     clear xform_jrgeco1a
+                    xform_jrgeco1aCorr(isnan(xform_jrgeco1aCorr)) = 0;
                     xform_jrgeco1aCorr_GSR = mouse.process.gsr(xform_jrgeco1aCorr,xform_isbrain);
                     clear xform_jrgeco1aCorr
                     xform_red_GSR = mouse.process.gsr(xform_red,xform_isbrain);
@@ -937,6 +936,36 @@ for excelRow = excelRows
                     [goodBlocks_GSR] = QC_stim(squeeze(xform_datahb_GSR(:,:,1,:))*10^6,squeeze(xform_datahb_GSR(:,:,2,:))*10^6,...
                         xform_FAD_GSR*100,xform_FADCorr_GSR*100,xform_green_GSR*100,xform_jrgeco1a_GSR*100,xform_jrgeco1aCorr_GSR*100,xform_red_GSR*100,...
                         xform_isbrain,numBlock,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_GSR,output_GSR,[]);
+                    save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'goodBlocks_GSR','-append')
+                elseif strcmp(sessionInfo.mouseType,'WT')
+                    xform_jrgeco1a(isnan(xform_jrgeco1a)) = 0;
+                    xform_jrgeco1a_GSR = mouse.process.gsr(xform_jrgeco1a,xform_isbrain);
+                    clear xform_jrgeco1a
+                    xform_jrgeco1aCorr(isnan(xform_jrgeco1aCorr)) = 0;
+                    xform_jrgeco1aCorr_GSR = mouse.process.gsr(xform_jrgeco1aCorr,xform_isbrain);
+                    clear xform_jrgeco1aCorr
+                    xform_red_GSR = mouse.process.gsr(xform_red,xform_isbrain);
+                    clear xform_red
+                    
+                    xform_FAD_GSR = mouse.process.gsr(xform_FAD,xform_isbrain);
+                    clear xform_FAD
+                    xform_FADCorr_GSR = mouse.process.gsr(xform_FADCorr,xform_isbrain);
+                    clear xform_FADCorr
+                    xform_green_GSR = mouse.process.gsr(xform_green,xform_isbrain);
+                    clear xform_green
+                    disp('saving FAD related data')
+                    %save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),...
+                    %'xform_datahb_GSR','xform_jrgeco1a_GSR','xform_jrgeco1aCorr_GSR','xform_red_GSR','xform_FAD_GSR','xform_FADCorr_GSR','xform_green_GSR','goodBlocks_NoGSR','goodBlocks_GSR','ROI_NoGSR','-append')
+                    
+                    save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),...
+                        'xform_datahb_GSR','xform_jrgeco1a_GSR','xform_jrgeco1aCorr_GSR','xform_red_GSR','xform_FAD_GSR','xform_FADCorr_GSR','xform_green_GSR','-append')
+                    
+                    disp('QC on GSR stim')
+                    [goodBlocks_GSR] = QC_stim_WT(squeeze(xform_datahb_GSR(:,:,1,:))*10^6,squeeze(xform_datahb_GSR(:,:,2,:))*10^6,...
+                        xform_FAD_GSR*100,xform_FADCorr_GSR*100,xform_green_GSR*100,xform_jrgeco1a_GSR*100,xform_jrgeco1aCorr_GSR*100,xform_red_GSR*100,...
+                        xform_isbrain,numBlock,numDesample,stimStartTime,sessionInfo.stimduration,sessionInfo.stimFrequency,sessionInfo.framerate,sessionInfo.stimblocksize,sessionInfo.stimbaseline,texttitle_GSR,output_GSR,[]);
+                    save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-stim',num2str(n),'_processed.mat')),'goodBlocks_GSR','-append')
+                    
                 elseif strcmp(sessionInfo.mouseType,'jrgeco1a-opto3')
                     xform_jrgeco1a_GSR = mouse.process.gsr(xform_jrgeco1a,xform_isbrain);
                     clear xform_jrgeco1a

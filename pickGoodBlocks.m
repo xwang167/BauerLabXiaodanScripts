@@ -85,6 +85,9 @@ jrgeco1aCorr_peak = abs(mean(jrgeco1aCorr_avg(:,:,stimStartTime+1:stimEndTime),3
 greenFluorCorr_peak = abs(mean(greenFluorCorr_avg(:,:,stimStartTime+1:stimEndTime),3));
 
 temp_jrgeco1aCorr_max = prctile(jrgeco1aCorr_peak(mask_new),90,'all')*1.4;
+if temp_jrgeco1aCorr_max == 0
+    temp_jrgeco1aCorr_max = 0.001;
+end
 temp_greenFluorCorr_max = prctile(greenFluorCorr_peak(mask_new),90,'all')*1.4;
     numRows = 5;
     
