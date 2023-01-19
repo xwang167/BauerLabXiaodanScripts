@@ -1,5 +1,5 @@
 load('deconvolution_regions.mat', 'HRF_awake', 'MRF_awake', 'HRF_anes', 'MRF_anes')
-load('CrossLag_regions_upsample.mat', 'crossLagY_NVC_awake', 'crossLagY_NMC_awake', 'crossLagY_NVC_anes', 'crossLagY_NMC_anes')
+load('X:\RGECO\CrossLag_regions_upsample.mat', 'crossLagY_NVC_awake', 'crossLagY_NMC_awake', 'crossLagY_NVC_anes', 'crossLagY_NMC_anes')
 freq_new = 250;
 t_kernel = 30;
 
@@ -14,7 +14,7 @@ ylabel('r')
 yyaxis right
 set(gca,{'ycolor'},{'b'})
 plot_distribution_prctile(t_deconvolution,HRF_awake,'Color',[0,0,1])
-ylim([-0.02 0.08])
+ylim([-0.001 0.004])
 xlabel('Time(t)')
 grid on
 title('Awake NVC')
@@ -28,7 +28,7 @@ ylabel('r')
 yyaxis right
 set(gca,{'ycolor'},{'b'})
 plot_distribution_prctile(t_deconvolution,MRF_awake,'Color',[0,0,1])
-ylim([-0.006 0.024])
+ylim([-0.0004 0.0016])
 xlabel('Time(t)')
 grid on
 title('Awake NMC')
@@ -42,7 +42,7 @@ ylabel('r')
 yyaxis right
 set(gca,{'ycolor'},{'b'})
 plot_distribution_prctile(t_deconvolution,HRF_anes,'Color',[0,0,1])
-ylim([-0.01 0.025])
+ylim([-0.0004 0.001])
 xlabel('Time(t)')
 grid on
 title('Anesthetized NVC')
@@ -56,9 +56,21 @@ ylabel('r')
 yyaxis right
 set(gca,{'ycolor'},{'b'})
 plot_distribution_prctile(t_deconvolution,MRF_anes,'Color',[0,0,1])
-ylim([-0.01 0.02])
+ylim([-0.0008 0.0016])
 xlabel('Time(t)')
 grid on
 title('Anesthetized NMC')
 xlim([-1 4])
 sgtitle('Red is Cross Lag, Blue is Deconvolution')
+
+[~,I_HRF_awake] = max(HRF_awake_median);
+t_deconvolution(I_HRF_awake)
+
+[~,I_HRF_anes] = max(HRF_anes_median);
+t_deconvolution(I_HRF_anes)
+
+[~,I_MRF_awake] = max(MRF_awake_median);
+t_deconvolution(I_MRF_awake)
+
+[~,I_MRF_anes] = max(MRF_anes_median);
+t_deconvolution(I_MRF_anes)
