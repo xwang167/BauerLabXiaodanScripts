@@ -156,7 +156,7 @@ for excelRow = excelRows
         cmocean('ice')
         title('A')
         set(gca,'FontSize',14,'FontWeight','Bold')
-        sgtitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-CalciumHbT-GammaFit-1min-smooth-Rolling-60epoch-0p05-5'))
+        sgtitle(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-CalciumHbT-GammaFit-1min-smooth-Rolling-60epoch-0p01-5'))
         
         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_GammaFit_1min_smooth_Rolling_60epoch_0p01_5.png')));
         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumHbT_GammaFit_1min_smooth_Rolling_60epoch_0p01_5.fig')));

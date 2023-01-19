@@ -1,5 +1,5 @@
 clear ;close all;clc
-excelFile = "X:\RGECO\DataBase_Xiaodan_3.xlsx";
+excelFile = "X:\RGECO\DataBase_Xiaodan_4.xlsx";
 startInd = 2;
 freqLow = 0.02;
 calMax = 8;
@@ -13,7 +13,7 @@ lambda_HRF = 5e-7;
 lambda_MRF = 5e-7;
 t_kernel = 30;
 t = (-3*freq_new :(t_kernel-3)*freq_new-1)/freq_new        ;
-load("C:\Users\Xiaodan Wang\Documents\GitHub\BauerLabXiaodanScripts\noVasculatureMask.mat",'mask_new')
+load("noVasculatureMask.mat",'mask_new')
 load('AtlasandIsbrain.mat','AtlasSeedsFilled')
 AtlasSeedsFilled(AtlasSeedsFilled==0) = nan;
 AtlasSeedsFilled(:,65:128) = AtlasSeedsFilled(:,65:128)+20;
@@ -34,7 +34,7 @@ mask_V1_R = AtlasSeedsFilled==37;
 mask_V2_R = AtlasSeedsFilled==36|AtlasSeedsFilled==38;
 
 
-for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
+for excelRow = [ 202 195 204 230 234 240]%181 183 185 228 232 236
 
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
     recDate = excelRaw{1}; recDate = string(recDate);
