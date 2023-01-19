@@ -1,4 +1,4 @@
-%clear ;close all;clc
+clear ;close all;clc
 excelFile = "X:\RGECO\DataBase_Xiaodan_3.xlsx";
 freq_new     = 250;
 t_kernel = 30;
@@ -122,8 +122,8 @@ for excelRow = [181 183 185 228 232 236]
     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
     for n = 1:3
         disp(strcat(mouseName,', run#',num2str(n)))
-        load(fullfile(saveDir,'HRF_Regions_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'HRF_Regions_Upsample','.mat')))
-        load(fullfile(saveDir,'MRF_Regions_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'MRF_Regions_Upsample','.mat')))
+        load(fullfile(saveDir,'HRF_Regions_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_HRF_Regions_Upsample','.mat')))
+        load(fullfile(saveDir,'MRF_Regions_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_MRF_Regions_Upsample','.mat')))
         % cat r_HRF
         r_HRF_M2_L_mice_awake = cat(2,r_HRF_M2_L_mice_awake,r_HRF_M2_L);
         r_HRF_M1_L_mice_awake = cat(2,r_HRF_M1_L_mice_awake,r_HRF_M1_L);
@@ -259,8 +259,8 @@ for excelRow = [202 195 204 230 234 240]
     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
     for n = 1:3
         disp(strcat(mouseName,', run#',num2str(n)))
-        load(fullfile(saveDir,'HRF_Regions_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'HRF_Regions_Upsample','.mat')))
-        load(fullfile(saveDir,'MRF_Regions_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'MRF_Regions_Upsample','.mat')))
+        load(fullfile(saveDir,'HRF_Regions_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_HRF_Regions_Upsample','.mat')))
+        load(fullfile(saveDir,'MRF_Regions_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_MRF_Regions_Upsample','.mat')))
         % cat r_HRF
         r_HRF_M2_L_mice_anes = cat(2,r_HRF_M2_L_mice_anes,r_HRF_M2_L);
         r_HRF_M1_L_mice_anes = cat(2,r_HRF_M1_L_mice_anes,r_HRF_M1_L);
@@ -643,14 +643,14 @@ end
 for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}
     eval(strcat('HRF_',region{1},'_mice_awake_median = median(HRF_',region{1},'_mice_awake);'))
     eval(strcat('[A_HRF_',region{1},'_mice_awake,T_HRF_',region{1},'_mice_awake,W_HRF_',region{1},'_mice_awake] = ',...
-        'findpeaks(HRF_',region{1},'_mice_awake_median,t,',char(39),'MinPeakProminence',char(39),',',num2str(0.05),');'))
+        'findpeaks(HRF_',region{1},'_mice_awake_median,t,',char(39),'MinPeakProminence',char(39),',',num2str(0.001),');'))
 end
 
 % Calculate T, W, A for anes median HRF for each region
 for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}
     eval(strcat('HRF_',region{1},'_mice_anes_median = median(HRF_',region{1},'_mice_anes);'))
     eval(strcat('[A_HRF_',region{1},'_mice_anes,T_HRF_',region{1},'_mice_anes,W_HRF_',region{1},'_mice_anes] = ',...
-        'findpeaks(HRF_',region{1},'_mice_anes_median,t,',char(39),'MinPeakProminence',char(39),',',num2str(0.01),');'))
+        'findpeaks(HRF_',region{1},'_mice_anes_median,t,',char(39),'MinPeakProminence',char(39),',',num2str(0.0006),');'))
 end
 
 % Calculate T,W,A,r for median MRF for each region
@@ -658,7 +658,7 @@ for condition = {'awake','anes'}
     for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}
         eval(strcat('MRF_',region{1},'_mice_',condition{1},'_median = median(MRF_',region{1},'_mice_',condition{1},');'));        
         eval(strcat('[A_MRF_',region{1},'_mice_',condition{1},',T_MRF_',region{1},'_mice_',condition{1},',W_MRF_',region{1},'_mice_',condition{1},'] = ',...
-            'findpeaks(MRF_',region{1},'_mice_',condition{1},'_median,t,',char(39),'MinPeakProminence',char(39),',',num2str(0.013),');'));
+            'findpeaks(MRF_',region{1},'_mice_',condition{1},'_median,t,',char(39),'MinPeakProminence',char(39),',',num2str(0.0008),');'));
     end
 end
 
@@ -672,19 +672,28 @@ for condition = {'awake','anes'}
     end
 end
 
-% Maps with regional values
+%% Maps with regional values
 for condition = {'awake','anes'}
     for h = {'HRF','MRF'}        
-       for var = {'T','W','A','r'}
+       for var = {'T','W','A'}
            eval(strcat(var{1},'_',h{1},'_',condition{1},'_map =  zeros(1,128*128);'))
            for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}                
-                eval(strcat(var{1},'_',h{1},'_',condition{1},'_map(mask_',region{1},'(:))=',var{1},'_',h{1},'_',region{1},'_mice_',condition{1},'_median;'))
+                eval(strcat(var{1},'_',h{1},'_',condition{1},'_map(mask_',region{1},'(:))=',var{1},'_',h{1},'_',region{1},'_mice_',condition{1},';'))
            end
            eval(strcat(var{1},'_',h{1},'_',condition{1},'_map = reshape(',var{1},'_',h{1},'_',condition{1},'_map,128,128);'))
         end
     end
 end
 
+for condition = {'awake','anes'}
+    for h = {'HRF','MRF'}        
+           eval(strcat(var{1},'_',h{1},'_',condition{1},'_map =  zeros(1,128*128);'))
+           for region = {'M2_L','M1_L','SS_L','P_L','V1_L','V2_L','M2_R','M1_R','SS_R','P_R','V1_R','V2_R'}                
+                eval(strcat('r_',h{1},'_',condition{1},'_map(mask_',region{1},'(:))=','r_',h{1},'_',region{1},'_mice_',condition{1},'_median;'))
+           end
+           eval(strcat(var{1},'_',h{1},'_',condition{1},'_map = reshape(',var{1},'_',h{1},'_',condition{1},'_map,128,128);'))
+    end
+end
 
 %% HRF and MRF for the whole brain
 % total number of pixels in all interested regions
@@ -793,10 +802,7 @@ for condition = {'awake','anes'}
         cmocean('ice')
         title('A')
         set(gca,'FontSize',14,'FontWeight','Bold')
-        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit_1min_smooth_Rolling_interp.png')));
-        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit_1min_smooth_Rolling_interp.fig')));
-
-        sgtitle(strcat('Gamma',{' '},h,' for RGECO mice under',{' '},condition,' condition'))
+        sgtitle(strcat('Deconvolution',{' '},h,' for RGECO mice under',{' '},condition,' condition'))
 
     end
 end
