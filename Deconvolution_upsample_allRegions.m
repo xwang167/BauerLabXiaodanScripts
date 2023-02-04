@@ -119,7 +119,7 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
                 imagesc(mask_region)
                 axis image off
                 title(parcelnames{region})
-                grid on
+                
                 subplot(2,2,2)
                 plot((1:t_kernel*freq_new)/freq_new,HbT_region,'k')
                 ylabel('\Delta\muM')
