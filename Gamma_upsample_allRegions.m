@@ -36,7 +36,7 @@ end
 % Region inside of mouse brain
 mask = AtlasSeeds.*xform_isbrain_mice;
 %%
-for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
+for excelRow = [236 202 195 204 230 234 240]
     
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
     recDate = excelRaw{1}; recDate = string(recDate);
@@ -178,6 +178,7 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
 
                  clear regHbT regCalcium
             end
+            close all
             clear HbT_temp
             
             %% Calculate Gamma NMC
@@ -202,11 +203,11 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
                 regFADPred = conv(regCalcium,MRF);
                 regFADPred = regFADPred(1:length(regCalcium));
                 FADPred(jj,:,region) = regFADPred;
-                T_NMC(jj,region)     = regHrfParam(1);
-                W_NMC(jj,region)     = regHrfParam(2);
-                A_NMC(jj,region)     = regHrfParam(3);
-                r_NMC(jj,region)     = corr(regHemoPred',regHbT');
-                r2_NMC(jj,region)    = 1-sumsqr(regHbT-regHemoPred)/sumsqr(regHbT-mean(regHbT));
+                T_NMC(jj,region)     = regMrfParam(1);
+                W_NMC(jj,region)     = regMrfParam(2);
+                A_NMC(jj,region)     = regMrfParam(3);
+                r_NMC(jj,region)     = corr(regFADPred',regFAD');
+                r2_NMC(jj,region)    = 1-sumsqr(regFAD-regFADPred)/sumsqr(regFAD-mean(regFAD));
                 obj_NMC(jj,region)   = obj;
                
                 
@@ -256,7 +257,7 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
                 if ~exist(fullfile(saveDir,'Gamma_NMC'))
                     mkdir(fullfile(saveDir,'Gamma_NMC'))
                 end
-                saveName =  fullfile(saveDir,'Gamma_NMC', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-segment#',num2str(ii),'-',rparcelnames{region},'-NoGSR-MRF'));
+                saveName =  fullfile(saveDir,'Gamma_NMC', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-segment#',num2str(ii),'-',parcelnames{region},'-NoGSR-MRF'));
                 saveas(gcf,strcat(saveName,'.fig'))
                 saveas(gcf,strcat(saveName,'.png'))
                 clear regFAD regCalcium               
