@@ -45,11 +45,6 @@ end
 excelRows_awake = [181 183 185 228 232 236];
 excelRows_anes  = [202 195 204 230 234 240];
 for condition = {'awake','anes'}
-    for var = {'lagAmp','lagTime','lagWid'}
-        for h = {'NVC','NMC'}
-            eval(strcat(var{1},'_',h{1},'_mice_',condition{1},'=[];'))
-        end
-    end
     for excelRow = eval(strcat('excelRows_',condition{1}))
         [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
         recDate = excelRaw{1}; recDate = string(recDate);
@@ -72,16 +67,6 @@ for condition = {'awake','anes'}
     end
 end
 
-% Median
-for condition = {'awake','anes'}
-    for h = {'NVC','NMC'}      
-        for var = {'lagAmp','lagTime','lagWid'}
-            eval(strcat(var{1},'_',h{1},'_mice_',condition{1},'_median = nanmedian(',...
-                var{1},'_',h{1},'_mice_',condition{1},');'))
-        end
-    end
-end
-
 % Maps with regional values
 saveName = "L:\RGECO\cat\CrossLag.mat";
 for condition = {'awake','anes'}
@@ -92,7 +77,7 @@ for condition = {'awake','anes'}
                mask_region = zeros(128,128);
                mask_region(mask == region) = 1;
                mask_region = logical(mask_region);
-               eval(strcat(var{1},'_',h{1},'_',condition{1},'_map(mask_region(:))=',var{1},'_',h{1},'_mice_',condition{1},'_median(region);'))
+               eval(strcat(var{1},'_',h{1},'_',condition{1},'_map(mask_region(:))=median(',var{1},'_',h{1},'_mice_',condition{1},'(:,region));'))
            end
                eval(strcat(var{1},'_',h{1},'_',condition{1},'_map = reshape(',var{1},'_',h{1},'_',condition{1},'_map,128,128);'))
            
