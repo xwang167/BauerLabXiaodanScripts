@@ -1,10 +1,10 @@
-ChR2 = xlsread("C:\Users\Xiaodan Wang\Documents\GitHub\newpipeline\Functions_and_Wrappers\+bauerParams\ChR2 Spectrum.csv");
+ChR2 = xlsread("C:\Users\xiaodanwang\Documents\GitHub\newpipeline\Functions_and_Wrappers\+bauerParams\ChR2 Spectrum.csv");
 
-fid = fopen("C:\Users\Xiaodan Wang\Documents\GitHub\newpipeline\Functions_and_Wrappers\+bauerParams\probeSpectra\gcamp6f_excitation.txt");
+fid = fopen("C:\Users\xiaodanwang\Documents\GitHub\newpipeline\Functions_and_Wrappers\+bauerParams\probeSpectra\gcamp6f_excitation.txt");
 gcamp = textscan(fid,'%f %f','headerlines',0);
 fclose(fid);
 
-fid = fopen("C:\Users\Xiaodan Wang\Documents\GitHub\newpipeline\Functions_and_Wrappers\+bauerParams\probeSpectra\jrgeco1a_excitation.txt");
+fid = fopen("C:\Users\xiaodanwang\Documents\GitHub\newpipeline\Functions_and_Wrappers\+bauerParams\probeSpectra\jrgeco1a_excitation.txt");
 rgeco = textscan(fid,'%f %f','headerlines',0);
 fclose(fid);
 
@@ -28,4 +28,4 @@ xlim([400,600])
 ylim([0,1.1])
 xlabel('Wavelength(nm)')
 ylabel('Relative Intensity')
-legend('ChR2 Activation','GCaMP6f Excitation','jRGECO1a Excitation','location','southwest')
+grid on
