@@ -118,14 +118,16 @@ for h = {'NVC','NMC'}
             disp([condition,h])
             eval(strcat('crossLagY_',h{1},'_',condition{1},'_allRegions=[];'))
             % Load
+            for n = 1:3
             eval(strcat('load(fullfile(saveDir,',char(39),'CrossLag_',h{1},char(39),',',char(39), recDate,'-',mouseName,'-',sessionType,num2str(n),'_CrossLag_',h{1},'.mat',char(39),'),',...
                     char(39),'crossLagY_',h{1},char(39),')'))
-            for region = 1:50
-                % Repeat crossLagY based on the number of pixels inside of
-                % reigonal mask.
-                eval(strcat('temp = repmat(crossLagY_',h{1},'(:,:,region),pixelNum(region),1);'))
-                % Concatenate
-                eval(strcat('crossLagY_',h{1},'_',condition{1},'_allRegions= cat(1,','crossLagY_',h{1},'_',condition{1},'_allRegions,temp);'))
+                for region = 1:50
+                    % Repeat crossLagY based on the number of pixels inside of
+                    % reigonal mask.
+                    eval(strcat('temp = repmat(crossLagY_',h{1},'(:,:,region),pixelNum(region),1);'))
+                    % Concatenate
+                    eval(strcat('crossLagY_',h{1},'_',condition{1},'_allRegions= cat(1,','crossLagY_',h{1},'_',condition{1},'_allRegions,temp);'))
+                end
             end
             eval(strcat('crossLagY_',h{1},'_',condition{1},'_allRegions_median = nanmedian(crossLagY_',h{1},'_',condition{1},'_allRegions);'))
             eval(strcat('crossLagY_',h{1},'_',condition{1},'_mice= cat(1,crossLagY_',h{1},'_',condition{1},'_mice,crossLagY_',h{1},'_',condition{1},'_allRegions_median',');'))
