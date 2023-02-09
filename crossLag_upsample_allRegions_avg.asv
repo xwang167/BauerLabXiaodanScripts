@@ -148,11 +148,10 @@ for h = {'NVC','NMC'}
         eval(strcat('crossLagY_',h{1},'_',condition{1},'_mice_median= nanmedian(crossLagY_',h{1},'_',condition{1},'_mice);'))
     end
 end
-load(fullfile(saveDir,'CrossLag_NVC',strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CrossLag_NVC.mat')),'crossLagX_NVC')
-save('L:\RGECO\cat\crossLag_allRegions.mat','crossLagX_NVC','crossLagY_NVC_awake_mice','crossLagY_NVC_anes_mice','crossLagY_NMC_awake_mice','crossLagY_NMC_anes_mice')
+save('L:\RGECO\cat\crossLag_allRegions.mat','crossLagX_NVC','crossLagY_NVC_awake_mice','crossLagY_NVC_awake_mice',)
 %% Visualization
 load("GoodWL.mat")
-
+load(fullfile(saveDir,'CrossLag_NVC',strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CrossLag_NVC.mat')),'crossLagX_NVC')
 mask(isnan(mask)) = 0;
 for condition = {'awake','anes'}
     for h = {'NVC','NMC'}
