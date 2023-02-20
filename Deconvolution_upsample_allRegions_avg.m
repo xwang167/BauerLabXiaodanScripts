@@ -114,8 +114,16 @@ for condition = {'awake','anes'}
         for region = 1:50 
             eval(strcat(h{1},'_temp = mean(',h{1},'_mice_',condition{1},'_allRegions(:,:,region));'))
             eval(strcat('M = max(',h{1},'_temp);'))
-            eval(strcat('[A_',h{1},'_mice_',condition{1},'(region),T_',h{1},'_mice_',condition{1},'(region),W_',h{1},'_mice_',condition{1},'(region)] = ',...
-        'findpeaks(',h{1},'_temp,t,',char(39),'MinPeakHeight',char(39),',',num2str(M*0.9999),');'))
+
+            if strcmp('HRF',h{1})
+                [A,T,W] = findpeaks(HRF_temp,t,'MinPeakHeight',M*0.999999);
+            else
+                [A,T,W] = findpeaks(MRF_temp,t,'MinPeakHeight',M*0.999999);
+            end
+
+            eval(strcat('A_',h{1},'_mice_',condition{1},'(region) = A;'))
+            eval(strcat('T_',h{1},'_mice_',condition{1},'(region) = T;'))
+            eval(strcat('W_',h{1},'_mice_',condition{1},'(region) = W;'))
         end
         if exist(saveName,'file')
             eval(strcat('save(',char(39),saveName,char(39),',',...
@@ -205,6 +213,12 @@ for condition = {'awake','anes'}
         xlabel('Time(s)')
         xlim([-3 10])
         set(gca,'FontSize',14,'FontWeight','Bold')
+         if strcmp(h,'HRF')
+            ylim([-0.0005 0.0035])
+        else
+            ylim([-0.0004 0.0013])
+        end
+        grid on
 
         subplot(2,3,1)
         eval(strcat('imagesc(T_',h{1},'_',condition{1},'_map,',char(39),'AlphaData',char(39),',mask)'));
