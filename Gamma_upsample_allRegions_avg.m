@@ -175,7 +175,7 @@ for condition = {'awake','anes'}
         hold on;
         imagesc(xform_WL,'AlphaData',1-mask);
         cb=colorbar;
-        clim([-1 1])
+        clim([0 1])
         axis image off
         colormap jet
         title('r')
@@ -238,8 +238,8 @@ for condition = {'awake','anes'}
         cmocean('ice')
         title('A')
         set(gca,'FontSize',14,'FontWeight','Bold')
-        sgtitle(strcat('Deconvolution',{' '},h,' for RGECO mice under',{' '},condition,' condition'))
-
+        sgtitle(strcat('Gamma',{' '},h,' for RGECO mice under',{' '},condition,' condition'))
+        saveas(gcf,strcat('X:\Paper1\Figure_2023\Gamma_',h{1},'_',condition{1},'.fig'))
     end
 end
 

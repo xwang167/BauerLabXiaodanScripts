@@ -38,6 +38,14 @@ for region = 1:50
 end
 pixelNumTotal = sum(pixelNum);
 
+% total number of pixels in all interested regions
+pixelNum = zeros(1,50);
+for region = 1:50
+    mask_region = zeros(128,128);
+    mask_region(mask == region) = 1;
+    pixelNum(region) = sum(mask_region,'all');
+end
+
 % Average Gamma Parameters for each region
 % Initialization
 for condition = {'awake','anes'}
@@ -77,7 +85,7 @@ for condition = {'awake','anes'}
 end
 
 %% Maps with regional values
-saveName = "E:\RGECO\cat\CrossLag_allRegions.mat";
+saveName = "E:\RGECO\cat\crossLag_allRegions.mat";
 for condition = {'awake','anes'}
     for h = {'NVC','NMC'}         
        for var = {'lagAmp','lagTime','lagWid'}
@@ -103,15 +111,6 @@ for condition = {'awake','anes'}
 end
 
 %% Calculate Gamma for the whole brain
-
-% total number of pixels in all interested regions
-pixelNum = zeros(1,50);
-for region = 1:50
-    mask_region = zeros(128,128);
-    mask_region(mask == region) = 1;
-    pixelNum(region) = sum(mask_region,'all');
-end
-
 %% Concatinate the matrix
 for condition = {'awake','anes'}
     mouseInd =1;
@@ -180,7 +179,7 @@ for condition = {'awake','anes'}
         hold on;
         imagesc(xform_WL,'AlphaData',1-mask);
         cb=colorbar;
-        caxis([-1 1])
+        caxis([0 1])
         axis image off
         colormap jet
         title('r')
@@ -230,8 +229,73 @@ for condition = {'awake','anes'}
         set(gca,'FontSize',14,'FontWeight','Bold')
 
         sgtitle(strcat('Cross lag',{' '},h,' for RGECO mice under',{' '},condition,' condition'))
-
+        saveas(gcf,strcat('X:\Paper1\Figure_2023\CrossLag_',h{1},'_',condition{1}))
     end
 end
 
-       
+%% lag and correlation values for each mouse
+
+% Rows for both conditions
+excelRows_awake = [181 183 185 228 232 236];
+excelRows_anes  = [202 195 204 230 234 240];
+
+% Initialize
+for condition = {'awake','anes'}
+    for h = {'NVC','NMC'}
+        for var = {'lagAmp','lagTime'}
+            eval(strcat(var{1},'_',h{1},'_',condition{1},'= zeros(6,1);'))
+        end
+    end
+end
+
+% Calculate lag and correlation for each mouse
+for condition = {'awake','anes'}
+    mouseInd = 1;
+    for excelRow = eval(strcat('excelRows_',condition{1}))
+        [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+        recDate = excelRaw{1}; recDate = string(recDate);
+        mouseName = excelRaw{2}; mouseName = string(mouseName);
+        saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+        sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+        for var = {'lagAmp','lagTime'}
+            % Initialize
+            for h = {'NVC','NMC'} 
+                eval(strcat(var{1},'_mouse = zeros(3,1);'))
+                for n = 1:3
+                    disp(strcat(mouseName,', run#',num2str(n)))
+                    % Load
+                    eval(strcat('load(fullfile(saveDir,',char(39),'CrossLag_',h{1},char(39),',',char(39), recDate,'-',mouseName,'-',sessionType,num2str(n),'_CrossLag_',h{1},'.mat',char(39),'),',...
+                        char(39),var{1},'_',h{1},char(39),')'))
+                    % Average across time windows
+                    eval(strcat('temp = squeeze(nanmean(',var{1},'_',h{1},'));'))
+                    % Average across regions
+                    eval(strcat(var{1},'_avg = 0;'))
+                    for region = 1:50
+                        % weighted by area
+                        eval(strcat(var{1},'_avg = ',var{1},'_avg + temp(region)*pixelNum(region)/pixelNumTotal;'))
+                    end
+                    eval(strcat(var{1},'_mouse(n) = ',var{1},'_avg;'))               
+                end
+                eval(strcat(var{1},'_',h{1},'_',condition{1},'(mouseInd)= mean(',var{1},'_mouse);'))
+                
+            end           
+        end
+        mouseInd = mouseInd+1;
+    end
+end
+
+% mean and std
+for condition = {'awake','anes'}
+    for h = {'NVC','NMC'}
+        for var = {'lagAmp','lagTime'}
+            for operation = {'mean','std'}
+                eval(strcat(operation{1},'_',var{1},'_',h{1},'_',condition{1},'=',...
+                    operation{1},'(',var{1},'_',h{1},'_',condition{1},');'))
+            end
+        end
+    end
+end
+
+[~, p_crossLag_NVC_lagTime]=ttest(lagTime_NVC_anes, lagTime_NVC_awake, 'Tail','both');
+[~, p_crossLag_NMC_lagTime]=ttest(lagTime_NMC_anes, lagTime_NMC_awake,'Tail','both');
+[~, p_crossLag_NMC_lagAmp]=ttest(lagAmp_NMC_anes, lagAmp_NMC_awake, 'Tail','both');

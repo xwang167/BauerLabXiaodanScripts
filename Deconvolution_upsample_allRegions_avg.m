@@ -36,7 +36,7 @@ for condition = {'awake','anes'}
         eval(strcat( h{1},'_mice_',condition{1},'_allRegions = nan(6,7500,50);'))
         eval(strcat('r_',h{1},'_mice_',condition{1},'_allRegions = nan(6,50);'))   
         eval(strcat( h{1},'_mice_',condition{1},' = zeros(6,7500);'))
-        eval(strcat('r_',h{1},'_mice_',condition{1},' = zeros(6);'))  
+        eval(strcat('r_',h{1},'_mice_',condition{1},' = zeros(6,1);'))  
     end
 end
 
@@ -201,7 +201,7 @@ for condition = {'awake','anes'}
         hold on;
         imagesc(xform_WL,'AlphaData',1-mask);
         cb=colorbar;
-        clim([-1 1])
+        clim([0 1])
         axis image off
         colormap jet
         title('r')
@@ -268,9 +268,110 @@ for condition = {'awake','anes'}
         title('A')
         set(gca,'FontSize',14,'FontWeight','Bold')
         sgtitle(strcat('Deconvolution',{' '},h,' for RGECO mice under',{' '},condition,' condition'))
-
+        saveName =  fullfile('D:\XiaodanPaperData\cat', strcat('Deconvoltuion_',h{1},'_',condition{1}));
+        saveas(gcf,strcat(saveName,'.fig'))
+        saveas(gcf,strcat(saveName,'.png'))
     end
 end
+%% Generate value for paper table
+
+% find mean and std for r
+mean_r_HRF_mice_awake = mean(r_HRF_mice_awake);
+std_r_HRF_mice_awake = std(r_HRF_mice_awake);
+
+mean_r_MRF_mice_awake = mean(r_MRF_mice_awake);
+std_r_MRF_mice_awake = std(r_MRF_mice_awake);
+
+mean_r_HRF_mice_anes = mean(r_HRF_mice_anes);
+std_r_HRF_mice_anes = std(r_HRF_mice_anes);
+
+mean_r_MRF_mice_anes = mean(r_MRF_mice_anes);
+std_r_MRF_mice_anes = std(r_MRF_mice_anes);
+
+% Test if there is significant difference between awake and anesthetized
+% condigtion for r
+[~,p_r_HRF_mice] = ttest(r_HRF_mice_awake,r_HRF_mice_anes,'Tail','both');
+[~,p_r_MRF_mice] = ttest(r_MRF_mice_awake,r_MRF_mice_anes,'Tail','both');
+
+% Initialize
+T_HRF_mice_awake = zeros(6,1);
+W_HRF_mice_awake = zeros(6,1);
+A_HRF_mice_awake = zeros(6,1);
+
+T_HRF_mice_anes = zeros(6,1);
+W_HRF_mice_anes = zeros(6,1);
+A_HRF_mice_anes = zeros(6,1);
+
+T_MRF_mice_awake = zeros(6,1);
+W_MRF_mice_awake = zeros(6,1);
+A_MRF_mice_awake = zeros(6,1);
+
+T_MRF_mice_anes = zeros(6,1);
+W_MRF_mice_anes = zeros(6,1);
+A_MRF_mice_anes = zeros(6,1);
+
+% Calculate T, W, A
+for mouseInd = 1:6
+    M_HRF_mice_awake = max(HRF_mice_awake(mouseInd,:));
+    [A_HRF_mice_awake(mouseInd),T_HRF_mice_awake(mouseInd),W_HRF_mice_awake(mouseInd)] = findpeaks(HRF_mice_awake(mouseInd,:),t,'MinPeakHeight',M_HRF_mice_awake*0.999999);
+    
+    M_HRF_mice_anes = max(HRF_mice_anes(mouseInd,:));
+    [A_HRF_mice_anes(mouseInd),T_HRF_mice_anes(mouseInd),W_HRF_mice_anes(mouseInd)] = findpeaks(HRF_mice_anes(mouseInd,:),t,'MinPeakHeight',M_HRF_mice_anes*0.999999);
+
+    M_MRF_mice_awake = max(MRF_mice_awake(mouseInd,:));
+    [A_MRF_mice_awake(mouseInd),T_MRF_mice_awake(mouseInd),W_MRF_mice_awake(mouseInd)] = findpeaks(MRF_mice_awake(mouseInd,:),t,'MinPeakHeight',M_MRF_mice_awake*0.999999);
+    
+    M_MRF_mice_anes = max(MRF_mice_anes(mouseInd,:));
+    [A_MRF_mice_anes(mouseInd),T_MRF_mice_anes(mouseInd),W_MRF_mice_anes(mouseInd)] = findpeaks(MRF_mice_anes(mouseInd,:),t,'MinPeakHeight',M_MRF_mice_anes*0.999999);
+end
+
+% mean and std for T
+mean_T_HRF_mice_awake = mean(T_HRF_mice_awake);
+std_T_HRF_mice_awake = std(T_HRF_mice_awake);
+
+mean_T_MRF_mice_awake = mean(T_MRF_mice_awake);
+std_T_MRF_mice_awake = std(T_MRF_mice_awake);
+
+mean_T_HRF_mice_anes = mean(T_HRF_mice_anes);
+std_T_HRF_mice_anes = std(T_HRF_mice_anes);
+
+mean_T_MRF_mice_anes = mean(T_MRF_mice_anes);
+std_T_MRF_mice_anes = std(T_MRF_mice_anes);
+
+[~,p_T_HRF_mice] = ttest(T_HRF_mice_awake,T_HRF_mice_anes,'Tail','both');
+[~,p_T_MRF_mice] = ttest(T_MRF_mice_awake,T_MRF_mice_anes,'Tail','both');
+
+% mean and std for W
+mean_W_HRF_mice_awake = mean(W_HRF_mice_awake);
+std_W_HRF_mice_awake = std(W_HRF_mice_awake);
+
+mean_W_MRF_mice_awake = mean(W_MRF_mice_awake);
+std_W_MRF_mice_awake = std(W_MRF_mice_awake);
+
+mean_W_HRF_mice_anes = mean(W_HRF_mice_anes);
+std_W_HRF_mice_anes = std(W_HRF_mice_anes);
+
+mean_W_MRF_mice_anes = mean(W_MRF_mice_anes);
+std_W_MRF_mice_anes = std(W_MRF_mice_anes);
+
+[~,p_W_HRF_mice] = ttest(W_HRF_mice_awake,W_HRF_mice_anes,'Tail','both');
+[~,p_W_MRF_mice] = ttest(W_MRF_mice_awake,W_MRF_mice_anes,'Tail','both');
+
+% mean and std for A
+mean_A_HRF_mice_awake = mean(A_HRF_mice_awake);
+std_A_HRF_mice_awake = std(A_HRF_mice_awake);
+
+mean_A_MRF_mice_awake = mean(A_MRF_mice_awake);
+std_A_MRF_mice_awake = std(A_MRF_mice_awake);
+
+mean_A_HRF_mice_anes = mean(A_HRF_mice_anes);
+std_A_HRF_mice_anes = std(A_HRF_mice_anes);
+
+mean_A_MRF_mice_anes = mean(A_MRF_mice_anes);
+std_A_MRF_mice_anes = std(A_MRF_mice_anes);
+
+[~,p_A_HRF_mice] = ttest(A_HRF_mice_awake,A_HRF_mice_anes,'Tail','both');
+[~,p_A_MRF_mice] = ttest(A_MRF_mice_awake,A_MRF_mice_anes,'Tail','both');
 
 % %% Visualization
 % % Visulize left regional masks
