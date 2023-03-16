@@ -2,7 +2,7 @@ function [goodBlocks,temp_oxy_max,temp_deoxy_max,temp_total_max,temp_jrgeco1aCor
     deoxyDownSampled,totalDownSampled,greenFluorCorrDownSampled,jrgecoCorrDownSampled,ROI)
 
 
- load('D:\OIS_Process\noVasculatureMask.mat')
+ load('noVasculatureMask.mat')
 mask_new = logical(mask_new);
 % subplot(1,3,1)
 % imagesc(squeeze(mean(oxyDownSampled(:,:,stimStartTime+1:stimEndTime,1),3)))
