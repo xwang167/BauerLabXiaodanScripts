@@ -3,7 +3,7 @@ excelFile = "X:\RGECO\DataBase_Xiaodan_3.xlsx";
 samplingRate =25;
 load('AtlasandIsbrain.mat','AtlasSeeds')
 mask_barrel = AtlasSeeds==9;
-for excelRow = [181,183,185,228,232,236, 202,195,204,230,234,240];
+for excelRow = [202]%181,183,185,228,232,236, 202,195,204,230,234,240
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
     recDate = excelRaw{1}; recDate = string(recDate);
     mouseName = excelRaw{2}; mouseName = string(mouseName);
