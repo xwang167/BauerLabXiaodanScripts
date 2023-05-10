@@ -1,12 +1,12 @@
-clear all;clc
+%clear all;clc
 import mouse.*
-excelFile = "X:\Paper\PaperExperiment.xlsx";
+excelFile = "X:\Paper1\PaperExperiment.xlsx";
 excelRows = [26 27 34];%:450;
 runs = 1:3;
 peak_rgeco_cat = [];
 std_rgeco_cat = [];
-
-saveDir_cat = 'X:\Paper\RGECO\cat';
+std_rgeco_stim_cat = [];
+saveDir_cat = 'X:\Paper1\RGECO\cat';
 miceName = [];
 for excelRow = excelRows
     [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
@@ -15,18 +15,6 @@ for excelRow = excelRows
     miceName = strcat(miceName,'-',mouseName);
     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-    maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-    % maskName = strcat(recDate,'-',mouseName,'-',sessionType,'1-dataFluor','.mat');
-    %     maskDir = strcat('L:\RGECO\Kenny\', recDate, '\');
-    maskDir = saveDir;
-    load(fullfile(maskDir,maskName), 'xform_isbrain')
-    %save(fullfile(maskDir_new,maskName_new),'xform_isbrain')
-    %load(fullfile(rawdataloc,recDate,maskName_new), 'xform_isbrain')
-    xform_isbrain = double(xform_isbrain);
-    if ~isempty(find(isnan(xform_isbrain), 1))
-        xform_isbrain(isnan(xform_isbrain))=0;
-    end
-    
     %     processedName_ROI = strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'_processed','.mat');
     %     load(fullfile(saveDir,processedName_ROI),'xform_rgecoCorr')
     %     xform_rgecoCorr = reshape(xform_rgecoCorr,128,128,750,[]);
@@ -134,30 +122,36 @@ for excelRow = excelRows
                 pause
             end
             
-            
+            max_rgeco = max(peak_rgeco);
             peak_rgeco = mean(peak_rgeco);
             std_rgeco = squeeze(std(rgecoCorr_ROI(1:125,ii),0,1));
+            std_rgeco_stim = squeeze(std(rgecoCorr_ROI(126:250,ii),0,1))/max_rgeco;
             %             if peak_rgeco >0
             peak_rgeco_cat = [peak_rgeco_cat,peak_rgeco];
             std_rgeco_cat = [std_rgeco_cat,std_rgeco];
+            std_rgeco_stim_cat = [std_rgeco_stim_cat,std_rgeco_stim];
             %             end
         end
     end
 end
 figure
 yyaxis left
-plot(peak_rgeco_cat,'r-')
+plot(peak_rgeco_cat*100,'r-')
 hold on
-plot(std_rgeco_cat,'g-')
-ylim([-0.01 0.2])
-ylabel('\muF/F')
+plot(std_rgeco_cat*100,'-','color',[255, 165, 0]/255)
+hold on
+plot(std_rgeco_stim_cat*100,'k-')
+ylim([0 35])
+ylabel('\DeltaF/F%')
 hold on
 yyaxis right
 ylabel('SNR')
 plot(peak_rgeco_cat./std_rgeco_cat,'b-')
-ylim([-20 20])
-legend('peak','standard deviation','SNR')
-title(strcat(recDate,'-RGECO-SNR'))
+hold on
+ylim([-90 20])
+legend('Signal',' Baseline STD','Scaled Stim STD','SNR')
+title('Thy1-jRGECO1a','Color','m')
+xlabel('Block Number')
 saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'-peak-std-ratio','.fig')))
 saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'-peak-std-ratio','.png')))
 

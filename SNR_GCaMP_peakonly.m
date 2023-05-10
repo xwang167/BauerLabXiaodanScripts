@@ -1,10 +1,11 @@
 %clear all;clc
 import mouse.*
-excelFile = "X:\Paper\PaperExperiment.xlsx";
-excelRows = 30;%29:31;%:450;
-runs = 2;%1:3;
+excelFile = "X:\Paper1\PaperExperiment.xlsx";
+excelRows = 29:31;%:450;
+runs = 1:3;
 peak_gcamp_cat = [];
 std_gcamp_cat = [];
+std_gcamp_stim_cat = [];
 
 saveDir_cat = 'X:\Paper\GCaMP\cat';
 miceName = [];
@@ -109,29 +110,36 @@ for excelRow = excelRows
                 disp('change minpeakpromimence')
                 pause
             end
+            max_gcamp = max(peak_gcamp);
             peak_gcamp = mean(peak_gcamp);
             std_gcamp = squeeze(std(gcampCorr_ROI(1:125,ii),0,1));
+            std_gcamp_stim = squeeze(std(gcampCorr_ROI(126:250,ii),0,1))/max_gcamp;
             %             if peak_gcamp >0
             peak_gcamp_cat = [peak_gcamp_cat,peak_gcamp];
             std_gcamp_cat = [std_gcamp_cat,std_gcamp];
+            std_gcamp_stim_cat = [std_gcamp_stim_cat,std_gcamp_stim];
             %             end
         end
     end
 end
 figure
 yyaxis left
-plot(peak_gcamp_cat,'r-')
+plot(peak_gcamp_cat*100,'r-')
 hold on
-plot(std_gcamp_cat,'g-')
-ylim([-0.01 0.09])
-ylabel('\DeltaF/F')
+plot(std_gcamp_cat*100,'-','color',[255, 165, 0]/255)
+hold on
+plot(std_gcamp_stim_cat*100,'k-')
+ylim([0 35])
+ylabel('\DeltaF/F%')
 hold on
 yyaxis right
 ylabel('SNR')
 plot(peak_gcamp_cat./std_gcamp_cat,'b-')
-ylim([-20 20])
-legend('peak','standard deviation','SNR')
-title(strcat(recDate,'-GCaMP-SNR'))
+hold on
+ylim([-90 20])
+legend('Signal',' Baseline STD','Scaled Stim STD','SNR')
+title('Thy1-GCaMP6f','Color',[107,142,35]/255)
+xlabel('Block Number')
 savefig(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mice,'-',sessionType,'-peak-std-ratio','.fig')))
 saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mice,'-',sessionType,'-peak-std-ratio','.png')))
 
