@@ -44,6 +44,7 @@ excelRows_awake = [181 183 185 228 232 236];
 excelRows_anes  = [202 195 204 230 234 240];
 
 %% Concatinate the matrix
+saveName = "D:\XiaodanPaperData\cat\deconvolution_allRegions.mat";
 for condition = {'awake','anes'}
     mouseInd =1;
     for excelRow = eval(strcat('excelRows_',condition{1}))
@@ -70,14 +71,137 @@ for condition = {'awake','anes'}
         for h = {'HRF','MRF'}
             eval(strcat( h{1},'_mouse_',condition{1},'_allRegions = mean(',h{1},'_mouse_',condition{1},'_allRegions);'))
             eval(strcat( 'r_',h{1},'_mouse_',condition{1},'_allRegions = mean(r_',h{1},'_mouse_',condition{1},'_allRegions);'))
+            saveName_mouse = fullfile(saveDir,strcat(h{1},'_Upsample'), strcat(recDate,'-',mouseName,'_',h{1},'_Upsample.mat'));
+            if exist(saveName_mouse,'file')
+                eval(strcat('save(',char(39),saveName_mouse,char(39),',',...
+                    char(39),h{1},'_mouse_',condition{1},'_allRegions',char(39),',',...
+                    char(39),'r_',h{1},'_mouse_',condition{1},'_allRegions',char(39),',',...
+                    char(39),'-append',char(39),')'))
+            else
+                eval(strcat('save(',char(39),saveName_mouse,char(39),',',...
+                    char(39),h{1},'_mouse_',condition{1},'_allRegions',char(39),',',...
+                    char(39),'r_',h{1},'_mouse_',condition{1},'_allRegions',char(39),')'))
+            end
+
             eval(strcat( h{1},'_mice_',condition{1},'_allRegions(mouseInd,:,:) =',h{1},'_mouse_',condition{1},'_allRegions;'))
-            eval(strcat( 'r_',h{1},'_mice_',condition{1},'_allRegions(mouseInd,:) = r_',h{1},'_mouse_',condition{1},'_allRegions;'))
+            eval(strcat( 'r_',h{1},'_mice_',condition{1},'_allRegions(mouseInd,:) = r_',h{1},'_mouse_',condition{1},'_allRegions;'))           
         end        
         mouseInd = mouseInd+1;
+    end
+    for h = {'HRF','MRF'}
+        if exist(saveName,'file')
+            eval(strcat('save(',char(39),saveName,char(39),',',...
+                char(39),h{1},'_mice_',condition{1},'_allRegions',char(39),',',...
+                char(39),'r_',h{1},'_mice_',condition{1},'_allRegions',char(39),',',...
+                char(39),'-append',char(39),')'))
+        else
+            eval(strcat('save(',char(39),saveName,char(39),',',...
+                char(39),h{1},'_mice_',condition{1},'_allRegions',char(39),',',...
+                char(39),'r_',h{1},'_mice_',condition{1},'_allRegions',char(39),')'))
+        end
+    end
+end
+%% Plot HRF for each region and each mouse
+saveName = "D:\XiaodanPaperData\cat\deconvolution_allRegions.mat";
+for condition = {'awake','anes'}
+    for h = {'HRF','MRF'}
+        figure
+        for region = 1:50
+            subplot(5,10,region)
+            eval(strcat('plot(t,',h{1},'_mice_',condition{1},'_allRegions(:,:,region))'))
+            title(parcelnames{region})
+            xlabel('Time(s)')
+            xlim([-3 5])
+            %                 if strcmp(h,'HRF')
+            %                     ylim([-0.0005 0.0035])
+            %                 else
+            %                     ylim([-0.0004 0.0013])
+            %                 end
+            grid on
+        end
+        sgtitle(strcat(h{1},{' '},condition{1}))
+    end
+end
+
+
+%% find T, W, A for each mouse
+saveName = "D:\XiaodanPaperData\cat\deconvolution_allRegions.mat";
+load(saveName)
+for condition = {'awake','anes'}
+    numMice = eval(strcat('length(excelRows_',condition{1},');'));
+    for h = {'HRF','MRF'}  
+        for var = {'T','W','A'}
+            eval(strcat(var{1},'_',h{1},'_mice_',condition{1},'_allRegions= nan(numMice,50);'))
+        end
+        for region = [3:25,28:50]% region 1,2,5,25,26,30 have biggest peak before 0 s
+            for mouseInd = 1:numMice
+                eval(strcat(h{1},'_temp =',h{1},'_mice_',condition{1},'_allRegions(mouseInd,:,region);'))    
+                
+                if strcmp('HRF',h{1})  
+                    eval(strcat('M = max(',h{1},'_temp(783:end));'))
+                    [A,T,W] = findpeaks(HRF_temp,t,'MinPeakHeight',M*0.999999);
+                else
+                    eval(strcat('M = max(',h{1},'_temp(751:end));'))
+                    [A,T,W] = findpeaks(MRF_temp,t,'MinPeakHeight',M*0.999999);
+                end
+                eval(strcat('A_',h{1},'_mice_',condition{1},'_allRegions(mouseInd,region) = A(end);'))
+                eval(strcat('T_',h{1},'_mice_',condition{1},'_allRegions(mouseInd,region) = T(end);'))
+                eval(strcat('W_',h{1},'_mice_',condition{1},'_allRegions(mouseInd,region) = W(end);'))
+            end
+        end
+        if exist(saveName,'file')
+            eval(strcat('save(',char(39),saveName,char(39),',',...
+                char(39),'T_',h{1},'_mice_',condition{1},'_allRegions',char(39),',',...
+                char(39),'W_',h{1},'_mice_',condition{1},'_allRegions',char(39),',',...
+                char(39),'A_',h{1},'_mice_',condition{1},'_allRegions',char(39),',',...
+                char(39),'-append',char(39),')'))
+        else
+            eval(strcat('save(',char(39),saveName,char(39),',',...
+                char(39),'T_',h{1},'_mice_',condition{1},'_allRegions',char(39),',',...
+                char(39),'W_',h{1},'_mice_',condition{1},'_allRegions',char(39),',',...
+                char(39),'A_',h{1},'_mice_',condition{1},'_allRegions',char(39),')'))
+        end
+    end
+end
+      
+% T W A for averaged across mice Response function
+saveName = "D:\XiaodanPaperData\cat\deconvolution_allRegions.mat";
+for condition = {'awake','anes'}
+    for h = {'HRF','MRF'}  
+        for var = {'T','W','A'}
+            eval(strcat(var{1},'_',h{1},'_mice_',condition{1},'= nan(1,50);'))
+        end
+        for region = 1:50 
+            eval(strcat(h{1},'_temp = mean(',h{1},'_mice_',condition{1},'_allRegions(:,:,region));'))
+            eval(strcat('M = max(',h{1},'_temp);'))
+
+            if strcmp('HRF',h{1})
+                [A,T,W] = findpeaks(HRF_temp,t,'MinPeakHeight',M*0.999999);
+            else
+                [A,T,W] = findpeaks(MRF_temp,t,'MinPeakHeight',M*0.999999);
+            end
+
+            eval(strcat('A_',h{1},'_mice_',condition{1},'(region) = A;'))
+            eval(strcat('T_',h{1},'_mice_',condition{1},'(region) = T;'))
+            eval(strcat('W_',h{1},'_mice_',condition{1},'(region) = W;'))
+        end
+        if exist(saveName,'file')
+            eval(strcat('save(',char(39),saveName,char(39),',',...
+                char(39),'T_',h{1},'_mice_',condition{1},char(39),',',...
+                char(39),'W_',h{1},'_mice_',condition{1},char(39),',',...
+                char(39),'A_',h{1},'_mice_',condition{1},char(39),',',...
+                char(39),'-append',char(39),')'))
+        else
+            eval(strcat('save(',char(39),saveName,char(39),',',...
+                char(39),'T_',h{1},'_mice_',condition{1},char(39),',',...
+                char(39),'W_',h{1},'_mice_',condition{1},char(39),',',...
+                char(39),'A_',h{1},'_mice_',condition{1},char(39),')'))
+        end
     end
 end
 
 %% Average across all regions 
+saveName = "D:\XiaodanPaperData\cat\deconvolution_allRegions.mat";
 for condition = {'awake','anes'}
     for h = {'HRF','MRF'}
         for mouseInd = 1:6
@@ -90,7 +214,6 @@ for condition = {'awake','anes'}
                 clear temp
             end
         end
-        saveName = "D:\XiaodanPaperData\cat\deconvolution_allRegions.mat";
         if exist(saveName,'file')
             eval(strcat('save(',char(39),saveName,char(39),',',...
                 char(39),h{1},'_mice_',condition{1},char(39),',',...
@@ -98,8 +221,8 @@ for condition = {'awake','anes'}
                 char(39),'-append',char(39),')'))
         else
             eval(strcat('save(',char(39),saveName,char(39),',',...
-                char(39),h{1},'_mice_',condition{1},char(39),',',...
-                char(39),'r_',h{1},'_mice_',condition{1},char(39),')'))
+                char(39),h{1},'_mice_',condition{1},'_allRegions',char(39),',',...
+                char(39),'r_',h{1},'_mice_',condition{1},'_allRegions',char(39),')'))
         end
     end
 end
@@ -203,7 +326,7 @@ for condition = {'awake','anes'}
         cb=colorbar;
         clim([0 1])
         axis image off
-        colormap jet
+        colormap(brewermap(256, '-Spectral'));
         title('r')
         set(gca,'FontSize',14,'FontWeight','Bold')
 
