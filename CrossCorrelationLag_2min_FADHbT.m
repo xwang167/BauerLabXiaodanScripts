@@ -1,15 +1,14 @@
 
-
+%% each run
 %load('L:\RGECO\190627\190627-R5M2286-fc3_processed.mat', 'xform_FADCorr','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
 %load('L:\RGECO\190707\190707-R5M2286-anes-fc1_processed.mat', 'xform_FADCorr','xform_jrgeco1aCorr','xform_FADCorr');
 clear all;close all;clc
 import mouse.*
-excelFile = 'L:\WT\WT.xlsx';
-excelRows = [2,3,4,5,7,8,11,12,14,15];%[181 183 185 228 232 236 202 195 204 230 234 240];
+excelFile = "X:\WT_Paper1\WT_Paper1.xlsx";
+excelRows = 2:2:24;%[181 183 185 228 232 236 202 195 204 230 234 240];
 runs = 1:3;%
-excelFile = "L:\WT\WT.xlsx";
-load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
-load('D:\OIS_Process\noVasculatureMask.mat')
+load('GoodWL.mat','xform_WL')
+load('noVasculatureMask.mat')
 lagTimeTrial_FADHbT_2min = nan(128,128,5);
 lagAmpTrial_FADHbT_2min = nan(128,128,5);
 edgeLen =1;
@@ -159,37 +158,52 @@ end
 
 
 %% RGECO Awake mice
-excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
+excelFile = "X:\RGECO\DataBase_Xiaodan_5.xlsx";
 excelRows =[181,183,185,228,232,236];%[195 202 204 230 234 240]; [195 202 204 181 183 185];
 miceCat = 'Awake RGECO';
-saveDir_cat = 'L:\RGECO\cat';
+saveDir_cat = 'D:\RGECO\cat';
 CrossLag_FADHbT_mice(excelFile,excelRows,miceCat,saveDir_cat)
 
 %% RGECO Anes mice
-excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
+excelFile = "X:\RGECO\DataBase_Xiaodan_5.xlsx";
 excelRows =[202 195 204 230 234 240];%[195 202 204 230 234 240]; [195 202 204 181 183 185];
 miceCat = 'Anesthetized RGECO';
-saveDir_cat = 'L:\RGECO\cat';
+saveDir_cat = 'D:\RGECO\cat';
 CrossLag_FADHbT_mice(excelFile,excelRows,miceCat,saveDir_cat)
 
 %% WT Awake mice
-excelFile = "L:\WT\WT.xlsx";
+excelFile = "X:\WT\WT.xlsx";
 excelRows =[2,4,7,11,14];%[195 202 204 230 234 240]; [195 202 204 181 183 185];
 miceCat = 'Awake WT';
-saveDir_cat = 'L:\WT\cat';
+saveDir_cat = 'X:\WT\cat';
 CrossLag_FADHbT_mice(excelFile,excelRows,miceCat,saveDir_cat)
 
 %% WT Anes mice
-excelFile = "L:\WT\WT.xlsx";
+excelFile = "X:\WT\WT.xlsx";
 excelRows = [3,5,8,12,15]; %[195 202 204 181 183 185];
 miceCat = 'Anes WT';
-saveDir_cat = 'L:\WT\cat';
+saveDir_cat = 'X:\WT\cat';
 CrossLag_FADHbT_mice(excelFile,excelRows,miceCat,saveDir_cat)
+
+%% WT Awake mice 2nd cohort
+excelFile = "X:\WT_Paper1\WT_Paper1.xlsx";
+excelRows =[2,6,10,14,18,22];%[195 202 204 230 234 240]; [195 202 204 181 183 185];
+miceCat = 'Awake WT';
+saveDir_cat = 'X:\WT_Paper1\cat';
+CrossLag_FADHbT_mice(excelFile,excelRows,miceCat,saveDir_cat)
+
+%% WT Anes mice 2nd cohort
+excelFile = "X:\WT_Paper1\WT_Paper1.xlsx";
+excelRows = [4,8,12,16,20,22]; %[195 202 204 181 183 185];
+miceCat = 'Anes WT';
+saveDir_cat = 'X:\WT_Paper1\cat';
+CrossLag_FADHbT_mice(excelFile,excelRows,miceCat,saveDir_cat)
+
 
 function CrossLag_FADHbT_mice(excelFile,excelRows,miceCat,saveDir_cat)
 runs = 1:3;
-load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
-load('D:\OIS_Process\noVasculaturemask.mat')
+load('GoodWL','xform_WL')
+load('noVasculaturemask.mat')
 
 lagTimeTrial_FADHbT_2min_median_mice = zeros(128,128,length(excelRows));
 lagAmpTrial_FADHbT_2min_median_mice = zeros(128,128,length(excelRows));
@@ -284,11 +298,11 @@ saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_FA
 
 if exist(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_2min.mat')),'file')
     save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_2min.mat')),...
-        'lagTimeTrial_FADHbT_2min_median_mice', 'lagAmpTrial_FADHbT_2min_median_mice',...
+        'lagTimeTrial_FADHbT_2min_median_mice', 'lagAmpTrial_FADHbT_2min_median_mice','mask',...
         '-append');
 else
     save(fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'_2min.mat')),...
-        'lagTimeTrial_FADHbT_2min_median_mice', 'lagAmpTrial_FADHbT_2min_median_mice',...
+        'lagTimeTrial_FADHbT_2min_median_mice', 'lagAmpTrial_FADHbT_2min_median_mice','mask',...
         '-v7.3');
 end
 
