@@ -140,7 +140,7 @@ plot(peak_rgeco_cat*100,'r-')
 hold on
 plot(std_rgeco_cat*100,'-','color',[255, 165, 0]/255)
 hold on
-plot(std_rgeco_stim_cat*100,'k-')
+plot(std_rgeco_cat*100,'k-')
 ylim([0 35])
 ylabel('\DeltaF/F%')
 hold on
@@ -155,7 +155,10 @@ xlabel('Block Number')
 saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'-peak-std-ratio','.fig')))
 saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',miceName,'-',sessionType,'-peak-std-ratio','.png')))
 
-
 SNR_mouse1 = mean(peak_rgeco_cat(1:30)./std_rgeco_cat(1:30));
 SNR_mouse2 = mean(peak_rgeco_cat(31:60)./std_rgeco_cat(31:60));
 SNR_mouse3 = mean(peak_rgeco_cat(31:60)./std_rgeco_cat(61:90));
+
+% save
+saveName = 'X:\Paper1\RGECO\cat\RGECO_quantification.mat';
+save(saveName,'peak_rgeco_cat','std_rgeco_cat','std_rgeco_cat')
