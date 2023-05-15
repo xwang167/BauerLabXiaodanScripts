@@ -124,6 +124,7 @@ for condition = {'awake','anes'}
 end
 
 
+
 %% find T, W, A for each mouse
 saveName = "D:\XiaodanPaperData\cat\deconvolution_allRegions.mat";
 load(saveName)
@@ -133,16 +134,13 @@ for condition = {'awake','anes'}
         for var = {'T','W','A'}
             eval(strcat(var{1},'_',h{1},'_mice_',condition{1},'_allRegions= nan(numMice,50);'))
         end
-        for region = 
-            [3:25,28:50]% region 1,2,5,25,26,30 have biggest peak before 0 s
+        for region = [3,4,6:25,28,29,31:50]% region 1,2,5,25,26,30 have biggest peak before 0 s
             for mouseInd = 1:numMice
-                eval(strcat(h{1},'_temp =',h{1},'_mice_',condition{1},'_allRegions(mouseInd,:,region);'))    
-                
-                if strcmp('HRF',h{1})  
-                    eval(strcat('M = max(',h{1},'_temp(783:end));'))
+                eval(strcat(h{1},'_temp =',h{1},'_mice_',condition{1},'_allRegions(mouseInd,:,region);'))
+                eval(strcat('M = max(',h{1},'_temp(751:end));'))
+                if strcmp('HRF',h{1})
                     [A,T,W] = findpeaks(HRF_temp,t,'MinPeakHeight',M*0.999999);
                 else
-                    eval(strcat('M = max(',h{1},'_temp(751:end));'))
                     [A,T,W] = findpeaks(MRF_temp,t,'MinPeakHeight',M*0.999999);
                 end
                 eval(strcat('A_',h{1},'_mice_',condition{1},'_allRegions(mouseInd,region) = A(end);'))
@@ -165,7 +163,7 @@ for condition = {'awake','anes'}
     end
 end
       
-% T W A for averaged across mice Response function
+
 saveName = "D:\XiaodanPaperData\cat\deconvolution_allRegions.mat";
 for condition = {'awake','anes'}
     for h = {'HRF','MRF'}  

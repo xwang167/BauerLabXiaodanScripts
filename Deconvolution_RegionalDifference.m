@@ -1,6 +1,8 @@
 %% median difference threshold with WN p value between conditions
 % load
+load("C:\Users\Xiaodan Wang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL.mat")
 saveName = "D:\XiaodanPaperData\cat\deconvolution_allRegions.mat";
+excelFile = "X:\RGECO\DataBase_Xiaodan_3.xlsx";
 excelRows_awake = [181 183 185 228 232 236];
 excelRows_anes  = [202 195 204 230 234 240];
 load(saveName)
@@ -13,6 +15,22 @@ for condition = {'awake','anes'}
             char(39),'A_',h{1},'_mice_',condition{1},'_allRegions',char(39),')'))
     end
 end
+load("AtlasandIsbrain_Allen.mat",'parcelnames','AtlasSeeds')
+xform_isbrain_mice = 1;
+for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
+    [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+    recDate = excelRaw{1}; recDate = string(recDate);
+    mouseName = excelRaw{2}; mouseName = string(mouseName);
+    saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+    sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+    disp(strcat(mouseName,', run #1'))
+    processedName = strcat(recDate,'-',mouseName,'-',sessionType,'1_processed','.mat');
+    load(fullfile(saveDir,processedName),'xform_isbrain')
+    xform_isbrain_mice = xform_isbrain_mice.*xform_isbrain;
+end
+% Region inside of mouse brain
+mask = AtlasSeeds.*xform_isbrain_mice;
+mask(isnan(mask)) = 0;
 % Exclude FRP an PL
 mask(mask==1)  = 0;
 mask(mask==2)  = 0;
@@ -282,6 +300,7 @@ end
 
 
 %% Difference between regions
+
 % table of comparison between M SS P V RS A 
 mask_region_ind = cell(1,6);
 mask_region_ind{1} = [3,4,28,29];
@@ -351,10 +370,56 @@ for var = {'T','W','A','r'}
     end
 end
 
+% Calculate median map for combined region
+close all
+for condition = {'awake','anes'}
+    for h = {'HRF','MRF'}
+        figure('units','normalized','outerposition',[0 0 1 1])
+        kk = 1;
+        for var = {'T','W','A','r'}
+            eval(strcat(var{1},'_',h{1},'_',condition{1},'_combined_map = nan(128,128);'))% mouse*combined region
+            for ii = 1:6
+                eval(strcat(var{1},'_',h{1},'_',condition{1},'_combined_map(logical(mask_combined(:,ii))) = median(',var{1},'_',h{1},'_',condition{1},'_combined(:,ii));'))
+            end
+            ax = subplot(2,2,kk);
+            eval(strcat('imagesc(',var{1},'_',h{1},'_',condition{1},'_combined_map,',...
+                char(39),'AlphaData',char(39),',mask)'));
+            hold on
+            imagesc(xform_WL,'AlphaData',1-mask);
+            axis image off
+            if strcmp('r',var{1})
+                colormap(ax,brewermap(256, '-Spectral'));
+            else
+                colormap(ax,cmocean('ice'))
+            end
+            kk = kk+1;
+            cb = colorbar;
+            if strcmp('r',var{1})
+                clabel = 'Correlation Coefficient';
+            elseif strcmp('A',var{1})
+                clabel = 'Arbitrary Unit';
+            else
+                clabel = 'Seconds';
+            end
+            cb.Label.String = clabel;
+            title(var{1})
+        end
+        % Visualize median map for combined region
+        temp = strcat('sgtitle(',char(39),'Median for Combined Region for',{' '},h{1},{' '},'under',{' '},condition{1},' Condition',char(39),')');
+        eval(temp{1})
+    end
+end
+
+
+
+
+
 % Calculate h and p
-for var = {'T','W','A','r'}
+for h = {'HRF','MRF'}
     for condition = {'awake','anes'}
-        for h = {'HRF','MRF'}
+        kk = 1;
+        figure('units','normalized','outerposition',[0 0 0.6 1])
+        for var = {'T','W','A','r'}
             eval(strcat('p_',var{1},'_',h{1},'_',condition{1},'_combined = nan(6,6);'))
             eval(strcat('h_',var{1},'_',h{1},'_',condition{1},'_combined = zeros(6,6);'))
             eval(strcat('difference_',var{1},'_',h{1},'_',condition{1},'_combined = nan(6,6);'))
@@ -369,8 +434,8 @@ for var = {'T','W','A','r'}
                         'median(',var{1},'_',h{1},'_',condition{1},'_combined(:,jj));'))
                 end
             end
-            eval(strcat('h_',var{1},'_',h{1},'_',condition{1},'_combined(logical(triu(ones(6)))) = 0;'))
-            figure
+            eval(strcat('h_',var{1},'_',h{1},'_',condition{1},'_combined(logical(triu(ones(6)))) = 0;')) 
+            subplot(2,2,kk)
             eval(strcat('imagesc(difference_',var{1},'_',h{1},'_',condition{1},'_combined,',...
                 char(39),'AlphaData',char(39),',h_',var{1},'_',h{1},'_',condition{1},'_combined)'));
             axis image
@@ -380,7 +445,10 @@ for var = {'T','W','A','r'}
             yticklabels({'M','SS','P','V','RS','A'})
             colorbar
             colormap(brewermap(256, '-Spectral'));
-             sgtitle(strcat(h{1},{' '},'Median Difference (y - x) for RGECO mice, Only Significant Difference is Shown'))
+            title(var{1})
+            kk = kk+1;
+            set(gca,'Color','k')
         end
+        sgtitle(strcat(h{1},{' '},condition{1},{' '},'Median Difference (y - x) for RGECO mice, Only Significant Difference is Shown'))
     end
 end
