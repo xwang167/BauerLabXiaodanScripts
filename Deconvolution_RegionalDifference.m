@@ -1,20 +1,23 @@
-%% median difference threshold with WN p value between conditions
 % load
 load("C:\Users\Xiaodan Wang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL.mat")
 saveName = "D:\XiaodanPaperData\cat\deconvolution_allRegions.mat";
 excelFile = "X:\RGECO\DataBase_Xiaodan_3.xlsx";
 excelRows_awake = [181 183 185 228 232 236];
 excelRows_anes  = [202 195 204 230 234 240];
-load(saveName)
 for condition = {'awake','anes'}
-    numMice = eval(strcat('length(excelRows_',condition{1},');'));
     for h = {'HRF','MRF'}
         eval(strcat('load(',char(39),saveName,char(39),',',...
             char(39),'T_',h{1},'_mice_',condition{1},'_allRegions',char(39),',',...
             char(39),'W_',h{1},'_mice_',condition{1},'_allRegions',char(39),',',...
-            char(39),'A_',h{1},'_mice_',condition{1},'_allRegions',char(39),')'))
+            char(39),'A_',h{1},'_mice_',condition{1},'_allRegions',char(39),',',...
+            char(39),'r_',h{1},'_mice_',condition{1},'_allRegions',char(39),...
+            ')'))
     end
 end
+
+
+
+%% median difference threshold with WN p value between conditions
 load("AtlasandIsbrain_Allen.mat",'parcelnames','AtlasSeeds')
 xform_isbrain_mice = 1;
 for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
