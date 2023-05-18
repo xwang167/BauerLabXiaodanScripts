@@ -42,7 +42,7 @@ set(gca,'XTickLabel',a,'FontName','Times','fontsize',14,'fontweight','bold')
 
 subplot('position',[0.8,0.1,0.2,0.25])
 
-load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','WL')
+load('GoodWL','WL')
 for b=stimStartTime-2: stimEndTime+6
     p = subplot('position', [0.015+(b-stimStartTime)*0.09 0.80 0.07 0.12]);
     imagesc(downSampledBlocks1(:,:,b), [-maxVal(1) maxVal(1)]);

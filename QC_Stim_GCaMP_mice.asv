@@ -136,7 +136,7 @@ colormap jet
 radius = sqrt((x1-x2)^2+(y1-y2)^2);
 ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
 max_ROI = prctile(peakMap_NoGSR(ROI),99);
-temp = peakMap_NoGSR.*ROI;
+temp = peakMap_ROI.*ROI;
 ROI_NoGSR = temp>0.75*max_ROI;
         
 save(fullfile(catDir,processedName_mice),'ROI_NoGSR','-append')

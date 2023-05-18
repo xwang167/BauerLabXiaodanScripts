@@ -231,7 +231,7 @@ for condition = {'awake','anes'}
         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit_1min_smooth_Rolling_interp.png')));
         saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CalciumFAD_GammaFit_1min_smooth_Rolling_interp.fig')));
 
-        sgtitle(strcat('Gamma',{' '},h,' for RGECO mice under',{' '},condition,' condition'))
+        sgtitle(strcat('Cross Correlation',{' '},h,' for RGECO mice under',{' '},condition,' condition'))
 
     end
 end

@@ -74,8 +74,8 @@ for excelRow = excelRows
         
         Calcium_filter = reshape(Calcium_filter,128,128,[]);
         HbT_filter = reshape(HbT_filter,128,128,[]);
-        time_epoch=30;
-        t=linspace(0,time_epoch,time_epoch*sessionInfo.framerate *(5/sessionInfo.framerate));%% force it to be 5 hz
+        time_epoch=120;
+        t=0:1/5:time_epoch-1/5;%% force it to be 5 hz
         
         
         for ii = 1:5

@@ -1,7 +1,7 @@
 function   [goodBlocks,ROI] = QC_stim(oxy,deoxy,greenFluor,greenFluorCorr,green,jrgeco1a,jrgeco1aCorr,red,xform_isbrain,numBlock,numDesample,stimStartTime,stimduration,stimFreq,framerate,stimblocksize,stimbaseline,texttitle,output,input_ROI)
 
 
-load('D:\OIS_Process\noVasculatureMask.mat')
+load('noVasculatureMask.mat')
 mask_new = logical(mask_new);
 disp('downsampling')
 
@@ -413,13 +413,7 @@ if ~isempty(goodBlocks)
     saveas(gcf,strcat(output,'tracePlot.fig'))
     
     saveas(gcf,strcat(output,'tracePlot.png'))
-    
-    
-    
-    load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','WL')
-    
-    
-    
+    load('GoodWL','WL')
     traceImage(oxy_downsampled_blocks,deoxy_downsampled_blocks,total_downsampled_blocks,...
         'HbO','HbR','Total',oxy_active,deoxy_active,total_active,'r','b','k',ROI,'\Delta\muM',...
         stimduration, stimblocksize, stimFreq, framerate, stimbaseline,stimStartTime,stimEndTime,xform_isbrain,[temp_oxy_max*1.2,temp_deoxy_max*1.2,temp_total_max*1.2])%]3,2,1
