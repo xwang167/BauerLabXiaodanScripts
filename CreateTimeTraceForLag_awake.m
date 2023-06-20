@@ -1,6 +1,6 @@
-load('L:\RGECO\190627\190627-R5M2286-fc3_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
-load('D:\OIS_Process\noVasculatureMask.mat');
-load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
+load('E:\RGECO\190627\190627-R5M2286-fc3_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
+load('noVasculatureMask.mat');
+load('BauerLabXiaodanScripts\GoodWL','xform_WL')
 mask = leftMask+rightMask;
 xform_datahb(isinf(xform_datahb)) = 0;
 xform_datahb(isnan(xform_datahb)) = 0;
@@ -16,9 +16,14 @@ xform_FADCorr(isnan(xform_FADCorr)) = 0;
 % FAD_filter = double(squeeze(xform_FADCorr));
 % Calcium_filter = double(squeeze(xform_jrgeco1aCorr));
 
-Hb_filter = mouse.freq.filterData(double(xform_datahb),0.02,2,25);
-FAD_filter = mouse.freq.filterData(double(squeeze(xform_FADCorr)),0.02,2,25);
-Calcium_filter = mouse.freq.filterData(double(squeeze(xform_jrgeco1aCorr)),0.02,2,25);
+% Hb_filter = mouse.freq.filterData(double(xform_datahb),0.02,2,25);
+% FAD_filter = mouse.freq.filterData(double(squeeze(xform_FADCorr)),0.02,2,25);
+% Calcium_filter = mouse.freq.filterData(double(squeeze(xform_jrgeco1aCorr)),0.02,2,25);
+
+Hb_filter = mouse.freq.lowpass(double(xform_datahb),2,25);
+FAD_filter = mouse.freq.lowpass(double(squeeze(xform_FADCorr)),2,25);
+Calcium_filter = mouse.freq.highpass(double(squeeze(xform_jrgeco1aCorr)),0.02,25);
+
 HbT_filter = Hb_filter(:,:,1,:) + Hb_filter(:,:,2,:);
 % Calcium = normRow(transpose(squeeze(mean(mean(Calcium_filter(71:75,17:21,:)*100,1),2))));
 % FAD = normRow(transpose(squeeze(mean(mean(FAD_filter(71:75,17:21,:)*100,1),2))));

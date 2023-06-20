@@ -1,6 +1,6 @@
-load('L:\RGECO\190701\190701-R5M2288-fc3_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
-load('D:\OIS_Process\noVasculatureMask.mat');
-load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
+load('E:\RGECO\190701\190701-R5M2288-fc3_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
+load('noVasculatureMask.mat');
+load('GoodWL','xform_WL')
 mask = leftMask+rightMask;
 xform_datahb(isinf(xform_datahb)) = 0;
 xform_datahb(isnan(xform_datahb)) = 0;

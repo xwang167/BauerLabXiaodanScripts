@@ -27,8 +27,8 @@ for excelRow = excelRows
     if ~isempty(find(isnan(xform_isbrain), 1))
         xform_isbrain(isnan(xform_isbrain))=0;
     end
-    
-    %     processedName_ROI = strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'_processed','.mat');
+
+    %     processedName_ROI = strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'_correction11','.mat');
     %     load(fullfile(saveDir,processedName_ROI),'xform_gcampCorr')
     %     xform_gcampCorr = reshape(xform_gcampCorr,128,128,750,[]);
     %     baseline= peak(xform_gcampCorr(:,:,1:125),3);
@@ -53,12 +53,12 @@ for excelRow = excelRows
     %     hold on
     %     contour(ROI)
     %     iROI = reshape(ROI,1,[]);
-    
+
     for n = runs
         peak_gcamp = nan(1,10);
         std_gcamp = nan(1,10);
         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
-        processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
+        processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_correction11','.mat');
         load(fullfile(saveDir,processedName),'xform_gcampCorr','ROI_NoGSR')
         iROI = reshape(ROI_NoGSR,1,[]);
         %         load(fullfile(saveDir,processedName),'xform_gcampCorr')
@@ -66,7 +66,7 @@ for excelRow = excelRows
         baseline= mean(xform_gcampCorr(:,:,1:125,:),3);
         baseline = repmat(baseline,1,1,750,1);
         xform_gcampCorr = xform_gcampCorr-baseline;
-        
+
         xform_gcampCorr = reshape(xform_gcampCorr,128*128,750,10);
         gcampCorr_ROI = squeeze(mean(xform_gcampCorr(iROI,:,:),1));
         timeTrace = reshape(gcampCorr_ROI,1,[]);
@@ -74,41 +74,58 @@ for excelRow = excelRows
         plot((1:7500)/25,timeTrace,'g')
         xlabel('Time(s)')
         ylabel('\muF/F')
-        title(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-TimeTrace'))
-        save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-TimeTrace.mat')),'timeTrace')
-        savefig(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-TimeTrace','.fig')))
-        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-TimeTrace','.png')))
+        title(strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-TimeTrace-Correction11'))
+        save(fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-TimeTrace-Correction11.mat')),'timeTrace')
+        savefig(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-TimeTrace-Correction11','.fig')))
+        saveas(gcf,fullfile(saveDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-TimeTrace-Correction11','.png')))
         for ii = 1:10
             [peak_gcamp,loc] =findpeaks(gcampCorr_ROI(126:250,ii),'MinPeakDistance',5,'MinPeakProminence',0.004);
-%             figure
-%             plot(gcampCorr_ROI(126:250,ii));
-%             hold on
-%             scatter(loc,peak_gcamp);
-           if excelRow ==31&& n==2 && ii == 7
-               peak_gcamp(end+1) = 0.0074;
-           end
-           if excelRow==31 && n==3 &&  ii == 2
-               peak_gcamp(end+1) = 0.019;
-               peak_gcamp(end+1) = 0.050;
-           end
-           if excelRow==31 && n==3 &&  ii == 4
-               peak_gcamp(end+1) = -0.0082;
-           end
-           if excelRow==31 && n==3 &&  ii == 5
-               peak_gcamp(end+1) = 0.010;
-           end
-           if excelRow==31 && n==3 &&  ii == 7
-               peak_gcamp(end+1) = 0.0072;
-           end
-          if excelRow==31 && n==3 &&  ii == 9
-               peak_gcamp(end+1) = 0.014;
-          end
-           if excelRow==31 && n==3 &&  ii == 10
-               peak_gcamp(end+1) = 0.021;
-           end
+
+            if excelRow ==29&& n==3 && ii == 10
+                peak_gcamp(end+1) = 0.015;
+            end
+
+            if excelRow ==30&& n==2 && ii == 9
+                peak_gcamp(7) = [];
+            end
+
+            if excelRow ==30&& n==3 && ii == 5
+                peak_gcamp(end+1) = 0.030;
+            end
+
+            if excelRow ==30&& n==3 && ii == 7
+                peak_gcamp([8,11]) = [];
+                peak_gcamp(end+1) = 0.016;
+            end
+            if excelRow ==31&& n==3 && ii == 2
+                peak_gcamp(end+1) = 0.046;
+            end
+
+            if excelRow ==31&& n==3 && ii == 6
+                peak_gcamp(end+1) = 0.034;
+            end
+
+
+            if excelRow ==31&& n==3 && ii == 7
+                peak_gcamp(end+1) = 0.011;
+            end
+
+            if excelRow ==31&& n==3 && ii == 9
+                peak_gcamp(end+1) = 0.021;
+            end
+
+            if excelRow ==31&& n==3 && ii == 10
+                peak_gcamp(end+1) = 0.022;
+                peak_gcamp(end+1) = 0.021;
+            end
+
             if length(peak_gcamp)~=15
                 disp('change minpeakpromimence')
-                pause
+                figure
+                plot(gcampCorr_ROI(126:250,ii));
+                hold on
+                scatter(loc,peak_gcamp);
+
             end
             max_gcamp = max(peak_gcamp);
             peak_gcamp = mean(peak_gcamp);
@@ -138,12 +155,17 @@ plot(peak_gcamp_cat./std_gcamp_cat,'b-')
 hold on
 ylim([-90 20])
 legend('Signal',' Baseline STD','Scaled Stim STD','SNR')
-title('Thy1-GCaMP6f','Color',[107,142,35]/255)
+title('Thy1-GCaMP6f-Correction11','Color',[107,142,35]/255)
 xlabel('Block Number')
-savefig(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mice,'-',sessionType,'-peak-std-ratio','.fig')))
-saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mice,'-',sessionType,'-peak-std-ratio','.png')))
+savefig(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mice,'-',sessionType,'-peak-std-ratio-Correction11','.fig')))
+saveas(gcf,fullfile(saveDir_cat,strcat(recDate,'-',mice,'-',sessionType,'-peak-std-ratio-Correction11','.png')))
 
 
 SNR_mouse1 = mean(peak_gcamp_cat(1:30)./std_gcamp_cat(1:30));
 SNR_mouse2 = mean(peak_gcamp_cat(31:60)./std_gcamp_cat(31:60));
 SNR_mouse3 = mean(peak_gcamp_cat(31:60)./std_gcamp_cat(61:90));
+
+
+% save
+saveName = 'X:\Paper1\GCaMP\cat\GCaMP_correction11_quantification.mat';
+save(saveName,'peak_gcamp_cat','std_gcamp_cat','std_gcamp_cat')

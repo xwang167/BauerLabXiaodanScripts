@@ -1,6 +1,6 @@
 close all
 excelRows = [181 183 185 228 232 236];
-excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
+excelFile = "X:\RGECO\DataBase_Xiaodan_1.xlsx";
 nVy = 128;
 mm=10;
 mpp=mm/nVy;
@@ -163,7 +163,7 @@ errorbar(x',model_series,zeros(7,3),model_error,'k','linestyle','none');
 hold off
 ylabel('Correlation')
 legend('jRGECO1a','FAD','HbT')
-ylim([0 2.5])
+ylim([0 4])
 xticklabels({'C','M','SS','RS','P','V','SSL-ML'})
 %set(gca,'TickLength',[0 .01])
 set(gca,'FontSize',14,'FontWeight','Bold')
@@ -233,7 +233,7 @@ end
 errorbar(x',model_series,zeros(7,3),model_error,'k','linestyle','none');
 hold off
 ylabel('Correlation')
-ylim([0 2.5])
+ylim([0 4])
 xticklabels({'C','M','SS','RS','P','V','SSL-ML'})
 %set(gca,'TickLength',[0 .01])
 set(gca,'FontSize',14,'FontWeight','Bold')
@@ -264,7 +264,7 @@ sigstar({[x(1,7),x(2,7)]},p_SSL_ML_Delta_CalciumFAD,0,3)
 
 
 excelRows = [195 202 204 230 234 240];
-excelFile = "C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\DataBase_Xiaodan.xlsx";
+excelFile = "X:\RGECO\DataBase_Xiaodan_1.xlsx";
 nVy = 128;
 mm=10;
 mpp=mm/nVy;
@@ -426,7 +426,7 @@ end
 errorbar(x',model_series,zeros(7,3),model_error,'k','linestyle','none');
 hold off
 ylabel('Correlation')
-ylim([0 2.5])
+ylim([0 4])
 xticklabels({'C','M','SS','RS','P','V','SSL-ML'})
 %set(gca,'TickLength',[0 .01])
 set(gca,'FontSize',14,'FontWeight','Bold')
@@ -517,7 +517,7 @@ end
 errorbar(x',model_series,zeros(7,3),model_error,'k','linestyle','none');
 hold off
 ylabel('Correlation')
-ylim([0 2.5])
+ylim([0 4])
 xticklabels({'C','M','SS','RS','P','V','SSL-ML'})
 %set(gca,'TickLength',[0 .01])
 set(gca,'FontSize',14,'FontWeight','Bold')
