@@ -161,4 +161,4 @@ SNR_mouse3 = mean(peak_rgeco_cat(31:60)./std_rgeco_cat(61:90));
 
 % save
 saveName = 'X:\Paper1\RGECO\cat\RGECO_quantification.mat';
-save(saveName,'peak_rgeco_cat','std_rgeco_cat','std_rgeco_cat')
+save(saveName,'peak_rgeco_cat','std_rgeco_cat','std_rgeco_cat','std_rgeco_stim_cat')

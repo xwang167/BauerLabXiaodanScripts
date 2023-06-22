@@ -23,7 +23,7 @@ max_gcamp  = max(peakMap_gcamp(mask_gcamp));
 % peak map with GSR for corrected rgeco and gcamp, colormap -spectral
 figure
 subplot(121)
-imagesc(peakMap_rgeco,[-max_rgecco max_rgecco]);
+imagesc(peakMap_rgeco,[-6 6]);
 hold on
 imagesc(xform_WL,'AlphaData',1-mask_rgeco)
 colorbar
@@ -33,7 +33,7 @@ title('Thy1-jRGECO1a','Color','m')
 
 
 subplot(122)
-imagesc(peakMap_gcamp,[-max_gcamp max_gcamp]);
+imagesc(peakMap_gcamp,[-1.6 1.6]);
 hold on
 imagesc(xform_WL,'AlphaData',1-mask_gcamp)
 colorbar

@@ -1,3 +1,5 @@
+load('X:\Paper1\GCaMP\cat\GCaMP_correction11_quantification.mat')
+load('X:\Paper1\RGECO\cat\RGECO_quantification.mat')
 % Signal
 figure
 plot(sort(peak_rgeco_cat*100),'m-')

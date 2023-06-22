@@ -168,4 +168,4 @@ SNR_mouse3 = mean(peak_gcamp_cat(31:60)./std_gcamp_cat(61:90));
 
 % save
 saveName = 'X:\Paper1\GCaMP\cat\GCaMP_correction11_quantification.mat';
-save(saveName,'peak_gcamp_cat','std_gcamp_cat','std_gcamp_cat')
+save(saveName,'peak_gcamp_cat','std_gcamp_cat','std_gcamp_cat','std_gcamp_stim_cat')
