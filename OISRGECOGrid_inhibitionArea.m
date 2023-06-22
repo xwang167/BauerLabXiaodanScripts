@@ -6,7 +6,7 @@ load('C:\Users\Xiaodan Wang\Documents\GitHub\BauerLabXiaodanScripts\noVasculatur
 mask = logical(leftMask+rightMask);
 load('X:\PVChR2-Thy1RGECO\cat\N13M309-N13M549-N13M548-N27M753-N27M755-N26M761-N26M764-N24M783-N24M778-N24M322-inhibitSTD.mat',...
     'stdMap')
-load('X:\PVChR2-Thy1RGECO\cat\N13M309-N13M549-N13M548-N27M753-N27M755-N26M761-N26M764-N24M783-N24M778-N24M322-inhibitSTD.mat',...
+load('X:\PVChR2-Thy1RGECO\cat\N13M309-N13M549-N13M548-N27M753-N27M755-N26M761-N26M764-N24M783-N24M778-N24M322-inhibitSNR.mat',...
     'snrMap')
 
 %%
@@ -17,7 +17,7 @@ localInhibitArea = nan(1,160);
 distantInhibitArea = nan(1,160);
 totalArea = zeros(1,160);
 validLocation = nan(1,160);
-for location = 50:160
+for location = 138
     X_center = round(seedLocation_mice_FOV(2,location));
     Y_center = round(seedLocation_mice_FOV(1,location));
     if ~isnan(seedLocation_mice_FOV(1,location))
