@@ -1,5 +1,5 @@
 excelFile="X:\Paper2\Hemi_Thy1_jRGECO1a_3Locs\Hemi_Thy1_jRGECO1a_3Locs - Copy.xlsx";
-excelRows=20:22;
+excelRows=29:37;
 
 runsInfo = parseRuns(excelFile,excelRows);
 [row,start_ind_mouse,numruns_per_mouse]=unique({runsInfo.excelRow_char}); %Note that unique only takes characters! This makes it so that we only do landmark for one of the runs!
@@ -12,6 +12,9 @@ for runInd=runNum %for each mouse
     oriFile = fullfile(rawDir, strcat(runInfo.recDate,'-tform.mat'));
     finalFile = fullfile(runInfo.saveFolder,strcat(runInfo.recDate,'-tform.mat'));
     load(oriFile)
+    if ~exist(runInfo.saveFolder,'dir')
+        mkdir(runInfo.saveFolder)
+    end
     save(finalFile,'mytform')
 end
 
