@@ -40,3 +40,6 @@ HbT_delta_anes = [0.51 0.50 0.55 0.33 0.58 0.54];
 [h, p]=ttest2(FAD_ISA_anes, HbT_ISA_anes, 0.05, 'both', 'unequal');
 [h, p]=ttest2(FAD_ISA_anes, calcium_ISA_anes, 0.05, 'both', 'unequal');
 [h, p]=ttest2(HbT_ISA_anes, calcium_ISA_anes, 0.05, 'both', 'unequal');
+
+[h, p]=ttest2(HBT_ISA_awake, HbT_Delta_awake, 0.05, 'both', 'unequal');
+[h, p]=ttest2(FAD_delta_awake, FAD_delta_anes, 0.05, 'both', 'unequal')
