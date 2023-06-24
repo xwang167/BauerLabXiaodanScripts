@@ -1,5 +1,5 @@
 function [lagTime_projection,lagAmp_projection] = calcProjectionLag(data,minFreq,maxFreq,fs,edgeLen,validRange,corrThr)
-load('D:\OIS_Process\noVasculatureMask.mat')
+load('noVasculatureMask.mat')
 
 %% resize to half
 data = imresize(data,0.5);
