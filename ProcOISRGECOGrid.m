@@ -1,12 +1,7 @@
 clear all;close all;
-poolobj = gcp('nocreate'); % If no pool, do not create new one.
-numcores = feature('numcores');
-if isempty(poolobj)
-    parpool('local',numcores-1);
-end
 %% Get Run and System Info
-excelFile="X:\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
-excelRows = 2;
+excelFile="X:\Paper2\Hemi_Thy1_jRGECO1a_leftGrid\Control_Hemi_Thy1_jRGECO1a_leftGrid.xlsx";
+excelRows = 3;
 
 runsInfo = parseRuns_xw(excelFile,excelRows);
 [row,start_ind_mouse,numruns_per_mouse]=unique({runsInfo.excelRow_char}); %Note that unique only takes characters! This makes it so that we only do landmark for one of the runs!
@@ -14,7 +9,7 @@ runNum=start_ind_mouse';
 
 % %get xform_isbrain
 for runInd=runNum %for each mouse
-    
+    %copy landmarksandmask from couchraw to saveDir 
     runInfo=runsInfo(runInd);
     load(runInfo.saveMaskFile,'isbrain','I')
     temp = I;
