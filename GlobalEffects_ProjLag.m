@@ -1,6 +1,11 @@
 clear;close all;clc
 excelFile="X:\Paper2\GlobalEffects\GlobalEffects_PVChR2Thy1jRGECO1a - Copy.xlsx";
-excelRows=3:2:7;
+excelRows=[9,11,13,17];
+
+fc1end = 20*10*60;
+fc2start = 20*(10*60+30)+1;
+stimstart = 20*10*60+1;
+stimend = 20*(10*60+30);
 
 fRange_ISA = [0.01 0.08];
 fRange_Delta = [0.5 4];
@@ -25,7 +30,7 @@ for runInd=mouse_ind
     load(runInfo.saveMaskFile,'xform_isbrain')
     % stim run
     tmp = matfile(runInfo.saveFluorFile);
-    stim1_calcium = tmp.xform_datafluorCorr(:,:,1:20*10*60);
+    stim1_calcium = tmp.xform_datafluorCorr(:,:,1:fc1end);
     % Lag with GS
     tic;
     [lagTime_Projection_stim1_calcium_ISA,lagAmp_Projection_stim1_calcium_ISA] = calcProjectionLag(stim1_calcium,fRange_ISA(1),fRange_ISA(2),runInfo.samplingRate,edgeLen,validRange,corrThr);
@@ -33,7 +38,7 @@ for runInd=mouse_ind
     [lagTime_Projection_stim1_calcium_Delta,lagAmp_Projection_stim1_calcium_Delta] = calcProjectionLag(stim1_calcium,fRange_Delta(1),fRange_Delta(2),runInfo.samplingRate,edgeLen,validRange,corrThr);
     clear stim1_calcium
 
-    stim2_calcium = tmp.xform_datafluorCorr(:,:,20*(10*60+5)+1:end);
+    stim2_calcium = tmp.xform_datafluorCorr(:,:,fc2start:end);
     [lagTime_Projection_stim2_calcium_ISA,lagAmp_Projection_stim2_calcium_ISA] = calcProjectionLag(stim2_calcium,fRange_ISA(1),fRange_ISA(2),runInfo.samplingRate,edgeLen,validRange,corrThr);
     [lagTime_Projection_stim2_calcium_Delta,lagAmp_Projection_stim2_calcium_Delta] = calcProjectionLag(stim2_calcium,fRange_Delta(1),fRange_Delta(2),runInfo.samplingRate,edgeLen,validRange,corrThr);
     clear stim2_calcium
@@ -41,19 +46,19 @@ for runInd=mouse_ind
 
     % Laser location
     tmp = matfile(strcat(runInfo.saveFilePrefix,'-dataLaser.mat'));
-    laser = mean(tmp.xform_datalaser(:,:,20*10*60+1:20*(10*60+5)),3);
+    laser = mean(tmp.xform_datalaser(:,:,stimstart:stimend),3);
     [~,I] = max(laser(:));
     [row,col] = ind2sub([128,128],I);
 
     % Corresponding fc run
     tmp = matfile(strcat(runInfo.saveFilePrefix(1:end-5),'fc1-dataFluor.mat'));
-    fc1_calcium = tmp.xform_datafluorCorr(:,:,1:20*10*60);
+    fc1_calcium = tmp.xform_datafluorCorr(:,:,1:fc1end);
     % Lag with GS
     [lagTime_Projection_fc1_calcium_ISA,lagAmp_Projection_fc1_calcium_ISA] = calcProjectionLag(fc1_calcium,fRange_ISA(1),fRange_ISA(2),runInfo.samplingRate,edgeLen,validRange,corrThr);
     [lagTime_Projection_fc1_calcium_Delta,lagAmp_Projection_fc1_calcium_Delta] = calcProjectionLag(fc1_calcium,fRange_Delta(1),fRange_Delta(2),runInfo.samplingRate,edgeLen,validRange,corrThr);
     clear fc1_calcium
     
-    fc2_calcium = tmp.xform_datafluorCorr(:,:,20*(10*60+5)+1:end);
+    fc2_calcium = tmp.xform_datafluorCorr(:,:,fc2start:end);
     [lagTime_Projection_fc2_calcium_ISA,lagAmp_Projection_fc2_calcium_ISA] = calcProjectionLag(fc2_calcium,fRange_ISA(1),fRange_ISA(2),runInfo.samplingRate,edgeLen,validRange,corrThr);
     [lagTime_Projection_fc2_calcium_Delta,lagAmp_Projection_fc2_calcium_Delta] = calcProjectionLag(fc2_calcium,fRange_Delta(1),fRange_Delta(2),runInfo.samplingRate,edgeLen,validRange,corrThr);
     clear fc2_calcium
@@ -134,7 +139,7 @@ for runInd=mouse_ind
     axis image off
 
     subplot(2,3,3)
-    imagesc(lagTime_Projection_fc2_calcium_Delta-lagTime_Projection_fc1_calcium_Delta,'AlphaData',imresize(xform_isbrain,0.5).*(~isnan(lagTime_Projection_fc1_calcium_Delta)),[-0.2 0.2])
+    imagesc(lagTime_Projection_fc2_calcium_Delta-lagTime_Projection_fc1_calcium_Delta,'AlphaData',imresize(xform_isbrain,0.5).*(~isnan(lagTime_Projection_fc1_calcium_Delta)),[-0.02 0.02])
     title('Difference without PS')
     colorbar
     axis image off
@@ -152,7 +157,7 @@ for runInd=mouse_ind
     axis image off
 
     subplot(2,3,6)
-    imagesc(lagTime_Projection_stim2_calcium_Delta-lagTime_Projection_stim1_calcium_Delta,'AlphaData',imresize(xform_isbrain,0.5).*(~isnan(lagTime_Projection_stim1_calcium_Delta)),[-0.2 0.2])
+    imagesc(lagTime_Projection_stim2_calcium_Delta-lagTime_Projection_stim1_calcium_Delta,'AlphaData',imresize(xform_isbrain,0.5).*(~isnan(lagTime_Projection_stim1_calcium_Delta)),[-0.02 0.02])
     title('Difference with PS')
     colorbar
     axis image off

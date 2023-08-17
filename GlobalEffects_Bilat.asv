@@ -1,11 +1,6 @@
 clear;close all;clc
 excelFile="X:\Paper2\GlobalEffects\GlobalEffects_PVChR2Thy1jRGECO1a - Copy.xlsx";
-excelRows=[9,11,13,17];
-
-fc1end = 20*10*60;
-fc2start = 20*(10*60+30)+1;
-stimstart = 20*10*60+1;
-stimend = 20*(10*60+30);
+excelRows=3:2:7;
 
 fRange_ISA = [0.01 0.08];
 fRange_Delta = [0.5 4];
@@ -20,7 +15,7 @@ for runInd=mouse_ind
     load(runInfo.saveMaskFile,'xform_isbrain')
     % stim run
     tmp = matfile(runInfo.saveFluorFile);
-    stim1_calcium = tmp.xform_datafluorCorr(:,:,1:fc1end);
+    stim1_calcium = tmp.xform_datafluorCorr(:,:,1:20*10*60);
     % Power
     [whole_spectra_map_stim1_calcium,avg_cort_spec_stim1_calcium,powerMap_stim1_calcium,hz_stim1_calcium,global_sig_for_stim1_calcium,glob_sig_power_stim1_calcium] = ...
         PowerAnalysis(stim1_calcium,runInfo.samplingRate,xform_isbrain);
@@ -38,7 +33,7 @@ for runInd=mouse_ind
 
 
 
-    stim2_calcium = tmp.xform_datafluorCorr(:,:,fc2start:end);
+    stim2_calcium = tmp.xform_datafluorCorr(:,:,20*(10*60+5)+1:end);
 
     % Power
      [whole_spectra_map_stim2_calcium,avg_cort_spec_stim2_calcium,powerMap_stim2_calcium,hz_stim2_calcium,global_sig_for_stim2_calcium,glob_sig_power_stim2_calcium] = ...
@@ -59,13 +54,13 @@ for runInd=mouse_ind
     % Laser location
 
     tmp = matfile(strcat(runInfo.saveFilePrefix,'-dataLaser.mat'));
-    laser = mean(tmp.xform_datalaser(:,:,stimstart:stimend),3);
+    laser = mean(tmp.xform_datalaser(:,:,20*10*60+1:20*(10*60+5)),3);
     [~,I] = max(laser(:));
     [row,col] = ind2sub([128,128],I);
 
     % Corresponding fc run
     tmp = matfile(strcat(runInfo.saveFilePrefix(1:end-5),'fc1-dataFluor.mat'));
-    fc1_calcium = tmp.xform_datafluorCorr(:,:,1:fc1end);
+    fc1_calcium = tmp.xform_datafluorCorr(:,:,1:20*10*60);
 
     % Power
     [whole_spectra_map_fc1_calcium,avg_cort_spec_fc1_calcium,powerMap_fc1_calcium,hz_fc1_calcium,global_sig_for_fc1_calcium,glob_sig_power_fc1_calcium] = ...
@@ -81,7 +76,7 @@ for runInd=mouse_ind
     Bilat_fc1_calcium_delta = bilateralFC_fun(fc1_calcium_delta);
     clear fc1_calcium_delta fc1_calcium
 
-    fc2_calcium = tmp.xform_datafluorCorr(:,:,fc2start:end);
+    fc2_calcium = tmp.xform_datafluorCorr(:,:,20*(10*60+5)+1:end);
 
     % Power
     [whole_spectra_map_fc2_calcium,avg_cort_spec_fc2_calcium,powerMap_fc2_calcium,hz_fc2_calcium,global_sig_for_fc2_calcium,glob_sig_power_fc2_calcium] = ...
@@ -101,47 +96,45 @@ for runInd=mouse_ind
 
     save(strcat(runInfo.saveFilePrefix(1:end-5),'_Bilat.mat'),...
         'Bilat_fc1_calcium_isa','Bilat_fc2_calcium_isa','Bilat_stim1_calcium_isa','Bilat_stim2_calcium_isa',...
-        'Bilat_fc1_calcium_delta','Bilat_fc2_calcium_delta','Bilat_stim1_calcium_delta','Bilat_stim2_calcium_delta')
+        'Bilat_fc1_calcium_delta','Bilat_fc2_calcium_delta','Bilat_stim1_calcium_delta','Bilat_stim2_calcium_delta','-append')
 
-    save(strcat(runInfo.saveFilePrefix(1:end-5),'_powerMap.mat'),...
-        'powerMap_fc1_calcium','powerMap_fc2_calcium','powerMap_stim1_calcium','powerMap_stim2_calcium')
 
 
     % Visualization
     % Power Total
     figure('units','normalized','outerposition',[0 0 1 1])
     subplot(2,3,1)
-    imagesc(log(powerMap_fc1_calcium(:,:,1)),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc1_calcium(:,:,1))))
+    imagesc(powerMap_fc1_calcium(:,:,1),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc1_calcium(:,:,1))))
     title('First resting state without PS')
     colorbar
     axis image off
 
     subplot(2,3,2)
-    imagesc(log(powerMap_fc2_calcium(:,:,1)),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc2_calcium(:,:,1))))
+    imagesc(powerMap_fc2_calcium(:,:,1),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc2_calcium(:,:,1))))
     title('Second resting state without PS')
     colorbar
     axis image off
 
     subplot(2,3,3)
-    imagesc(log(powerMap_fc2_calcium(:,:,1))-log(powerMap_fc1_calcium(:,:,1)),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc2_calcium(:,:,1))),[-0.6 0.6])
+    imagesc(powerMap_fc2_calcium(:,:,1)-powerMap_fc1_calcium(:,:,1),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc2_calcium(:,:,1))))
     title('Difference without PS')
     colorbar
     axis image off
 
     subplot(2,3,4)
-    imagesc(log(powerMap_stim1_calcium(:,:,1)),'AlphaData',xform_isbrain.*(~isnan(powerMap_stim1_calcium(:,:,1))))
+    imagesc(powerMap_stim1_calcium(:,:,1),'AlphaData',xform_isbrain.*(~isnan(powerMap_stim1_calcium(:,:,1))))
     title('First resting state before PS')
     colorbar
     axis image off
 
     subplot(2,3,5)
-    imagesc(log(powerMap_stim2_calcium(:,:,1)),'AlphaData',xform_isbrain.*(~isnan(powerMap_stim2_calcium(:,:,1))))
+    imagesc(powerMap_stim2_calcium(:,:,1),'AlphaData',xform_isbrain.*(~isnan(powerMap_stim2_calcium(:,:,1))))
     title('Second resting state after PS')
     colorbar
     axis image off
 
     subplot(2,3,6)
-    imagesc(log(powerMap_stim2_calcium(:,:,1))-log(powerMap_stim1_calcium(:,:,1)),'AlphaData',xform_isbrain.*(~isnan(powerMap_stim2_calcium(:,:,1))),[-0.6 0.6])
+    imagesc(powerMap_stim2_calcium(:,:,1)-powerMap_stim1_calcium(:,:,1),'AlphaData',xform_isbrain.*(~isnan(powerMap_stim2_calcium(:,:,1))))
     title('Difference with PS')
     colorbar
     axis image off
@@ -156,37 +149,37 @@ for runInd=mouse_ind
     % Power ISA
     figure('units','normalized','outerposition',[0 0 1 1])
     subplot(2,3,1)
-    imagesc(log(powerMap_fc1_calcium(:,:,2)),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc1_calcium(:,:,2))))
+    imagesc(powerMap_fc1_calcium(:,:,2),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc1_calcium(:,:,2)))
     title('First resting state without PS')
     colorbar
     axis image off
 
     subplot(2,3,2)
-    imagesc(log(powerMap_fc2_calcium(:,:,2)),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc2_calcium(:,:,2))))
+    imagesc(powerMap_fc2_calcium(:,:,2),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc2_calcium(:,:,2))))
     title('Second resting state without PS')
     colorbar
     axis image off
 
     subplot(2,3,3)
-    imagesc(log(powerMap_fc2_calcium(:,:,2))-log(powerMap_fc1_calcium(:,:,2)),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc2_calcium(:,:,2))),[-0.6 0.6])
+    imagesc(powerMap_fc2_calcium(:,:,2)-powerMap_fc1_calcium(:,:,2),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc2_calcium(:,:,2))))
     title('Difference without PS')
     colorbar
     axis image off
 
     subplot(2,3,4)
-    imagesc(log(powerMap_stim1_calcium(:,:,2)),'AlphaData',xform_isbrain.*(~isnan(powerMap_stim1_calcium(:,:,2))))
+    imagesc(powerMap_stim1_calcium(:,:,2),'AlphaData',xform_isbrain.*(~isnan(powerMap_stim1_calcium(:,:,2))))
     title('First resting state before PS')
     colorbar
     axis image off
 
     subplot(2,3,5)
-    imagesc(log(powerMap_stim2_calcium(:,:,2)),'AlphaData',xform_isbrain.*(~isnan(powerMap_stim2_calcium(:,:,2))))
+    imagesc(powerMap_stim2_calcium(:,:,2),'AlphaData',xform_isbrain.*(~isnan(powerMap_stim2_calcium(:,:,2))))
     title('Second resting state after PS')
     colorbar
     axis image off
 
     subplot(2,3,6)
-    imagesc(log(powerMap_stim2_calcium(:,:,2))-log(powerMap_stim1_calcium(:,:,2)),'AlphaData',xform_isbrain.*(~isnan(powerMap_stim2_calcium(:,:,2))),[-0.6 0.6])
+    imagesc(powerMap_stim2_calcium(:,:,2)-powerMap_stim1_calcium(:,:,2),'AlphaData',xform_isbrain.*(~isnan(powerMap_stim2_calcium(:,:,2))))
     title('Difference with PS')
     colorbar
     axis image off
@@ -202,19 +195,19 @@ for runInd=mouse_ind
     % Power Delta
     figure('units','normalized','outerposition',[0 0 1 1])
     subplot(2,3,1)
-    imagesc(log(powerMap_fc1_calcium(:,:,3)),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc1_calcium(:,:,3))))
+    imagesc(powerMap_fc1_calcium(:,:,3),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc1_calcium(:,:,3))))
     title('First resting state without PS')
     colorbar
     axis image off
 
     subplot(2,3,2)
-    imagesc(log(powerMap_fc2_calcium(:,:,3)),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc2_calcium(:,:,3))))
+    imagesc(powerMap_fc2_calcium(:,:,3),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc2_calcium(:,:,3))))
     title('Second resting state without PS')
     colorbar
     axis image off
 
     subplot(2,3,3)
-    imagesc(log(powerMap_fc2_calcium(:,:,3))-log(powerMap_fc1_calcium(:,:,3)),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc2_calcium(:,:,3))),[-0.6 0.6])
+    imagesc(powerMap_fc2_calcium(:,:,3)-powerMap_fc1_calcium(:,:,3),'AlphaData',xform_isbrain.*(~isnan(powerMap_fc2_calcium(:,:,3))))
     title('Difference without PS')
     colorbar
     axis image off
@@ -226,13 +219,13 @@ for runInd=mouse_ind
     axis image off
 
     subplot(2,3,5)
-    imagesc(log(powerMap_stim2_calcium(:,:,3)),'AlphaData',xform_isbrain.*(~isnan(powerMap_stim2_calcium(:,:,3))))
+    imagesc(powerMap_stim2_calcium(:,:,3),'AlphaData',xform_isbrain.*(~isnan(powerMap_stim2_calcium(:,:,3))))
     title('Second resting state after PS')
     colorbar
     axis image off
 
     subplot(2,3,6)
-    imagesc(log(powerMap_stim2_calcium(:,:,3))-log(powerMap_stim1_calcium(:,:,3)),'AlphaData',xform_isbrain.*(~isnan(powerMap_stim2_calcium(:,:,3))),[-0.6 0.6])
+    imagesc(powerMap_stim2_calcium(:,:,3)-powerMap_stim1_calcium(:,:,3),'AlphaData',xform_isbrain.*(~isnan(powerMap_stim2_calcium(:,:,3))))
     title('Difference with PS')
     colorbar
     axis image off
@@ -336,6 +329,6 @@ for runInd=mouse_ind
 
     saveas(gca,strcat(runInfo.saveFilePrefix(1:end-5),'_Bilat_Delta.fig'))
     saveas(gca,strcat(runInfo.saveFilePrefix(1:end-5),'_Bilat_Delta.png'))
-    close all
+
 end
 

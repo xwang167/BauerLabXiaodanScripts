@@ -1,5 +1,6 @@
+clear;close all;clc;
 excelFile="X:\Paper2\GlobalEffects\GlobalEffects_PVChR2Thy1jRGECO1a - Copy.xlsx";
-excelRows=4:7;
+excelRows=8:17;
 
 runsInfo = parseRuns(excelFile,excelRows);
 [row,start_ind_mouse,numruns_per_mouse]=unique({runsInfo.excelRow_char}); %Note that unique only takes characters! This makes it so that we only do landmark for one of the runs!
