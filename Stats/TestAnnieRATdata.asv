@@ -1,0 +1,75 @@
+
+database="X:\CodeModification\RAT\RAT2.xlsx";
+excelfiles=[6:22,24:26];  % Rows from Excell Database
+a=0;
+b=0;
+c=0;
+
+
+
+isbrainall=ones(128);
+
+for n=excelfiles;
+    
+    [~, ~, raw]=xlsread(database,1, ['A',num2str(n),':H',num2str(n)]);
+    Date=num2str(raw{1});
+    Mouse=raw{2};
+    saveloc=raw{4};
+    Group=raw{8};
+   % Time=raw{8};
+    directory=[saveloc, Date, '\'];
+    
+    file=[directory, Date,'-',Mouse,'-fc-cat.mat'];
+    
+    disp(['Loading ', Mouse, ' n= ' , num2str(n)])
+    
+    if exist(file)
+        load(file,['BilatMap_',Mouse,'_Whole'], 'xform_isbrain');
+        disp(['Loading file: ', file])
+        isbrainall=isbrainall.*single(xform_isbrain);
+        %tempR=real(atanh(eval(['BilatMap_',Mouse,'_Whole'])));
+        tempR=real(atanh(eval(['BilatMap_',Mouse,'_Whole'])));
+        
+        if strcmp(Group,'Sal') %&&strcmp(Time, 'wk0')
+            a=a+1;
+            Sal_Bilat(:,:,a)=tempR;
+        elseif strcmp(Group,'Oxy') %&& strcmp(Time, 'wk2')
+            b=b+1;
+            Oxy_Bilat(:,:,b)=tempR;
+       
+        end
+        
+        clear(['BilatMap_',Mouse,'_Whole'])
+        clear Group Date Mouse
+        
+    else
+        disp(['BilatMap_',Mouse,'_Whole ', 'does not exist'])
+    end
+end
+
+bilatFC_Sal = nan(128,128,10);
+bilatFC_Oxy = nan(128,128,10);
+
+salPath = "C:\Users\Xiaodan Wang\Downloads\Sal";
+oxyPath = "C:\Users\Xiaodan Wang\Downloads\Oxy";
+
+temp = dir(salPath);
+for ii = 3:12
+    cd(salPath)
+    name = temp(ii).name;
+    varName = strcat('BilatMap_',name(8:end-11),'_Whole');
+    load(name,varName)
+    eval(strcat('bilatFC_Sal(:,:,ii-2) = atanh(',varName,');'))
+end
+
+
+tmp = dir(oxyPath);
+for ii = 3:12
+    cd(oxyPath)
+    name = tmp(ii).name;
+    varName = strcat('BilatMap_',name(8:end-11),'_Whole');
+    load(name,varName)
+    eval(strcat('bilatFC_Oxy(:,:,ii-2) = atanh(',varName,');'))
+end
+
+[h,p] = ttest2groups(bilatFC_Sal, bilatFC_Oxy);
