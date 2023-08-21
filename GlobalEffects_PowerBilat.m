@@ -57,7 +57,6 @@ for runInd=mouse_ind
     clear tmp
 
     % Laser location
-
     tmp = matfile(strcat(runInfo.saveFilePrefix,'-dataLaser.mat'));
     laser = mean(tmp.xform_datalaser(:,:,stimstart:stimend),3);
     [~,I] = max(laser(:));
