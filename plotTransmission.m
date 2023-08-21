@@ -1,4 +1,4 @@
-fid = fopen('C:\Users\xiaodanwang\Documents\GitHub\BauerLab\MATLAB\parameters\+bauerParams\filterTransmission\FESH0700_Transmission.txt');
+fid = fopen("C:\Users\Xiaodan Wang\Documents\GitHub\newpipeline\Functions_and_Wrappers\+bauerParams\filterTransmission\FESH0700_Transmission.txt");
 s =textscan(fid,'%f %f');
 fclose(fid);
 lambda = s{1};
@@ -11,7 +11,7 @@ xlim([350 750])
 xticks(350:50:750);
 
 
-fid = fopen('C:\Users\xiaodanwang\Documents\GitHub\BauerLab\MATLAB\parameters\+bauerParams\filterTransmission\FF580-FDi01 Lot Code 618392-618394.txt');
+fid = fopen("C:\Users\Xiaodan Wang\Documents\GitHub\newpipeline\Functions_and_Wrappers\+bauerParams\filterTransmission\FF580-FDi01 Lot Code 618392-618394.txt");
 s =textscan(fid,'%f %f');
 fclose(fid);
 lambda = s{1};
@@ -19,12 +19,12 @@ transmission = s{2};
 transmission_580 = interp1(lambda,transmission,340:760);
 OD = -log10(transmission);
 hold on
-h(2) = plot(lambda,OD,'y');
+h(2) = plot(lambda,OD,'m');
 xlim([350 750])
 xticks(350:50:750);
 
 
-fid = fopen('C:\Users\xiaodanwang\Documents\GitHub\BauerLab\MATLAB\parameters\+bauerParams\filterTransmission\FF01-593_LP LotCode A18289-318381.txt');
+fid = fopen("C:\Users\Xiaodan Wang\Documents\GitHub\newpipeline\Functions_and_Wrappers\+bauerParams\filterTransmission\FF01-593_LP LotCode A18289-318381.txt");
 s =textscan(fid,'%f %f');
 fclose(fid);
 lambda = s{1};
@@ -36,7 +36,7 @@ h(3) = plot(lambda,OD,'Color',[ 0.9300 0.4100 0.1700]);
 xlim([350 750])
 xticks(350:50:750);
 
-fid = fopen('C:\Users\xiaodanwang\Documents\GitHub\BauerLab\MATLAB\parameters\+bauerParams\filterTransmission\FF01-500_LP LotCode 818104.txt');
+fid = fopen("C:\Users\Xiaodan Wang\Documents\GitHub\newpipeline\Functions_and_Wrappers\+bauerParams\filterTransmission\FF01-500_LP LotCode 818104.txt");
 s =textscan(fid,'%f %f');
 fclose(fid);
 lambda = s{1};
@@ -46,7 +46,9 @@ OD = -log10(transmission);
 hold on
 h(4)= plot(lambda,OD,'g');
 xlim([350 750])
-
+legend('700 SP','580 Dichoic','593 LP','500 LP')
+xlabel('Wavelength(nm)')
+ylabel('OD')
 transfer2 = transmission_593.*transmission_580.*transmission_700;
 transfer1 = transmission_500.*(1-transmission_580).*transmission_700;
 
