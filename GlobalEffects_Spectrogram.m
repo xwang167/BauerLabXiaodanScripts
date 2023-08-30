@@ -1,6 +1,6 @@
 clear;close all;clc
 excelFile="X:\Paper2\GlobalEffects\GlobalEffects_PVChR2Thy1jRGECO1a - Copy.xlsx";
-excelRows=[9,11,13,17];
+excelRows=[11,13,17,9];
 runsInfo = parseRuns(excelFile,excelRows);
 [row,start_ind_mouse,numruns_per_mouse]=unique({runsInfo.excelRow_char}); %Note that unique only takes characters! This makes it so that we only do landmark for one of the runs!
 
@@ -88,7 +88,7 @@ order(22+22) = 18+22;
 order(12) = 19;
 order(12+22) = 19+22;
 
-order(15) = 20+22;
+order(15) = 20;
 order(15+22) = 20+22;
 
 order(13) = 21;
@@ -148,8 +148,10 @@ for runInd=mouse_ind
         ylabel('Frequency')
         set(gca,'YScale','log')
         caxis([-15 5])
+        cb = colorbar;
+        cb.Label.String = '10*log_1_0(F/F%)^2)/Hz';
         title('10 mins before PS')
-
+        
         subplot(212)
         [S2_stim,F2_stim,T2_stim] = spectrogram(stim2_calcium_region,600,300,600,frameRate,'yaxis');
         s = surf(T2_stim/60,F2_stim,10*log10(abs(S2_stim)));
@@ -160,6 +162,9 @@ for runInd=mouse_ind
         ylabel('Frequency')
         set(gca,'YScale','log')
         caxis([-15 5])
+        cb = colorbar;
+        cb.Label.String = '10*log_1_0(F/F%)^2)/Hz';
+
         title('10 mins after PS')
         colormap(brewermap(256, '-Spectral'))
 
@@ -193,6 +198,8 @@ for runInd=mouse_ind
         ylabel('Frequency')
         set(gca,'YScale','log')
         caxis([-15 5])
+        cb = colorbar;
+        cb.Label.String = '10*log_1_0(F/F%)^2)/Hz';
         title('10 mins before PS(rest)')
 
         subplot(212)
@@ -205,6 +212,8 @@ for runInd=mouse_ind
         ylabel('Frequency')
         set(gca,'YScale','log')
         caxis([-15 5])
+        cb = colorbar;
+        cb.Label.String = '10*log_1_0(F/F%)^2)/Hz';
         title('10 mins after PS(rest)')
         colormap(brewermap(256, '-Spectral'))
        
