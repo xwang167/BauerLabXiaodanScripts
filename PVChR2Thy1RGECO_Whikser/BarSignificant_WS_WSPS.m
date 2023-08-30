@@ -11,6 +11,16 @@ peakMaps_mice= reshape(peakMaps_mice,128,128,5,7);
 peakMaps_S1bLWhisker = mean(peakMaps_mice,4);
 S1bLWhisker = ROI_mice;
 
+% get xform_isbrain_intersect
+runsInfo = parseRuns(excelFile,excelRows);
+runNum = numel(runsInfo);
+xform_isbrain_intersect = 1;
+for runInd = 1:runNum
+    runInfo=runsInfo(runInd);
+    load(runInfo.saveMaskFile,'xform_isbrain')
+    xform_isbrain_intersect = xform_isbrain_intersect.*xform_isbrain;
+end
+
 % PeakMaps visualization
 hbcolormap = customcolormap_preset('red-white-blue');
 calciumcolormap = customcolormap_preset('pink-white-green');
@@ -47,7 +57,7 @@ imagesc(xform_WL,'AlphaData',1-xform_isbrain_intersect);
 colormap(ax4,calciumcolormap)
 axis image off
 colorbar('southoutside')
-contour(ROI,'w')
+%contour(ROI,'w')
 
 ax5 = subplot(2,4,5)
 imagesc(peakMaps_S1bLWhisker(:,:,1),[-6 6])
