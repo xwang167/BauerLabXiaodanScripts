@@ -219,8 +219,6 @@ for runInd=mouse_ind
        
         saveas(gca,strcat(runInfo.saveFilePrefix(1:end-5),'fc',num2str(runInfo.run),'-',region_name{1},'-spectrogram.fig'))
         saveas(gca,strcat(runInfo.saveFilePrefix(1:end-5),'fc',num2str(runInfo.run),'-',region_name{1},'-spectrogram.png'))
-
-
         close all
     end
 
