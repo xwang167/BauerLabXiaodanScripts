@@ -11,7 +11,7 @@ fc2start = frameRate*(10*60+stimDur)+1;
 stimstart = frameRate*10*60+1;
 stimend = frameRate*(10*60+stimDur);
 
-
+z
 load("AtlasandIsbrain_Allen.mat")
 
 ii = 1;
