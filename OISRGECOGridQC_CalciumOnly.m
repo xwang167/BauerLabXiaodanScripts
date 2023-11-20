@@ -1,13 +1,13 @@
 clear all;close all;
 %% Get Run and System Info
-excelFile="X:\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
-excelRows = 5:11;
+excelFile="X:\Paper2\Hemi_Thy1_jRGECO1a_leftGrid\Control_Hemi_Thy1_jRGECO1a_leftGrid.xlsx";
+excelRows = [5,7,8,9];
 
 runsInfo = parseRuns_xw(excelFile,excelRows);
 [row,start_ind_mouse,numruns_per_mouse]=unique({runsInfo.excelRow_char}); %Note that unique only takes characters! This makes it so that we only do landmark for one of the runs!
 
 runNum = numel(runsInfo);
-load('W:\220210\220210-m.mat')
+load('Y:\220210\220210-m.mat')
 [refseeds, I]=GetReferenceGridSeeds;
 for runInd = 1:runNum
     clearvars -except runsInfo runNum runInd fRange_ISA fRange_delta refseeds m

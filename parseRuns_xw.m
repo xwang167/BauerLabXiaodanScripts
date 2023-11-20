@@ -154,7 +154,8 @@ for row = tableRows % for each row of excel file
     samplingRate = excelData{row,'SamplingRate'};
     
     dataLoc = fullfile(rawDataLoc,recDate); % where raw data is located
-    D = dir(dataLoc); D(1:2) = []; %number of runs
+    D = dir(dataLoc);
+    D(1:2) = []; %number of runs
     
     % find out valid files
     validFile = false(1,numel(D));
