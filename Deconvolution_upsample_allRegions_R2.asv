@@ -46,6 +46,7 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
         disp(strcat(mouseName,', run#',num2str(n)))
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
         load(fullfile(saveDir,processedName),'xform_datahb','xform_FADCorr','xform_jrgeco1aCorr')
+
         % mask within brain
         HbT = squeeze(xform_datahb(:,:,1,:)+xform_datahb(:,:,2,:))*10^6;% convert to muM
         clear xform_datahb
@@ -69,8 +70,7 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
 
         % Initialization
         for h = {'HRF','MRF'}
-            eval(strcat('r_',h{1},'= zeros(21-startInd,50);'))
-            eval(strcat(h{1},'     = zeros(21-startInd,freq_new*t_kernel,50);'))
+            eval(strcat('R2_',h{1},'= zeros(21-startInd,50);'))
         end
         jj = 1;
         for ii = startInd:20
@@ -99,20 +99,11 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
                 HbT_region     = tukeywin(length(HbT_region)    ,.3).*squeeze(HbT_region'    );
                 FAD_region     = tukeywin(length(FAD_region)    ,.3).*squeeze(FAD_region'    );
                 Calcium_region = tukeywin(length(Calcium_region),.3).*squeeze(Calcium_region');
-
-                X = convmtx(Calcium_region,length(Calcium_region));
-                % make it square
-                X = X(1:length(Calcium_region),1:length(Calcium_region));
-                [~,S,~]=svd(X);
-                
-                % Least square deconvolution
-                HRF(jj,:,region)= (X*S*X+(S(1,1).^2)*lambda_HRF*eye(length(Calcium_region))) \ (X*S*[zeros(3*freq_new,1); HbT_region(1:end-3*freq_new)]);% add 3s of zeros
-                MRF(jj,:,region)= (X*S*X+(S(1,1).^2)*lambda_MRF*eye(length(Calcium_region))) \ (X*S*[zeros(3*freq_new,1); FAD_region(1:end-3*freq_new)]);% add 3s of zeros
                 
                 % Predicted HbT
                 HbT_pred = conv(Calcium_region,HRF(jj,:,region));
                 HbT_pred = HbT_pred(1:(length(HbT_region)+3*freq_new))';
-                r_HRF(jj,region)= corr(HbT_region,HbT_pred(3*freq_new+1:end));
+                R2_HRF(jj,region)= (HbT_region-HbT_pred(3*freq_new+1:end))^2;
                 % Visualization for HRF
                 figure('units','normalized','outerposition',[0 0 1 1])
                 subplot(2,2,1)
@@ -221,12 +212,6 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
             jj = jj+1;
         end
         clear HbT FAD Calcium
-
-        % save HRF
-        save(fullfile(saveDir,'HRF_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_HRF_Upsample','.mat')),'HRF','r_HRF')
-
-        % save MRF
-        save(fullfile(saveDir,'MRF_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_MRF_Upsample','.mat')),'MRF','r_MRF')
     toc
     end
 end
