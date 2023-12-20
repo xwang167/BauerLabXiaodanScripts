@@ -45,9 +45,6 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
         load(fullfile(maskDir,maskName),'xform_isbrain')
     end
     saveDir_lpf = strcat("E:\RGECO\CorrectionComparisonFiltervsUnfilteredDatahb\",recDate);
-    if ~exist(saveDir_lpf)
-        mkdir(saveDir_lpf)
-    end
     for n = runs
         processedName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_processed','.mat');
         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
@@ -58,9 +55,11 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
         xform_jrgeco1aCorr = mouse.physics.correctHb(xform_jrgeco1a,xform_datahb,...
             [E_in(1) E_out(1)],[E_in(2) E_out(2)],dpIn,dpOut);
 
-        % Correction with low passed datahb
+        %% Correction with low passed datahb
         xform_datahb(isnan(xform_datahb)) = 0;
         xform_datahb_lpf = lowpass(xform_datahb,lowFreq,sessionInfo.framerate);
+
+        % Calcium
         xform_jrgeco1aCorr_lpf = mouse.physics.correctHb(xform_jrgeco1a,xform_datahb_lpf,...
             [E_in(1) E_out(1)],[E_in(2) E_out(2)],dpIn,dpOut);
 
@@ -75,105 +74,8 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
         [~,powerdata_FADCorr]           = QCcheck_CalcPDS(xform_FADCorr/0.01,         sessionInfo.framerate,xform_isbrain);
         [~,powerdata_FAD]               = QCcheck_CalcPDS(xform_FAD/0.01,             sessionInfo.framerate,xform_isbrain);
 
-        [~,powerdata_oxy]               = QCcheck_CalcPDS(xform_datahb(:,:,1,:)*10^6,sessionInfo.framerate,xform_isbrain);
+        [~,powerdata_oxy]               = QCcheck_CalcPDS((xform_datahb(:,:,1,:))*10^6,sessionInfo.framerate,xform_isbrain);
         [~,powerdata_deoxy]             = QCcheck_CalcPDS(xform_datahb(:,:,2,:)*10^6,sessionInfo.framerate,xform_isbrain);
-        
-        % Visualization of power spectra
-        figure('units','normalized','outerposition',[0 0 1 1])
-        subplot(221)
-        loglog(hz,powerdata_jrgeco1a,'r')
-        hold on
-        loglog(hz,powerdata_jrgeco1aCorr,'b')
-        legend('Raw jRGECO1a','Corrected jRGECO1a with unfiltered xform\_datahb',...
-            'location','southwest')
-        xlim([0.01 10])
-        xlabel('Frequency(Hz)')
-        ylabel('jRGECO1a(\DeltaF/F)')
-        subplot(222)
-        loglog(hz,powerdata_jrgeco1a,'r')
-        hold on
-        loglog(hz,powerdata_jrgeco1aCorr_lpf,'k')
-        legend('Raw jRGECO1a','Corrected jRGECO1a with filtered xform\_datahb',...
-            'location','southwest')
-        xlim([0.01 10])
-        xlabel('Frequency(Hz)')
-        ylabel('jRGECO1a(\DeltaF/F)')
-        subplot(223)
-        loglog(hz,powerdata_jrgeco1aCorr,'b')
-        hold on
-        loglog(hz,powerdata_jrgeco1aCorr_lpf,'k')
-        legend('Corrected jRGECO1a with unfiltered xform\_datahb','Corrected jRGECO1a with filtered xform\_datahb',...
-            'location','southwest')
-        xlim([0.01 10])
-        xlabel('Frequency(Hz)')
-        ylabel('jRGECO1a(\DeltaF/F)')
-        subplot(224)
-        loglog(hz,powerdata_jrgeco1a,'r')
-        hold on
-        loglog(hz,powerdata_jrgeco1aCorr,'b')
-        hold on
-        loglog(hz,powerdata_jrgeco1aCorr_lpf,'k')
-        hold on
-        loglog(hz,powerdata_oxy,'m')
-        hold on
-        loglog(hz,powerdata_deoxy,'c')
-        legend('Raw jRGECO1a','Corrected jRGECO1a with unfiltered xform\_datahb','Corrected jRGECO1a with filtered xform\_datahb','unfiltered HbO','unfitlered HbR',...
-            'location','southwest')
-        xlim([0.01 10])
-        xlabel('Frequency(Hz)')
-        ylabel('jRGECO1a(\DeltaF/F)')
-
-        sgtitle(strcat(visName,' low pass filter datahb at 1 hz'))
-        saveas(gcf,fullfile(saveDir_lpf,strcat(visName,'_jrgeco1aPowerSpectra.png')));
-        saveas(gcf,fullfile(saveDir_lpf,strcat(visName,'_jrgeco1aPowerSpectra.fig')));
-
-        figure('units','normalized','outerposition',[0 0 1 1])
-        subplot(221)
-        loglog(hz,powerdata_FAD,'r')
-        hold on
-        loglog(hz,powerdata_FADCorr,'b')
-        legend('Raw FAD','Corrected FAD with unfiltered xform\_datahb',...
-            'location','southwest')
-        xlim([0.01 10])
-        xlabel('Frequency(Hz)')
-        ylabel('FAD(\DeltaF/F)')
-        subplot(222)
-        loglog(hz,powerdata_FAD,'r')
-        hold on
-        loglog(hz,powerdata_FADCorr_lpf,'k')
-        legend('Raw FAD','Corrected FAD with filtered xform\_datahb',...
-            'location','southwest')
-        xlim([0.01 10])
-        xlabel('Frequency(Hz)')
-        ylabel('FAD(\DeltaF/F)')
-        subplot(223)
-        loglog(hz,powerdata_FADCorr,'b')
-        hold on
-        loglog(hz,powerdata_FADCorr_lpf,'k')
-        legend('Corrected FAD with unfiltered xform\_datahb','Corrected FAD with filtered xform\_datahb',...
-            'location','southwest')
-        xlim([0.01 10])
-        xlabel('Frequency(Hz)')
-        ylabel('FAD(\DeltaF/F)')
-        subplot(224)
-        loglog(hz,powerdata_FAD,'r')
-        hold on
-        loglog(hz,powerdata_FADCorr,'b')
-        hold on
-        loglog(hz,powerdata_FADCorr_lpf,'k')
-        hold on
-        loglog(hz,powerdata_oxy,'m')
-        hold on
-        loglog(hz,powerdata_deoxy,'c')
-        legend('Raw FAD','Corrected FAD with unfiltered xform\_datahb','Corrected FAD with filtered xform\_datahb','unfiltered HbO','unfitlered HbR',...
-            'location','southwest')
-        xlim([0.01 10])
-        xlabel('Frequency(Hz)')
-        ylabel('FAD(\DeltaF/F)')
-        sgtitle(strcat(visName,' low pass filter datahb at 1 hz at '))
-
-        saveas(gcf,fullfile(saveDir_lpf,strcat(visName,'_FADPowerSpectra.png')));
-        saveas(gcf,fullfile(saveDir_lpf,strcat(visName,'_FADPowerSpectra.fig')));
 
         % power map for correction with filtered datahb ISA
         jrgeco1aCorr_ISA_powerMap_lpf = QCcheck_CalcPowerMap(double(xform_jrgeco1aCorr_lpf)/0.01,sessionInfo.framerate,[sessionInfo.bandtype_ISA{2},sessionInfo.bandtype_ISA{3}]);
@@ -230,6 +132,5 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
 
         QCcheck_fcVis(refseeds,R_jrgeco1aCorr_Delta, Rs_jrgeco1aCorr_Delta,'jrgeco1aCorr','m','Delta',saveDir_lpf,strcat(visName,'-NoFilteredCorrection'),false,xform_isbrain)
         QCcheck_fcVis(refseeds,R_FADCorr_Delta,      Rs_FADCorr_Delta,     'FADCorr',     'g','Delta',saveDir_lpf,strcat(visName,'-NoFilteredCorrection'),false,xform_isbrain)
-        close all
     end
 end
