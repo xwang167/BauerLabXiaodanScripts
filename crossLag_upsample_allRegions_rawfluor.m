@@ -1,6 +1,6 @@
 clear ;close all;clc
 excelFile = "X:\RGECO\DataBase_Xiaodan_1.xlsx";
-excelRows =[185 228 232 236 202 195 204 230 234 240];
+excelRows =[181,183];
 startInd = 2;
 freqLow = 0.02;
 calMax = 8;
@@ -11,8 +11,8 @@ mrfMax = 0.002;
 samplingRate = 25;
 freq_new     = 250;
 t_kernel = 30;
-tZone = 4;
-validRange = - freq_new : round(tZone*freq_new);
+tZone = 10;
+validRange = - round(tZone*freq_new) : round(tZone*freq_new);
 maxValidRange = max(abs(validRange));
 validInd = (min(validRange)+maxValidRange+1):(maxValidRange+1+max(validRange));
 
@@ -138,10 +138,10 @@ for excelRow = excelRows
 
                 subplot(1,3,3)
                 plot(crossLagX_NMC_raw(jj,:,region),crossLagY_NMC_raw(jj,:,region),'k')
-                xlim([-1 4])
                 xlabel('Time(s)')
                 title(strcat('Cross correlaiton of NMC of raw FAF for',{' '},parcelnames{region}))
                 grid on
+                ylim([-inf inf])
 
                 sgtitle(strcat('Cross Lag of NMC of raw FAF for Region',{' '},parcelnames{region},',',{' '},num2str(freqLow),'-2Hz,',mouseName,' Run #',num2str(n),', Segment #',num2str(ii)))
                 saveName =  fullfile(saveDir,'CrossLag_NMC_raw', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-segment#',num2str(ii),'-',parcelnames{region},'-CrossLag-NMC'));

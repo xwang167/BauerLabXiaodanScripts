@@ -11,7 +11,7 @@ samplingRate = 25;
 freq_new     = 250;
 t_kernel = 30;
 tZone = 4;
-validRange = - freq_new : round(tZone*freq_new);
+validRange = - round(tZone*freq_new) : round(tZone*freq_new);
 maxValidRange = max(abs(validRange));
 validInd = (min(validRange)+maxValidRange+1):(maxValidRange+1+max(validRange));
 

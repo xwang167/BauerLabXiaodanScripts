@@ -79,7 +79,6 @@ grid on
 title('No Filter')
 subplot(1,2,2)
 plot(crossLagX_NMC_corrCalciumrawFAF,crossLagY_NMC_corrCalciumrawFAF,'k')
-xlim([-1 4])
 xlabel('Time(s)')
 grid on
 title("Cross Correlation between Raw FAF and Corrected Calcium")
@@ -129,8 +128,11 @@ hold on
 plot(crossLagX_NMC_corrCalciumcorrFAF,crossLagY_NMC_corrCalciumcorrFAF,'b')
 hold on
 plot(crossLagX_NVC_corrCalcium,crossLagY_NVC_corrCalcium,'k')
+hold on
+plot(crossLagX_NVC_corrCalcium,-crossLagY_NMC_corrCalciumrawFAF,'c')
 grid on
+
 legend('b/t Corrected Calcium and Raw FAF','b/t Corrected Calcium and Corrected FAF',...
-    'b/t Corrected Calcium and HbT')
+    'b/t Corrected Calcium and HbT','flip b/t Corrected Calcium and Raw FAF')
 xlabel('Time(s)')
 ylabel('Correlation')

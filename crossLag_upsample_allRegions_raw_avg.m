@@ -46,12 +46,7 @@ for region = 1:50
     pixelNum(region) = sum(mask_region,'all');
 end
 
-% Average Gamma Parameters for each region
-% Initialization
-for condition = {'awake','anes'}
-    eval(strcat('crossLagY_NMC_raw_mice_',condition{1},'=[];'))
-end
-
+% Average cross correlation
 excelRows_awake = [181 183 185 228 232 236];
 excelRows_anes  = [202 195 204 230 234 240];
 
@@ -81,8 +76,10 @@ end
 %% Averaged cross lag for each mouse, then averaged across mice
 
 for condition = {'awake','anes'}
-    eval(strcat('crossLagY_NMC_raw_mice_',condition{1},'= zeros(6,1251);'))
     mouseInd =1;
+    % Initialization
+    eval(strcat('crossLagY_NMC_raw_mice_',condition{1},'=zeros(6,5001);'))
+
     for excelRow = eval(strcat('excelRows_',condition{1}))
         [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
         recDate = excelRaw{1}; recDate = string(recDate);
@@ -114,7 +111,6 @@ for condition = {'awake','anes'}
     eval(strcat('plot_distribution_prctile(crossLagX_NMC_raw(1,:,1),crossLagY_NMC_raw_mice_',condition{1},',',char(39),'Color',char(39),',[1 0 0])'))
     title(condition)
     xlabel('Time(s)')
-    xlim([-1 4])
     set(gca,'FontSize',14,'FontWeight','Bold')
     grid on
     ii = ii+1;
@@ -135,7 +131,7 @@ for condition = {'awake','anes'}
     eval(strcat('plot_distribution_prctile(crossLagX_NMC_raw(1,:,1),crossLagY_NVC_mice_',condition{1},',',char(39),'Color',char(39),',[0 0 0])'))
     title(condition)
     xlabel('Time(s)')
-    xlim([-1 4])
+    xlim([-10 10])
     set(gca,'FontSize',14,'FontWeight','Bold')
     grid on
     ii = ii+1;
