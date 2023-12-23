@@ -134,8 +134,6 @@ saveDir_cat = "E:\RGECO\cat\";
 set(0,'defaultaxesfontsize',12);
 info.nVx = 128;
 info.nVy = 128;
-numMice = length(excelRows);
-xform_isbrain_mice = 1;
 xform_raw_FAD_mice     = nan(128,128,6);
 xform_raw_Calcium_mice = nan(128,128,6);
 ll = 1;
