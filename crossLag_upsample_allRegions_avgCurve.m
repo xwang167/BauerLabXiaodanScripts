@@ -46,70 +46,8 @@ for region = 1:50
     pixelNum(region) = sum(mask_region,'all');
 end
 
-% Average Gamma Parameters for each region
-% Initialization
-for condition = {'awake','anes'}
-    for h = {'NVC','NMC'}
-      
-             eval(strcat('lagAmp_' ,  h{1},'_mice_',condition{1},'=[];'))
-             eval(strcat('lagTime_',  h{1},'_mice_',condition{1},'=[];'))
-             eval(strcat('lagWid_' ,  h{1},'_mice_',condition{1},'=[];'))
-             eval(strcat('crossLagY_',h{1},'_mice_',condition{1},'=[];'))
-        
-    end
-end
-
 excelRows_awake = [181 183 185 228 232 236];
 excelRows_anes  = [202 195 204 230 234 240];
-for condition = {'awake','anes'}
-    for excelRow = eval(strcat('excelRows_',condition{1}))
-        [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
-        recDate = excelRaw{1}; recDate = string(recDate);
-        mouseName = excelRaw{2}; mouseName = string(mouseName);
-        saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
-        sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-        for n = 1:3
-            disp(strcat(mouseName,', run#',num2str(n)))            
-            for h = {'NVC','NMC'} 
-                for var = {'lagAmp','lagTime','lagWid'}
-                % Load
-                eval(strcat('load(fullfile(saveDir,',char(39),'CrossLag_',h{1},char(39),',',char(39), recDate,'-',mouseName,'-',sessionType,num2str(n),'_CrossLag_',h{1},'.mat',char(39),'),',...
-                    char(39),var{1},'_',h{1},char(39),')'))
-                % concatenate
-                eval(strcat(var{1},'_',h{1},'_mice_',condition{1},'= cat(1,',...
-                    var{1},'_',h{1},'_mice_',condition{1},',',var{1},'_',h{1},');'))
-                end
-            end
-        end
-    end
-end
-
-%% Maps with regional values
-saveName = "E:\RGECO\cat\crossLag_allRegions.mat";
-for condition = {'awake','anes'}
-    for h = {'NVC','NMC'}         
-       for var = {'lagAmp','lagTime','lagWid'}
-           eval(strcat(var{1},'_',h{1},'_',condition{1},'_map =  zeros(1,128*128);')) 
-           for region = 1:50
-               mask_region = zeros(128,128);
-               mask_region(mask == region) = 1;
-               mask_region = logical(mask_region);
-               eval(strcat(var{1},'_',h{1},'_',condition{1},'_map(mask_region(:))=nanmedian(',var{1},'_',h{1},'_mice_',condition{1},'(:,region));'))
-           end
-               eval(strcat(var{1},'_',h{1},'_',condition{1},'_map = reshape(',var{1},'_',h{1},'_',condition{1},'_map,128,128);'))
-           
-           if exist(saveName,'file')
-               eval(strcat('save(',char(39),saveName,char(39),',',...
-                   char(39),var{1},'_' ,h{1},'_',condition{1},'_map',char(39),',',...
-                   char(39),'-append',char(39),')'))
-           else
-               eval(strcat('save(',char(39),saveName,char(39),',',...
-                   char(39),var{1},'_' ,h{1},'_',condition{1},'_map',char(39),')'))
-           end
-        end
-    end
-end
-
 %% Calculate Gamma for the whole brain
 %% Concatinate the matrix
 for condition = {'awake','anes'}
@@ -141,6 +79,45 @@ for condition = {'awake','anes'}
     end
 end
 
+%% Averaged across lag for each region
+load(fullfile(saveDir,'CrossLag_NVC',strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CrossLag_NVC.mat')),'crossLagX_NVC')
+for condition = {'awake','anes'}
+    mouseInd =1;
+    for excelRow = eval(strcat('excelRows_',condition{1}))
+        [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
+        recDate = excelRaw{1}; recDate = string(recDate);
+        mouseName = excelRaw{2}; mouseName = string(mouseName);
+        saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
+        sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
+        for h = {'NVC','NMC'}
+             eval(strcat('crossLagY_',h{1},'_mouse_',condition{1},'_allRegions = [];'))
+        end
+        for n = 1:3
+            disp(strcat(mouseName,', run #',num2str(n)))
+            load(fullfile(saveDir,'CrossLag_NVC', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CrossLag_NVC.mat')),'crossLagY_NVC')
+            load(fullfile(saveDir,'CrossLag_NMC', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CrossLag_NMC.mat')),'crossLagY_NMC')
+            % cat r,MRF, HRF
+            for h = {'NVC','NMC'}
+                eval(strcat( 'crossLagY_',h{1},'_mouse_',condition{1},'_allRegions = cat(1,crossLagY_',h{1},'_mouse_',condition{1},'_allRegions,crossLagY_',h{1},');'))
+            end    
+        end
+
+        for h = {'NVC','NMC'}
+            eval(strcat('crossLagY_',h{1},'_mice_',condition{1},'_allRegions_avg = squeeze(mean(crossLagY_',h{1},'_mice_',condition{1},'_allRegions));'))          
+            for ii = 1:50
+                eval(strcat('covResult=crossLagY_',h{1},'_mice_',condition{1},'_allRegions_avg(:,ii);'))
+                [A,T,W] = findpeaks(covResult,crossLagX_NVC(1,:,1),'MinPeakHeight',0);
+                [M,I] = max(A);                  
+                lagAmp (ii) = A(I);
+                lagTime(ii) = T(I);
+                lagWid (ii) = W(I);
+            end
+            
+        end        
+        mouseInd = mouseInd+1;
+    end
+end
+
 %% Averaged cross lag for each mouse, then averaged across mice
 for h = {'NVC','NMC'}
     for condition = {'awake','anes'}
@@ -165,7 +142,6 @@ for h = {'NVC','NMC'}
         end
     end
 end
-load(fullfile(saveDir,'CrossLag_NVC',strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CrossLag_NVC.mat')),'crossLagX_NVC')
 save('E:\RGECO\cat\crossLag_allRegions.mat','crossLagX_NVC','crossLagY_NVC_mice_awake','crossLagY_NVC_mice_anes','crossLagY_NMC_mice_awake','crossLagY_NMC_mice_anes')
 %% Visualization
 load("GoodWL.mat")

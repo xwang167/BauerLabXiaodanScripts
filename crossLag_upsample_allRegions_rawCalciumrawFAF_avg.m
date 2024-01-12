@@ -60,15 +60,15 @@ for condition = {'awake','anes'}
         mouseName = excelRaw{2}; mouseName = string(mouseName);
         saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
         sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-        eval(strcat('crossLagY_NMC_raw_mouse_',condition{1},'_allRegions = [];'))
+        eval(strcat('crossLagY_NMC_rawCalciumrawFAF_mouse_',condition{1},'_allRegions = [];'))
         for n = 1:3
             disp(strcat(mouseName,', run #',num2str(n)))
-            load(fullfile(saveDir,'CrossLag_NMC_raw', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CrossLag_NMC_raw.mat')),'crossLagY_NMC_raw')
+            load(fullfile(saveDir,'CrossLag_NMC_rawCalciumrawFAF', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CrossLag_NMC_rawCalciumrawFAF.mat')),'crossLagY_NMC_rawCalciumrawFAF')
             % catMRF
-            eval(strcat( 'crossLagY_NMC_raw_mouse_',condition{1},'_allRegions = cat(1,crossLagY_NMC_raw_mouse_',condition{1},'_allRegions,crossLagY_NMC_raw);'))   
+            eval(strcat( 'crossLagY_NMC_rawCalciumrawFAF_mouse_',condition{1},'_allRegions = cat(1,crossLagY_NMC_rawCalciumrawFAF_mouse_',condition{1},'_allRegions,crossLagY_NMC_rawCalciumrawFAF);'))   
         end
-        eval(strcat('crossLagY_NMC_raw_mouse_',condition{1},'_allRegions = nanmedian(crossLagY_NMC_raw_mouse_',condition{1},'_allRegions);'))
-        eval(strcat('crossLagY_NMC_raw_mice_',condition{1},'_allRegions(mouseInd,:,:) = crossLagY_NMC_raw_mouse_',condition{1},'_allRegions;'))
+        eval(strcat('crossLagY_NMC_rawCalciumrawFAF_mouse_',condition{1},'_allRegions = nanmedian(crossLagY_NMC_rawCalciumrawFAF_mouse_',condition{1},'_allRegions);'))
+        eval(strcat('crossLagY_NMC_rawCalciumrawFAF_mice_',condition{1},'_allRegions(mouseInd,:,:) = crossLagY_NMC_rawCalciumrawFAF_mouse_',condition{1},'_allRegions;'))
         mouseInd = mouseInd+1;
     end
 end
@@ -78,7 +78,7 @@ end
 for condition = {'awake','anes'}
     mouseInd =1;
     % Initialization
-    eval(strcat('crossLagY_NMC_raw_mice_',condition{1},'=zeros(6,5001);'))
+    eval(strcat('crossLagY_NMC_rawCalciumrawFAF_mice_',condition{1},'=zeros(6,5001);'))
 
     for excelRow = eval(strcat('excelRows_',condition{1}))
         [~, ~, excelRaw]=xlsread(excelFile,1, ['A',num2str(excelRow),':V',num2str(excelRow)]);
@@ -91,16 +91,16 @@ for condition = {'awake','anes'}
         for region = 1:50
             %Weight crossLagY based on the number of pixels inside of
             % reigonal mask.
-            eval(strcat('temp = squeeze(crossLagY_NMC_raw_mice_',condition{1},'_allRegions(mouseInd,:,region))*pixelNum(region)/pixelNumTotal;'))
-            eval(strcat('crossLagY_NMC_raw_mice_',condition{1},'(mouseInd,:)= crossLagY_NMC_raw_mice_',condition{1},'(mouseInd,:)+temp;'))
+            eval(strcat('temp = squeeze(crossLagY_NMC_rawCalciumrawFAF_mice_',condition{1},'_allRegions(mouseInd,:,region))*pixelNum(region)/pixelNumTotal;'))
+            eval(strcat('crossLagY_NMC_rawCalciumrawFAF_mice_',condition{1},'(mouseInd,:)= crossLagY_NMC_rawCalciumrawFAF_mice_',condition{1},'(mouseInd,:)+temp;'))
             clear temp
         end
         mouseInd = mouseInd+1;
     end
 end
 
-load(fullfile(saveDir,'CrossLag_NMC_raw',strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CrossLag_NMC_raw.mat')),'crossLagX_NMC_raw')
-save('E:\RGECO\cat\crossLag_allRegions_raw.mat','crossLagX_NMC_raw','crossLagY_NMC_raw_mice_awake','crossLagY_NMC_raw_mice_anes')
+load(fullfile(saveDir,'CrossLag_NMC_rawCalciumrawFAF',strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CrossLag_NMC_rawCalciumrawFAF.mat')),'crossLagX_NMC_rawCalciumrawFAF')
+save('E:\RGECO\cat\crossLag_allRegions_rawCalciumrawFAF.mat','crossLagX_NMC_rawCalciumrawFAF','crossLagY_NMC_rawCalciumrawFAF_mice_awake','crossLagY_NMC_rawCalciumrawFAF_mice_anes')
 %% Visualization
 load("GoodWL.mat")
 mask(isnan(mask)) = 0;
@@ -108,7 +108,7 @@ ii = 1;
 figure('units','normalized','outerposition',[0 0 1 1])
 for condition = {'awake','anes'}
     subplot(1,2,ii)
-    eval(strcat('plot_distribution_prctile(crossLagX_NMC_raw(1,:,1),crossLagY_NMC_raw_mice_',condition{1},',',char(39),'Color',char(39),',[1 0 0])'))
+    eval(strcat('plot_distribution_prctile(crossLagX_NMC_rawCalciumrawFAF(1,:,1),crossLagY_NMC_rawCalciumrawFAF_mice_',condition{1},',',char(39),'Color',char(39),',[1 0 0])'))
     title(condition)
     xlabel('Time(s)')
     set(gca,'FontSize',14,'FontWeight','Bold')
@@ -123,15 +123,12 @@ load('E:\RGECO\cat\crossLag_allRegions.mat',...
 ii = 1;   
 figure('units','normalized','outerposition',[0 0 1 1])
 for condition = {'awake','anes'}
-    figure
-    eval(strcat('plot_distribution_prctile(crossLagX_NMC_raw(1,:,1),crossLagY_NMC_raw_mice_',condition{1},',',char(39),'Color',char(39),',[1 0 0])'))
+    subplot(1,2,ii)
+    eval(strcat('plot_distribution_prctile(crossLagX_NMC_rawCalciumrawFAF(1,:,1),crossLagY_NMC_rawCalciumrawFAF_mice_',condition{1},',',char(39),'Color',char(39),',[1 0 0])'))
     hold on 
-    eval(strcat('plot_distribution_prctile(crossLagX_NMC_raw(1,:,1),crossLagY_NMC_mice_',condition{1},',',char(39),'Color',char(39),',[0 0 1])'))
+    eval(strcat('plot_distribution_prctile(crossLagX_NMC_rawCalciumrawFAF(1,:,1),crossLagY_NMC_mice_',condition{1},',',char(39),'Color',char(39),',[0 0 1])'))
     hold on
-    eval(strcat('plot_distribution_prctile(crossLagX_NMC_raw(1,:,1),crossLagY_NVC_mice_',condition{1},',',char(39),'Color',char(39),',[0 0 0])'))
-    hold on
-    eval(strcat('plot_distribution_prctile(crossLagX_NMC_raw(1,:,1),-crossLagY_NMC_raw_mice_',condition{1},',',char(39),'Color',char(39),',[0 1 1])'))
-    legend('Corrected Calcium & Raw FAF','Corrected Calcium & Corrected FAF','Corrected Calcium & HbT','Flipped Corrected Calcium & Raw FAF')
+    eval(strcat('plot_distribution_prctile(crossLagX_NMC_rawCalciumrawFAF(1,:,1),crossLagY_NVC_mice_',condition{1},',',char(39),'Color',char(39),',[0 0 0])'))
     title(condition)
     xlabel('Time(s)')
     xlim([-10 10])
@@ -140,31 +137,6 @@ for condition = {'awake','anes'}
     ii = ii+1;
 end
 
-%% compare deconvolution and cross lag
-load('D:\XiaodanPaperData\cat\deconvolution_allRegions.mat', 'HRF_mice_awake', 'MRF_mice_awake')
-freq_new = 250;
-t_kernel = 30;
-t_deconvolution = (-3*freq_new :(t_kernel-3)*freq_new-1)/freq_new;
 
-figure
-subplot(121)
-plot_distribution_prctile(crossLagX_NMC_raw(1,:,1),crossLagY_NVC_mice_awake,'Color',[0 0 1])
-hold on
-ylabel('Cross Lag')
-yyaxis right
-plot_distribution_prctile(t_deconvolution,HRF_mice_awake,'Color',[0 0 0])
-xlim([-3,4])
-ylabel('Deconvolution')
-xlabel('Time(s)')
-title('NVC')
-subplot(122)
-plot_distribution_prctile(crossLagX_NMC_raw(1,:,1),crossLagY_NMC_mice_awake,'Color',[0 0 1])
-hold on
-ylabel('Cross Lag')
-yyaxis right
-plot_distribution_prctile(t_deconvolution,MRF_mice_awake,'Color',[0 0 0])
-ylabel('Deconvolution')
-xlim([-3,4])
-xlabel('Time(s)')
-title('NMC')
-sgtitle('Awake')
+
+
