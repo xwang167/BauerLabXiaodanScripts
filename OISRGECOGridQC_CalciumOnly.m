@@ -1,7 +1,7 @@
 clear all;close all;
 %% Get Run and System Info
 excelFile="X:\Paper2\Hemi_Thy1_jRGECO1a_leftGrid\Control_Hemi_Thy1_jRGECO1a_leftGrid.xlsx";
-excelRows = [5,7,8,9];
+excelRows = 3;
 
 runsInfo = parseRuns_xw(excelFile,excelRows);
 [row,start_ind_mouse,numruns_per_mouse]=unique({runsInfo.excelRow_char}); %Note that unique only takes characters! This makes it so that we only do landmark for one of the runs!

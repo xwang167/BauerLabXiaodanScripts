@@ -1,21 +1,21 @@
 clear all;close all;clc
-excelFile="X:\XW\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
-excelRows = 2:11;
+excelFile="X:\Paper2\Hemi_Thy1_jRGECO1a_leftGrid\Control_Hemi_Thy1_jRGECO1a_leftGrid.xlsx";
+excelRows = 2:9;
+catDir = "X:\Paper2\Hemi_Thy1_jRGECO1a_leftGrid\cat\";
 miceName = [];
-excelFile="X:\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
 for excelRow = excelRows
      runsInfo = parseRuns_xw(excelFile,excelRow);
      runInfo = runsInfo(1);
   miceName = strcat(miceName,'-',runInfo.mouseName);
 end
-load('X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-SeedLocation.mat',...
+load(strcat(catDir,miceName(2:end),'-SeedLocation.mat'),...
     'seedLocation_mice_valid')
-load('D:\OIS_Process\Paxinos\AtlasandIsbrain.mat','xform_WL')
+load('AtlasandIsbrain.mat','xform_WL')
 
 HomoFC_valid_mice = nan(128,128,3);
 numMouse = 1;
-for excelRows = 2:4
-    runsInfo = parseRuns_xw(excelFile,excelRows);
+for excelRow = excelRows
+    runsInfo = parseRuns_xw(excelFile,excelRow);
     runInfo = runsInfo(1);
     load(strcat(runInfo.saveFilePrefix(1:end-6),'-evokeTimeTrace-Calcium.mat'),...
         'gridEvokeTimeTrace_jRGECO1a_valid_L','gridEvokeTimeTrace_jRGECO1a_valid_R')
@@ -51,10 +51,10 @@ for excelRows = 2:4
 end
 
 HomoFC_valid_mice = mean(HomoFC_valid_mice,3);
-save('X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-HomoFC-Calcium','HomoFC_valid_mice')
+save(strcat(catDir,miceName(2:end),'-HomoFC-Calcium.mat'),'HomoFC_valid_mice')
 figure
 colormap jet
-imagesc(HomoFC_valid_mice,[-1 1])
+imagesc(HomoFC_valid_mice,[-1.4 1.4])
 mask = isnan(HomoFC_valid_mice);
 hold on
 imagesc(xform_WL,'AlphaData',mask);
@@ -63,6 +63,6 @@ h = colorbar;
 ylabel(h, 'z(r)','fontsize',10,'FontWeight','bold')
 a = get(gca,'XTickLabel');
 set(gca,'XTickLabel',a,'fontsize',10,'FontWeight','bold')
-suptitle('N13M309-N13M548-N13M549 Calcium HomoFC')
-saveas(gcf,'X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-HomoFC-Calcium.png')
-saveas(gcf,'X:\XW\PVChR2-Thy1RGECO\cat\N13M309-N13M548-N13M549-HomoFC-Calcium.fig')
+sgtitle(strcat(miceName(2:end),'Calcium HomoFC'))
+saveas(gcf,strcat(catDir,miceName(2:end),'-HomoFC-Calcium.png'))
+saveas(gcf,strcat(catDir,miceName(2:end),'-HomoFC-Calcium.fig'))

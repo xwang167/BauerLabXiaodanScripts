@@ -2,13 +2,14 @@ clear all;close all;
 % need ProcOISRGECOGrid to process the raw data.
 
 %% Get Run and System Info
-load('W:\220210\220210-m.mat')
-excelFile="X:\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
+load('Y:\220210\220210-m.mat')
+excelFile="X:\Paper2\Hemi_Thy1_jRGECO1a_leftGrid\Control_Hemi_Thy1_jRGECO1a_leftGrid.xlsx";
+excelRows = 3;
 [refseeds, ~]=GetReferenceGridSeeds;
 %% Average movies across runs for each mouse
-for excelRows = 2
+for excelRow = excelRows
     
-    runsInfo = parseRuns_xw(excelFile,excelRows);
+    runsInfo = parseRuns_xw(excelFile,excelRow);
     [row,start_ind_mouse,numruns_per_mouse]=unique({runsInfo.excelRow_char}); %Note that unique only takes characters! This makes it so that we only do landmark for one of the runs!
     runNum=start_ind_mouse';
     runInfo = runsInfo(1);
@@ -31,8 +32,8 @@ for excelRows = 2
 end
 
 %% Peak maps for each mouse, each site, averaged across runs
-for excelRows = 5:11
-    runsInfo = parseRuns_xw(excelFile,excelRows);
+for excelRow = excelRows
+    runsInfo = parseRuns_xw(excelFile,excelRow);
     runInfo = runsInfo(1);
     totalSubFileNum = length(runInfo.rawFile)/2;
     load(runInfo.saveMaskFile,'GoodSeedsidx','I')
@@ -80,8 +81,8 @@ for excelRows = 5:11
 end
 
 %% collect all the peak maps for one mouse
-for excelRows = 5:11
-    runsInfo = parseRuns_xw(excelFile,excelRows);
+for excelRow = excelRows
+    runsInfo = parseRuns_xw(excelFile,excelRow);
     runInfo = runsInfo(1);
     totalSubFileNum = length(runInfo.rawFile)/2;
     gridPeakMaps_jrgeco1aCorr_mouse = nan(128,128,160,totalSubFileNum);
@@ -94,8 +95,8 @@ for excelRows = 5:11
 end
 
 %% store laser maps in the right order
-for excelRows = 5:11
-    runsInfo = parseRuns_xw(excelFile,excelRows);
+for excelRow = excelRows
+    runsInfo = parseRuns_xw(excelFile,excelRow);
     runInfo = runsInfo(1);
     totalSubFileNum = length(runInfo.rawFile)/2;
     load(runInfo.saveMaskFile,'GoodSeedsidx','I')
@@ -118,8 +119,8 @@ for excelRows = 5:11
 end
 
 %% collect all the laser for one mouse
-for excelRows = 5:11
-    runsInfo = parseRuns_xw(excelFile,excelRows);
+for excelRow = excelRows
+    runsInfo = parseRuns_xw(excelFile,excelRow);
     runInfo = runsInfo(1);
     totalSubFileNum = length(runInfo.rawFile)/2;
     gridLaser_mouse = nan(128,128,160,totalSubFileNum);
@@ -139,8 +140,8 @@ end
 % [refseeds, I]=GetReferenceGridSeeds;
 % figure
 % imagesc(xform_WL)
-% for excelRows = 2:4
-%     runsInfo = parseRuns_xw(excelFile,excelRows);
+% for excelRow = 2:4
+%     runsInfo = parseRuns_xw(excelFile,excelRow);
 %     load(runsInfo(1).saveMaskFile,'GoodSeedsidx','xform_isbrain')
 %     GoodSeedsidx_shared = GoodSeedsidx_shared.*GoodSeedsidx;
 %     hold on

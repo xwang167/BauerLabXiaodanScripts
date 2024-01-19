@@ -1,17 +1,18 @@
 clear all;close all;clc
-excelFile="X:\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
+excelFile="X:\Paper2\Hemi_Thy1_jRGECO1a_leftGrid\Control_Hemi_Thy1_jRGECO1a_leftGrid.xlsx";
+excelRows = 2:9;
+catDir = "X:\Paper2\Hemi_Thy1_jRGECO1a_leftGrid\cat\";
 % load('W:\220210\220210-m.mat')
- load('D:\OIS_Process\Paxinos\AtlasandIsbrain.mat','xform_WL')
+ load('AtlasandIsbrain.mat','xform_WL')
+ load('Y:\220210\220210-m.mat')
  xform_isbrain_mice = 1;
- excelRows = 2:11;
 for excelRow = excelRows
     runsInfo = parseRuns_xw(excelFile,excelRow);
     load(runsInfo(1).saveMaskFile,'xform_isbrain')
     xform_isbrain_mice = xform_isbrain_mice.*xform_isbrain;
 end
  xform_isbrain_mice = xform_isbrain_mice & fliplr(xform_isbrain_mice);
- 
-  excelRows = 2:11;
+
 GoodSeedsidx_shared = 1;
 for excelRow = excelRows
     runsInfo = parseRuns_xw(excelFile,excelRow);
@@ -19,7 +20,6 @@ for excelRow = excelRows
     GoodSeedsidx_shared = GoodSeedsidx_shared.*GoodSeedsidx;
 end
 
- excelRows = 5:11;
 for excelRow = excelRows
     runsInfo = parseRuns_xw(excelFile,excelRow);
     runInfo = runsInfo(1);
@@ -45,7 +45,7 @@ for excelRow = excelRows
                 [X,Y] = meshgrid(1:128,1:128);
                 radius = 3;
                 ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
-                if M < 10000 || xform_isbrain_mice(row,col) == 0 %|| GoodSeedsidx_shared(m(jj)) ==0
+                if M <1000 || xform_isbrain_mice(row,col) == 0 %|| GoodSeedsidx_shared(m(jj)) ==0
                     GoodSeedsidx_new(m(jj)) = 0;
                     disp([runInfo.mouseName,'#' num2str(m(jj)) ])
                 else
@@ -94,8 +94,7 @@ for excelRow = excelRows
 
 end
 % 
-gridEC_jRGECO1a_mice = nan(128,128,160,10);
-excelRows = 2:11;
+gridEC_jRGECO1a_mice = nan(128,128,160,length(excelRows));
 mouseInd = 1;
 miceName = [];
 for excelRow = excelRows
@@ -107,73 +106,73 @@ for excelRow = excelRows
     miceName = strcat(miceName,'-',runInfo.mouseName);
 end
 gridEC_jRGECO1a_mice = nanmean(gridEC_jRGECO1a_mice,4);
-save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-gridEFC.mat'),'gridEC_jRGECO1a_mice')
+save(strcat(catDir,miceName(2:end),'-gridEFC.mat'),'gridEC_jRGECO1a_mice')
 % %
-% % for ii = 1:160
-% %     imagesc(gridEC_jRGECO1a_mice(:,:,ii),[-2 2])
-% %     pause
-% % end
-% 
-% %% how many good seeds
-% excelRows = 2:11;
-% GoodSeedsidx_new_mice = 1;
-% for excelRow = excelRows
-%     runsInfo = parseRuns_xw(excelFile,excelRow);
-%     runInfo=runsInfo(1);
-%     load(runInfo.saveMaskFile,'GoodSeedsidx_new')
-%     GoodSeedsidx_new_mice = GoodSeedsidx_new_mice.*GoodSeedsidx_new;
-% end
-% save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-GoodSeedsNew.mat'),'GoodSeedsidx_new_mice')
-% 
-% %how many valid frames in gridEFC
-% numValid = 0;
 % for ii = 1:160
-%     if ~isnan(gridEC_jRGECO1a_mice(64,64,ii))
-%         numValid = numValid+1;
-%     end
+%     imagesc(gridEC_jRGECO1a_mice(:,:,ii),[-2 2])
+%     pause
 % end
 % 
-% 
-% 
-% gridLaser_mice = nan(128,128,160,10);
-% ii = 1;
-% excelRows = 2:11;
-% for excelRow = excelRows;
-%     runsInfo = parseRuns_xw(excelFile,excelRow);
-%     runInfo = runsInfo(1);
-%     totalSubFileNum = length(runInfo.rawFile)/2;
-%     load(strcat(runInfo.saveFilePrefix(1:end-6),'-xform_laser_grid.mat'),'gridLaser_mouse')
-%     gridLaser_mice(:,:,:,ii)= gridLaser_mouse;
-%     ii = ii+1;
-% end
-% save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-gridLaser_mice.mat'),'gridLaser_mice')
-% 
+%% how many good seeds
+
+GoodSeedsidx_new_mice = 1;
+for excelRow = excelRows
+    runsInfo = parseRuns_xw(excelFile,excelRow);
+    runInfo=runsInfo(1);
+    load(runInfo.saveMaskFile,'GoodSeedsidx_new')
+    GoodSeedsidx_new_mice = GoodSeedsidx_new_mice.*GoodSeedsidx_new;
+end
+save(strcat(catDir,miceName(2:end),'-GoodSeedsNew.mat'),'GoodSeedsidx_new_mice')
+
+%how many valid frames in gridEFC
+numValid = 0;
+for ii = 1:160
+    if ~isnan(gridEC_jRGECO1a_mice(64,64,ii))
+        numValid = numValid+1;
+    end
+end
+
+
+
+gridLaser_mice = nan(128,128,160,length(excelRows));
+ii = 1;
+for excelRow = excelRows;
+    runsInfo = parseRuns_xw(excelFile,excelRow);
+    runInfo = runsInfo(1);
+    totalSubFileNum = length(runInfo.rawFile)/2;
+    load(strcat(runInfo.saveFilePrefix(1:end-6),'-xform_laser_grid.mat'),'gridLaser_mouse')
+    gridLaser_mice(:,:,:,ii)= gridLaser_mouse;
+    ii = ii+1;
+end
+save(strcat(catDir,miceName(2:end),'-gridLaser_mice.mat'),'gridLaser_mice')
+
 %Find the maximum of each of the laser frames
-% load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-GoodSeedsNew.mat'),'GoodSeedsidx_new_mice')
-% seedLocation = nan(2,10,160);
-% seedLocation_mice = nan(2,160);
-% for ii = 1:160
-%     if GoodSeedsidx_new_mice(ii)
-%         for jj = 1:10
-%             tmp=gridLaser_mice(:,:,ii,jj);
-%             [~,I] = max(tmp(:));
-%             [row,col] = ind2sub([128 128],I);
-%             seedLocation(1,jj,ii) = row;
-%             seedLocation(2,jj,ii) = col;
-%         end
-%         seedLocation_mice(1,ii) = mean(seedLocation(1,:,ii),2);
-%         seedLocation_mice(2,ii)= mean(seedLocation(2,:,ii),2);
-%     end
-%     save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice')
-% end
+load(strcat(catDir,miceName(2:end),'-GoodSeedsNew.mat'),'GoodSeedsidx_new_mice')
+seedLocation = nan(2,length(excelRows),160);
+seedLocation_mice = nan(2,160);
+for ii = 1:160
+    if GoodSeedsidx_new_mice(ii)
+        for jj = 1:length(excelRows)
+            tmp=gridLaser_mice(:,:,ii,jj);
+            [~,I] = max(tmp(:));
+            [row,col] = ind2sub([128 128],I);
+            seedLocation(1,jj,ii) = row;
+            seedLocation(2,jj,ii) = col;
+        end
+        seedLocation_mice(1,ii) = nanmean(seedLocation(1,:,ii),2);
+        seedLocation_mice(2,ii)= nanmean(seedLocation(2,:,ii),2);
+    end
+    save(strcat(catDir,miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice')
+end
 
-
+%% make group average 
 jj = 1;
+kk = 1;
 figure('units','normalized','outerposition',[0 0 1 1])
 colormap jet
 [X,Y] = meshgrid(1:128,1:128);
- load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-gridEFC.mat'))
- load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-SeedLocation.mat'))
+ load(strcat(catDir,miceName(2:end),'-gridEFC.mat'))
+ load(strcat(catDir,miceName(2:end),'-SeedLocation.mat'))
 for ii = 1:160
     if ~isnan(gridEC_jRGECO1a_mice(64,64,ii))
         x1 = seedLocation_mice(2,ii);
@@ -198,25 +197,24 @@ for ii = 1:160
         
         jj = jj+1;
         if jj==41
-            sgtitle(strcat(miceName(2:end),' Calcium EC -1'))           
+            sgtitle(strcat(miceName(2:end),' Calcium EC -',num2str(kk)))           
             jj = 1;
-            saveas(gcf,strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-EC-Calcium-1.png'))
-            saveas(gcf,strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-EC-Calcium-1.fig'))
+            saveas(gcf,strcat(catDir,miceName(2:end),'-EC-Calcium-',num2str(kk),'.png'))
+            saveas(gcf,strcat(catDir,miceName(2:end),'-EC-Calcium-',num2str(kk),'.fig'))
+            kk = kk+1;
             figure('units','normalized','outerposition',[0 0 1 1])
             colormap jet
         end
     end
 end
-sgtitle(strcat(miceName(2:end),' Calcium EC -2'))
-p = subplot(5,8,39);
+p = subplot(5,8,40);
 Pos = get(p,'Position');
 h = colorbar;
 ylabel(h, 'z(r)')
 set(p,'Position',Pos)
-saveas(gcf,strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-EC-Calcium-2.png'))
-saveas(gcf,strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-EC-Calcium-2.fig'))
-
-
+sgtitle(strcat(miceName(2:end),' Calcium EC -',num2str(kk)))            
+saveas(gcf,strcat(catDir,miceName(2:end),'-EC-Calcium-',num2str(kk),'.png'))
+saveas(gcf,strcat(catDir,miceName(2:end),'-EC-Calcium-',num2str(kk),'.fig'))
 
 
 

@@ -1,11 +1,12 @@
 clear all;close all;clc
-excelFile="X:\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
+excelFile="X:\Paper2\Hemi_Thy1_jRGECO1a_leftGrid\Control_Hemi_Thy1_jRGECO1a_leftGrid.xlsx";
+excelRows = 2:9;
+catDir = "X:\Paper2\Hemi_Thy1_jRGECO1a_leftGrid\cat\";
 load(which('AtlasandIsbrain.mat'))
 AtlasSeedsFilled(:,65:end)=AtlasSeedsFilled(:,65:end)+20;
 AtlasSeedsFilled(AtlasSeedsFilled==20) = 0;
 imagesc(AtlasSeedsFilled)
-load('W:\220210\220210-m.mat')
-excelRows = 2:11;
+load('Y:\220210\220210-m.mat')
 
 %load the laser frame (first frame of the laser stim)
 for excelRow = excelRows
@@ -22,9 +23,8 @@ for excelRow = excelRows
 end
 
 %loading prevoius step into one step file
-gridLaser_mice = nan(128,128,160,10);
+gridLaser_mice = nan(128,128,160,length(excelRows));
 ii = 1;
-excelRows = 2:11;
 miceName = [];
 for excelRow = excelRows
     runsInfo = parseRuns_xw(excelFile,excelRow);
@@ -34,16 +34,16 @@ for excelRow = excelRows
     gridLaser_mice(:,:,:,ii)= gridLaser_mouse;
     ii = ii+1;
 end
-save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-gridLaser_mice.mat'),'gridLaser_mice')
+save(strcat(catDir,miceName(2:end),'-gridLaser_mice.mat'),'gridLaser_mice')
 
 
 %Find the maximum of each of the laser frames
-load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-GoodSeedsNew.mat'),'GoodSeedsidx_new_mice')
-seedLocation = nan(2,10,160);
+load(strcat(catDir,miceName(2:end),'-GoodSeedsNew.mat'),'GoodSeedsidx_new_mice')
+seedLocation = nan(2,length(excelRows),160);
 seedLocation_mice = nan(2,160);
 for ii = 1:160
     if GoodSeedsidx_new_mice(ii)
-        for jj = 1:10
+        for jj = 1:length(excelRows)
             tmp=gridLaser_mice(:,:,ii,jj);
             [~,I] = max(tmp(:));
             [row,col] = ind2sub([128 128],I);
@@ -53,14 +53,15 @@ for ii = 1:160
         seedLocation_mice(1,ii) = mean(seedLocation(1,:,ii),2);
         seedLocation_mice(2,ii)= mean(seedLocation(2,:,ii),2);
     end
-    save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice')
+    save(strcat(catDir,miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice')
 end
 
+numValidSites = sum(GoodSeedsidx_new_mice==1);
 % find index to sort the matrix in the order of functional regions
-load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice')
+load(strcat(catDir,miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice')
 atlasIndx = nan(1,160);
-atlasIndx_valid = nan(1,79);
-seedLocation_mice_valid = nan(2,79);
+atlasIndx_valid = nan(1,numValidSites);
+seedLocation_mice_valid = nan(2,numValidSites);
 jj = 1;
 for ii = 1:160
     if ~isnan(seedLocation_mice(1,ii))
@@ -73,22 +74,22 @@ for ii = 1:160
 end
 [atlasIndx_valid_sorted,I] = sort(atlasIndx_valid);
 seedLocation_mice_valid_sorted = seedLocation_mice_valid(:,I);
-save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-Atlas.mat'),'atlasIndx_valid_sorted','I','atlasIndx_valid')
-save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice_valid','seedLocation_mice_valid_sorted','-append')
+save(strcat(catDir,miceName(2:end),'-Atlas.mat'),'atlasIndx_valid_sorted','I','atlasIndx_valid')
+save(strcat(catDir,miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice_valid','seedLocation_mice_valid_sorted','-append')
 
 %create sorted seed location
-load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end)),'-GoodSeedsNew.mat')
-colors = {'r','g','b','w'};
+load(strcat(catDir,miceName(2:end),'-GoodSeedsNew.mat'))
+colors = {'r','g','b','w','y','k','m','c'};
 ll = 1;
-for excelRow = 5:11
+for excelRow = excelRows
     runsInfo = parseRuns_xw(excelFile,excelRow);
     runInfo = runsInfo(1);
     totalSubFileNum = length(runInfo.rawFile)/2;
     load(strcat(runInfo.saveFilePrefix(1:end-6),'-xform_laser_grid.mat'),'gridLaser_mouse')
     seedLocation_mouse = nan(2,160);
-    seedLocation_mouse_valid = nan(2,79);
+    seedLocation_mouse_valid = nan(2,numValidSites);
     seedLocation_mouse_R = nan(2,160);
-    seedLocation_mouse_valid_R = nan(2,79);
+    seedLocation_mouse_valid_R = nan(2,numValidSites);
     jj = 1;
     for ii = 1:160
         if GoodSeedsidx_new_mice(ii)
@@ -110,12 +111,12 @@ for excelRow = 5:11
     end
     seedLocation_mouse_valid_sorted = seedLocation_mouse_valid(:,I);
     seedLocation_mouse_valid_sorted_R = seedLocation_mouse_valid_R(:,I);
-    for kk = 1:79
+    for kk = 1:numValidSites
         hold on
         scatter(seedLocation_mouse_valid_sorted(2,kk),...
             seedLocation_mouse_valid_sorted(1,kk),colors{ll})
     end
-    for kk = 1:79
+    for kk = 1:numValidSites
         hold on
         scatter(seedLocation_mouse_valid_sorted_R(2,kk),...
             seedLocation_mouse_valid_sorted_R(1,kk),colors{ll})
@@ -127,7 +128,7 @@ for excelRow = 5:11
 end
 
 % create time trace for each seed
-for excelRow = 5:11
+for excelRow = excelRows
     runsInfo = parseRuns_xw(excelFile,excelRow);
     runInfo = runsInfo(1);
     totalSubFileNum = length(runInfo.rawFile)/2;
@@ -181,18 +182,18 @@ for excelRow = 5:11
 end
 
 %Generate EC matrix
-ECMatrix_calcium_mice_LR_sorted = nan(79,79*2,10);
+ECMatrix_calcium_mice_LR_sorted = nan(numValidSites,numValidSites*2,length(excelRows));
 numMouse = 1;
-for excelRow = 2:11
+for excelRow = excelRows
     runsInfo = parseRuns_xw(excelFile,excelRow);
     runInfo = runsInfo(1);
     load(strcat(runInfo.saveFilePrefix(1:end-6),'-evokeTimeTrace-Calcium'),...
         'gridEvokeTimeTrace_jRGECO1a_valid_L_sorted','gridEvokeTimeTrace_jRGECO1a_valid_R_sorted')
-    ECMatrix_calcium_R_sorted = nan(79);
-    ECMatrix_calcium_L_sorted = nan(79);
-    ECMatrix_calcium_LR_sorted = nan(79,79*2);
-    for kk = 1:79
-        for ll = 1:79
+    ECMatrix_calcium_R_sorted = nan(numValidSites);
+    ECMatrix_calcium_L_sorted = nan(numValidSites);
+    ECMatrix_calcium_LR_sorted = nan(numValidSites,numValidSites*2);
+    for kk = 1:numValidSites
+        for ll = 1:numValidSites
             ECMatrix_calcium_R_sorted(kk,ll) = corr(gridEvokeTimeTrace_jRGECO1a_valid_L_sorted(:,kk),...
                 gridEvokeTimeTrace_jRGECO1a_valid_R_sorted(:,ll));
             ECMatrix_calcium_L_sorted(kk,ll) = corr(gridEvokeTimeTrace_jRGECO1a_valid_L_sorted(:,kk),...
@@ -200,15 +201,15 @@ for excelRow = 2:11
         end
     end
     save(strcat(runInfo.saveFilePrefix(1:end-6),'-ECMatrix-Calcium'),...
-        'ECMatrix_calcium_L_sorted','ECMatrix_calcium_R_sorted','-append')
-    ECMatrix_calcium_LR_sorted(:,1:79) = ECMatrix_calcium_L_sorted;
-    ECMatrix_calcium_LR_sorted(:,80:end) = ECMatrix_calcium_R_sorted;
+        'ECMatrix_calcium_L_sorted','ECMatrix_calcium_R_sorted')
+    ECMatrix_calcium_LR_sorted(:,1:numValidSites) = ECMatrix_calcium_L_sorted;
+    ECMatrix_calcium_LR_sorted(:,numValidSites+1:end) = ECMatrix_calcium_R_sorted;
     
     save(strcat(runInfo.saveFilePrefix(1:end-6),'-ECMatrix-Calcium'),...
         'ECMatrix_calcium_L_sorted','ECMatrix_calcium_R_sorted','ECMatrix_calcium_LR_sorted','-append')
     
-    ECMatrix_calcium_mice_LR_sorted(:,1:79,numMouse) = atanh(ECMatrix_calcium_L_sorted);
-    ECMatrix_calcium_mice_LR_sorted(:,80:end,numMouse) = atanh(ECMatrix_calcium_R_sorted);
+    ECMatrix_calcium_mice_LR_sorted(:,1:numValidSites,numMouse) = atanh(ECMatrix_calcium_L_sorted);
+    ECMatrix_calcium_mice_LR_sorted(:,numValidSites+1:end,numMouse) = atanh(ECMatrix_calcium_R_sorted);
     numMouse = numMouse+1;
     figure
     colormap jet
@@ -224,20 +225,20 @@ end
 
 
 ECMatrix_calcium_mice_LR_sorted = mean(ECMatrix_calcium_mice_LR_sorted,3);
-save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-ECMatrix.mat'),...
+save(strcat(catDir,miceName(2:end),'-ECMatrix.mat'),...
     'ECMatrix_calcium_mice_LR_sorted')
 
 
-load('D:\OIS_Process\Paxinos\AtlasandIsbrain.mat')
-load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-Atlas.mat'), 'atlasIndx_valid_sorted')
-for ii = 1:79
+load('AtlasandIsbrain.mat')
+load(strcat(catDir,miceName(2:end),'-Atlas.mat'), 'atlasIndx_valid_sorted')
+for ii = 1:numValidSites
     ECMatrix_calcium_mice_LR_sorted(ii,ii) = 0;
-    ECMatrix_calcium_mice_LR_sorted(ii,ii+79) = 0;
+    ECMatrix_calcium_mice_LR_sorted(ii,ii+numValidSites) = 0;
 end
 figure('units','normalized','outerposition',[0 0 1 1])
 colormap jet
 imagesc(ECMatrix_calcium_mice_LR_sorted,[-0.8 0.8]);
-title('N13M309-N13M548-N13M549-ECMatrix-Calcium-LR')
+title(strcat(catDir,miceName(2:end),'-ECMatrix-Calcium-LR'))
 h = colorbar;
 ylabel(h, 'z(r)','fontsize',14,'FontWeight','bold')
 axis image
@@ -249,7 +250,7 @@ for ii = 1:17
 end
 yticks(ia)
 yticklabels(seednames_sorted)
-xticks([ia' ia'+79])
+xticks([ia' ia'+numValidSites])
 xticklabels(seednames_sorted)
 xtickangle(45)
 a = get(gca,'XTickLabel');
@@ -257,7 +258,7 @@ set(gca,'XTickLabel',a,'fontsize',10,'FontWeight','bold')
 grid on
 ax = gca;
 ax.GridAlpha = 1;
-saveas(gcf,strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-ECMatrix-Calcium-LR.png'))
-saveas(gcf,strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-ECMatrix-Calcium-LR.fig')
+saveas(gcf,strcat(catDir,miceName(2:end),'-ECMatrix-Calcium-LR.png'))
+saveas(gcf,strcat(catDir,miceName(2:end),'-ECMatrix-Calcium-LR.fig'))
 
 
