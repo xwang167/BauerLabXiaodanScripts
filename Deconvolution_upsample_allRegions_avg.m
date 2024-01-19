@@ -1,9 +1,6 @@
 clear ;close all;clc
 excelFile = "X:\RGECO\DataBase_Xiaodan_3.xlsx";
 freq_new     = 250;
-t_kernel = 30;
-t = (-3*freq_new:(t_kernel-3)*freq_new-1)/freq_new ;
-
 load("AtlasandIsbrain_Allen.mat",'parcelnames','AtlasSeeds')
 
 % Overlapped brain mask
