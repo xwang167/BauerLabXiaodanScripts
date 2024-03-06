@@ -69,9 +69,11 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
         load(fullfile(saveDir,'HRF_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_HRF_Upsample','.mat')),'HRF')
         load(fullfile(saveDir,'MRF_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_MRF_Upsample','.mat')),'MRF')
 
-        fft_error_HbT = zeros(21-startInd,1025,50);
-        fft_error_FAD = zeros(21-startInd,1025,50);
+        fft2_error_HbT = zeros(21-startInd,7500,50);
+        fft2_error_FAD = zeros(21-startInd,7500,50);
         jj = 1;
+        HbT_pred = zeros(21-startInd,7500,50);
+        FAD_pred = zeros(21-startInd,7500,50);
         for ii = startInd:20
 
             % reshape for each window
@@ -101,104 +103,111 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
 
                              
                 % Predicted HbT
-                HbT_pred = conv(Calcium_region,HRF(jj,:,region));
-                HbT_pred = HbT_pred(1:(length(HbT_region)+3*freq_new))';
-
+                temp = conv(Calcium_region,HRF(jj,:,region));
+                temp = temp(1:(length(HbT_region)+3*freq_new))';
+                HbT_pred(jj,:,region) = temp(3*freq_new+1:3*freq_new+length(HbT_region));
                 % Error
-                error_HbT = HbT_region-HbT_pred(3*freq_new+1:3*freq_new+length(HbT_region));
+                mu_ori = mean(HbT_region);
+                sig_ori = std(HbT_region);
+                mu_pred = mean(HbT_pred(jj,:,region));
+
+                HbT_region_norm = (HbT_region'-mu_ori)/sig_ori;
+                HbT_pred_norm = (HbT_pred(jj,:,region)-mu_pred)/sig_ori;
+                error_HbT_norm = HbT_region_norm-HbT_pred_norm;
                 % Power Spectral Density of Error
-                [fft_error_HbT(jj,:,region),hz] = pwelch(error_HbT,[],[],[],freq_new);
-
-
-                % % Visualization for HRF
-                % figure('units','normalized','outerposition',[0 0 1 1])
-                % subplot(2,2,1)
-                % imagesc(mask_region)
-                % axis image off
-                % title(parcelnames{region})
-                % 
-                % subplot(2,2,2)
-                % plot((1:t_kernel*freq_new)/freq_new,HbT_region,'k')
-                % hold on
-                % plot((1:t_kernel*freq_new)/freq_new,HbT_pred(3*freq_new+1:3*freq_new+length(HbT_region)),'Color',[0 0.5 0])
-                % xlabel('Time(s)')
-                % ylabel('\Delta\muM')
-                % legend('Actual','Predicted')               
-                % grid on
-                % title('HbT')
-                % 
-                % subplot(2,2,3)
-                % plot((1:t_kernel*freq_new)/freq_new,error_HbT,'k')
-                % xlabel('Time(s)')
-                % ylabel('\Delta\muM')          
-                % grid on
-                % 
-                % subplot(2,2,4)
-                % loglog(hz,fft_error_HbT(jj,:,region))
-                % xlabel('Frequency(Hz)')
-                % ylabel('Power/Frequency((\Delta\muM)^2/Hz)')
-                % sgtitle(strcat('HbT Error Power Spectral Density for Region',{' '},parcelnames{region},', ',mouseName,' Run #',num2str(n),', Segment #',num2str(ii)))
-                % 
-                % saveName =  fullfile(saveDir,'HRF_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-segment#',num2str(ii),'-',parcelnames{region},'-HRF-Error'));
-                % saveas(gcf,strcat(saveName,'.fig'))
-                % saveas(gcf,strcat(saveName,'.png'))
+                fft2_error_HbT(jj,:,region)= fft(error_HbT_norm);
 
                 % Predicted FAD
-                FAD_pred = conv(Calcium_region,MRF(jj,:,region));
-                FAD_pred = FAD_pred(1:(length(FAD_region)+3*freq_new))';
-
+                temp = conv(Calcium_region,MRF(jj,:,region));
+                temp = temp(1:(length(FAD_region)+3*freq_new))';
+                FAD_pred(jj,:,region) = temp(3*freq_new+1:3*freq_new+length(FAD_region));
                 % Error
-                error_FAD = FAD_region - FAD_pred(3*freq_new+1:3*freq_new+length(FAD_region));
+                mu_ori = mean(FAD_region);
+                sig_ori = std(FAD_region);
+                mu_pred = mean(FAD_pred(jj,:,region));
+                
+                FAD_region_norm = (FAD_region'-mu_ori)/sig_ori;
+                FAD_pred_norm = (FAD_pred(jj,:,region)-mu_pred)/sig_ori;
+                error_FAD_norm = FAD_region_norm-FAD_pred_norm;
                 % Power Spectral Density of Error
-                [fft_error_FAD(jj,:,region),hz] = pwelch(error_FAD,[],[],[],freq_new);
+                fft2_error_FAD(jj,:,region) = fft(error_FAD_norm);
+                hz2 = 250/7500*(0:7500-1);
+                % Visualization 
 
-                % % Visualize MRF
-                % figure('units','normalized','outerposition',[0 0 1 1])
-                % subplot(2,2,1)
-                % imagesc(mask_region)
-                % axis image off
-                % title(parcelnames{region})
-                % 
-                % subplot(2,2,2)
-                % plot((1:t_kernel*freq_new)/freq_new,FAD_region,'g')
-                % hold on
-                % plot((1:t_kernel*freq_new)/freq_new,FAD_pred(3*freq_new+1:3*freq_new+length(HbT_region)),'Color',[0 0.5 0])
-                % xlabel('Time(s)')
-                % ylabel('\DeltaF/F%')
-                % legend('Actual','Predicted')               
-                % grid on
-                % title('FAF')
-                % 
-                % subplot(2,2,3)
-                % plot((1:t_kernel*freq_new)/freq_new,error_FAD,'k')
-                % xlabel('Time(s)')
-                % ylabel('\Delta\muM')          
-                % grid on
-                % 
-                % subplot(2,2,4)
-                % loglog(hz,fft_error_HbT(jj,:,region))
-                % xlabel('Frequency(Hz)')
-                % ylabel('Power/Frequency((\Delta\muM)^2/Hz)')
-                % sgtitle(strcat('FAF Error Power Spectral Density for Region',{' '},parcelnames{region},', ',mouseName,' Run #',num2str(n),', Segment #',num2str(ii)))
-                % 
-                % saveName =  fullfile(saveDir,'MRF_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-segment#',num2str(ii),'-',parcelnames{region},'-MRF-Error'));
-                % saveas(gcf,strcat(saveName,'.fig'))
-                % saveas(gcf,strcat(saveName,'.png'))
-                % close all
+                % FAD
+                figure('units','normalized','outerposition',[0 0 1 1])
+                subplot(2,3,1)
+                plot((1:t_kernel*freq_new)/freq_new,FAD_region_norm,'g')
+                hold on
+                plot((1:t_kernel*freq_new)/freq_new,FAD_pred_norm,'c')
+                xlabel('Time(s)')
+                ylabel('\DeltaF/F')
+                legend('Norm Actual','Norm Predicted')               
+                grid on
+                title('FAD Time Series')
+
+                subplot(2,3,2)
+                plot((1:t_kernel*freq_new)/freq_new,error_FAD_norm,'g')
+                xlabel('Time(s)')
+                ylabel('\DeltaF/F')          
+                grid on
+                title('FAD Error Time Series')
+
+
+                subplot(2,3,3)
+                loglog(hz2,abs(fft2_error_FAD(jj,:,region)),'g')
+                xlabel('Frequency(Hz)')
+                ylabel('Power/Frequency((\DeltaF/F)^2/Hz)')
+                xlim([0.2 2])
+                title('FAD Error fft')
+
+                % HbT
+                subplot(2,3,4)
+                plot((1:t_kernel*freq_new)/freq_new,HbT_region_norm,'k')
+                hold on
+                plot((1:t_kernel*freq_new)/freq_new,HbT_pred_norm,'Color',[0.5 0.5 0.5])
+                xlabel('Time(s)')
+                ylabel('\Delta\muM')
+                legend('Norm Actual','Norm Predicted')               
+                grid on
+                title('HbT Time Series')
+
+                subplot(2,3,5)
+                plot((1:t_kernel*freq_new)/freq_new,error_HbT_norm,'k')
+                xlabel('Time(s)')
+                ylabel('\Delta\muM')          
+                grid on
+                title('HbT Error Time Series')
+
+
+                subplot(2,3,6)
+                loglog(hz2,abs(fft2_error_HbT(jj,:,region)),'k')
+                xlabel('Frequency(Hz)')
+                ylabel('Power/Frequency((\Delta\muM)^2/Hz)')
+                xlim([0.2 2])
+                title('HbT Error fft')
+
+
+                sgtitle(strcat('HbT Error fft for Region',{' '},parcelnames{region},', ',mouseName,' Run #',num2str(n),', Segment #',num2str(ii)))
+
+                saveName =  fullfile(saveDir, strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'-segment#',num2str(ii),'-',parcelnames{region},'-HRF-Error-fft'));
+                saveas(gcf,strcat(saveName,'.fig'))
+                saveas(gcf,strcat(saveName,'.png'))
+                close all
             end
             jj = jj+1;
         end
         clear HbT FAD Calcium
          % save HRF
-        save(fullfile(saveDir,'HRF_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_HRF_Upsample','.mat')),'fft_error_HbT','-append')
+        save(fullfile(saveDir,'HRF_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_HRF_Upsample','.mat')),'HbT_pred','fft2_error_HbT','hz2','-append')
 
         % save MRF
-        save(fullfile(saveDir,'MRF_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_MRF_Upsample','.mat')),'fft_error_FAD','hz','-append')
+        save(fullfile(saveDir,'MRF_Upsample', strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_MRF_Upsample','.mat')),'FAD_pred','fft2_error_FAD','hz2','-append')
 
     toc
     end
 end
 
-save("D:\XiaodanPaperData\cat\deconvolution_allRegions.mat",'hz','-append')
+save("D:\XiaodanPaperData\cat\deconvolution_allRegions.mat",'hz2','-append')
 
 

@@ -1,42 +1,65 @@
 load('X:\RGECO\deconvolution_regions.mat', 'HRF_awake', 'MRF_awake', 'HRF_anes', 'MRF_anes')
-load('X:\RGECO\crossLag_allRegions.mat', 'crossLagY_NVC_awake_mice', 'crossLagY_NMC_awake_mice', 'crossLagY_NVC_anes_mice', 'crossLagY_NMC_anes_mice')
-load('Gamma_regions.mat', 'T_NVC_awake_median', 'W_NVC_awake_median', 'A_NVC_awake_median', 'T_NMC_awake_median', 'W_NMC_awake_median', 'A_NMC_awake_median',...
-    'T_NVC_anes_median', 'W_NVC_anes_median', 'A_NVC_anes_median', 'T_NMC_anes', 'W_NMC_anes', 'A_NMC_anes')
+load('E:\RGECO\cat\crossLag_allRegions.mat','crossLagX_NVC','crossLagY_NVC_mice_awake','crossLagY_NVC_mice_anes','crossLagY_NMC_mice_awake','crossLagY_NMC_mice_anes')
 freq_new = 250;
 t_kernel = 30;
-
 t_deconvolution = (-3*freq_new :(t_kernel-3)*freq_new-1)/freq_new;
 t_crossLag = crossLagX_NVC(1,:,1);
 t_gamma = (0 :(t_kernel-3)*freq_new-1)/freq_new;
 
-% gamma function for NVC awake
-alpha_NVC_awake = (T_NVC_awake/W_NVC_awake)^2*8*log(2);
-beta_NVC_awake = W_NVC_awake^2/(T_NVC_awake*8*log(2));
-y_NVC_awake = A_NVC_awake*(t_gamma/T_NVC_awake).^alpha_NVC_awake.*exp((t_gamma-T_NVC_awake)/(-beta_NVC_awake));
-y_NVC_awake(isnan(y_NVC_awake)) = 0;
+%% compare deconvolution and cross lag
+load('D:\XiaodanPaperData\cat\deconvolution_allRegions.mat', 'HRF_mice_awake', 'MRF_mice_awake')
+freq_new = 250;
+t_kernel = 30;
+t_deconvolution = (-3*freq_new :(t_kernel-3)*freq_new-1)/freq_new;
 
-% gamma function for NMC awake
-alpha_NMC_awake = (T_NMC_awake/W_NMC_awake)^2*8*log(2);
-beta_NMC_awake = W_NMC_awake^2/(T_NMC_awake*8*log(2));
-y_NMC_awake = A_NMC_awake*(t_gamma/T_NMC_awake).^alpha_NMC_awake.*exp((t_gamma-T_NMC_awake)/(-beta_NMC_awake));
-y_NMC_awake(isnan(y_NMC_awake)) = 0;
+%% Statistical Analysis for Time to Peak
+t_crossLag = crossLagX_NVC(1,:,1);
+crossLagY_NVC_mice_awake_T = nan(1,6);
+crossLagY_NMC_mice_awake_T = nan(1,6);
+HRF_mice_awake_T = nan(1,6);
+MRF_mice_awake_T = nan(1,6);
+for ii = 1:6
+    [~,temp] = max(crossLagY_NVC_mice_awake(ii,:));
+    crossLagY_NVC_mice_awake_T(ii) = t_crossLag(temp);
 
-% gamma function for NVC anesthetized
-alpha_NVC_anes = (T_NVC_anes/W_NVC_anes)^2*8*log(2);
-beta_NVC_anes = W_NVC_anes^2/(T_NVC_anes*8*log(2));
-y_NVC_anes = A_NVC_anes*(t_gamma/T_NVC_anes).^alpha_NVC_anes.*exp((t_gamma-T_NVC_anes)/(-beta_NVC_anes));
-y_NVC_anes(isnan(y_NVC_anes)) = 0; 
+    [~,temp] = max(crossLagY_NMC_mice_awake(ii,:));
+    crossLagY_NMC_mice_awake_T(ii) = t_crossLag(temp);
 
-% gamma function for NMC anesthetized
-alpha_NMC_anes = (T_NMC_anes/W_NMC_anes)^2*8*log(2);
-beta_NMC_anes = W_NMC_anes^2/(T_NMC_anes*8*log(2));
-y_NMC_anes = A_NMC_anes*(t_gamma/T_NMC_anes).^alpha_NMC_anes.*exp((t_gamma-T_NMC_anes)/(-beta_NMC_anes));
-y_NMC_anes(isnan(y_NMC_anes)) = 0; 
+    [~,temp] = max(HRF_mice_awake(ii,:));
+    HRF_mice_awake_T(ii) = t_deconvolution(temp);
 
+    [~,temp] = max(MRF_mice_awake(ii,:));
+    MRF_mice_awake_T(ii) = t_deconvolution(temp);
+end
+[NVC_h,NVC_p] = ttest(crossLagY_NVC_mice_awake_T,HRF_mice_awake_T);
+[NMC_h,NMC_p] = ttest(crossLagY_NMC_mice_awake_T,MRF_mice_awake_T);
+%% visualization
+figure
+plot_distribution_prctile(t_crossLag,crossLagY_NVC_mice_awake,'Color',[0 0 1])
+hold on
+ylabel('Cross Lag')
+yyaxis right
+plot_distribution_prctile(t_deconvolution,HRF_mice_awake,'Color',[0 0 0])
+xlim([-3,4])
+ylabel('Deconvolution')
+xlabel('Time(s)')
+title('NVC')
 
 figure
+plot_distribution_prctile(t_crossLag,crossLagY_NMC_mice_awake,'Color',[0 0 1])
+hold on
+ylabel('Cross Lag')
+yyaxis right
+plot_distribution_prctile(t_deconvolution,MRF_mice_awake,'Color',[0 0 0])
+ylabel('Deconvolution')
+xlim([-3,4])
+xlabel('Time(s)')
+title('NMC')
+
+%%
+figure
 subplot(2,2,1)
-plot_distribution_prctile(t_crossLag,crossLagY_NVC_awake,'Color',[1,0,0]);
+plot_distribution_prctile(t_crossLag,crossLagY_NVC_mice_awake,'Color',[1,0,0]);
 hold on
 ylim([-0.15 0.6])
 ylabel('r')
@@ -52,7 +75,7 @@ title('Awake NVC')
 xlim([-3 4])
 
 subplot(2,2,2)
-plot_distribution_prctile(t_crossLag,crossLagY_NMC_awake,'Color',[1,0,0])
+plot_distribution_prctile(t_crossLag,crossLagY_NMC_mice_awake,'Color',[1,0,0])
 hold on
 ylim([-0.2 0.8])
 ylabel('r')
@@ -66,7 +89,7 @@ title('Awake NMC')
 xlim([-3 4])
 
 subplot(2,2,3)
-plot_distribution_prctile(t_crossLag,crossLagY_NVC_anes,'Color',[1,0,0])
+plot_distribution_prctile(t_crossLag,crossLagY_NVC_mice_anes,'Color',[1,0,0])
 hold on
 ylim([-0.1 0.25])
 ylabel('r')
@@ -80,7 +103,7 @@ title('Anesthetized NVC')
 xlim([-3 4])
 
 subplot(2,2,4)
-plot_distribution_prctile(t_crossLag,crossLagY_NMC_anes,'Color',[1,0,0])
+plot_distribution_prctile(t_crossLag,crossLagY_NMC_mice_anes,'Color',[1,0,0])
 hold on
 ylim([-0.5 1])
 ylabel('r')
@@ -94,17 +117,17 @@ title('Anesthetized NMC')
 xlim([-3 4])
 sgtitle('Red is Cross Lag, Blue is Deconvolution')
 
-[~,I_HRF_awake] = max(HRF_awake_median);
-t_deconvolution(I_HRF_awake)
+[~,I_HRF_mice_awake] = max(HRF_mice_awake_median);
+t_deconvolution(I_HRF_mice_awake)
 
-[~,I_HRF_anes] = max(HRF_anes_median);
-t_deconvolution(I_HRF_anes)
+[~,I_HRF_mice_anes] = max(HRF_mice_anes_median);
+t_deconvolution(I_HRF_mice_anes)
 
-[~,I_MRF_awake] = max(MRF_awake_median);
-t_deconvolution(I_MRF_awake)
+[~,I_MRF_mice_awake] = max(MRF_mice_awake_median);
+t_deconvolution(I_MRF_mice_awake)
 
-[~,I_MRF_anes] = max(MRF_anes_median);
-t_deconvolution(I_MRF_anes)
+[~,I_MRF_mice_anes] = max(MRF_mice_anes_median);
+t_deconvolution(I_MRF_mice_anes)
 
 %% Visualization
 excelFile = "X:\RGECO\DataBase_Xiaodan_1.xlsx";
@@ -133,12 +156,12 @@ mask(mask==26) = 0;
 mask(mask==27) = 0;
 mask(mask==30) = 0;
 
-load('E:\RGECO\cat\crossLag_allRegions.mat','lagTime_NVC_awake_map','lagTime_NMC_awake_map')
-load('D:\XiaodanPaperData\cat\deconvolution_allRegions.mat', 'T_HRF_awake_map_mean','T_MRF_awake_map_mean')
-lagTime_NVC_awake_map = reshape(lagTime_NVC_awake_map,1,[]);
-lagTime_NMC_awake_map = reshape(lagTime_NMC_awake_map,1,[]);
-T_HRF_awake_map_mean =  reshape(T_HRF_awake_map_mean ,1,[]);
-T_MRF_awake_map_mean =  reshape(T_MRF_awake_map_mean ,1,[]);
+load('E:\RGECO\cat\crossLag_allRegions.mat','lagTime_NVC_mice_awake_map','lagTime_NMC_mice_awake_map')
+load('D:\XiaodanPaperData\cat\deconvolution_allRegions.mat', 'T_HRF_mice_awake_map_mean','T_MRF_mice_awake_map_mean')
+lagTime_NVC_mice_awake_map = reshape(lagTime_NVC_mice_awake_map,1,[]);
+lagTime_NMC_mice_awake_map = reshape(lagTime_NMC_mice_awake_map,1,[]);
+T_HRF_mice_awake_map_mean =  reshape(T_HRF_mice_awake_map_mean ,1,[]);
+T_MRF_mice_awake_map_mean =  reshape(T_MRF_mice_awake_map_mean ,1,[]);
 
 lagTime_NVC = nan(1,44);
 lagTime_NMC = nan(1,44);
@@ -146,10 +169,10 @@ T_HRF       = nan(1,44);
 T_MRF       = nan(1,44);
 jj = 1;
 for ii = [3,4,6:25,28,29,31:50]
-    lagTime_NVC(jj) = mean(lagTime_NVC_awake_map(mask==ii));
-    lagTime_NMC(jj) = mean(lagTime_NMC_awake_map(mask==ii));
-    T_HRF      (jj) = mean(T_HRF_awake_map_mean (mask==ii));
-    T_MRF      (jj) = mean(T_MRF_awake_map_mean (mask==ii));
+    lagTime_NVC(jj) = mean(lagTime_NVC_mice_awake_map(mask==ii));
+    lagTime_NMC(jj) = mean(lagTime_NMC_mice_awake_map(mask==ii));
+    T_HRF      (jj) = mean(T_HRF_mice_awake_map_mean (mask==ii));
+    T_MRF      (jj) = mean(T_MRF_mice_awake_map_mean (mask==ii));
     jj = jj+1;
 end
 
@@ -158,7 +181,7 @@ end
 % load("GoodWL.mat")
 % mask(mask>1) = 1;
 % subplot(221)
-% imagesc(T_HRF_awake_map_mean,[0,1.6])
+% imagesc(T_HRF_mice_awake_map_mean,[0,1.6])
 % colorbar
 % hold on
 % axis image off
@@ -166,7 +189,7 @@ end
 % cmocean('ice')
 % title('Deconvolution,NVC')
 % subplot(222)
-% imagesc(lagTime_NVC_awake_map,[0,1.6])
+% imagesc(lagTime_NVC_mice_awake_map,[0,1.6])
 % colorbar
 % hold on
 % imagesc(xform_WL,'AlphaData',1-mask);
@@ -174,7 +197,7 @@ end
 % cmocean('ice')
 % title('Cross Correlation,NVC')
 % subplot(223)
-% imagesc(T_MRF_awake_map_mean,[0,0.2])
+% imagesc(T_MRF_mice_awake_map_mean,[0,0.2])
 % colorbar
 % hold on
 % axis image off
@@ -182,7 +205,7 @@ end
 % cmocean('ice')
 % title('Deconvolution,NMC')
 % subplot(224)
-% imagesc(lagTime_NMC_awake_map,[0,0.2])
+% imagesc(lagTime_NMC_mice_awake_map,[0,0.2])
 % colorbar
 % hold on
 % imagesc(xform_WL,'AlphaData',1-mask);

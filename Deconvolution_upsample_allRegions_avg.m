@@ -394,6 +394,40 @@ for condition = {'awake','anes'}
         saveas(gcf,strcat(saveName,'.png'))
     end
 end
+
+% Awake vs Anes
+load('deconvolution_allRegions.mat', 'HRF_mice_awake', 'MRF_mice_awake', 'HRF_mice_anes', 'MRF_mice_anes')
+freq_new = 250;
+t_kernel = 30;
+t = (-3*freq_new :(t_kernel-3)*freq_new-1)/freq_new;
+figure
+yyaxis left
+plot_distribution_prctile(t,MRF_mice_awake,'Color',[0.2,0.2,0.2])
+ylim([-0.0004, 0.0012])
+hold on
+yyaxis right
+plot_distribution_prctile(t,HRF_mice_awake,'Color',[0.5,0,0.5])
+% ax = gca;
+% ax.YAxis(1).Color = [0.2,0.2,0.2];
+% ax.YAxis(2).Color = [0.5,0,0.5];
+xlim([0, 4])
+ylim([-0.0012, 0.0036])
+xlabel('Time(s)')
+
+figure
+yyaxis left
+plot_distribution_prctile(t,MRF_mice_anes,'Color',[0.2,0.2,0.2])
+ylim([-0.0004, 0.0012])
+hold on
+yyaxis right
+plot_distribution_prctile(t,HRF_mice_anes,'Color',[0.5,0,0.5])
+% ax = gca;
+% ax.YAxis(1).Color = [0.2,0.2,0.2];
+% ax.YAxis(2).Color = [0.5,0,0.5];
+xlim([0, 4])
+ylim([-0.0012, 0.0036])
+xlabel('Time(s)')
+
 %% Generate value for paper table
 
 % find mean and std for r

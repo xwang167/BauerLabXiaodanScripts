@@ -91,7 +91,7 @@ for region = [3,4,6:25,28,29,31:50]
 end
 
 % vector for NVC NMC correlation
- load('deconvolution_allRegions.mat',...
+ load('D:\XiaodanPaperData\cat\deconvolution_allRegions.mat',...
      'r_HRF_mice_awake_exclude', 'r_MRF_mice_awake_exclude', 'r_HRF_mice_anes_exclude', 'r_MRF_mice_anes_exclude')
 
 %% Visualization
@@ -176,6 +176,11 @@ for ii = 1:44
 scatter(mean(r_HRF_mice_awake_exclude(:,ii)),calcium_baseline_awake(ii),"MarkerEdgeColor",raw(colorOrder(ii)*scale,:),"MarkerFaceColor",raw(colorOrder(ii)*scale,:))
 hold on
 end
+temp1 = fitlm(mean(r_HRF_mice_awake_exclude),calcium_baseline_awake);
+hold on
+h = plot(temp1) ;
+delete(h(1))
+legend off
 xlabel('r of NVC')
 ylabel('Raw Counts of Calcium')
 title('Awake Calcium vs r of NVC')
@@ -185,6 +190,11 @@ for ii = 1:44
 scatter(mean(r_HRF_mice_anes_exclude(:,ii)),calcium_baseline_anes(ii),"MarkerEdgeColor",raw(colorOrder(ii)*scale,:),"MarkerFaceColor",raw(colorOrder(ii)*scale,:))
 hold on
 end
+temp2 = fitlm(mean(r_HRF_mice_anes_exclude),calcium_baseline_anes);
+hold on
+h = plot(temp2) ;
+delete(h(1))
+legend off
 xlabel('r of NVC')
 ylabel('Raw Counts of Calcium')
 title('Anesthetized Calcium vs r of NVC')
@@ -194,6 +204,11 @@ for ii = 1:44
 scatter(mean(r_MRF_mice_awake_exclude(:,ii)),calcium_baseline_awake(ii),"MarkerEdgeColor",raw(colorOrder(ii)*scale,:),"MarkerFaceColor",raw(colorOrder(ii)*scale,:))
 hold on
 end
+temp3 = fitlm(mean(r_MRF_mice_awake_exclude),calcium_baseline_awake);
+hold on
+h = plot(temp3) ;
+delete(h(1))
+legend off
 xlabel('r of NMC')
 ylabel('Raw Counts of Calcium')
 title('Awake Calcium vs r of NMC')
@@ -203,6 +218,11 @@ for ii = 1:44
 scatter(mean(r_MRF_mice_anes_exclude(:,ii)),calcium_baseline_anes(ii),"MarkerEdgeColor",raw(colorOrder(ii)*scale,:),"MarkerFaceColor",raw(colorOrder(ii)*scale,:))
 hold on
 end
+temp4 = fitlm(mean(r_MRF_mice_anes_exclude),calcium_baseline_anes);
+hold on
+h = plot(temp4) ;
+delete(h(1))
+legend off
 xlabel('r of NMC')
 ylabel('Raw Counts of Calcium')
 title('Anesthetized Calcium vs r of NMC')
@@ -213,6 +233,11 @@ for ii = 1:44
 scatter(mean(r_MRF_mice_awake_exclude(:,ii)),FAD_baseline_awake(ii),"MarkerEdgeColor",raw(colorOrder(ii)*scale,:),"MarkerFaceColor",raw(colorOrder(ii)*scale,:))
 hold on
 end
+temp5 = fitlm(mean(r_MRF_mice_awake_exclude),FAD_baseline_awake);
+hold on
+h = plot(temp5) ;
+delete(h(1))
+legend off
 xlabel('r of NMC')
 ylabel('Raw Counts of FAF')
 title('Awake FAF vs r of NVC')
@@ -222,6 +247,11 @@ for ii = 1:44
 scatter(mean(r_MRF_mice_anes_exclude(:,ii)),FAD_baseline_anes(ii),"MarkerEdgeColor",raw(colorOrder(ii)*scale,:),"MarkerFaceColor",raw(colorOrder(ii)*scale,:))
 hold on
 end
+temp6 = fitlm(mean(r_MRF_mice_anes_exclude),FAD_baseline_anes);
+hold on
+h = plot(temp6) ;
+delete(h(1))
+legend off
 xlabel('r of NMC')
 ylabel('Raw Counts of FAF')
 title('Anesthetized FAF vs r of NVC')

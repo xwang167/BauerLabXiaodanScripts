@@ -1,6 +1,6 @@
-%load('L:\RGECO\190707\190707-R5M2286-anes-fc1_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
-load('L:\RGECO\190627\190627-R5M2286-fc1_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
-load('D:\OIS_Process\noVasculatureMask.mat');
+load('E:\RGECO\190707\190707-R5M2286-anes-fc1_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
+%load('E:\RGECO\190627\190627-R5M2286-fc1_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
+load('noVasculatureMask.mat');
 WB = 255*ones(128,128,3);
 mask = leftMask+rightMask;
 xform_datahb(isinf(xform_datahb)) = 0;
@@ -13,39 +13,36 @@ xform_FADCorr(isnan(xform_FADCorr)) = 0;
 % FAD_filter = mouse.freq.lowpass(double(squeeze(xform_FADCorr)),0.4,25);
 % Calcium_filter = mouse.freq.lowpass(double(squeeze(xform_jrgeco1aCorr)),0.4,25);
 
-Hb_filter = double(xform_datahb);
-FAD_filter = double(squeeze(xform_FADCorr));
-Calcium_filter = double(squeeze(xform_jrgeco1aCorr));
 
 Hb_filter = mouse.freq.filterData(double(xform_datahb),0.02,2,25);
 FAD_filter = mouse.freq.filterData(double(squeeze(xform_FADCorr)),0.02,2,25);
-Calcium_filter = mouse.freq.filterData(double(squeeze(xform_jrgeco1aCorr)),0.02,2,25);
+
 HbT_filter = Hb_filter(:,:,1,:) + Hb_filter(:,:,2,:);
-Calcium = squeeze(mean(mean(Calcium_filter(71:75,17:21,:),1),2))*100;
+Calcium = squeeze(mean(mean(xform_jrgeco1aCorr(71:75,17:21,:),1),2))*100;
 FAD = squeeze(mean(mean(FAD_filter(71:75,17:21,:),1),2))*100;
 HbT = squeeze(mean(mean(HbT_filter(71:75,17:21,:),1),2))*10^6;
 figure
-time = (1:1+60*25)/25;
+time = (1:1+30*25)/25;
 yyaxis left
-h(1) = plot(time,Calcium(3769:3769+60*25)/4,'m-')
+h(1) = plot(time,Calcium(3769:3769+30*25),'m-');
 hold on
-h(2) = plot(time,FAD(3769:3769+60*25),'g-')
+h(2) = plot(time,FAD(3769:3769+30*25)*4,'g-');
 ylabel('\DeltaF/F%')
 hold on
-ylim([-2.5 2.5])
+ylim([-10 10])
 yyaxis right
-h(3) = plot(time,HbT(3769:3769+60*25),'k-')
+h(3) = plot(time,HbT(3769:3769+30*25),'k-');
 ylabel('\muM')
 xlabel('time(s)')
 set(findall(gca, 'Type', 'Line'),'LineWidth',2);
 set(gca,'FontSize',20,'FontWeight','Bold')
-legend(h,{'Corrected jRGECO1a/4','Corrected FAD','HbT'},'location','northwest','FontSize',14,'FontWeight','Bold')
-xlim([0,60])
-ylim([-2.5 2.5])
+legend(h,{'Corrected jRGECO1a','Corrected FAD x 4','HbT'},'location','northwest','FontSize',14,'FontWeight','Bold')
+xlim([0,30])
+ylim([-6 6])
 ROI = zeros(128,128);
 ROI(71:75,17:21) =1;
-patch([27.64,27.64+90/25,27.64+90/25,27.64],[-5 -5 10 10],[0.5 0.5 0.5],'EdgeColor','none','FaceAlpha',0.5)
-legend(h,{'Corrected jRGECO1a/4','Corrected FAD','HbT'},'location','northwest','FontSize',14,'FontWeight','Bold')
+%patch([27.64,27.64+90/25,27.64+90/25,27.64],[-5 -5 10 10],[0.5 0.5 0.5],'EdgeColor','none','FaceAlpha',0.5)
+%legend(h,{'Corrected jRGECO1a/4','Corrected FAD','HbT'},'location','northwest','FontSize',14,'FontWeight','Bold')
 
 % 
 % 

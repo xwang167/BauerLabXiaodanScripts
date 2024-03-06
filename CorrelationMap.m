@@ -201,34 +201,38 @@ figure
 subplot(221)
 imagesc(correlation_FADHbT_mice_awake,[-1 1])
 axis image off
-colorbar
+cb = colorbar;
+ylabel(cb,'r')
 hold on
 imagesc(xform_WL,'AlphaData',1-mask);
-title('Awake b/w FAD and HbT')
+title('Awake b/w FAF and HbT')
 
 subplot(222)
 imagesc(correlation_CorrFADHbT_mice_awake,[-1 1])
 axis image off
-colorbar
+cb = colorbar;
+ylabel(cb,'r')
 hold on
 imagesc(xform_WL,'AlphaData',1-mask);
-title('Awake b/w Corrected FAD and HbT')
+title('Awake b/w Corrected FAF and HbT')
 
 subplot(223)
 imagesc(correlation_FADHbT_mice_anes,[-1 1])
 axis image off
-colorbar
+cb = colorbar;
+ylabel(cb,'r')
 hold on
 imagesc(xform_WL,'AlphaData',1-mask);
-title('Anes b/w FAD and HbT')
+title('Anesthesized b/w FAF and HbT')
 
 subplot(224)
 imagesc(correlation_CorrFADHbT_mice_anes,[-1 1])
 axis image off
-colorbar
+cb = colorbar;
+ylabel(cb,'r')
 hold on
 imagesc(xform_WL,'AlphaData',1-mask);
-title('Anes b/w Corrected FAD and HbT')
+title('Anesthetized b/w Corrected FAF and HbT')
 
-sgtitle('Correlation between contrasts')
+%sgtitle('Correlation between contrasts')
 colormap(brewermap(256, '-Spectral'))

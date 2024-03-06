@@ -1,4 +1,4 @@
-clear ;close all;clc
+clear ;clc
 excelFile = "X:\RGECO\DataBase_Xiaodan_1.xlsx";
 freq_new = 250;
 t_kernel = 30;
@@ -102,6 +102,8 @@ end
 load(fullfile(saveDir,'CrossLag_NMC_raw',strcat(recDate,'-',mouseName,'-',sessionType,num2str(n),'_CrossLag_NMC_raw.mat')),'crossLagX_NMC_raw')
 save('E:\RGECO\cat\crossLag_allRegions_raw.mat','crossLagX_NMC_raw','crossLagY_NMC_raw_mice_awake','crossLagY_NMC_raw_mice_anes')
 %% Visualization
+load('E:\RGECO\cat\crossLag_allRegions_raw.mat','crossLagX_NMC_raw','crossLagY_NMC_raw_mice_awake','crossLagY_NMC_raw_mice_anes')
+
 load("GoodWL.mat")
 mask(isnan(mask)) = 0;
 ii = 1;   
@@ -131,40 +133,13 @@ for condition = {'awake','anes'}
     eval(strcat('plot_distribution_prctile(crossLagX_NMC_raw(1,:,1),crossLagY_NVC_mice_',condition{1},',',char(39),'Color',char(39),',[0 0 0])'))
     hold on
     eval(strcat('plot_distribution_prctile(crossLagX_NMC_raw(1,:,1),-crossLagY_NMC_raw_mice_',condition{1},',',char(39),'Color',char(39),',[0 1 1])'))
-    legend('Corrected Calcium & Raw FAF','Corrected Calcium & Corrected FAF','Corrected Calcium & HbT','Flipped Corrected Calcium & Raw FAF')
+    %legend('Corrected Calcium & Raw FAF','Corrected Calcium & Corrected FAF','Corrected Calcium & HbT','Flipped Corrected Calcium & Raw FAF')
     title(condition)
     xlabel('Time(s)')
     xlim([-10 10])
     set(gca,'FontSize',14,'FontWeight','Bold')
-    grid on
+    grid off
     ii = ii+1;
 end
 
-%% compare deconvolution and cross lag
-load('D:\XiaodanPaperData\cat\deconvolution_allRegions.mat', 'HRF_mice_awake', 'MRF_mice_awake')
-freq_new = 250;
-t_kernel = 30;
-t_deconvolution = (-3*freq_new :(t_kernel-3)*freq_new-1)/freq_new;
-
-figure
-subplot(121)
-plot_distribution_prctile(crossLagX_NMC_raw(1,:,1),crossLagY_NVC_mice_awake,'Color',[0 0 1])
-hold on
-ylabel('Cross Lag')
-yyaxis right
-plot_distribution_prctile(t_deconvolution,HRF_mice_awake,'Color',[0 0 0])
-xlim([-3,4])
-ylabel('Deconvolution')
-xlabel('Time(s)')
-title('NVC')
-subplot(122)
-plot_distribution_prctile(crossLagX_NMC_raw(1,:,1),crossLagY_NMC_mice_awake,'Color',[0 0 1])
-hold on
-ylabel('Cross Lag')
-yyaxis right
-plot_distribution_prctile(t_deconvolution,MRF_mice_awake,'Color',[0 0 0])
-ylabel('Deconvolution')
-xlim([-3,4])
-xlabel('Time(s)')
-title('NMC')
-sgtitle('Awake')
+ylim([-0.4 0.5])
