@@ -1,4 +1,4 @@
-clear ;close all;clc
+
 excelFile = "X:\RGECO\DataBase_Xiaodan_3.xlsx";
 freq_new     = 250;
 load("AtlasandIsbrain_Allen.mat",'parcelnames','AtlasSeeds')
