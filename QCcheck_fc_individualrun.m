@@ -3,17 +3,13 @@
 close all;clear all;clc
 import mouse.*
 
-excelFile = "L:\RGECO\RGECO.xlsx";
-excelRows = 8:13;% [228 230 232 234 236 240];
+excelRows = 2:4:22;
+excelFile = "X:\Paper1\WT_Paper1\WT_Paper1.xlsx";
 
 runs =1:3;
 isDetrend = 1;
 nVy = 128;
 nVx = 128;
-
-
-
-
 
 
 for excelRow = excelRows
@@ -58,24 +54,24 @@ for excelRow = excelRows
                 close all
                 clear xform_gcampCorr xform_datahb
                 
-            elseif strcmp(sessionInfo.mouseType,'jrgeco1a')
+            elseif strcmp(sessionInfo.mouseType,'jrgeco1a') || strcmp(sessionInfo.mouseType,'WT')
                 load(fullfile(saveDir, processedName),'xform_jrgeco1aCorr','xform_FADCorr')
                 sessionInfo.bandtype_ISA = {"ISA",0.009,0.08};
                 sessionInfo.bandtype_Delta = {"Delta",0.4,4};
                 total = squeeze(xform_datahb(:,:,1,:)) + squeeze(xform_datahb(:,:,2,:));
                 disp('calculate pds')
 
-                [hz,powerdata_jrgeco1aCorr] = QCcheck_CalcPDS_191112(double(xform_jrgeco1aCorr)/0.01,sessionInfo.framerate,xform_isbrain);
-                [~,powerdata_FADCorr] = QCcheck_CalcPDS_191112(double(xform_FADCorr)/0.01,sessionInfo.framerate,xform_isbrain);
-                [~,powerdata_total] = QCcheck_CalcPDS_191112(double(total)*10^6,sessionInfo.framerate,xform_isbrain);
-                [~,powerdata_oxy] = QCcheck_CalcPDS_191112(double(xform_datahb(:,:,1,:))*10^6,sessionInfo.framerate,xform_isbrain);
-                [~,powerdata_deoxy] = QCcheck_CalcPDS_191112(double(xform_datahb(:,:,2,:))*10^6,sessionInfo.framerate,xform_isbrain);
+                [hz,powerdata_jrgeco1aCorr] = QCcheck_CalcPDS(double(xform_jrgeco1aCorr)/0.01,sessionInfo.framerate,xform_isbrain);
+                [~,powerdata_FADCorr] = QCcheck_CalcPDS(double(xform_FADCorr)/0.01,sessionInfo.framerate,xform_isbrain);
+                [~,powerdata_total] = QCcheck_CalcPDS(double(total)*10^6,sessionInfo.framerate,xform_isbrain);
+                [~,powerdata_oxy] = QCcheck_CalcPDS(double(xform_datahb(:,:,1,:))*10^6,sessionInfo.framerate,xform_isbrain);
+                [~,powerdata_deoxy] = QCcheck_CalcPDS(double(xform_datahb(:,:,2,:))*10^6,sessionInfo.framerate,xform_isbrain);
                 
-                [hz,powerdata_average_jrgeco1aCorr] = QCcheck_CalcPDSAverage_191112(double(xform_jrgeco1aCorr)/0.01,sessionInfo.framerate,xform_isbrain);
-                [~,powerdata_average_FADCorr] = QCcheck_CalcPDSAverage_191112(double(xform_FADCorr)/0.01,sessionInfo.framerate,xform_isbrain);
-                [~,powerdata_average_total] = QCcheck_CalcPDSAverage_191112(double(total)*10^6,sessionInfo.framerate,xform_isbrain);
-                [~,powerdata_average_oxy] = QCcheck_CalcPDSAverage_191112(double(xform_datahb(:,:,1,:))*10^6,sessionInfo.framerate,xform_isbrain);
-                [~,powerdata_average_deoxy] = QCcheck_CalcPDSAverage_191112(double(xform_datahb(:,:,2,:))*10^6,sessionInfo.framerate,xform_isbrain);
+                [hz,powerdata_average_jrgeco1aCorr] = QCcheck_CalcPDSAverage(double(xform_jrgeco1aCorr)/0.01,sessionInfo.framerate,xform_isbrain);
+                [~,powerdata_average_FADCorr] = QCcheck_CalcPDSAverage(double(xform_FADCorr)/0.01,sessionInfo.framerate,xform_isbrain);
+                [~,powerdata_average_total] = QCcheck_CalcPDSAverage(double(total)*10^6,sessionInfo.framerate,xform_isbrain);
+                [~,powerdata_average_oxy] = QCcheck_CalcPDSAverage(double(xform_datahb(:,:,1,:))*10^6,sessionInfo.framerate,xform_isbrain);
+                [~,powerdata_average_deoxy] = QCcheck_CalcPDSAverage(double(xform_datahb(:,:,2,:))*10^6,sessionInfo.framerate,xform_isbrain);
                 
                 
                 clear xform_datahb 
@@ -124,11 +120,8 @@ for excelRow = excelRows
                 rightLineStyle= {'r-','b-','k-'};
                 legendName = ["Corrected jRGECO1a","Corrected FAD","HbO","HbR","HbT"];
 
+                QCcheck_fftVis(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir,strcat(visName, '_powerCurve_average'))
                 
-                
-                QCcheck_fftVis_191112(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir,strcat(visName, '_powerCurve_average'))
-                
-            
               
             end
             close all

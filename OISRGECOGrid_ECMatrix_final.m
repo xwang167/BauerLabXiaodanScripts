@@ -1,11 +1,14 @@
 clear all;close all;clc
-excelFile="X:\Paper2\Hemi_Thy1_jRGECO1a_leftGrid\Control_Hemi_Thy1_jRGECO1a_leftGrid.xlsx";
-excelRows = 2:9;
-catDir = "X:\Paper2\Hemi_Thy1_jRGECO1a_leftGrid\cat\";
+excelFile = "X:\Paper3\ExcelSheet\PVChR2_Group1.xlsx";
+excelRows = [16,19];
+catDir = "W:\PV Mapping After Stroke\PV\cat\";
+excelData = readtable(excelFile);
+groupLabel = excelData{excelRows,'Group'};
+
 load(which('AtlasandIsbrain.mat'))
 AtlasSeedsFilled(:,65:end)=AtlasSeedsFilled(:,65:end)+20;
 AtlasSeedsFilled(AtlasSeedsFilled==20) = 0;
-imagesc(AtlasSeedsFilled)
+%imagesc(AtlasSeedsFilled)
 load('Y:\220210\220210-m.mat')
 
 %load the laser frame (first frame of the laser stim)
@@ -34,11 +37,11 @@ for excelRow = excelRows
     gridLaser_mice(:,:,:,ii)= gridLaser_mouse;
     ii = ii+1;
 end
-save(strcat(catDir,miceName(2:end),'-gridLaser_mice.mat'),'gridLaser_mice')
+save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-gridLaser_mice.mat'),'gridLaser_mice')
 
 
 %Find the maximum of each of the laser frames
-load(strcat(catDir,miceName(2:end),'-GoodSeedsNew.mat'),'GoodSeedsidx_new_mice')
+load(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-GoodSeedsNew.mat'),'GoodSeedsidx_new_mice')
 seedLocation = nan(2,length(excelRows),160);
 seedLocation_mice = nan(2,160);
 for ii = 1:160
@@ -53,32 +56,40 @@ for ii = 1:160
         seedLocation_mice(1,ii) = mean(seedLocation(1,:,ii),2);
         seedLocation_mice(2,ii)= mean(seedLocation(2,:,ii),2);
     end
-    save(strcat(catDir,miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice')
+    save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice')
 end
 
-numValidSites = sum(GoodSeedsidx_new_mice==1);
+
 % find index to sort the matrix in the order of functional regions
-load(strcat(catDir,miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice')
+load(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice')
 atlasIndx = nan(1,160);
-atlasIndx_valid = nan(1,numValidSites);
-seedLocation_mice_valid = nan(2,numValidSites);
+
 jj = 1;
+atlasIndx_valid = [];
+seedLocation_mice_valid = [];
 for ii = 1:160
     if ~isnan(seedLocation_mice(1,ii))
         seedLocation_mice_valid(:,jj) = round(seedLocation_mice(:,ii));
         atlasIndx(ii) = AtlasSeedsFilled(seedLocation_mice_valid(1,jj),...
             seedLocation_mice_valid(2,jj));
-        atlasIndx_valid(jj) = atlasIndx(ii);
-        jj = jj+1;
+        if atlasIndx(ii)~=0
+            atlasIndx_valid(jj) = atlasIndx(ii);
+            jj = jj+1;
+        else
+            GoodSeedsidx_new_mice(ii) = 0;
+        end
     end
 end
+
+numValidSites = length(atlasIndx_valid);
+
 [atlasIndx_valid_sorted,I] = sort(atlasIndx_valid);
 seedLocation_mice_valid_sorted = seedLocation_mice_valid(:,I);
-save(strcat(catDir,miceName(2:end),'-Atlas.mat'),'atlasIndx_valid_sorted','I','atlasIndx_valid')
-save(strcat(catDir,miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice_valid','seedLocation_mice_valid_sorted','-append')
+save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-Atlas.mat'),'atlasIndx_valid_sorted','I','atlasIndx_valid')
+save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice_valid','seedLocation_mice_valid_sorted','-append')
 
 %create sorted seed location
-load(strcat(catDir,miceName(2:end),'-GoodSeedsNew.mat'))
+load(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-GoodSeedsNew.mat'))
 colors = {'r','g','b','w','y','k','m','c'};
 ll = 1;
 for excelRow = excelRows
@@ -225,12 +236,12 @@ end
 
 
 ECMatrix_calcium_mice_LR_sorted = mean(ECMatrix_calcium_mice_LR_sorted,3);
-save(strcat(catDir,miceName(2:end),'-ECMatrix.mat'),...
+save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-ECMatrix.mat'),...
     'ECMatrix_calcium_mice_LR_sorted')
 
 
 load('AtlasandIsbrain.mat')
-load(strcat(catDir,miceName(2:end),'-Atlas.mat'), 'atlasIndx_valid_sorted')
+load(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-Atlas.mat'), 'atlasIndx_valid_sorted')
 for ii = 1:numValidSites
     ECMatrix_calcium_mice_LR_sorted(ii,ii) = 0;
     ECMatrix_calcium_mice_LR_sorted(ii,ii+numValidSites) = 0;
@@ -238,15 +249,15 @@ end
 figure('units','normalized','outerposition',[0 0 1 1])
 colormap jet
 imagesc(ECMatrix_calcium_mice_LR_sorted,[-0.8 0.8]);
-title(strcat(catDir,miceName(2:end),'-ECMatrix-Calcium-LR'))
+title(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-ECMatrix-Calcium-LR'))
 h = colorbar;
 ylabel(h, 'z(r)','fontsize',14,'FontWeight','bold')
 axis image
 [C, ia, ic] = unique(atlasIndx_valid_sorted);
-seednames_sorted = cell(1,17*2);
-for ii = 1:17
+seednames_sorted = cell(1,length(ia)*2);
+for ii = 1:length(ia)
     seednames_sorted{ii} = seednames{atlasIndx_valid_sorted(ia(ii))};
-    seednames_sorted{ii+17} = seednames{atlasIndx_valid_sorted(ia(ii))};
+    seednames_sorted{ii+length(ia)} = seednames{atlasIndx_valid_sorted(ia(ii))};
 end
 yticks(ia)
 yticklabels(seednames_sorted)
@@ -258,7 +269,7 @@ set(gca,'XTickLabel',a,'fontsize',10,'FontWeight','bold')
 grid on
 ax = gca;
 ax.GridAlpha = 1;
-saveas(gcf,strcat(catDir,miceName(2:end),'-ECMatrix-Calcium-LR.png'))
-saveas(gcf,strcat(catDir,miceName(2:end),'-ECMatrix-Calcium-LR.fig'))
+saveas(gcf,strcat(catDir,groupLabel{1},'-',miceName(2:end),'-ECMatrix-Calcium-LR.png'))
+saveas(gcf,strcat(catDir,groupLabel{1},'-',miceName(2:end),'-ECMatrix-Calcium-LR.fig'))
 
 

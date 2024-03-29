@@ -31,7 +31,7 @@ for j=1:numel(p_value)
         fill(Px,Py,color_value,'FaceAlpha',alpha_value,'EdgeColor','none');
     end
 end
-plot(X,median(Y),'LineWidth',line_width,'Color',color_value);
+plot(X,median(Y),'LineWidth',line_width,'Color',color_value,'LineStyle','-','Marker', 'none');
 hold off
 
 

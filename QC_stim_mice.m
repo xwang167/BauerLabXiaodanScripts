@@ -192,6 +192,20 @@ disp('QC on GSR stim')
 
 %% No GSR
 
-
+        [x1,y1] = ginput(1);
+        
+        [x2,y2] = ginput(1);
+        
+        [X,Y] = meshgrid(1:128,1:128);
+        
+        radius = sqrt((x1-x2)^2+(y1-y2)^2);
+        
+        ROI = sqrt((X-x1).^2+(Y-y1).^2)<radius;
+        
+        max_ROI = prctile(peakMap(ROI),99);
+        
+        temp = peakMap.*ROI;
+        
+        ROI = temp>0.75*max_ROI;
 
 

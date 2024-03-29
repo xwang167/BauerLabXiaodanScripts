@@ -1,7 +1,7 @@
 function [hz, powerdata_averaged] = QCcheck_CalcPDSAverage(data,framerate,xform_isbrain)
 nVy = size(data,1);
 nVx = size(data,2);
-load('D:\OIS_Process\noVasculatureMask.mat')
+load('noVasculatureMask.mat')
 mask = logical(xform_isbrain.*(double(leftMask)+double(rightMask)));
 ibi = find(mask ==1);
 data(isnan(data)) = 0;

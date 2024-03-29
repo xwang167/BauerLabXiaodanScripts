@@ -543,13 +543,16 @@ for excelRow = excelRows
     rawdataloc = excelRaw{3};
     sessionInfo.framerate = excelRaw{7};
     systemInfo.numLEDs = 4;
-    maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
-    maskDir = saveDir;
-    load(fullfile(maskDir,maskName), 'xform_isbrain')
-    xform_isbrain = double(xform_isbrain);
-    if ~isempty(find(isnan(xform_isbrain), 1))
-        xform_isbrain(isnan(xform_isbrain))=0;
+    maskDir = strcat('L:\RGECO\Kenny\', recDate, '\');
+    if exist(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-dataFluor.mat')),'file')
+        load(fullfile(maskDir,strcat(recDate,'-',mouseName,'-',sessionType,num2str(1),'-dataFluor.mat')),'xform_isbrain');
+        load(fullfile(maskDir,strcat(recDate,'-',mouseName,'-','LandmarksAndMask.mat')),'affineMarkers')
+    else
+        maskDir = saveDir;
+        maskName = strcat(recDate,'-',mouseName,'-LandmarksAndMask','.mat');
+        load(fullfile(maskDir,maskName),'affineMarkers','xform_isbrain','isbrain')
     end
+    
     for n = runs
         visName = strcat(recDate,'-',mouseName,'-',sessionType,num2str(n));
         
@@ -689,17 +692,14 @@ for excelRow = excelRows
                         QCcheck_fftVis(hz, leftData,rightData,leftLabel,rightLabel,leftLineStyle,rightLineStyle,legendName,saveDir,strcat(visName, '_powerCurve_average'))
                         %
                         %
-                        %                         QCcheck_powerMapVis(jrgeco1aCorr_ISA_powerMap,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, '_RGECOISA'))
-                        %                         QCcheck_powerMapVis(FADCorr_ISA_powerMap,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, '_FADISA'))
-                        %                         QCcheck_powerMapVis(total_ISA_powerMap,xform_isbrain,'\muM',saveDir,strcat(visName, "_TotalISA"))
-                        %
-                        %                         QCcheck_powerMapVis(jrgeco1aCorr_Delta_powerMap,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, "_RGECODelta"))
-                        %                         QCcheck_powerMapVis(FADCorr_Delta_powerMap,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName,"_FADDelta"))
-                        %                         QCcheck_powerMapVis(total_Delta_powerMap,xform_isbrain,'\muM',saveDir,strcat(visName,"_TotalDelta"))
-                        %
-                        
-                        
-                        
+                        QCcheck_powerMapVis(jrgeco1aCorr_ISA_powerMap,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, '_RGECOISA'))
+                        QCcheck_powerMapVis(FADCorr_ISA_powerMap,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, '_FADISA'))
+                        QCcheck_powerMapVis(total_ISA_powerMap,xform_isbrain,'\muM',saveDir,strcat(visName, "_TotalISA"))
+
+                        QCcheck_powerMapVis(jrgeco1aCorr_Delta_powerMap,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName, "_RGECODelta"))
+                        QCcheck_powerMapVis(FADCorr_Delta_powerMap,xform_isbrain,'(\DeltaF/F%)',saveDir,strcat(visName,"_FADDelta"))
+                        QCcheck_powerMapVis(total_Delta_powerMap,xform_isbrain,'\muM',saveDir,strcat(visName,"_TotalDelta"))
+                    
                         QCcheck_fcVis(refseeds,R_jrgeco1aCorr_ISA, Rs_jrgeco1aCorr_ISA,'jrgeco1aCorr','m','ISA',saveDir,visName,false,xform_isbrain)
                         close all
                         QCcheck_fcVis(refseeds,R_FADCorr_ISA, Rs_FADCorr_ISA,'FADCorr','g','ISA',saveDir,visName,false,xform_isbrain)

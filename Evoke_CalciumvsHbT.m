@@ -19,23 +19,33 @@ Calcium = mean(Calcium(ROI_NoGSR(:),:));
 HbT     = HbT    -mean(HbT    (1:125));
 Calcium = Calcium-mean(Calcium(1:125));
 figure
-subplot(1,2,1)
-for ii = 1:750
-    scatter(Calcium(ii),HbT(ii),"MarkerEdgeColor",raw(ceil(ii/750*256),:),"MarkerFaceColor",raw(ceil(ii/750*256),:))
-    hold on
-end
-xlabel('Calcium(\DeltaF/F%)')
-ylabel('HbT(\Delta\muM)')
-title('Evoked Response at Awake State')
-subplot(1,2,2)
-plot((1:750)/25,Calcium,'m')
+subplot(1,3,1)
+plot((1-125:750-125)/25,Calcium,'m')
 hold on
-plot((1:750)/25,HbT,'k')
+plot((1-125:750-125)/25,HbT,'k')
 for ii = 1:750
-
-    scatter(ii/25,0,"MarkerEdgeColor",raw(ceil(ii/750*256),:),"MarkerFaceColor",raw(ceil(ii/750*256),:))
+    scatter((ii-125)/25,0,"MarkerEdgeColor",raw(ceil(ii/750*256),:),"MarkerFaceColor",raw(ceil(ii/750*256),:))
     hold on
 end
 grid on
 xlabel('Time(s)')
 ylabel('\DeltaF/F% or \Delta\muM')
+
+subplot(1,3,2)
+for ii = [1:250,301:750]
+    scatter(Calcium(ii),HbT(ii),"MarkerEdgeColor",raw(ceil(ii/750*256),:),"MarkerFaceColor",raw(ceil(ii/750*256),:))
+    hold on
+end
+xlabel('Calcium(\DeltaF/F%)')
+ylabel('HbT(\Delta\muM)')
+
+
+subplot(1,3,3)
+for ii = 251:750
+    scatter(Calcium(ii),HbT(ii),"MarkerEdgeColor",raw(ceil(ii/750*256),:),"MarkerFaceColor",raw(ceil(ii/750*256),:))
+    hold on
+end
+xlabel('Calcium(\DeltaF/F%)')
+ylabel('HbT(\Delta\muM)')
+title('5s-7s')
+sgtitle('Evoked Response at Awake State')

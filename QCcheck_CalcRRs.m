@@ -1,5 +1,5 @@
 function [R,Rs] = QCcheck_CalcRRs(refseeds,data,framerate,xform_isbrain,freqRange,isGSR)
-load('D:\OIS_Process\noVasculatureMask.mat')
+load('noVasculatureMask.mat')
 mask = leftMask+rightMask;
 nVy = size(data,1);
 nVx = size(data,2);

@@ -1,5 +1,5 @@
 function QCcheck_fcVis(refseeds,R_fluor_band, Rs_fluor_band,fluorName,fluorColor,bandname,saveDir,visName,isZTransform,xform_isbrain)
-load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\CerebMask.mat')
+load('CerebMask.mat')
 
 mm=10;
 mpp=mm/size(xform_isbrain,1);
@@ -19,7 +19,7 @@ colorMax = 1.5;
     end
 
 
-    load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL')
+    load('GoodWL','xform_WL')
 
 figure('units','normalized','outerposition',[0 0 0.5 1])
 colormap jet

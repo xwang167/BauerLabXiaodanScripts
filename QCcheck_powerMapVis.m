@@ -1,14 +1,15 @@
 function QCcheck_powerMapVis(powerMap,xform_isbrain,unit,saveDir,titleName)
-load('D:\OIS_Process\noVasculatureMask.mat')
+load("C:\Users\Xiaodan Wang\Documents\GitHub\BauerLabXiaodanScripts\noVasculatureMask.mat")
 mask = leftMask_small+rightMask_small;
-load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\CerebMask.mat')
+load('CerebMask.mat')
 
 xform_isbrain(isnan(xform_isbrain)) = 0;
 % maxVal = max(max(powerMap(logical(xform_isbrain.*(double(leftMask)+double(rightMask))))));
 % minVal = min(min(powerMap(logical(xform_isbrain.*(double(leftMask)+double(rightMask))))));
 maxVal = max(max(log10(powerMap(logical(xform_isbrain.*(double(mask)))))));
 minVal = min(min(log10(powerMap(logical(xform_isbrain.*(double(mask)))))));
-figure('Position', [50 50 200 300])
+%figure('Position', [50 50 200 300])
+figure
 % imagesc(powerMap,[0.5 1.5]);
 % colorbar
 
@@ -24,7 +25,7 @@ cb.Ruler.MinorTick = 'on';
 %set(cb,'YTick',[-0.25 0 0.25]);
 ylabel(cb,['log_1_0(',unit,'^2)'],'FontSize',12,'fontweight','bold')
 hold on
-load('C:\Users\xiaodanwang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL');
+load('C:\Users\Xiaodan Wang\Documents\GitHub\BauerLabXiaodanScripts\GoodWL','xform_WL');
 
 imagesc(xform_WL,'AlphaData',1-mask);
 %imagesc(xform_WL,'AlphaData',1-xform_isbrain.*cerebralMask);

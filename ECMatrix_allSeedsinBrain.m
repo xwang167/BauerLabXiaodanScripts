@@ -1,11 +1,15 @@
 % clear all;close all;clc
-excelFile="X:\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
-% load('Z:\220210\220210-m.mat')
-load('D:\OIS_Process\Paxinos\AtlasandIsbrain.mat','xform_WL')
-load('W:\220210\220210-m.mat')
+excelFile = "X:\Paper3\PilotStudyComparison\ExcelSheet\PVChR2_Group1.xlsx";
+excelRows = [23,26];
+catDir = "W:\PV Mapping After Stroke\PV\cat\";
+excelData = readtable(excelFile);
+groupLabel = excelData{excelRows,'Group'};
+load('y:\220210\220210-m.mat')
+load('AtlasandIsbrain.mat','xform_WL')
+
 xform_isbrain_union = zeros(128,128,10);
 numMouse = 1;
-for excelRow = 2:11
+for excelRow = excelRows
     runsInfo = parseRuns_xw(excelFile,excelRow);
     load(runsInfo(1).saveMaskFile,'xform_isbrain')
     xform_isbrain_union(:,:,numMouse) = xform_isbrain;
@@ -17,7 +21,7 @@ xform_isbrain_union(xform_isbrain_union>0) = 1;
 xform_isbrain_union = xform_isbrain_union & fliplr(xform_isbrain_union);
 
 %%
-excelRows = 2:11;
+
 miceName = [];
 for excelRow = excelRows
     runsInfo = parseRuns_xw(excelFile,excelRow);
@@ -25,7 +29,7 @@ for excelRow = excelRows
     miceName = strcat(miceName,'-',runInfo.mouseName);
 end
 %%
-for excelRow = 2:11
+for excelRow = excelRows
     runsInfo = parseRuns_xw(excelFile,excelRow);
     runInfo = runsInfo(1);
     totalSubFileNum = length(runInfo.rawFile)/2;
@@ -94,7 +98,7 @@ end
 %% EC averaged across mice
 gridEC_jRGECO1a_mice_FOV = nan(128,128,160,10);
 mouseInd = 1;
-for excelRow = 2:11
+for excelRow = excelRows
     runsInfo = parseRuns_xw(excelFile,excelRow);
     runInfo=runsInfo(1);
     load(strcat(runInfo.saveFilePrefix(1:end-6),'-ECMap-Calcium.mat'),'gridEC_jRGECO1a_FOV')
@@ -103,7 +107,7 @@ for excelRow = 2:11
 end
 
 gridEC_jRGECO1a_mice_FOV = nanmean(gridEC_jRGECO1a_mice_FOV,4);
-save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-gridEC.mat'),'gridEC_jRGECO1a_mice_FOV')
+save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-gridEC.mat'),'gridEC_jRGECO1a_mice_FOV')
 
 % for ii = 1:160
 %     imagesc(gridEC_jRGECO1a_mice_FOV(:,:,ii),[-2 2])
@@ -113,7 +117,7 @@ save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-gridEC.mat'),'gridEC_jR
 %% how many seeds inside union of xform_isbrains
 GoodSeedsidx_FOV_mice =nan(160,10);
 numMouse = 1;
-for excelRow = 2:11
+for excelRow = excelRows
     runsInfo = parseRuns_xw(excelFile,excelRow);
     runInfo=runsInfo(1);
     load(runInfo.saveMaskFile,'GoodSeedsidx_FOV')
@@ -123,10 +127,10 @@ end
 GoodSeedsidx_FOV_mice = nanmean(GoodSeedsidx_FOV_mice,2);
 GoodSeedsidx_FOV_mice(GoodSeedsidx_FOV_mice>0)=1;
 
-save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-GoodSeedsNew.mat'),'GoodSeedsidx_FOV_mice')
+save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-GoodSeedsNew.mat'),'GoodSeedsidx_FOV_mice')
 
 %how many valid frames in gridEC
-% load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-gridEC.mat'),'gridEC_jRGECO1a_mice_FOV')
+% load(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-gridEC.mat'),'gridEC_jRGECO1a_mice_FOV')
 % numValid = 0;
 % for ii = 1:160
 %     if ~isnan(gridEC_jRGECO1a_mice_FOV(64,64,ii))
@@ -136,9 +140,9 @@ save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-GoodSeedsNew.mat'),'Goo
 
 
 %% Averaged Seed Location
-load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-gridLaser_mice.mat'),'gridLaser_mice')
+load(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-gridLaser_mice.mat'),'gridLaser_mice')
 seedLocation_mice_FOV = nan(2,160);
-excelRows = 2:11;
+excelRows = excelRows
 for ii = 1:160
     row_mice = nan(1,length(excelRows));
     col_mice = nan(1,length(excelRows));
@@ -153,16 +157,16 @@ for ii = 1:160
     seedLocation_mice_FOV(1,ii) = nanmean(row_mice);
     seedLocation_mice_FOV(2,ii)= nanmean(col_mice);
 end
-save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice_FOV','-append')
+save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice_FOV','-append')
 
 %% EC Map
-load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice_FOV')
+load(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice_FOV')
 jj = 1;
 figure('units','normalized','outerposition',[0 0 1 1])
 colormap jet
 [X,Y] = meshgrid(1:128,1:128);
-load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-gridEC.mat'))
-load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-SeedLocation.mat'))
+load(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-gridEC.mat'))
+load(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-SeedLocation.mat'))
 num = 1;
 for ii = 1:160
     if ~isnan(gridEC_jRGECO1a_mice_FOV(64,64,ii))
@@ -185,10 +189,10 @@ for ii = 1:160
             h = colorbar;
             ylabel(h, 'z(r)')
             set(p,'Position',Pos)
-            sgtitle(strcat(miceName(2:end), 'Calcium EC -',num2str(num)))
+            sgtitle(strcat(groupLabel{1},'-',miceName(2:end), 'Calcium EC -',num2str(num)))
             jj = 1;
-            saveas(gcf,strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-EC-Calcium-',num2str(num),'.png'))
-            saveas(gcf,strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-EC-Calcium-',num2str(num),'.fig'))
+            saveas(gcf,strcat(catDir,groupLabel{1},'-',miceName(2:end),'-EC-Calcium-',num2str(num),'.png'))
+            saveas(gcf,strcat(catDir,groupLabel{1},'-',miceName(2:end),'-EC-Calcium-',num2str(num),'.fig'))
             num = num+1;
             figure('units','normalized','outerposition',[0 0 1 1])
             colormap jet
@@ -200,15 +204,15 @@ Pos = get(p,'Position');
 h = colorbar;
 ylabel(h, 'z(r)')
 set(p,'Position',Pos)
-sgtitle(strcat(miceName(2:end), 'Calcium EC -',num2str(num)))
-saveas(gcf,strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-EC-Calcium-',num2str(num),'.png'))
-saveas(gcf,strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-EC-Calcium-',num2str(num),'.fig'))
+sgtitle(strcat(groupLabel{1},'-',miceName(2:end), 'Calcium EC -',num2str(num)))
+saveas(gcf,strcat(catDir,groupLabel{1},'-',miceName(2:end),'-EC-Calcium-',num2str(num),'.png'))
+saveas(gcf,strcat(catDir,groupLabel{1},'-',miceName(2:end),'-EC-Calcium-',num2str(num),'.fig'))
 
 
 
 %% find index to sort the matrix in the order of functional regions
-load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice_FOV')
-load('D:\OIS_Process\Paxinos\AtlasandIsbrain.mat')
+load(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice_FOV')
+load('AtlasandIsbrain.mat')
 seed_frame = find(isnan(seedLocation_mice_FOV(1,:)));
 gridEC_frame = find(isnan(squeeze(gridEC_jRGECO1a_mice_FOV(64,64,:))));
 badFrames = union(seed_frame,gridEC_frame);
@@ -235,22 +239,21 @@ seedLocation_mice_valid_FOV(:,badFrames) = [];
 
 [atlasIndx_valid_sorted_FOV,I_FOV] = sort(atlasIndx_valid_FOV);
 
-load(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-gridEC.mat'),'gridEC_jRGECO1a_mice_FOV')
-load('D:\OIS_Process\Paxinos\AtlasandIsbrain.mat','xform_WL')
-excelFile="X:\PVChR2-Thy1RGECO\PVChR2-Thy1RGECO-LeftGrid.xlsx";
+load(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-gridEC.mat'),'gridEC_jRGECO1a_mice_FOV')
+load('AtlasandIsbrain.mat','xform_WL')
 
 gridEC_jRGECO1a_mice_valid_FOV = gridEC_jRGECO1a_mice_FOV;
 gridEC_jRGECO1a_mice_valid_FOV(:,:,badFrames)=[];
 gridEC_jRGECO1a_mice_valid_sorted_FOV = gridEC_jRGECO1a_mice_valid_FOV(:,:,I_FOV);
 
 
-save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-gridEC.mat'),...
+save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-gridEC.mat'),...
     'gridEC_jRGECO1a_mice_valid_FOV','gridEC_jRGECO1a_mice_valid_sorted_FOV','-append')
 
 seedLocation_mice_valid_sorted_FOV = seedLocation_mice_valid_FOV(:,I_FOV);
 
-save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-Atlas.mat'),'atlasIndx_valid_sorted_FOV','I_FOV','atlasIndx_valid_FOV')
-save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice_valid_FOV','seedLocation_mice_valid_sorted_FOV','-append')
+save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-Atlas.mat'),'atlasIndx_valid_sorted_FOV','I_FOV','atlasIndx_valid_FOV')
+save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice_valid_FOV','seedLocation_mice_valid_sorted_FOV','-append')
 %
 
 
@@ -263,7 +266,7 @@ save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-SeedLocation.mat'),'see
 seedLocation_mice_valid_sorted_R_FOV = nan(2,length(seedLocation_mice_valid_sorted_FOV));
 seedLocation_mice_valid_sorted_R_FOV(1,:) = seedLocation_mice_valid_sorted_FOV(1,:);
 seedLocation_mice_valid_sorted_R_FOV(2,:) = 129-seedLocation_mice_valid_sorted_FOV(2,:);
-save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-SeedLocation.mat'),...
+save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-SeedLocation.mat'),...
     'seedLocation_mice_valid_sorted_R_FOV','-append')
 
 [X,Y] = meshgrid(1:128,1:128);
@@ -303,7 +306,7 @@ ECMatrix_mice_valid_sorted_LR_FOV(:,length(seedLocation_mice_valid_sorted_FOV)+1
 figure('units','normalized','outerposition',[0 0 1 1])
 colormap jet
 imagesc(ECMatrix_mice_valid_sorted_LR_FOV,[-1.4 1.4]);
-title([miceName(2:end),'-Calcium-LR'])
+title([groupLabel{1},'-',miceName(2:end),'-Calcium-LR'])
 h = colorbar;
 ylabel(h, 'z(r)','fontsize',14,'FontWeight','bold')
 set(h,'XTick',[-1.4 0 1.4])
@@ -323,9 +326,9 @@ set(gca,'XTickLabel',a,'fontsize',10,'FontWeight','bold')
 grid on
 ax = gca;
 ax.GridAlpha = 1;
-saveas(gcf,strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-Calcium-LR-FOV.png'))
-saveas(gcf,strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-ECMatrix-Calcium-LR-FOV.fig'))
-save(strcat('X:\PVChR2-Thy1RGECO\cat\',miceName(2:end),'-ECMatrix.mat'),...
+saveas(gcf,strcat(catDir,groupLabel{1},'-',miceName(2:end),'-Calcium-LR-FOV.png'))
+saveas(gcf,strcat(catDir,groupLabel{1},'-',miceName(2:end),'-ECMatrix-Calcium-LR-FOV.fig'))
+save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-ECMatrix.mat'),...
     'ECMatrix_mice_valid_sorted_LR_FOV')
 
 

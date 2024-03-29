@@ -1,7 +1,16 @@
 clear all;close all;clc
-excelFile="X:\Paper2\Hemi_Thy1_jRGECO1a_leftGrid\Control_Hemi_Thy1_jRGECO1a_leftGrid.xlsx";
-excelRows = 2:9;
-catDir = "X:\Paper2\Hemi_Thy1_jRGECO1a_leftGrid\cat\";
+excelFile = "X:\Paper3\PilotStudyComparison\ExcelSheet\PVChR2_Group1.xlsx";
+excelRows = [23,26];
+catDir = "W:\PV Mapping After Stroke\PV\cat\";
+excelData = readtable(excelFile);
+groupLabel = excelData{excelRows,'Group'};
+
+% check if the mice from the same group
+for ii = 2:length(groupLabel{1})
+    if ~strcmp(groupLabel{1},groupLabel{1})
+        error('Mice from different groups are combined!')
+    end
+end
 % load('W:\220210\220210-m.mat')
  load('AtlasandIsbrain.mat','xform_WL')
  load('Y:\220210\220210-m.mat')
@@ -19,7 +28,7 @@ for excelRow = excelRows
     load(runsInfo(1).saveMaskFile,'GoodSeedsidx','xform_isbrain')
     GoodSeedsidx_shared = GoodSeedsidx_shared.*GoodSeedsidx;
 end
-
+%% Calcium EC for each mouse
 for excelRow = excelRows
     runsInfo = parseRuns_xw(excelFile,excelRow);
     runInfo = runsInfo(1);
@@ -93,7 +102,7 @@ for excelRow = excelRows
     save(runInfo.saveMaskFile,'GoodSeedsidx_new','-append')
 
 end
-% 
+%% group average 
 gridEC_jRGECO1a_mice = nan(128,128,160,length(excelRows));
 mouseInd = 1;
 miceName = [];
@@ -106,14 +115,15 @@ for excelRow = excelRows
     miceName = strcat(miceName,'-',runInfo.mouseName);
 end
 gridEC_jRGECO1a_mice = nanmean(gridEC_jRGECO1a_mice,4);
-save(strcat(catDir,miceName(2:end),'-gridEFC.mat'),'gridEC_jRGECO1a_mice')
+save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-gridEFC.mat'),'gridEC_jRGECO1a_mice')
 % %
 % for ii = 1:160
 %     imagesc(gridEC_jRGECO1a_mice(:,:,ii),[-2 2])
 %     pause
 % end
-% 
-%% how many good seeds
+
+
+%how many good seeds
 
 GoodSeedsidx_new_mice = 1;
 for excelRow = excelRows
@@ -122,7 +132,7 @@ for excelRow = excelRows
     load(runInfo.saveMaskFile,'GoodSeedsidx_new')
     GoodSeedsidx_new_mice = GoodSeedsidx_new_mice.*GoodSeedsidx_new;
 end
-save(strcat(catDir,miceName(2:end),'-GoodSeedsNew.mat'),'GoodSeedsidx_new_mice')
+save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-GoodSeedsNew.mat'),'GoodSeedsidx_new_mice')
 
 %how many valid frames in gridEFC
 numValid = 0;
@@ -144,10 +154,10 @@ for excelRow = excelRows;
     gridLaser_mice(:,:,:,ii)= gridLaser_mouse;
     ii = ii+1;
 end
-save(strcat(catDir,miceName(2:end),'-gridLaser_mice.mat'),'gridLaser_mice')
+save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-gridLaser_mice.mat'),'gridLaser_mice')
 
 %Find the maximum of each of the laser frames
-load(strcat(catDir,miceName(2:end),'-GoodSeedsNew.mat'),'GoodSeedsidx_new_mice')
+load(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-GoodSeedsNew.mat'),'GoodSeedsidx_new_mice')
 seedLocation = nan(2,length(excelRows),160);
 seedLocation_mice = nan(2,160);
 for ii = 1:160
@@ -162,17 +172,17 @@ for ii = 1:160
         seedLocation_mice(1,ii) = nanmean(seedLocation(1,:,ii),2);
         seedLocation_mice(2,ii)= nanmean(seedLocation(2,:,ii),2);
     end
-    save(strcat(catDir,miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice')
+    save(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-SeedLocation.mat'),'seedLocation_mice')
 end
 
-%% make group average 
+%% Visualization
 jj = 1;
 kk = 1;
 figure('units','normalized','outerposition',[0 0 1 1])
 colormap jet
 [X,Y] = meshgrid(1:128,1:128);
- load(strcat(catDir,miceName(2:end),'-gridEFC.mat'))
- load(strcat(catDir,miceName(2:end),'-SeedLocation.mat'))
+ load(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-gridEFC.mat'))
+ load(strcat(catDir,groupLabel{1},'-',miceName(2:end),'-SeedLocation.mat'))
 for ii = 1:160
     if ~isnan(gridEC_jRGECO1a_mice(64,64,ii))
         x1 = seedLocation_mice(2,ii);
@@ -197,10 +207,10 @@ for ii = 1:160
         
         jj = jj+1;
         if jj==41
-            sgtitle(strcat(miceName(2:end),' Calcium EC -',num2str(kk)))           
+            sgtitle(strcat(groupLabel{1},'-',miceName(2:end),' Calcium EC -',num2str(kk)))           
             jj = 1;
-            saveas(gcf,strcat(catDir,miceName(2:end),'-EC-Calcium-',num2str(kk),'.png'))
-            saveas(gcf,strcat(catDir,miceName(2:end),'-EC-Calcium-',num2str(kk),'.fig'))
+            saveas(gcf,strcat(catDir,groupLabel{1},'-',miceName(2:end),'-EC-Calcium-',num2str(kk),'.png'))
+            saveas(gcf,strcat(catDir,groupLabel{1},'-',miceName(2:end),'-EC-Calcium-',num2str(kk),'.fig'))
             kk = kk+1;
             figure('units','normalized','outerposition',[0 0 1 1])
             colormap jet
@@ -212,9 +222,9 @@ Pos = get(p,'Position');
 h = colorbar;
 ylabel(h, 'z(r)')
 set(p,'Position',Pos)
-sgtitle(strcat(miceName(2:end),' Calcium EC -',num2str(kk)))            
-saveas(gcf,strcat(catDir,miceName(2:end),'-EC-Calcium-',num2str(kk),'.png'))
-saveas(gcf,strcat(catDir,miceName(2:end),'-EC-Calcium-',num2str(kk),'.fig'))
+sgtitle(strcat(groupLabel{1},'-',miceName(2:end),' Calcium EC -',num2str(kk)))            
+saveas(gcf,strcat(catDir,groupLabel{1},'-',miceName(2:end),'-EC-Calcium-',num2str(kk),'.png'))
+saveas(gcf,strcat(catDir,groupLabel{1},'-',miceName(2:end),'-EC-Calcium-',num2str(kk),'.fig'))
 
 
 

@@ -381,25 +381,25 @@ colormap(brewermap(256, '-Spectral'))
 %% std
 figure
 subplot(221)
-imagesc(std_Calcium_Uncorr_mice_awake*100,'AlphaData',mask)
+imagesc(2*std_Calcium_Uncorr_mice_awake*100,'AlphaData',mask)
 axis image off
-clim([0 2.5])
+clim([0 5])
 b = colorbar;
 ylabel(b,'%')
 title('jRGECO1a')
 
 subplot(222)
-imagesc(std_FAD_Uncorr_mice_awake*100,'AlphaData',mask)
+imagesc(2*std_FAD_Uncorr_mice_awake*100,'AlphaData',mask)
 axis image off
-clim([0 1.5])
+clim([0 3])
 b = colorbar;
 ylabel(b,'%')
 title('FAF')
 
 subplot(223)
-imagesc(std_HbT_mice_awake*100,'AlphaData',mask)
+imagesc(2*std_HbT_mice_awake*100,'AlphaData',mask)
 axis image off
-clim([0 4])
+clim([0 8])
 b = colorbar;
 ylabel(b,'%')
 title('HbT')
@@ -408,25 +408,25 @@ sgtitle('Awake STD')
 
 figure
 subplot(221)
-imagesc(std_Calcium_Uncorr_mice_anes*100,'AlphaData',mask)
+imagesc(2*std_Calcium_Uncorr_mice_anes*100,'AlphaData',mask)
 axis image off
-clim([0 6])
+clim([0 12])
 b = colorbar;
 ylabel(b,'%')
 title('jRGECO1a')
 
 subplot(222)
-imagesc(std_FAD_Uncorr_mice_anes*100,'AlphaData',mask)
+imagesc(2*std_FAD_Uncorr_mice_anes*100,'AlphaData',mask)
 axis image off
-clim([0 1.5])
+clim([0 3])
 b = colorbar;
 ylabel(b,'%')
 title('FAF')
 
 subplot(223)
-imagesc(std_HbT_mice_anes*100,'AlphaData',mask)
+imagesc(2*std_HbT_mice_anes*100,'AlphaData',mask)
 axis image off
-clim([0 1.5])
+clim([0 3])
 b = colorbar;
 ylabel(b,'%')
 title('HbT')
@@ -483,6 +483,45 @@ title('HbT')
 colormap(brewermap(256, '-Spectral'))
 sgtitle('Anesthetized SNR')
 
+%% Quantification
+calcium_awake_noise = xform_eNoise_percent_mice_awake(:,:,2)*100;
+calcium_awake_noise_avg = mean(calcium_awake_noise(logical(mask)));
 
+FAF_awake_noise = xform_eNoise_percent_mice_awake(:,:,1)*100;
+FAF_awake_noise_avg = mean(FAF_awake_noise(logical(mask)));
 
+green_awake_noise = xform_eNoise_percent_mice_awake(:,:,3)*100;
+green_awake_noise_avg = mean(green_awake_noise(logical(mask)));
 
+red_awake_noise = xform_eNoise_percent_mice_awake(:,:,4)*100;
+red_awake_noise_avg = mean(red_awake_noise(logical(mask)));
+
+calcium_anes_noise = xform_eNoise_percent_mice_anes(:,:,2)*100;
+calcium_anes_noise_avg = mean(calcium_anes_noise(logical(mask)));
+
+FAF_anes_noise = xform_eNoise_percent_mice_anes(:,:,1)*100;
+FAF_anes_noise_avg = mean(FAF_anes_noise(logical(mask)));
+
+green_anes_noise = xform_eNoise_percent_mice_anes(:,:,3)*100;
+green_anes_noise_avg = mean(green_anes_noise(logical(mask)));
+
+red_anes_noise = xform_eNoise_percent_mice_anes(:,:,4)*100;
+red_anes_noise_avg = mean(red_anes_noise(logical(mask)));
+
+calcium_awake_SNR = 2*std_Calcium_Uncorr_mice_awake./xform_eNoise_percent_mice_awake(:,:,2);
+calcium_awake_SNR_avg = mean(calcium_awake_SNR(logical(mask)));
+
+FAF_awake_SNR = 2*std_FAD_Uncorr_mice_awake./xform_eNoise_percent_mice_awake(:,:,1);
+FAF_awake_SNR_avg = mean(FAF_awake_SNR(logical(mask)));
+
+HbT_awake_SNR = 2*std_HbT_mice_awake./xform_eNoise_percent_mice_awake(:,:,3);
+HbT_awake_SNR_avg = mean(HbT_awake_SNR(logical(mask)));
+
+calcium_anes_SNR = 2*std_Calcium_Uncorr_mice_anes./xform_eNoise_percent_mice_anes(:,:,2);
+calcium_anes_SNR_avg = mean(calcium_anes_SNR(logical(mask)));
+
+FAF_anes_SNR = 2*std_FAD_Uncorr_mice_anes./xform_eNoise_percent_mice_anes(:,:,1);
+FAF_anes_SNR_avg = mean(FAF_anes_SNR(logical(mask)));
+
+HbT_anes_SNR = 2*std_HbT_mice_anes./xform_eNoise_percent_mice_anes(:,:,3);
+HbT_anes_SNR_avg = mean(HbT_anes_SNR(logical(mask)));
