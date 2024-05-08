@@ -38,9 +38,7 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
     mouseName = excelRaw{2}; mouseName = string(mouseName);
     saveDir = excelRaw{4}; saveDir = fullfile(string(saveDir),recDate);
     sessionType = excelRaw{6}; sessionType = sessionType(3:end-2);
-    if ~exist(strcat(saveDir,'\Barrel_HRF'),'dir')
-        mkdir(strcat(saveDir,'\Barrel_HRF'))
-    end
+    
     for n = 1:3
         tic
         disp(strcat(mouseName,', run#',num2str(n)))
@@ -106,8 +104,8 @@ for excelRow = [181 183 185 228 232 236 202 195 204 230 234 240]
                 [~,S,~]=svd(X);
                 
                 % Least square deconvolution
-                HRF(jj,:,region)= (X*S*X+(S(1,1).^2)*lambda_HRF*eye(length(Calcium_region))) \ (X*S*[zeros(3*freq_new,1); HbT_region(1:end-3*freq_new)]);% add 3s of zeros
-                MRF(jj,:,region)= (X*S*X+(S(1,1).^2)*lambda_MRF*eye(length(Calcium_region))) \ (X*S*[zeros(3*freq_new,1); FAD_region(1:end-3*freq_new)]);% add 3s of zeros
+                HRF(jj,:,region)= (X'*S*X+(S(1,1).^2)*lambda_HRF*eye(length(Calcium_region))) \ (X'*S*[zeros(3*freq_new,1); HbT_region(1:end-3*freq_new)]);% add 3s of zeros
+                MRF(jj,:,region)= (X'*S*X+(S(1,1).^2)*lambda_MRF*eye(length(Calcium_region))) \ (X'*S*[zeros(3*freq_new,1); FAD_region(1:end-3*freq_new)]);% add 3s of zeros
                 
                 % Predicted HbT
                 HbT_pred = conv(Calcium_region,HRF(jj,:,region));
