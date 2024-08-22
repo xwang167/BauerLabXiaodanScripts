@@ -1,5 +1,9 @@
-load('E:\RGECO\190707\190707-R5M2286-anes-fc1_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
-%load('E:\RGECO\190627\190627-R5M2286-fc1_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
+clear;clc
+%load('X:\Paper1\XiaodanPaperData\190707\190707-R5M2286-anes-fc1_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
+%load('X:\Paper1\XiaodanPaperData\190627\190627-R5M2286-fc1_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
+%load('X:\Paper1\XiaodanPaperData\190701\190701-R5M2288-fc1_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
+load('X:\Paper1\XiaodanPaperData\191028\191028-R6M2460-awake-fc1_processed.mat', 'xform_datahb','xform_jrgeco1aCorr','xform_FADCorr');%190627-R5M2286-fc1
+
 load('noVasculatureMask.mat');
 WB = 255*ones(128,128,3);
 mask = leftMask+rightMask;
@@ -16,9 +20,11 @@ xform_FADCorr(isnan(xform_FADCorr)) = 0;
 
 Hb_filter = mouse.freq.filterData(double(xform_datahb),0.02,2,25);
 FAD_filter = mouse.freq.filterData(double(squeeze(xform_FADCorr)),0.02,2,25);
+Calcium_filter = mouse.freq.filterData(double(squeeze(xform_jrgeco1aCorr)),0.02,2,25);
+
 
 HbT_filter = Hb_filter(:,:,1,:) + Hb_filter(:,:,2,:);
-Calcium = squeeze(mean(mean(xform_jrgeco1aCorr(71:75,17:21,:),1),2))*100;
+Calcium = squeeze(mean(mean(Calcium_filter(71:75,17:21,:),1),2))*100;
 FAD = squeeze(mean(mean(FAD_filter(71:75,17:21,:),1),2))*100;
 HbT = squeeze(mean(mean(HbT_filter(71:75,17:21,:),1),2))*10^6;
 figure
