@@ -2,9 +2,9 @@ function powerMap = QCcheck_CalcPowerMap_GSR(data,framerate,freqRange)
 nVy = size(data,1);
 nVx = size(data,2);
 data(isnan(data)) = 0;
-load('D:\OIS_Process\noVasculatureMask.mat')
+load('noVasculatureMask.mat')
 mask = leftMask+rightMask;
-data = mouse.process.gsr(data,mask);
+data = gsr(data,mask);
 data = transpose(reshape(data,nVx*nVy,[]));
 [Pxx,hz] = pwelch(data,[],[],[],framerate);
 Pxx = Pxx';
